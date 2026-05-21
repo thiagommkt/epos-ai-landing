@@ -1,0 +1,775 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPOS AI para Dentistas — Agenda sempre cheia. Secretária focada no que importa.</title>
+  <meta name="description" content="Sistema completo de marketing digital para clínicas odontológicas. IA que atende, qualifica pacientes e agenda consultas 24h por dia pelo WhatsApp.">
+
+  <!-- Meta Pixel -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init','1908702156421842');fbq('track','PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1908702156421842&ev=PageView&noscript=1"/></noscript>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B928TEHGF9"></script>
+  <script>
+    window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());gtag('config','G-B928TEHGF9');
+  </script>
+
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wur8q8gnly");
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FFFFFF;
+      --bg2: #F0F9FF;
+      --bg3: #E0F2FE;
+      --cyan: #0891B2;
+      --cyan-light: #06B6D4;
+      --cyan-dim: rgba(8,145,178,0.1);
+      --cyan-border: rgba(8,145,178,0.2);
+      --coral: #F97316;
+      --coral-dim: rgba(249,115,22,0.1);
+      --dark: #0C1A26;
+      --dark2: #0F2231;
+      --text: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+      --max: 1160px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--cyan-border);
+    }
+
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+
+    .nav-logo {
+      font-size: 18px; font-weight: 800; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--dark); text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--cyan); }
+
+    .nav-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; background: var(--bg2); border: 1px solid var(--cyan-border);
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+      color: var(--cyan); letter-spacing: 0.04em;
+    }
+
+    .nav-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; background: var(--cyan); color: #fff;
+      font-size: 13px; font-weight: 700; text-decoration: none;
+      border-radius: 100px; transition: all 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cyan-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(8,145,178,0.3); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh; padding-top: 60px;
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    }
+
+    .hero-bg-img {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?auto=format&fit=crop&w=1400&q=80');
+      background-size: cover; background-position: center;
+      opacity: 0.15;
+    }
+
+    .hero-accent {
+      position: absolute; top: -10%; right: -5%;
+      width: 60vw; height: 60vw;
+      background: radial-gradient(ellipse, rgba(8,145,178,0.25) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+      min-height: calc(100vh - 60px);
+      padding: 60px 0;
+    }
+
+    .hero-content {}
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border: 1px solid rgba(8,145,178,0.4);
+      border-radius: 100px; margin-bottom: 28px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--cyan-light);
+      opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+    }
+
+    .hero-badge::before { content: '●'; font-size: 6px; animation: pulse 1.5s ease-in-out infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .hero-h1 {
+      font-size: clamp(40px, 5.5vw, 72px); font-weight: 800;
+      line-height: 1.02; letter-spacing: -0.03em; color: #fff;
+      margin-bottom: 24px;
+      opacity: 0; animation: fadeUp 0.9s 0.35s ease forwards;
+    }
+
+    .hero-h1 .accent { color: var(--cyan-light); }
+
+    .hero-sub {
+      font-size: clamp(15px, 1.7vw, 18px); color: rgba(255,255,255,0.6);
+      line-height: 1.7; max-width: 440px; margin-bottom: 40px;
+      opacity: 0; animation: fadeUp 0.9s 0.5s ease forwards;
+    }
+
+    .hero-cta-row {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.9s 0.65s ease forwards;
+    }
+
+    .btn-hero-main {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 36px; background: var(--cyan); color: #fff;
+      font-size: 14px; font-weight: 700; text-decoration: none;
+      border-radius: 100px; transition: all 0.2s; letter-spacing: 0.02em;
+    }
+
+    .btn-hero-main:hover { background: var(--cyan-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(8,145,178,0.4); }
+
+    .btn-hero-sec {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 16px 28px; border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 600;
+      text-decoration: none; border-radius: 100px; transition: all 0.2s;
+    }
+
+    .btn-hero-sec:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+    .hero-metrics {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; margin-top: 48px; padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      opacity: 0; animation: fadeUp 0.9s 0.8s ease forwards;
+    }
+
+    .metric { text-align: center; padding: 0 16px; }
+    .metric + .metric { border-left: 1px solid rgba(255,255,255,0.1); }
+
+    .metric-val {
+      font-size: clamp(26px, 3vw, 36px); font-weight: 800;
+      color: var(--cyan-light); line-height: 1;
+    }
+
+    .metric-lbl { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 0.04em; }
+
+    /* HERO IMAGE SIDE */
+    .hero-image-side {
+      position: relative;
+      opacity: 0; animation: fadeUp 1s 0.5s ease forwards;
+    }
+
+    .hero-img-main {
+      width: 100%; height: 520px;
+      object-fit: cover; border-radius: 16px;
+      display: block;
+    }
+
+    .hero-img-float {
+      position: absolute; bottom: -20px; left: -20px;
+      width: 180px; height: 180px;
+      object-fit: cover; border-radius: 12px;
+      border: 4px solid var(--dark);
+    }
+
+    .hero-float-badge {
+      position: absolute; top: 20px; right: -12px;
+      background: #fff; padding: 12px 16px; border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .float-badge-icon { font-size: 24px; }
+    .float-badge-text { font-size: 13px; font-weight: 700; color: var(--text); }
+    .float-badge-sub { font-size: 11px; color: var(--text-muted); }
+
+    /* PAIN */
+    #pain { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg); }
+
+    .pain-header { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+
+    .section-tag {
+      display: inline-block; padding: 5px 16px;
+      background: var(--cyan-dim); border-radius: 100px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: 16px;
+    }
+
+    .pain-header h2 {
+      font-size: clamp(28px, 3.5vw, 44px); font-weight: 800;
+      line-height: 1.15; margin-bottom: 12px;
+    }
+
+    .pain-header p { font-size: 17px; color: var(--text-muted); }
+
+    .pain-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .pain-card {
+      background: var(--bg2); border-radius: 12px;
+      padding: 28px 24px; border: 1px solid var(--cyan-border);
+      transition: all 0.2s;
+    }
+
+    .pain-card:hover { background: var(--bg3); border-color: var(--cyan); transform: translateY(-2px); }
+
+    .pain-card-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+    .pain-card-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .pain-card-text { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* HOW */
+    #how { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg2); }
+
+    .how-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+
+    .how-image-side { position: relative; }
+
+    .how-img {
+      width: 100%; height: 500px;
+      object-fit: cover; border-radius: 16px; display: block;
+    }
+
+    .how-img-overlay {
+      position: absolute; bottom: 24px; right: 24px;
+      background: var(--cyan); color: #fff;
+      padding: 16px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 700;
+    }
+
+    .how-content h2 {
+      font-size: clamp(28px, 3.5vw, 44px); font-weight: 800;
+      line-height: 1.15; margin-bottom: 12px;
+    }
+
+    .how-content > p { font-size: 17px; color: var(--text-muted); margin-bottom: 36px; }
+
+    .how-steps-list { display: flex; flex-direction: column; gap: 2px; }
+
+    .how-step-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px; background: #fff; border: 1px solid var(--cyan-border);
+      border-radius: 10px; transition: all 0.2s;
+    }
+
+    .how-step-item:hover { border-color: var(--cyan); background: var(--bg2); }
+
+    .step-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--cyan); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; flex-shrink: 0;
+    }
+
+    .step-item-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .step-item-body { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    /* FEATURES */
+    #features { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg); }
+
+    .features-centered { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+
+    .features-centered h2 { font-size: clamp(28px, 3.5vw, 44px); font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+
+    .features-centered p { font-size: 17px; color: var(--text-muted); }
+
+    .feat-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .feat-card {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 24px; background: var(--bg2); border-radius: 12px;
+      border: 1px solid var(--cyan-border); transition: all 0.2s;
+    }
+
+    .feat-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+
+    .feat-card.wide { grid-column: 1 / -1; }
+
+    .feat-icon-wrap {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--cyan-dim); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+
+    .feat-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .feat-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+    /* TESTIMONIAL */
+    #testimonial { padding: clamp(64px, 9vw, 112px) 0; background: var(--dark); }
+
+    .test-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+
+    .test-img {
+      width: 100%; height: 400px;
+      object-fit: cover; border-radius: 16px; display: block;
+    }
+
+    .test-content {}
+
+    .test-stars { font-size: 20px; color: var(--coral); margin-bottom: 24px; letter-spacing: 4px; }
+
+    .test-quote {
+      font-size: clamp(20px, 2.5vw, 28px); font-weight: 400;
+      font-style: italic; color: rgba(255,255,255,0.9);
+      line-height: 1.45; margin-bottom: 28px;
+    }
+
+    .test-name { font-size: 15px; font-weight: 700; color: var(--cyan-light); }
+    .test-cred { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+
+    /* PRICING */
+    #pricing { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg2); }
+
+    .pricing-wrap {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: center;
+    }
+
+    .pricing-left h2 { font-size: clamp(28px, 3.5vw, 44px); font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .pricing-left p { font-size: 17px; color: var(--text-muted); line-height: 1.7; }
+
+    .pricing-right {
+      background: var(--dark); border-radius: 16px;
+      padding: 44px 40px; position: relative; overflow: hidden;
+    }
+
+    .pricing-right::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(to right, var(--cyan), var(--coral));
+    }
+
+    .pr-tier { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cyan-light); margin-bottom: 8px; }
+    .pr-name { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .pr-desc { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+    .pr-amount { font-size: 52px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 4px; }
+    .pr-period { font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 24px; }
+    .pr-divider { height: 1px; background: rgba(255,255,255,0.08); margin-bottom: 20px; }
+
+    .pr-list { list-style: none; margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px; }
+
+    .pr-list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: rgba(255,255,255,0.6);
+    }
+
+    .pr-list li .c { color: var(--cyan-light); flex-shrink: 0; }
+
+    .pr-btn {
+      display: block; width: 100%; padding: 16px; text-align: center;
+      background: var(--cyan); color: #fff; font-size: 14px; font-weight: 700;
+      letter-spacing: 0.04em; text-decoration: none; border-radius: 100px;
+      transition: all 0.2s;
+    }
+
+    .pr-btn:hover { background: var(--cyan-light); box-shadow: 0 4px 20px rgba(8,145,178,0.35); }
+
+    /* FAQ */
+    #faq { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg); }
+
+    .faq-center { text-align: center; margin-bottom: 48px; }
+    .faq-center h2 { font-size: clamp(28px, 3.5vw, 44px); font-weight: 800; }
+
+    .faq-wrap { max-width: 720px; margin: 0 auto; }
+
+    .faq-item { border-bottom: 1px solid var(--cyan-border); }
+
+    .faq-btn {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      gap: 20px; padding: 22px 0; background: none; border: none; cursor: pointer;
+      text-align: left; font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px; font-weight: 700; color: var(--text); transition: color 0.2s;
+    }
+
+    .faq-btn:hover { color: var(--cyan); }
+    .faq-icon { color: var(--cyan); font-size: 18px; transition: transform 0.3s; flex-shrink: 0; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .faq-answer-inner { padding: 0 0 20px; font-size: 15px; color: var(--text-muted); line-height: 1.75; }
+
+    /* CTA FINAL */
+    #cta-final {
+      padding: clamp(80px, 12vw, 140px) 0;
+      background: var(--cyan);
+      text-align: center; position: relative; overflow: hidden;
+    }
+
+    #cta-final::before {
+      content: '😁';
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-size: 600px; opacity: 0.04; pointer-events: none; line-height: 1;
+    }
+
+    .cta-final-h2 {
+      font-size: clamp(36px, 5vw, 64px); font-weight: 800;
+      color: #fff; line-height: 1.05; margin-bottom: 16px;
+      position: relative;
+    }
+
+    .cta-final-sub { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 36px; position: relative; }
+
+    .btn-cta-white {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 18px 44px; background: #fff; color: var(--cyan);
+      font-size: 15px; font-weight: 800; text-decoration: none;
+      border-radius: 100px; transition: all 0.2s; position: relative;
+    }
+
+    .btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+
+    /* FOOTER */
+    footer { background: var(--dark); padding: 32px 0; border-top: 1px solid rgba(8,145,178,0.15); }
+    footer .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { font-size: 16px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #fff; }
+    .footer-logo span { color: var(--cyan-light); }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+
+    /* WA */
+    .wa-float {
+      position: fixed; bottom: 28px; right: 28px; z-index: 200;
+      width: 56px; height: 56px; background: #25D366; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform 0.2s;
+      text-decoration: none;
+    }
+    .wa-float:hover { transform: scale(1.1); }
+    .wa-float svg { width: 28px; height: 28px; fill: #fff; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity:0; transform:translateY(20px); transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-image-side { display: none; }
+      .pain-cards { grid-template-columns: 1fr; }
+      .how-layout { grid-template-columns: 1fr; }
+      .how-image-side { display: none; }
+      .test-layout { grid-template-columns: 1fr; }
+      .pricing-wrap { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .feat-grid { grid-template-columns: 1fr; }
+      .feat-card.wide { grid-column: 1; }
+      .hero-cta-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">EPOS <span>AI</span></a>
+        <div class="nav-pill">🦷 Para Clínicas Odontológicas</div>
+        <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+dentistas" class="nav-cta cta-whatsapp" data-vertical="dentista" target="_blank" rel="noopener">Falar agora</a>
+      </div>
+    </div>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-bg-img"></div>
+    <div class="hero-accent"></div>
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-badge">Para Dentistas e Clínicas Odonto</div>
+          <h1 class="hero-h1">
+            Agenda sempre cheia.<br>
+            <span class="accent">Secretária focada</span><br>
+            no que importa.
+          </h1>
+          <p class="hero-sub">
+            Enquanto você atende um paciente, a IA já está agendando os próximos três. WhatsApp respondido em segundos, 24 horas por dia.
+          </p>
+          <div class="hero-cta-row">
+            <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+dentistas" class="btn-hero-main cta-whatsapp" data-vertical="dentista" target="_blank" rel="noopener">Quero esse sistema</a>
+            <a href="#how" class="btn-hero-sec">Como funciona →</a>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric"><div class="metric-val">24h</div><div class="metric-lbl">Atendimento no WhatsApp</div></div>
+            <div class="metric"><div class="metric-val">0</div><div class="metric-lbl">Pacientes perdidos à noite</div></div>
+            <div class="metric"><div class="metric-val">+40%</div><div class="metric-lbl">Mais agendamentos em média</div></div>
+          </div>
+        </div>
+        <div class="hero-image-side">
+          <img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=700&q=85" alt="Clínica odontológica moderna" class="hero-img-main">
+          <div class="hero-float-badge">
+            <span class="float-badge-icon">✅</span>
+            <div>
+              <div class="float-badge-text">Novo agendamento</div>
+              <div class="float-badge-sub">Gabriela Souza · Limpeza</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pain">
+    <div class="container">
+      <div class="pain-header reveal">
+        <div class="section-tag">O problema</div>
+        <h2>Sua secretária não deveria ser uma máquina de responder WhatsApp.</h2>
+        <p>E você não deveria perder pacientes porque a clínica estava fechada quando eles mandaram mensagem.</p>
+      </div>
+      <div class="pain-cards reveal">
+        <div class="pain-card">
+          <span class="pain-card-icon">😓</span>
+          <div class="pain-card-title">Atendimento sobrecarregado</div>
+          <div class="pain-card-text">A secretária passa horas por dia no WhatsApp — agendando, confirmando e reagendando — em vez de atender bem quem está na recepção.</div>
+        </div>
+        <div class="pain-card">
+          <span class="pain-card-icon">🌙</span>
+          <div class="pain-card-title">Pacientes que somem à noite</div>
+          <div class="pain-card-text">Dor de dente não avisa. Quando alguém manda mensagem às 22h e recebe resposta às 9h, provavelmente já foi para outra clínica.</div>
+        </div>
+        <div class="pain-card">
+          <span class="pain-card-icon">📉</span>
+          <div class="pain-card-title">Campanhas sem dados reais</div>
+          <div class="pain-card-text">Você investe em anúncios mas não sabe qual campanha trouxe qual paciente. Otimiza no achismo, desperdiça budget.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <div class="how-layout">
+        <div class="how-image-side reveal">
+          <img src="https://images.unsplash.com/photo-1588776814546-1ffbb8c7a849?auto=format&fit=crop&w=700&q=80" alt="Dentista atendendo paciente" class="how-img">
+          <div class="how-img-overlay">
+            🤖 IA ativa agora
+          </div>
+        </div>
+        <div class="how-content reveal" style="transition-delay:0.15s">
+          <div class="section-tag">Como funciona</div>
+          <h2>Do anúncio ao paciente com a boca aberta.</h2>
+          <p>Em três passos simples, a IA faz o trabalho de triagem e agendamento — sem depender da sua equipe.</p>
+          <div class="how-steps-list">
+            <div class="how-step-item">
+              <div class="step-circle">1</div>
+              <div>
+                <div class="step-item-title">Paciente clica no anúncio e manda mensagem</div>
+                <div class="step-item-body">Campanha no ar com copy específico para odontologia. Lead chega direto no número dedicado da clínica.</div>
+              </div>
+            </div>
+            <div class="how-step-item">
+              <div class="step-circle">2</div>
+              <div>
+                <div class="step-item-title">IA qualifica: procedimento, urgência e plano</div>
+                <div class="step-item-body">A assistente pergunta o que precisa, verifica se é dentro do seu escopo e checa a disponibilidade real na agenda.</div>
+              </div>
+            </div>
+            <div class="how-step-item">
+              <div class="step-circle">3</div>
+              <div>
+                <div class="step-item-title">Consulta agendada. Clínica notificada.</div>
+                <div class="step-item-body">Evento no Google Calendar, secretária avisada. Quando a equipe assume, a IA para automaticamente.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="container">
+      <div class="features-centered reveal">
+        <div class="section-tag">O que está incluído</div>
+        <h2>Sistema completo para a sua clínica crescer.</h2>
+        <p>Muito mais do que um robô de atendimento — é uma operação completa de marketing e captação.</p>
+      </div>
+      <div class="feat-grid reveal">
+        <div class="feat-card">
+          <div class="feat-icon-wrap">🧭</div>
+          <div><div class="feat-title">Estratégia</div><div class="feat-desc">Posicionamento, público e calendário editorial específico para odontologia.</div></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon-wrap">✍️</div>
+          <div><div class="feat-title">Copy especializado</div><div class="feat-desc">Textos que convertem pacientes — sem violar o CFO e sem soar genérico.</div></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon-wrap">🎬</div>
+          <div><div class="feat-title">Audiovisual</div><div class="feat-desc">Fotos e vídeos que mostram o antes/depois e transmitem confiança.</div></div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon-wrap">📡</div>
+          <div><div class="feat-title">Tráfego pago</div><div class="feat-desc">Meta Ads com CAPI server-side — rastreamento real de cada agendamento gerado.</div></div>
+        </div>
+        <div class="feat-card wide">
+          <div class="feat-icon-wrap" style="width:52px;height:52px;font-size:24px">🤖</div>
+          <div>
+            <div class="feat-title">Sistema WhatsApp IA completo</div>
+            <div class="feat-desc">Qualificação, agendamento e notificação da equipe — 24h por dia, 7 dias por semana. Quando a secretária responde, a IA recua. Automático.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonial">
+    <div class="container">
+      <div class="test-layout reveal">
+        <img src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?auto=format&fit=crop&w=600&q=80" alt="Dentista satisfeito" class="test-img">
+        <div class="test-content">
+          <div class="test-stars">★★★★★</div>
+          <blockquote class="test-quote">
+            "Antes, a gente perdia paciente toda semana por falta de resposta rápida. Hoje a clínica recebe mais agendamentos às 22h do que no horário comercial. O sistema trabalha quando eu não consigo."
+          </blockquote>
+          <div class="test-name">Dra. Patrícia Alves</div>
+          <div class="test-cred">Ortodontista · São Paulo, SP</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="container">
+      <div class="pricing-wrap reveal">
+        <div class="pricing-left">
+          <div class="section-tag">Investimento</div>
+          <h2>Um valor previsível. Resultado mensurável.</h2>
+          <p>Menos de um implante cobrado. E os retornos começam na primeira semana de campanha ativa.</p>
+        </div>
+        <div class="pricing-right">
+          <div class="pr-tier">Plano Odonto · Fase 2</div>
+          <div class="pr-name">Sistema Completo</div>
+          <div class="pr-desc">Tudo que uma clínica odontológica precisa para crescer com consistência.</div>
+          <div class="pr-amount">R$6.000</div>
+          <div class="pr-period">/mês · setup gratuito (economize R$3.000)</div>
+          <div class="pr-divider"></div>
+          <ul class="pr-list">
+            <li><span class="c">✓</span> Estratégia e posicionamento</li>
+            <li><span class="c">✓</span> Copy respeitando normas CFO</li>
+            <li><span class="c">✓</span> Identidade visual clínica</li>
+            <li><span class="c">✓</span> Gestão de tráfego Meta Ads</li>
+            <li><span class="c">✓</span> Site / landing page</li>
+            <li><span class="c">✓</span> IA de qualificação e agendamento 24h</li>
+            <li><span class="c">✓</span> Meta CAPI configurado</li>
+          </ul>
+          <a href="https://wa.me/5561985545598?text=Ola,+quero+o+sistema+EPOS+AI+para+minha+clinica" class="pr-btn cta-whatsapp" data-vertical="dentista" target="_blank" rel="noopener">Quero esse sistema</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="faq-center reveal">
+        <div class="section-tag">Dúvidas</div>
+        <h2>Perguntas frequentes</h2>
+      </div>
+      <div class="faq-wrap reveal">
+        <div class="faq-item"><button class="faq-btn">O sistema respeita as normas do CFO? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Sim. A IA é configurada para não divulgar preços, não usar termos proibidos como "clareamento garantido" e não mostrar antes/depois nas campanhas. O foco é qualificação e agendamento.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">Funciona para urgências odontológicas? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Sim — e esse é um dos maiores ganhos. Urgências às 22h são respondidas imediatamente com triagem, verificação de disponibilidade e agendamento para o primeiro horário disponível.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">Funciona para diferentes especialidades (orto, implante, estética)? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Sim. A IA é configurada por especialidade e pode direcionar cada tipo de paciente para o procedimento e dentista correto dentro da clínica.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">Quanto tempo para o sistema entrar em funcionamento? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">até 10 dias úteis para o setup completo. Os primeiros pacientes chegam na primeira semana após a campanha ir ao ar.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cta-final">
+    <div class="container">
+      <h2 class="cta-final-h2 reveal">Enquanto você lê isso,<br>alguém está buscando um dentista.</h2>
+      <p class="cta-final-sub reveal">Em 15 minutos mostramos como funciona para a sua clínica.</p>
+      <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+dentistas" class="btn-cta-white cta-whatsapp reveal" data-vertical="dentista" target="_blank" rel="noopener">Falar agora no WhatsApp</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-logo">EPOS <span>AI</span></div>
+      <div class="footer-copy">Sistema completo de marketing com IA para odontologia.</div>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+dentistas" class="wa-float cta-whatsapp" data-vertical="dentista" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+  </a>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting){x.target.classList.add('visible');obs.unobserve(x.target);}}), {threshold:0.08});
+    reveals.forEach(el => obs.observe(el));
+    document.querySelectorAll('.faq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement, ans = item.querySelector('.faq-answer'), open = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-answer').style.maxHeight = null; });
+        if(!open){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+      });
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(a => { a.addEventListener('click', e => { e.preventDefault(); const t = document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth'}); }); });
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const utms = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid'];
+      const captured = {};
+      utms.forEach(k => { if(params.get(k)) captured[k] = params.get(k); });
+      if(Object.keys(captured).length) {
+        document.querySelectorAll('.cta-whatsapp').forEach(btn => {
+          try {
+            const url = new URL(btn.href);
+            const msg = url.searchParams.get('text') || '';
+            url.searchParams.set('text', msg + ' [' + Object.entries(captured).map(([k,v])=>`${k}=${v}`).join('&') + ']');
+            btn.href = url.toString();
+          } catch(e){}
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

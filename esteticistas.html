@@ -1,0 +1,905 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPOS AI para Esteticistas — Sua agenda sempre cheia. Sem estresse.</title>
+  <meta name="description" content="Sistema completo de marketing digital para clínicas de estética. IA que atende, qualifica e agenda clientes 24h por dia pelo WhatsApp.">
+
+  <!-- Meta Pixel -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init','1908702156421842');fbq('track','PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1908702156421842&ev=PageView&noscript=1"/></noscript>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B928TEHGF9"></script>
+  <script>
+    window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());gtag('config','G-B928TEHGF9');
+  </script>
+
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wur8q8gnly");
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #120C0F;
+      --bg2: #1A1014;
+      --bg3: #231419;
+      --bg4: #2C1A1F;
+      --rose: #C9826A;
+      --rose-light: #DFA090;
+      --rose-dim: rgba(201,130,106,0.12);
+      --rose-border: rgba(201,130,106,0.22);
+      --cream: #F5EDE8;
+      --cream2: #EDE0D8;
+      --cream-dim: rgba(245,237,232,0.06);
+      --text: #F5EDE8;
+      --text-muted: #9E8880;
+      --text-dim: #5A4642;
+      --max: 1160px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* TEXTURE */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 120% 80% at 80% 20%, rgba(201,130,106,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse 80% 120% at 10% 90%, rgba(120,60,50,0.08) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); position: relative; z-index: 1; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(18,12,15,0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--rose-border);
+    }
+
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text); text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--rose); }
+
+    .nav-tagline {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 14px; color: var(--text-muted);
+    }
+
+    .nav-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; background: var(--rose); color: var(--bg);
+      font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--rose-light); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      padding-top: 60px; position: relative; overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: clamp(48px, 6vw, 100px) clamp(32px, 5vw, 72px);
+      background: var(--bg2); position: relative; z-index: 1;
+    }
+
+    .hero-left::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 100% 60% at -10% 60%, rgba(201,130,106,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-right { position: relative; overflow: hidden; }
+
+    .hero-right img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      display: block;
+    }
+
+    .hero-right::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, var(--bg2) 0%, transparent 25%),
+                  linear-gradient(to top, rgba(18,12,15,0.5) 0%, transparent 50%);
+    }
+
+    .hero-ornament {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--rose);
+      margin-bottom: 28px; display: flex; align-items: center; gap: 12px;
+      opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+    }
+
+    .hero-ornament::before { content: ''; width: 28px; height: 1px; background: var(--rose); }
+
+    .hero-h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(44px, 5.5vw, 80px); font-weight: 300;
+      line-height: 1.05; letter-spacing: -0.01em; color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    .hero-h1 .line { display: block; opacity: 0; }
+    .hero-h1 .line:nth-child(1) { animation: fadeUp 0.9s 0.3s ease forwards; }
+    .hero-h1 .line:nth-child(2) { animation: fadeUp 0.9s 0.45s ease forwards; font-style: italic; color: var(--rose); }
+    .hero-h1 .line:nth-child(3) { animation: fadeUp 0.9s 0.6s ease forwards; }
+
+    .hero-sub {
+      font-size: clamp(15px, 1.6vw, 18px); color: var(--text-muted);
+      line-height: 1.8; max-width: 420px; margin-bottom: 40px;
+      opacity: 0; animation: fadeUp 0.9s 0.75s ease forwards;
+    }
+
+    .hero-actions {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.9s 0.9s ease forwards;
+    }
+
+    .btn-primary-rose {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 36px; background: var(--rose); color: var(--bg);
+      font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      text-decoration: none; transition: all 0.2s;
+    }
+
+    .btn-primary-rose:hover { background: var(--rose-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,130,106,0.3); }
+
+    .btn-ghost-rose {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 16px 28px; border: 1px solid var(--rose-border);
+      color: var(--text-muted); font-size: 14px;
+      text-decoration: none; transition: all 0.2s;
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 17px;
+    }
+
+    .btn-ghost-rose:hover { border-color: var(--rose); color: var(--rose); }
+
+    .hero-proof {
+      display: flex; gap: 32px; margin-top: 56px; padding-top: 32px;
+      border-top: 1px solid var(--rose-border);
+      opacity: 0; animation: fadeUp 0.9s 1.05s ease forwards;
+    }
+
+    .proof-val {
+      font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300;
+      color: var(--rose); line-height: 1;
+    }
+
+    .proof-lbl { font-size: 12px; color: var(--text-dim); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* STATEMENT */
+    #statement {
+      padding: clamp(64px, 8vw, 100px) 0;
+      background: var(--rose); position: relative; overflow: hidden;
+    }
+
+    #statement::before {
+      content: '"';
+      position: absolute; top: -40px; left: -10px;
+      font-family: 'Cormorant Garamond', serif; font-size: 400px;
+      font-weight: 700; color: rgba(18,12,15,0.08);
+      line-height: 1; pointer-events: none; user-select: none;
+    }
+
+    .statement-inner { max-width: 800px; position: relative; z-index: 1; }
+
+    .statement-quote {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: clamp(28px, 4vw, 52px); font-weight: 300;
+      color: var(--bg); line-height: 1.2; margin-bottom: 20px;
+    }
+
+    .statement-sub {
+      font-size: 16px; color: rgba(18,12,15,0.65); line-height: 1.7;
+    }
+
+    /* PAIN */
+    #pain { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg2); }
+
+    .pain-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+
+    .pain-content {}
+
+    .section-eye {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .section-eye::before { content: ''; width: 20px; height: 1px; background: var(--rose); }
+
+    .pain-content h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 3.5vw, 48px); font-weight: 300;
+      line-height: 1.15; margin-bottom: 20px;
+    }
+
+    .pain-content h2 em { font-style: italic; color: var(--rose); }
+
+    .pain-content p { font-size: 16px; color: var(--text-muted); line-height: 1.8; margin-bottom: 28px; }
+
+    .pain-items { display: flex; flex-direction: column; gap: 16px; }
+
+    .pain-item {
+      display: flex; gap: 16px; padding: 18px 20px;
+      border: 1px solid var(--rose-border); transition: background 0.2s;
+    }
+
+    .pain-item:hover { background: var(--bg3); }
+
+    .pi-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .pi-text { font-size: 14px; color: var(--text-muted); line-height: 1.55; }
+    .pi-text strong { color: var(--text); font-weight: 500; display: block; margin-bottom: 2px; }
+
+    .pain-image-side { position: relative; }
+
+    .pain-img {
+      width: 100%; height: 500px;
+      object-fit: cover; object-position: center;
+      display: block;
+    }
+
+    .pain-img-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 32px 28px;
+      background: linear-gradient(to top, rgba(18,12,15,0.95) 0%, transparent 100%);
+    }
+
+    .overlay-stat {
+      font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300;
+      color: var(--rose); line-height: 1;
+    }
+
+    .overlay-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    /* HOW */
+    #how { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg); }
+
+    .how-header { margin-bottom: 60px; }
+
+    .how-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 4.5vw, 60px); font-weight: 300;
+      line-height: 1.1; margin-top: 12px;
+    }
+
+    .how-header h2 em { font-style: italic; color: var(--rose); }
+
+    .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--rose-border); border: 1px solid var(--rose-border); }
+
+    .how-card {
+      background: var(--bg); padding: 44px 36px;
+      position: relative; overflow: hidden; transition: background 0.2s;
+    }
+
+    .how-card:hover { background: var(--bg2); }
+
+    .how-card-num {
+      font-family: 'Cormorant Garamond', serif; font-size: 80px;
+      font-weight: 300; color: var(--rose); opacity: 0.1; line-height: 1;
+      position: absolute; top: 12px; right: 20px;
+    }
+
+    .how-card-phase {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 16px;
+      display: block;
+    }
+
+    .how-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 600; line-height: 1.2; margin-bottom: 14px;
+    }
+
+    .how-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    .how-card-list { list-style: none; margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+
+    .how-card-list li {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text-dim);
+    }
+
+    .how-card-list li::before { content: '→'; color: var(--rose); }
+
+    /* FEATURES */
+    #features { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg2); }
+
+    .features-layout { display: grid; grid-template-columns: 400px 1fr; gap: 80px; align-items: start; }
+
+    .features-side h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 3.5vw, 48px); font-weight: 300;
+      line-height: 1.15; margin-top: 12px;
+    }
+
+    .features-side h2 em { font-style: italic; color: var(--rose); }
+
+    .features-side p { font-size: 16px; color: var(--text-muted); line-height: 1.75; margin-top: 16px; }
+
+    .features-img {
+      width: 100%; height: 260px;
+      object-fit: cover; margin-top: 28px;
+      display: block;
+    }
+
+    .feat-list { display: flex; flex-direction: column; gap: 2px; background: var(--rose-border); border: 1px solid var(--rose-border); }
+
+    .feat-entry {
+      background: var(--bg2); padding: 24px 28px;
+      display: flex; align-items: flex-start; gap: 16px;
+      transition: background 0.2s;
+    }
+
+    .feat-entry:hover { background: var(--bg3); }
+
+    .feat-entry-icon {
+      width: 40px; height: 40px; display: flex; align-items: center;
+      justify-content: center; border: 1px solid var(--rose-border);
+      font-size: 18px; flex-shrink: 0;
+    }
+
+    .feat-entry-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+    .feat-entry-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+    /* TESTIMONIAL */
+    #testimonial { padding: 0; overflow: hidden; }
+
+    .test-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 480px; }
+
+    .test-img-side { position: relative; overflow: hidden; }
+    .test-img-side img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .test-content-side {
+      background: var(--rose); padding: clamp(48px, 6vw, 80px);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .test-stars { font-size: 18px; color: var(--bg); margin-bottom: 24px; letter-spacing: 4px; opacity: 0.7; }
+
+    .test-blockquote {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: clamp(20px, 2.5vw, 30px); font-weight: 300;
+      color: var(--bg); line-height: 1.4; margin-bottom: 32px;
+    }
+
+    .test-name { font-size: 14px; font-weight: 600; color: rgba(18,12,15,0.8); letter-spacing: 0.06em; }
+    .test-cred { font-size: 12px; color: rgba(18,12,15,0.45); margin-top: 4px; }
+
+    /* OFFER */
+    #offer { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg); }
+
+    .offer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--rose-border); border: 1px solid var(--rose-border); }
+
+    .offer-card { background: var(--bg); padding: 56px 48px; }
+
+    .offer-card.highlighted { background: var(--bg2); position: relative; overflow: hidden; }
+
+    .offer-card.highlighted::before {
+      content: 'OFERTA ATUAL';
+      position: absolute; top: 20px; right: -28px;
+      background: var(--rose); color: var(--bg);
+      font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+      padding: 5px 40px; transform: rotate(45deg);
+    }
+
+    .offer-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--rose); margin-bottom: 16px;
+    }
+
+    .offer-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 600; margin-bottom: 8px;
+    }
+
+    .offer-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
+
+    .offer-price-old {
+      font-size: 14px; color: var(--text-dim); text-decoration: line-through; margin-bottom: 4px;
+    }
+
+    .offer-price-box { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+
+    .offer-amount {
+      font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300;
+      line-height: 1; color: var(--text);
+    }
+
+    .offer-period { font-size: 14px; color: var(--text-muted); }
+
+    .offer-badge {
+      display: inline-block; padding: 5px 14px;
+      background: rgba(201,130,106,0.15); border: 1px solid var(--rose-border);
+      font-size: 12px; font-weight: 600; color: var(--rose);
+      margin-bottom: 28px;
+    }
+
+    .offer-divider { height: 1px; background: var(--rose-border); margin-bottom: 24px; }
+
+    .offer-includes { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 11px; }
+
+    .offer-includes li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--text-muted); line-height: 1.4;
+    }
+
+    .offer-includes li .check { color: var(--rose); flex-shrink: 0; }
+
+    .offer-condition {
+      font-size: 12px; color: var(--text-dim); margin-bottom: 24px;
+      font-style: italic; line-height: 1.5;
+    }
+
+    .btn-offer {
+      display: block; width: 100%; padding: 17px; text-align: center;
+      background: var(--rose); color: var(--bg); font-family: 'Jost', sans-serif;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; text-decoration: none; transition: all 0.2s;
+    }
+
+    .btn-offer:hover { background: var(--rose-light); }
+
+    .btn-offer.outline {
+      background: transparent; border: 1px solid var(--rose-border);
+      color: var(--text-muted);
+    }
+
+    .btn-offer.outline:hover { border-color: var(--rose); color: var(--rose); background: transparent; }
+
+    /* FAQ */
+    #faq { padding: clamp(64px, 9vw, 112px) 0; background: var(--bg2); }
+
+    .faq-header { margin-bottom: 56px; }
+
+    .faq-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 4vw, 52px); font-weight: 300;
+      line-height: 1.1; margin-top: 12px;
+    }
+
+    .faq-wrap { max-width: 800px; border: 1px solid var(--rose-border); }
+
+    .faq-item { border-bottom: 1px solid var(--rose-border); }
+    .faq-item:last-child { border-bottom: none; }
+
+    .faq-btn {
+      width: 100%; display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 20px; padding: 26px 28px; background: none; border: none; cursor: pointer;
+      text-align: left; font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 600; color: var(--text); transition: color 0.2s;
+    }
+
+    .faq-btn:hover { color: var(--rose); }
+    .faq-icon { color: var(--rose); font-size: 18px; transition: transform 0.3s; flex-shrink: 0; margin-top: 4px; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .faq-answer-inner { padding: 0 28px 24px; font-size: 15px; color: var(--text-muted); line-height: 1.8; }
+
+    /* CTA FINAL */
+    #cta-final {
+      padding: clamp(80px, 12vw, 140px) 0;
+      background-image: linear-gradient(rgba(18,12,15,0.7), rgba(18,12,15,0.85)),
+        url('https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=1400&q=80');
+      background-size: cover; background-position: center;
+      text-align: center; position: relative;
+    }
+
+    .cta-eye {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--rose);
+      margin-bottom: 20px;
+    }
+
+    .cta-h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 6vw, 80px); font-weight: 300;
+      line-height: 1.05; margin-bottom: 16px;
+    }
+
+    .cta-h2 em { font-style: italic; color: var(--rose); }
+
+    .cta-sub { font-size: 17px; color: var(--text-muted); margin-bottom: 40px; }
+
+    /* FOOTER */
+    footer { background: var(--bg); padding: 32px 0; border-top: 1px solid var(--rose-border); }
+    footer .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); }
+    .footer-logo span { color: var(--rose); }
+    .footer-copy { font-size: 12px; color: var(--text-dim); }
+
+    /* WA */
+    .wa-float {
+      position: fixed; bottom: 28px; right: 28px; z-index: 200;
+      width: 56px; height: 56px; background: #25D366; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform 0.2s;
+      text-decoration: none;
+    }
+    .wa-float:hover { transform: scale(1.1); }
+    .wa-float svg { width: 28px; height: 28px; fill: #fff; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    .reveal { opacity:0; transform:translateY(20px); transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    @media (max-width: 900px) {
+      #hero { grid-template-columns: 1fr; }
+      .hero-right { height: 320px; }
+      .pain-layout { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .features-layout { grid-template-columns: 1fr; }
+      .test-wrap { grid-template-columns: 1fr; }
+      .test-img-side { height: 320px; }
+      .offer-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-actions { flex-direction: column; }
+      .hero-proof { flex-direction: column; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">EPOS <span>AI</span></a>
+        <span class="nav-tagline">Para Clínicas de Estética</span>
+        <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+esteticistas" class="nav-cta cta-whatsapp" data-vertical="estetica" target="_blank" rel="noopener">Falar agora</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-left">
+      <div class="hero-ornament">Para Esteticistas e Clínicas de Estética</div>
+      <h1 class="hero-h1">
+        <span class="line">Sua agenda</span>
+        <span class="line">sempre cheia.</span>
+        <span class="line">Sem estresse.</span>
+      </h1>
+      <p class="hero-sub">
+        Enquanto você faz o procedimento, a IA já está agendando a próxima cliente. WhatsApp respondido em segundos, dia e noite, sem depender de você.
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+esteticistas" class="btn-primary-rose cta-whatsapp" data-vertical="estetica" target="_blank" rel="noopener">Quero esse sistema</a>
+        <a href="#how" class="btn-ghost-rose">Como funciona →</a>
+      </div>
+      <div class="hero-proof">
+        <div><div class="proof-val">24h</div><div class="proof-lbl">Atendimento ativo</div></div>
+        <div><div class="proof-val">&lt;2min</div><div class="proof-lbl">Para qualificar e agendar</div></div>
+        <div><div class="proof-val">0</div><div class="proof-lbl">Clientes perdidos à noite</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=85" alt="Clínica de estética premium" loading="eager">
+    </div>
+  </section>
+
+  <!-- STATEMENT -->
+  <section id="statement">
+    <div class="container">
+      <div class="statement-inner reveal">
+        <blockquote class="statement-quote">
+          "A cliente que não recebeu resposta rápida não esperou. Ela agendou com a concorrência."
+        </blockquote>
+        <p class="statement-sub">Cada mensagem sem resposta é uma cliente perdida. O sistema EPOS AI resolve isso de forma definitiva — respondendo, qualificando e agendando enquanto você atende.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAIN -->
+  <section id="pain">
+    <div class="container">
+      <div class="pain-layout">
+        <div class="pain-content reveal">
+          <div class="section-eye">O Problema</div>
+          <h2>Você é uma excelente esteticista.<br>Mas não tem <em>tempo para tudo.</em></h2>
+          <p>Atender, fazer o procedimento, responder o WhatsApp, confirmar agendamentos, recuperar clientes que sumiram — tudo ao mesmo tempo. Em algum momento, algo escapa.</p>
+          <div class="pain-items">
+            <div class="pain-item">
+              <span class="pi-icon">📱</span>
+              <div class="pi-text"><strong>WhatsApp tomando o seu tempo</strong>Mensagens durante procedimentos, cancelamentos de última hora, clientes que "somem" antes de responder.</div>
+            </div>
+            <div class="pain-item">
+              <span class="pi-icon">🌙</span>
+              <div class="pi-text"><strong>Noite e fim de semana perdidos</strong>Clientes mandam mensagem quando a clínica está fechada. Quando você responde de manhã, já foi.</div>
+            </div>
+            <div class="pain-item">
+              <span class="pi-icon">💸</span>
+              <div class="pi-text"><strong>Anúncios sem retorno mensurável</strong>Você investe mas não sabe qual post ou campanha trouxe qual cliente. Sem dados, sem melhora.</div>
+            </div>
+          </div>
+        </div>
+        <div class="pain-image-side reveal" style="transition-delay: 0.15s">
+          <img src="https://images.unsplash.com/photo-1519415943484-9fa1873496d4?auto=format&fit=crop&w=700&q=80" alt="Procedimento estético premium" class="pain-img">
+          <div class="pain-img-overlay">
+            <div class="overlay-stat">+40%</div>
+            <div class="overlay-sub">mais agendamentos com atendimento 24h</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="container">
+      <div class="how-header reveal">
+        <div class="section-eye">Como Funciona</div>
+        <h2>Do anúncio à cliente<br><em>com procedimento marcado.</em></h2>
+      </div>
+      <div class="how-grid reveal">
+        <div class="how-card">
+          <span class="how-card-num">01</span>
+          <span class="how-card-phase">Atração</span>
+          <h3>Cliente vê o anúncio e manda mensagem</h3>
+          <p>Campanha com copy e visual estratégico para estética. Um clique e a cliente cai direto no seu número dedicado.</p>
+          <ul class="how-card-list">
+            <li>CAPI registra a origem do anúncio</li>
+            <li>Sistema identifica se é cliente nova</li>
+            <li>Atendimento começa em segundos</li>
+          </ul>
+        </div>
+        <div class="how-card">
+          <span class="how-card-num">02</span>
+          <span class="how-card-phase">Qualificação</span>
+          <h3>IA identifica o procedimento e disponibilidade</h3>
+          <p>A assistente entende o que a cliente quer, verifica se está dentro dos seus serviços e confere a sua agenda em tempo real.</p>
+          <ul class="how-card-list">
+            <li>Pergunta o procedimento desejado</li>
+            <li>Coleta: nome, histórico, urgência</li>
+            <li>Verifica disponibilidade no Calendar</li>
+          </ul>
+        </div>
+        <div class="how-card">
+          <span class="how-card-num">03</span>
+          <span class="how-card-phase">Agendamento</span>
+          <h3>Sessão marcada. Você notificada.</h3>
+          <p>Evento criado na sua agenda, confirmação enviada para a cliente. Quando você assume a conversa, a IA silencia automaticamente.</p>
+          <ul class="how-card-list">
+            <li>Evento no Google Calendar</li>
+            <li>Notificação para você no WhatsApp</li>
+            <li>IA para quando humano assume</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="features-layout reveal">
+        <div class="features-side">
+          <div class="section-eye">O que está incluído</div>
+          <h2>Muito mais do que<br><em>automação de WhatsApp.</em></h2>
+          <p>Um sistema completo de marketing e captação — da identidade visual às campanhas pagas e à IA que nunca dorme.</p>
+          <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=600&q=80" alt="Clínica de estética" class="features-img">
+        </div>
+        <div class="feat-list">
+          <div class="feat-entry">
+            <div class="feat-entry-icon">🧭</div>
+            <div><div class="feat-entry-title">Estratégia Digital</div><div class="feat-entry-desc">Posicionamento, público-alvo, calendário editorial — baseado no perfil real da sua clientela.</div></div>
+          </div>
+          <div class="feat-entry">
+            <div class="feat-entry-icon">✍️</div>
+            <div><div class="feat-entry-title">Copy & Conteúdo</div><div class="feat-entry-desc">Textos de anúncio, landing page e scripts da IA que convertem visitante em cliente.</div></div>
+          </div>
+          <div class="feat-entry">
+            <div class="feat-entry-icon">🎬</div>
+            <div><div class="feat-entry-title">Audiovisual & Identidade</div><div class="feat-entry-desc">Fotos e vídeos que comunicam o padrão premium do seu serviço antes da primeira sessão.</div></div>
+          </div>
+          <div class="feat-entry">
+            <div class="feat-entry-icon">📡</div>
+            <div><div class="feat-entry-title">Gestão de Tráfego</div><div class="feat-entry-desc">Meta Ads com rastreamento real — cada real investido rastreado até o agendamento.</div></div>
+          </div>
+          <div class="feat-entry">
+            <div class="feat-entry-icon">💻</div>
+            <div><div class="feat-entry-title">Site Profissional</div><div class="feat-entry-desc">Landing page que converte, com Pixel e rastreamento completo desde o primeiro clique.</div></div>
+          </div>
+          <div class="feat-entry" style="background: var(--bg3);">
+            <div class="feat-entry-icon" style="border-color: var(--rose);">🤖</div>
+            <div><div class="feat-entry-title" style="color: var(--rose);">IA de Qualificação e Agendamento</div><div class="feat-entry-desc">Atende, qualifica e agenda 24h por dia. Quando você ou uma assistente assume, a IA recua automaticamente.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section id="testimonial">
+    <div class="test-wrap reveal">
+      <div class="test-img-side">
+        <img src="https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?auto=format&fit=crop&w=700&q=80" alt="Esteticista atendendo cliente">
+      </div>
+      <div class="test-content-side">
+        <div class="test-stars">★★★★★</div>
+        <blockquote class="test-blockquote">
+          "Antes eu perdia cliente toda semana porque não conseguia responder o WhatsApp durante os atendimentos. Hoje a IA agenda enquanto eu trabalho. Minha agenda tem três semanas de antecedência."
+        </blockquote>
+        <div class="test-name">Rafaela Costa</div>
+        <div class="test-cred">Esteticista · Goiânia, GO</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFER -->
+  <section id="offer">
+    <div class="container">
+      <div class="reveal" style="text-align:center; margin-bottom: 56px;">
+        <div class="section-eye" style="justify-content: center;">Investimento</div>
+        <h2 style="font-family:'Cormorant Garamond',serif; font-size: clamp(28px,3.5vw,48px); font-weight:300; margin-top:12px;">
+          Transparência total.<br><em style="font-style:italic; color:var(--rose)">Nenhuma surpresa.</em>
+        </h2>
+      </div>
+      <div class="offer-grid reveal">
+        <div class="offer-card highlighted">
+          <div class="offer-label">Plano Estética · Disponível agora</div>
+          <div class="offer-name">Sistema Completo</div>
+          <div class="offer-desc">Tudo que uma clínica de estética precisa para crescer com consistência e previsibilidade.</div>
+          <div class="offer-price-old">Setup: R$3.000 — <strong>GRATUITO nesta oferta</strong></div>
+          <div class="offer-price-box">
+            <div class="offer-amount">R$6.000</div>
+            <div class="offer-period">/mês</div>
+          </div>
+          <div class="offer-badge">Contrato mínimo de 6 meses</div>
+          <div class="offer-divider"></div>
+          <ul class="offer-includes">
+            <li><span class="check">✦</span> Estratégia e posicionamento</li>
+            <li><span class="check">✦</span> Identidade visual completa</li>
+            <li><span class="check">✦</span> Copy de anúncios e landing page</li>
+            <li><span class="check">✦</span> Audiovisual para campanhas</li>
+            <li><span class="check">✦</span> Site profissional</li>
+            <li><span class="check">✦</span> Gestão de tráfego Meta Ads</li>
+            <li><span class="check">✦</span> Conteúdo orgânico mensal</li>
+            <li><span class="check">✦</span> IA de qualificação e agendamento 24h</li>
+            <li><span class="check">✦</span> Meta CAPI configurado</li>
+            <li><span class="check">✦</span> Suporte e manutenção mensal</li>
+          </ul>
+          <div class="offer-condition">Setup (configuração técnica completa, identidade e site) no valor de R$3.000 — incluso gratuitamente nesta oferta. Sistema ativo em até 10 dias úteis.</div>
+          <a href="https://wa.me/5561985545598?text=Ola,+quero+o+sistema+EPOS+AI+para+minha+clinica+de+estetica" class="btn-offer cta-whatsapp" data-vertical="estetica" target="_blank" rel="noopener">Quero esse sistema</a>
+        </div>
+        <div class="offer-card">
+          <div class="offer-label">Em breve · Fase 3</div>
+          <div class="offer-name">Sistema Elite</div>
+          <div class="offer-desc">CRM integrado, dashboard de ROI em tempo real e email marketing automatizado para reativar clientes inativos.</div>
+          <div class="offer-price-box">
+            <div class="offer-amount" style="color: var(--text-dim);">R$8.000</div>
+            <div class="offer-period">/mês</div>
+          </div>
+          <div class="offer-badge" style="opacity:0.4;">Disponível em breve</div>
+          <div class="offer-divider"></div>
+          <ul class="offer-includes" style="opacity:0.45;">
+            <li><span class="check">✦</span> Tudo do Sistema Completo</li>
+            <li><span class="check">✦</span> CRM com pipeline de clientes</li>
+            <li><span class="check">✦</span> Dashboard de ROI em tempo real</li>
+            <li><span class="check">✦</span> Reativação de clientes inativos</li>
+            <li><span class="check">✦</span> Email marketing automatizado</li>
+          </ul>
+          <div class="offer-condition" style="opacity:0.5;">Entre na lista de espera e seja notificado quando disponível.</div>
+          <a href="https://wa.me/5561985545598?text=Tenho+interesse+no+plano+Elite+EPOS+AI+para+estetica" class="btn-offer outline cta-whatsapp" data-vertical="estetica" target="_blank" rel="noopener">Lista de espera</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <div class="faq-header reveal">
+        <div class="section-eye">Dúvidas</div>
+        <h2>Perguntas <em style="font-style:italic; color:var(--rose)">frequentes.</em></h2>
+      </div>
+      <div class="faq-wrap reveal">
+        <div class="faq-item"><button class="faq-btn">Funciona para procedimentos que precisam de anamnese? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Sim. A IA pode coletar informações de anamnese básica durante o fluxo de qualificação — condições de saúde relevantes, alergias, histórico de procedimentos anteriores. Tudo configurável conforme os procedimentos que você oferece.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">Posso configurar os procedimentos e valores que a IA menciona? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Sim, totalmente. A IA é configurada com os seus serviços, faixa de preço e política da clínica. Ela não cita preços sem sua autorização explícita — você controla o que ela pode e não pode dizer.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">Quanto tempo leva para o sistema entrar em funcionamento? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Até 10 dias úteis para o setup completo (configuração técnica, identidade visual básica e primeiras campanhas). Os primeiros agendamentos costumam acontecer na primeira semana depois da campanha ir ao ar.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">E se eu quiser cancelar? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Contrato mínimo de 6 meses — necessário porque campanhas e o sistema precisam de ciclos para otimizar. Após isso, renovação mensal com aviso prévio de 30 dias. Todo o material criado (identidade, site, copy) fica com você.</div></div></div>
+        <div class="faq-item"><button class="faq-btn">Preciso de um número WhatsApp separado? <span class="faq-icon">+</span></button><div class="faq-answer"><div class="faq-answer-inner">Sim — um chip dedicado para a clínica, diferente do seu pessoal. Orientamos o processo completo. É simples e leva menos de 30 minutos para configurar.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section id="cta-final">
+    <div class="container">
+      <div class="reveal" style="position:relative; z-index:1;">
+        <div class="cta-eye">Comece agora</div>
+        <h2 class="cta-h2">Sua agenda<br><em>cheia no piloto automático.</em></h2>
+        <p class="cta-sub">Em 15 minutos mostramos como funciona para a sua clínica.</p>
+        <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+esteticistas" class="btn-primary-rose cta-whatsapp" data-vertical="estetica" target="_blank" rel="noopener" style="display:inline-flex; margin: 0 auto;">Falar agora no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-logo">EPOS <span>AI</span></div>
+      <div class="footer-copy">Sistema completo de marketing com IA para clínicas de estética.</div>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/5561985545598?text=Ola,+quero+saber+mais+sobre+o+sistema+EPOS+AI+para+esteticistas" class="wa-float cta-whatsapp" data-vertical="estetica" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+  </a>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting){x.target.classList.add('visible');obs.unobserve(x.target);}}), {threshold:0.08});
+    reveals.forEach(el => obs.observe(el));
+
+    document.querySelectorAll('.faq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement, ans = item.querySelector('.faq-answer'), open = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-answer').style.maxHeight = null; });
+        if(!open){ item.classList.add('open'); ans.style.maxHeight = ans.scrollHeight + 'px'; }
+      });
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => { e.preventDefault(); const t = document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth'}); });
+    });
+
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const utms = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid'];
+      const captured = {};
+      utms.forEach(k => { if(params.get(k)) captured[k] = params.get(k); });
+      if(Object.keys(captured).length) {
+        document.querySelectorAll('.cta-whatsapp').forEach(btn => {
+          try {
+            const url = new URL(btn.href);
+            const msg = url.searchParams.get('text') || '';
+            url.searchParams.set('text', msg + ' [' + Object.entries(captured).map(([k,v])=>`${k}=${v}`).join('&') + ']');
+            btn.href = url.toString();
+          } catch(e){}
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
