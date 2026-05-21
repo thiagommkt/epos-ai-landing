@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPOS AI — Landing Pages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#080808;color:#F2EEE6;font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+    .wrap{max-width:600px;width:100%}
+    h1{font-size:13px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:6px}
+    p{font-size:13px;color:#7A766E;margin-bottom:40px}
+    .cards{display:flex;flex-direction:column;gap:2px}
+    a.card{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;text-decoration:none;border:1px solid rgba(201,168,76,.15);transition:border-color .2s}
+    a.card:hover{border-color:rgba(201,168,76,.5)}
+    a.dark{background:#111}
+    a.cream{background:#F5EFE3;border-color:#C8B898}
+    a.cream:hover{background:#EDE5D2;border-color:#8B2232}
+    a.purple{background:#18181B;border-color:rgba(145,70,255,.25)}
+    a.purple:hover{border-color:rgba(145,70,255,.6)}
+    .t{font-size:16px;font-weight:600}
+    a.dark .t{color:#C9A84C}
+    a.cream .t{color:#8B2232;font-family:Georgia,serif;font-style:italic}
+    a.purple .t{color:#BF94FF}
+    .s{font-size:11px;margin-top:3px;opacity:.45}
+    .arr{font-size:16px;opacity:.4}
+    a.card:hover .arr{opacity:1}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>EPOS AI — Demos</h1>
+    <p>Escolha a versão da landing page</p>
+    <div class="cards">
+      <a href="index.html" class="card dark"><div><div class="t">Dark Luxury</div><div class="s">Gold + Black · Cormorant Garamond · Grain overlay</div></div><span class="arr">→</span></a>
+      <a href="madmen.html" class="card cream"><div><div class="t">Mad Men</div><div class="s">Cream + Burgundy · Playfair Display · 1960s editorial</div></div><span class="arr" style="color:#8B2232">→</span></a>
+      <a href="twitch.html" class="card purple"><div><div class="t">Twitch / Purple</div><div class="s">#9146FF · Syne · LIVE badge · Scanlines</div></div><span class="arr" style="color:#BF94FF">→</span></a>
+    </div>
+  </div>
+</body>
+</html>
