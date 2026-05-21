@@ -1,0 +1,1654 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPOS AI — Do clique ao cliente fechado, no automático</title>
+  <meta name="description" content="Sistema completo de marketing digital com IA para WhatsApp. Estratégia, tráfego, identidade, site e automação que qualifica leads e agenda consultas 24h por dia.">
+  <meta property="og:title" content="EPOS AI — Do clique ao cliente fechado, no automático">
+  <meta property="og:description" content="Tráfego, IA, identidade e automação num único sistema. Seu negócio atendendo e agendando enquanto você trabalha.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #070707;
+      --bg2: #0f0f0f;
+      --bg3: #161616;
+      --bg4: #1e1e1e;
+      --gold: #C9A84C;
+      --gold-light: #E2C06A;
+      --gold-dim: rgba(201,168,76,0.15);
+      --gold-border: rgba(201,168,76,0.25);
+      --green: #25D366;
+      --green-dim: rgba(37,211,102,0.1);
+      --text: #F2EEE6;
+      --text-muted: #7A766E;
+      --text-dim: #4A4642;
+      --radius: 4px;
+      --max: 1160px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* GRAIN OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* TYPOGRAPHY */
+    .display {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .display-italic {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    /* LAYOUT */
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 clamp(24px, 5vw, 64px); }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 0;
+      transition: background 0.4s, padding 0.4s;
+    }
+
+    nav.scrolled {
+      background: rgba(7,7,7,0.95);
+      backdrop-filter: blur(12px);
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gold-border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .nav-logo span { color: var(--gold); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--gold);
+      color: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s ease forwards;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero-h1 {
+      font-size: clamp(48px, 7vw, 96px);
+      max-width: 900px;
+      margin-bottom: 32px;
+    }
+
+    .hero-h1 .line {
+      display: block;
+      opacity: 0;
+    }
+
+    .hero-h1 .line:nth-child(1) { animation: fadeUp 0.9s 0.3s ease forwards; }
+    .hero-h1 .line:nth-child(2) { animation: fadeUp 0.9s 0.45s ease forwards; }
+    .hero-h1 .line:nth-child(3) { animation: fadeUp 0.9s 0.6s ease forwards; }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 19px);
+      color: var(--text-muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.75s ease forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.9s ease forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.25); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      border: 1px solid var(--gold-border);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn 1s 1.4s ease forwards;
+    }
+
+    .hero-scroll span {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* STATS STRIP */
+    #stats {
+      border-top: 1px solid var(--gold-border);
+      border-bottom: 1px solid var(--gold-border);
+      padding: 40px 0;
+      background: var(--bg2);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    .stat-item {
+      padding: 0 40px;
+      border-right: 1px solid var(--gold-border);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* SECTIONS */
+    section { padding: clamp(72px, 10vw, 120px) 0; }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .section-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .section-title {
+      font-size: clamp(36px, 5vw, 60px);
+      max-width: 720px;
+      margin-bottom: 20px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 64px;
+    }
+
+    /* SERVICES */
+    #services { background: var(--bg2); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--gold-border);
+      border: 1px solid var(--gold-border);
+    }
+
+    .service-card {
+      background: var(--bg2);
+      padding: 40px 36px;
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width 0.4s ease;
+    }
+
+    .service-card:hover { background: var(--bg3); }
+    .service-card:hover::before { width: 100%; }
+
+    .service-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .service-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .service-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .service-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .service-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid var(--bg4);
+      padding: 4px 10px;
+    }
+
+    /* HOW IT WORKS */
+    #how {
+      position: relative;
+    }
+
+    .how-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--gold-border);
+      border: 1px solid var(--gold-border);
+      margin-bottom: 64px;
+    }
+
+    .how-step {
+      background: var(--bg);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .how-step-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 80px;
+      font-weight: 300;
+      color: var(--gold-dim);
+      line-height: 1;
+      position: absolute;
+      top: 16px; right: 24px;
+    }
+
+    .how-step-phase {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .how-step-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .how-step-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .how-step-items {
+      list-style: none;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .how-step-items li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .how-step-items li::before {
+      content: '→';
+      color: var(--gold);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* TECH */
+    #tech { background: var(--bg2); }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .tech-diagram {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--gold-border);
+      border: 1px solid var(--gold-border);
+    }
+
+    .tech-node {
+      background: var(--bg3);
+      padding: 24px;
+      transition: background 0.2s;
+    }
+
+    .tech-node:hover { background: var(--bg4); }
+
+    .tech-node-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .tech-node-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .tech-node-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .tech-content h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .tech-content p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .tech-highlight {
+      padding: 20px 24px;
+      border-left: 2px solid var(--gold);
+      background: var(--gold-dim);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      margin-top: 24px;
+    }
+
+    /* FOR WHOM */
+    #for-whom {}
+
+    .verticals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 2px;
+      background: var(--gold-border);
+      border: 1px solid var(--gold-border);
+    }
+
+    .vertical-item {
+      background: var(--bg);
+      padding: 28px 24px;
+      transition: background 0.2s;
+      cursor: default;
+    }
+
+    .vertical-item:hover { background: var(--bg3); }
+
+    .vertical-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+
+    .vertical-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .vertical-pain {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* PRICING */
+    #pricing { background: var(--bg2); }
+
+    .pricing-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--gold-border);
+      border: 1px solid var(--gold-border);
+    }
+
+    .pricing-card {
+      background: var(--bg2);
+      padding: 48px 44px;
+    }
+
+    .pricing-card.featured {
+      background: var(--bg3);
+      position: relative;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -1px; right: 40px;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+    }
+
+    .pricing-tier {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .pricing-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .pricing-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .pricing-value {
+      margin-bottom: 8px;
+    }
+
+    .pricing-prefix {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .pricing-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(48px, 6vw, 64px);
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .pricing-period {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .pricing-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      font-style: italic;
+    }
+
+    .pricing-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--gold-border);
+      margin-bottom: 28px;
+    }
+
+    .pricing-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .pricing-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .pricing-list li .check {
+      color: var(--gold);
+      flex-shrink: 0;
+      font-size: 16px;
+      line-height: 1;
+      margin-top: 1px;
+    }
+
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      text-align: center;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .pricing-cta:hover { background: var(--gold-light); }
+
+    .pricing-cta.outline {
+      background: transparent;
+      border: 1px solid var(--gold-border);
+      color: var(--text);
+    }
+
+    .pricing-cta.outline:hover { border-color: var(--gold); color: var(--gold); background: transparent; }
+
+    /* FAQ */
+    #faq {}
+
+    .faq-list {
+      max-width: 760px;
+      margin: 0 auto;
+      border: 1px solid var(--gold-border);
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--gold-border);
+    }
+
+    .faq-item:last-child { border-bottom: none; }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 32px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    .faq-question:hover { color: var(--gold); }
+
+    .faq-icon {
+      font-size: 20px;
+      color: var(--gold);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .faq-answer-inner {
+      padding: 0 32px 28px;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* CTA FINAL */
+    #cta-final {
+      background: var(--bg2);
+      text-align: center;
+      padding: clamp(80px, 12vw, 140px) 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta-final::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    #cta-final .section-title { margin: 0 auto 20px; }
+    #cta-final .section-sub { margin: 0 auto 40px; text-align: center; }
+
+    .cta-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--gold-border);
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .footer-logo span { color: var(--gold); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* WHATSAPP FLOAT */
+    .wa-float {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      z-index: 200;
+      width: 56px; height: 56px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .wa-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 32px rgba(37,211,102,0.5);
+    }
+
+    .wa-float svg { width: 28px; height: 28px; fill: #fff; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(0.6); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-item { padding: 20px 24px; border-bottom: 1px solid var(--gold-border); }
+      .stat-item:nth-child(2) { border-right: none; }
+      .how-steps { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: 1fr; }
+      .tech-diagram { order: -1; }
+      .pricing-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-item { border-right: none !important; }
+      .hero-actions { flex-direction: column; }
+      .btn-primary, .btn-secondary { text-align: center; justify-content: center; }
+      .faq-question { font-size: 17px; padding: 22px 24px; }
+      .faq-answer-inner { padding: 0 24px 22px; }
+    }
+
+    /* VISUAL IMPACT */
+    #visual {
+      background: var(--bg);
+      border-top: 1px solid var(--gold-border);
+      padding: clamp(72px, 10vw, 120px) 0;
+    }
+
+    .visual-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .visual-quote-side {
+      position: relative;
+    }
+
+    .visual-ornament {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 120px;
+      font-weight: 300;
+      color: var(--gold);
+      opacity: 0.12;
+      line-height: 1;
+      position: absolute;
+      top: -40px;
+      left: -20px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .visual-blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 300;
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+
+    .visual-blockquote em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .visual-caption {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .visual-caption::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--text-dim);
+    }
+
+    .visual-body-side p {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.85;
+      margin-bottom: 20px;
+    }
+
+    .visual-body-side p:last-child { margin-bottom: 0; }
+
+    .visual-body-side strong { color: var(--text); font-weight: 500; }
+
+    .visual-highlight {
+      padding: 20px 24px;
+      border-left: 2px solid var(--gold);
+      background: var(--gold-dim);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-top: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .visual-layout { grid-template-columns: 1fr; gap: 40px; }
+    }
+  </style>
+  <!-- Meta Pixel -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init','1908702156421842');fbq('track','PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1908702156421842&ev=PageView&noscript=1"/></noscript>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-B928TEHGF9"></script>
+  <script>
+    window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());gtag('config','G-B928TEHGF9');
+  </script>
+
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wur8q8gnly");
+  </script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="container">
+      <a href="#" class="nav-logo">EPOS <span>AI</span></a>
+      <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="nav-cta" target="_blank" rel="noopener">
+        Falar com especialista
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-eyebrow">Marketing digital com inteligência artificial</div>
+      <h1 class="hero-h1 display">
+        <span class="line">Do primeiro clique</span>
+        <span class="line display-italic" style="color: var(--gold)">ao cliente na agenda,</span>
+        <span class="line">no automático.</span>
+      </h1>
+      <p class="hero-sub">
+        Estratégia, identidade, tráfego pago, site e um sistema de IA que atende, qualifica
+        e agenda pelo WhatsApp — 24 horas por dia, sem precisar de você.
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="btn-primary" target="_blank" rel="noopener">
+          Quero esse sistema
+        </a>
+        <a href="#how" class="btn-secondary">
+          Como funciona
+        </a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Explorar</span>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div id="stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <div class="stat-number" data-count="24">0</div>
+          <div class="stat-label">Horas atendendo por dia</div>
+        </div>
+        <div class="stat-item reveal" style="transition-delay: 0.1s">
+          <div class="stat-number" data-count="7">0</div>
+          <div class="stat-label">Pilares de entrega</div>
+        </div>
+        <div class="stat-item reveal" style="transition-delay: 0.2s">
+          <div class="stat-number">2 min</div>
+          <div class="stat-label">Para qualificar um lead</div>
+        </div>
+        <div class="stat-item reveal" style="transition-delay: 0.3s">
+          <div class="stat-number">0 ads</div>
+          <div class="stat-label">Leads perdidos por demora</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="container">
+      <div class="section-eyebrow reveal">O que você recebe</div>
+      <h2 class="section-title display reveal">
+        Sete pilares.<br>Uma operação completa.
+      </h2>
+      <p class="section-sub reveal">
+        Não vendemos peças soltas. Entregamos um sistema integrado onde cada pilar
+        alimenta o próximo — da atração à conversão.
+      </p>
+      <div class="services-grid">
+
+        <div class="service-card reveal">
+          <span class="service-number">01</span>
+          <span class="service-icon">🧭</span>
+          <h3 class="service-title">Estratégia Digital</h3>
+          <p class="service-desc">Diagnóstico completo do seu negócio, posicionamento de mercado, definição de persona, jornada do cliente e calendário editorial integrado.</p>
+          <div class="service-tags">
+            <span class="tag">Diagnóstico</span>
+            <span class="tag">Posicionamento</span>
+            <span class="tag">Persona</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal" style="transition-delay: 0.05s">
+          <span class="service-number">02</span>
+          <span class="service-icon">✍️</span>
+          <h3 class="service-title">Copy & Conteúdo</h3>
+          <p class="service-desc">Copywriting de anúncios, landing pages, scripts do bot de qualificação, conteúdo editorial para redes sociais e e-mail.</p>
+          <div class="service-tags">
+            <span class="tag">Anúncios</span>
+            <span class="tag">Landing page</span>
+            <span class="tag">Scripts IA</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal" style="transition-delay: 0.1s">
+          <span class="service-number">03</span>
+          <span class="service-icon">🎬</span>
+          <h3 class="service-title">Audiovisual & Identidade Visual</h3>
+          <p class="service-desc">E se o seu cliente, ao ver qualquer peça sua — um vídeo, uma arte, uma foto — já sentisse que o seu preço é justo? Cada frame e cada elemento visual que produzimos carrega uma mensagem antes das palavras: este negócio vale o que cobra.</p>
+          <div class="service-tags">
+            <span class="tag">Percepção de Valor</span>
+            <span class="tag">Vídeos de Anúncio</span>
+            <span class="tag">Identidade Completa</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal" style="transition-delay: 0.15s">
+          <span class="service-number">04</span>
+          <span class="service-icon">📡</span>
+          <h3 class="service-title">Gestão de Tráfego</h3>
+          <p class="service-desc">Campanhas Meta Ads e Google Ads gerenciadas com dados reais de conversão via CAPI server-side. Sem achismo, só resultado mensurável.</p>
+          <div class="service-tags">
+            <span class="tag">Meta Ads</span>
+            <span class="tag">Google Ads</span>
+            <span class="tag">CAPI</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal" style="transition-delay: 0.2s">
+          <span class="service-number">05</span>
+          <span class="service-icon">🌐</span>
+          <h3 class="service-title">Comunidade Online</h3>
+          <p class="service-desc">Presença orgânica estratégica no Instagram, TikTok e/ou LinkedIn. Conteúdo que educa, constrói autoridade e gera demanda de graça.</p>
+          <div class="service-tags">
+            <span class="tag">Instagram</span>
+            <span class="tag">TikTok</span>
+            <span class="tag">LinkedIn</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal" style="transition-delay: 0.25s">
+          <span class="service-number">06</span>
+          <span class="service-icon">💻</span>
+          <h3 class="service-title">Site Profissional</h3>
+          <p class="service-desc">Landing page ou site institucional construído para converter. Rápido, responsivo, com Pixel e rastreamento completo desde o primeiro dia.</p>
+          <div class="service-tags">
+            <span class="tag">Landing page</span>
+            <span class="tag">Responsivo</span>
+            <span class="tag">Rastreamento</span>
+          </div>
+        </div>
+
+        <div class="service-card reveal" style="transition-delay: 0.3s; grid-column: 1 / -1; max-width: 100%;">
+          <div style="display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start;">
+            <div>
+              <span class="service-number">07</span>
+              <span class="service-icon" style="font-size: 40px;">🤖</span>
+            </div>
+            <div>
+              <h3 class="service-title" style="font-size: 26px;">Sistema WhatsApp IA — o coração da operação</h3>
+              <p class="service-desc" style="font-size: 15px; max-width: 680px;">Um sistema completo de qualificação e agendamento via WhatsApp que funciona 24 horas por dia, 7 dias por semana. Integrado às suas campanhas, ao seu calendário e à sua equipe — sem precisar de você para nada.</p>
+              <div class="service-tags" style="margin-top: 20px;">
+                <span class="tag">Qualificação automática</span>
+                <span class="tag">Agendamento real</span>
+                <span class="tag">Meta CAPI server-side</span>
+                <span class="tag">Handoff humano inteligente</span>
+                <span class="tag">Notificação de vendedores</span>
+                <span class="tag">Silêncio quando humano assume</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- VISUAL IMPACT -->
+  <section id="visual">
+    <div class="container">
+      <div class="visual-layout">
+        <div class="visual-quote-side reveal">
+          <div class="visual-ornament">"</div>
+          <blockquote class="visual-blockquote display">
+            E se o seu cliente, ao ver qualquer peça sua —
+            <em>um vídeo, uma foto, uma arte</em>
+            — já sentisse que o seu preço é justo?
+          </blockquote>
+          <div class="visual-caption">Pilar Audiovisual & Identidade Visual</div>
+        </div>
+        <div class="visual-body-side reveal" style="transition-delay: 0.15s">
+          <p>O visual não é decoração. <strong>É o argumento de venda mais silencioso e mais poderoso que você tem.</strong></p>
+          <p>Quando a identidade está certa — quando cada frame carrega peso, quando cada foto transmite profissionalismo, quando cada arte nas redes comunica exatamente quem você é — o cliente chega pré-convencido.</p>
+          <p>A negociação começa com o cliente querendo fechar. Não pedindo desconto.</p>
+          <div class="visual-highlight">
+            Produzimos cada elemento visual para que a primeira impressão já justifique o seu posicionamento. Antes de qualquer palavra. Antes de qualquer proposta.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="container">
+      <div class="section-eyebrow reveal">Como funciona</div>
+      <h2 class="section-title display reveal">
+        Três fases.<br>Do anúncio ao agendamento.
+      </h2>
+      <p class="section-sub reveal">
+        Cada etapa é conectada. O que acontece em uma alimenta a próxima — e tudo é rastreado de ponta a ponta.
+      </p>
+      <div class="how-steps">
+
+        <div class="how-step reveal">
+          <span class="how-step-number">01</span>
+          <span class="how-step-phase">Fase 1 — Atração</span>
+          <h3 class="how-step-title display">Campanha no ar, lead chega pelo WhatsApp</h3>
+          <p class="how-step-desc">Anúncios no Meta ou Google com copy e criativo estratégico. Quando alguém clica, cai direto no seu WhatsApp.</p>
+          <ul class="how-step-items">
+            <li>Pixel e CAPI rastreiam o clique no servidor</li>
+            <li>UTM parameters identificam a origem</li>
+            <li>Sistema registra o lead automaticamente</li>
+          </ul>
+        </div>
+
+        <div class="how-step reveal" style="transition-delay: 0.1s">
+          <span class="how-step-number">02</span>
+          <span class="how-step-phase">Fase 2 — Qualificação</span>
+          <h3 class="how-step-title display">IA qualifica e agenda em menos de 2 minutos</h3>
+          <p class="how-step-desc">A Ana — sua assistente IA personalizada — inicia o atendimento, entende a necessidade e verifica a disponibilidade real na sua agenda.</p>
+          <ul class="how-step-items">
+            <li>Fluxo estruturado coleta dados essenciais</li>
+            <li>IA conversacional qualifica por perfil</li>
+            <li>Agendamento criado direto no Google Calendar</li>
+          </ul>
+        </div>
+
+        <div class="how-step reveal" style="transition-delay: 0.2s">
+          <span class="how-step-number">03</span>
+          <span class="how-step-phase">Fase 3 — Conversão</span>
+          <h3 class="how-step-title display">Humano fecha. Sistema aprende.</h3>
+          <p class="how-step-desc">Sua equipe recebe notificação com os dados do lead e assume a conversa quando quiser — a IA para automaticamente e aguarda.</p>
+          <ul class="how-step-items">
+            <li>Vendedores notificados no WhatsApp</li>
+            <li>IA silencia quando humano assume</li>
+            <li>Dados do lead salvos para o histórico</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH -->
+  <section id="tech">
+    <div class="container">
+      <div class="tech-grid">
+
+        <div class="tech-diagram reveal">
+          <div class="tech-node">
+            <div class="tech-node-label">Entrada</div>
+            <div class="tech-node-name">WhatsApp</div>
+            <div class="tech-node-desc">Número dedicado. Recebe todos os leads das campanhas.</div>
+          </div>
+          <div class="tech-node">
+            <div class="tech-node-label">Intake</div>
+            <div class="tech-node-name">Typebot</div>
+            <div class="tech-node-desc">Fluxo estruturado. Coleta dados essenciais do lead.</div>
+          </div>
+          <div class="tech-node">
+            <div class="tech-node-label">Inteligência</div>
+            <div class="tech-node-name">Ana / Dify IA</div>
+            <div class="tech-node-desc">Agente conversacional personalizado para seu negócio.</div>
+          </div>
+          <div class="tech-node">
+            <div class="tech-node-label">Agenda</div>
+            <div class="tech-node-name">Google Calendar</div>
+            <div class="tech-node-desc">Consulta e cria eventos reais. Zero conflito de horário.</div>
+          </div>
+          <div class="tech-node">
+            <div class="tech-node-label">Atendimento</div>
+            <div class="tech-node-name">Chatwoot</div>
+            <div class="tech-node-desc">Caixa unificada para sua equipe assumir quando precisar.</div>
+          </div>
+          <div class="tech-node">
+            <div class="tech-node-label">Rastreamento</div>
+            <div class="tech-node-name">Meta CAPI</div>
+            <div class="tech-node-desc">Eventos server-side. Dados de conversão sem depender de pixel.</div>
+          </div>
+        </div>
+
+        <div class="tech-content reveal" style="transition-delay: 0.15s">
+          <div class="section-eyebrow" style="margin-bottom: 16px;">Por dentro do sistema</div>
+          <h3 class="display">Tecnologia de empresa grande.<br>Para o seu negócio.</h3>
+          <p>A mesma infraestrutura que empresas de tecnologia usam para automatizar vendas — configurada, integrada e operando para você.</p>
+          <p>Não é um chatbot simples que responde com menu. É um sistema que raciocina sobre o contexto do lead, verifica disponibilidade real na sua agenda e só entrega para o humano quando já está qualificado e agendado.</p>
+          <div class="tech-highlight">
+            <strong style="color: var(--gold);">O diferencial que muda tudo:</strong> quando um humano responde no Chatwoot, a IA para automaticamente e fica em silêncio por 12 horas. Sem sobreposição, sem confusão. Equipe e IA trabalhando em harmonia.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR WHOM -->
+  <section id="for-whom">
+    <div class="container">
+      <div class="section-eyebrow reveal">Para quem é</div>
+      <h2 class="section-title display reveal">
+        Se você vende<br>pelo WhatsApp, é para você.
+      </h2>
+      <p class="section-sub reveal">
+        O sistema funciona para qualquer negócio que receba leads e precise qualificar
+        antes de atender. Especialmente para quem tem agenda limitada.
+      </p>
+      <div class="verticals-grid">
+        <div class="vertical-item reveal">
+          <span class="vertical-icon">⚖️</span>
+          <div class="vertical-name">Advocacia</div>
+          <div class="vertical-pain">"Recebo mensagens de casos que não atendo e perco tempo com leads errados."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.05s">
+          <span class="vertical-icon">🦷</span>
+          <div class="vertical-name">Clínicas Odonto</div>
+          <div class="vertical-pain">"Minha recepcionista passa o dia respondendo no WhatsApp sem conseguir agendar."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.1s">
+          <span class="vertical-icon">🩺</span>
+          <div class="vertical-name">Consultórios Médicos</div>
+          <div class="vertical-pain">"Leads chegam fora do horário e quando respondo de manhã, já foram para outro."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.15s">
+          <span class="vertical-icon">🏠</span>
+          <div class="vertical-name">Imobiliárias</div>
+          <div class="vertical-pain">"Não consigo escalar a qualificação sem contratar mais corretores."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.2s">
+          <span class="vertical-icon">💆</span>
+          <div class="vertical-name">Estética & Bem-estar</div>
+          <div class="vertical-pain">"Passo mais tempo no celular do que atendendo clientes."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.25s">
+          <span class="vertical-icon">🎓</span>
+          <div class="vertical-name">Educação & Coaching</div>
+          <div class="vertical-pain">"Quero focar nos clientes certos e automatizar todo o resto."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.3s">
+          <span class="vertical-icon">🏗️</span>
+          <div class="vertical-name">Serviços & Construção</div>
+          <div class="vertical-pain">"Leads não têm paciência. Se não responder em minutos, somem."</div>
+        </div>
+        <div class="vertical-item reveal" style="transition-delay: 0.35s">
+          <span class="vertical-icon">💼</span>
+          <div class="vertical-name">Consultoria & B2B</div>
+          <div class="vertical-pain">"Preciso de um processo de qualificação antes da primeira reunião."</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-eyebrow reveal">Investimento</div>
+      <h2 class="section-title display reveal">
+        Um sistema completo.<br>Um investimento claro.
+      </h2>
+      <p class="section-sub reveal">
+        Transparência total. Sem contrato anual obrigatório. Mínimo de 6 meses para
+        o sistema atingir a maturidade e entregar resultado consistente.
+      </p>
+
+      <div class="pricing-layout reveal">
+
+        <div class="pricing-card">
+          <div class="pricing-tier">Entrada — Fase 2</div>
+          <div class="pricing-title">Sistema Completo</div>
+          <div class="pricing-desc">Para negócios que querem começar agora, com tudo que é essencial para vender pelo WhatsApp com IA.</div>
+          <div class="pricing-value">
+            <div class="pricing-prefix">A partir de</div>
+            <div class="pricing-amount">R$6.000</div>
+            <div class="pricing-period">/mês (inclui setup nos 2 primeiros meses)</div>
+          </div>
+          <div class="pricing-note">Setup único: R$3.500–5.000 — coberto nos primeiros meses do contrato.</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-list">
+            <li><span class="check">✦</span> Estratégia digital completa</li>
+            <li><span class="check">✦</span> Identidade visual (logo, paleta, tipografia)</li>
+            <li><span class="check">✦</span> Copy de anúncios e landing page</li>
+            <li><span class="check">✦</span> Audiovisual para campanhas</li>
+            <li><span class="check">✦</span> Site de 1 página (landing page)</li>
+            <li><span class="check">✦</span> Gestão de tráfego Meta + Google</li>
+            <li><span class="check">✦</span> Conteúdo orgânico mensal</li>
+            <li><span class="check">✦</span> Sistema WhatsApp IA completo</li>
+            <li><span class="check">✦</span> Meta CAPI configurado</li>
+            <li><span class="check">✦</span> Suporte e manutenção mensal</li>
+          </ul>
+          <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="pricing-cta" target="_blank" rel="noopener">
+            Quero esse sistema
+          </a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Em breve</div>
+          <div class="pricing-tier">Fase 3 — Completo</div>
+          <div class="pricing-title">Sistema Elite</div>
+          <div class="pricing-desc">Para negócios que querem um sistema completo com CRM, dashboards de ROI e email marketing automatizado.</div>
+          <div class="pricing-value">
+            <div class="pricing-prefix">A partir de</div>
+            <div class="pricing-amount" style="color: var(--text-muted);">R$8.000</div>
+            <div class="pricing-period">/mês</div>
+          </div>
+          <div class="pricing-note">Disponível em breve. Entre na lista de espera.</div>
+          <div class="pricing-divider"></div>
+          <ul class="pricing-list">
+            <li><span class="check" style="color: var(--text-muted);">✦</span> Tudo do Sistema Completo</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> CRM integrado (pipeline de vendas)</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> Dashboard de ROI em tempo real</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> Email marketing automatizado</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> Remarketing automatizado</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> Relatório mensal com dados do cliente</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> API oficial WhatsApp Business</li>
+            <li><span class="check" style="color: var(--text-muted);">✦</span> Onboarding dedicado</li>
+          </ul>
+          <a href="https://wa.me/5561985545598?text=Tenho+interesse+no+Sistema+Elite+da+EPOS+AI" class="pricing-cta outline" target="_blank" rel="noopener">
+            Entrar na lista de espera
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-eyebrow reveal">Dúvidas frequentes</div>
+      <h2 class="section-title display reveal" style="margin-bottom: 48px;">Respostas diretas.</h2>
+
+      <div class="faq-list reveal">
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Preciso ter um número WhatsApp específico para isso?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Sim — recomendamos fortemente um número dedicado (chip novo ou número secundário do seu negócio). O número principal não deve ser usado porque, no início, haverá configurações e testes. Além disso, manter separado facilita a gestão e protege seu número principal de qualquer risco.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Minha equipe precisa aprender a usar alguma ferramenta?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Só o Chatwoot — a caixa de entrada onde você acompanha as conversas e pode assumir qualquer atendimento quando quiser. É simples como um WhatsApp Web, mas muito mais organizado. Treinamos sua equipe no dia do go-live, e o uso diário leva menos de 10 minutos para aprender.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Quanto tempo para o sistema estar funcionando?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              O setup técnico completo leva entre 7 e 10 dias úteis — dependendo de quanto tempo o cliente leva para fornecer os acessos necessários (Google Calendar, Business Manager, etc.). As campanhas de tráfego começam logo após a aprovação dos criativos. Em média, os primeiros leads chegam na primeira semana.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            O bot pode responder por coisas erradas e me prejudicar?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              A IA é configurada com instruções precisas sobre o que pode e não pode dizer. Ela não faz diagnósticos, não promete resultados, não inventa informações. Se alguém perguntar algo fora do escopo, ela redireciona para o atendimento humano. E quando um humano assume no Chatwoot, a IA para imediatamente — sem conflito.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            E se eu quiser cancelar? Fico preso?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Contrato Mínimo de 6 meses — necessário porque o sistema precisa de ciclos para otimizar campanhas e resultados consistentes levam tempo. Após isso, é mensal com aviso prévio de 30 dias. Todo o material criado (identidade visual, site, copy) é seu — não fica preso com a agência.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section id="cta-final">
+    <div class="container">
+      <div class="section-eyebrow reveal" style="justify-content: center;">Pronto para começar</div>
+      <h2 class="section-title display reveal" style="text-align: center;">
+        Seu negócio pode estar<br>
+        <span class="display-italic" style="color: var(--gold)">vendendo amanhã.</span>
+      </h2>
+      <p class="section-sub reveal" style="text-align: center;">
+        Fale com a gente agora. Em 15 minutos entendemos seu negócio e mostramos exatamente como o sistema funciona para o seu caso.
+      </p>
+      <div class="cta-actions reveal">
+        <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="btn-primary" target="_blank" rel="noopener">
+          Falar agora no WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">EPOS <span>AI</span></div>
+      <div class="footer-copy">Sistema completo de marketing com inteligência artificial.</div>
+    </div>
+  </footer>
+
+  <!-- WHATSAPP FLOAT -->
+  <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="wa-float" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+  </a>
+
+  <script>
+    // NAV scroll effect
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // Counter animation
+    function animateCounter(el, target, duration = 1500) {
+      const start = 0;
+      const startTime = performance.now();
+      const update = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(start + (target - start) * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.count);
+          if (!isNaN(target)) animateCounter(el, target);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+
+        document.querySelectorAll('.faq-item.open').forEach(openItem => {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-answer').style.maxHeight = null;
+        });
+
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
+      });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+</html>
