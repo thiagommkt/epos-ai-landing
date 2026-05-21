@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farias &amp; Moura — Estudo de Funil: Sistema Ana</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #0B1724;
+      --navy2:       #152236;
+      --navy3:       #1E3350;
+      --gold:        #B8943F;
+      --gold-light:  #D4AE62;
+      --gold-dim:    rgba(184,148,63,0.15);
+      --gold-dim2:   rgba(184,148,63,0.08);
+      --cream:       #F7F3EC;
+      --cream2:      #EDE7DB;
+      --text:        #1A2840;
+      --text-soft:   #4A5F7A;
+      --text-muted:  #7A8FA8;
+      --white:       #FFFFFF;
+      --line:        rgba(184,148,63,0.2);
+      --line-soft:   rgba(26,40,64,0.1);
+      --green:       #2D6A4F;
+      --green-bg:    rgba(45,106,79,0.08);
+      --red:         #8B1A1A;
+      --red-bg:      rgba(139,26,26,0.07);
+      --blue:        #1A3A6E;
+      --blue-bg:     rgba(26,58,110,0.07);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .cover {
+      background: var(--navy);
+      color: var(--white);
+      padding: 80px 48px 72px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 90% 50%, rgba(184,148,63,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(184,148,63,0.07) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .cover-inner { max-width: 860px; margin: 0 auto; position: relative; }
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 2px;
+      margin-bottom: 36px;
+    }
+    .cover-badge::before {
+      content: '⚖';
+      font-size: 12px;
+    }
+    .cover h1 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .cover h1 span { color: var(--gold-light); }
+    .cover-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 20px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 40px;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .cover-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cover-meta-item label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .cover-meta-item span {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      font-weight: 500;
+    }
+    .cover-rule {
+      width: 48px;
+      height: 2px;
+      background: var(--gold);
+      margin: 32px 0;
+    }
+    .cover-desc {
+      font-size: 16px;
+      color: rgba(255,255,255,0.62);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      background: var(--navy2);
+      border-bottom: 1px solid rgba(184,148,63,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav ul {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      list-style: none;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav ul::-webkit-scrollbar { display: none; }
+    nav a {
+      display: block;
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    nav a:hover { color: var(--gold-light); border-bottom-color: var(--gold); }
+
+    /* ── MAIN WRAPPER ───────────────────────────── */
+    main { max-width: 860px; margin: 0 auto; padding: 60px 24px 100px; }
+
+    /* ── SECTIONS ────────────────────────────────── */
+    .section { margin-bottom: 72px; }
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-num {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      font-weight: 700;
+      padding-top: 4px;
+      white-space: nowrap;
+    }
+    .section-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+    .section-title em {
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-style: normal;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+      margin-top: 5px;
+    }
+
+    /* ── INTRO BLOCK ─────────────────────────────── */
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .intro-grid { grid-template-columns: 1fr; } }
+    .intro-card {
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-left: 3px solid var(--gold);
+      padding: 22px 24px;
+      border-radius: 4px;
+    }
+    .intro-card h3 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .intro-card p {
+      font-size: 13.5px;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+
+    /* ── FUNNEL DIAGRAM ─────────────────────────── */
+    .funnel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .funnel-stage {
+      width: 100%;
+      max-width: 640px;
+      position: relative;
+    }
+    .funnel-box {
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-radius: 6px;
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .funnel-box:hover { box-shadow: 0 4px 24px rgba(184,148,63,0.12); }
+    .funnel-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .stage-top    .funnel-box::before { background: var(--gold); }
+    .stage-mid    .funnel-box::before { background: var(--navy3); }
+    .stage-bottom .funnel-box::before { background: var(--green); }
+
+    .funnel-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+      margin-bottom: 12px;
+    }
+    .stage-top    .funnel-tag { background: var(--gold-dim);  color: var(--gold); }
+    .stage-mid    .funnel-tag { background: var(--blue-bg);   color: var(--blue); }
+    .stage-bottom .funnel-tag { background: var(--green-bg);  color: var(--green); }
+
+    .funnel-box h3 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .funnel-box p {
+      font-size: 13.5px;
+      color: var(--text-soft);
+      margin-bottom: 16px;
+    }
+    .funnel-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .funnel-pill {
+      background: var(--cream2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--line-soft);
+    }
+
+    .funnel-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 0;
+      gap: 0;
+    }
+    .funnel-arrow-line {
+      width: 2px;
+      height: 24px;
+      background: linear-gradient(to bottom, var(--gold-dim), var(--gold));
+    }
+    .funnel-arrow-head {
+      width: 0; height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid var(--gold);
+    }
+    .funnel-arrow-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 6px;
+    }
+
+    /* ── SCENARIOS ───────────────────────────────── */
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 600px) { .scenarios-grid { grid-template-columns: 1fr; } }
+    .scenario-card {
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-radius: 6px;
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .scenario-card.wide { grid-column: 1 / -1; }
+    .scenario-num {
+      position: absolute;
+      top: 18px; right: 18px;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: rgba(26,40,64,0.05);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .scenario-icon {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      margin-bottom: 14px;
+    }
+    .sc-new   .scenario-icon { background: var(--gold-dim2);  }
+    .sc-ret   .scenario-icon { background: var(--blue-bg);    }
+    .sc-drop  .scenario-icon { background: var(--red-bg);     }
+    .sc-type  .scenario-icon { background: var(--green-bg);   }
+    .sc-sched .scenario-icon { background: var(--gold-dim);   }
+
+    .scenario-card h4 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .scenario-card .sc-trigger {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .scenario-card p {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+    .scenario-card .sc-quote {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--cream);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 4px 4px 0;
+      font-size: 12.5px;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── QUALIFICATION STEPS ─────────────────────── */
+    .qual-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .qual-step {
+      display: flex;
+      gap: 0;
+      position: relative;
+    }
+    .qual-step:not(:last-child) .qual-connector {
+      position: absolute;
+      left: 19px;
+      top: 44px;
+      width: 2px;
+      height: calc(100% - 24px);
+      background: linear-gradient(to bottom, var(--navy3), rgba(26,51,80,0.1));
+    }
+    .qual-step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--gold-light);
+      font-family: 'Libre Baskerville', serif;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .qual-step-body {
+      padding: 8px 0 28px 20px;
+      flex: 1;
+    }
+    .qual-step-body h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .qual-step-body .q-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+    .qual-step-body .q-ask {
+      display: inline-block;
+      background: var(--gold-dim2);
+      border: 1px solid var(--gold-dim);
+      border-radius: 3px;
+      padding: 7px 12px;
+      font-size: 12.5px;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .qual-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .tag-optional { background: var(--cream2); color: var(--text-muted); }
+    .tag-key      { background: var(--gold-dim); color: var(--gold); }
+
+    /* ── SCHEDULING ──────────────────────────────── */
+    .sched-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sched-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-radius: 6px;
+      padding: 18px 20px;
+    }
+    .sched-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .sched-body h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .sched-body p {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+    .sched-sub {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .sched-pill {
+      background: var(--cream);
+      border: 1px solid var(--line-soft);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      color: var(--text-soft);
+    }
+    .sched-pill strong { color: var(--navy); font-weight: 600; }
+
+    /* ── DIVISION TABLE ──────────────────────────── */
+    .division {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 560px) { .division { grid-template-columns: 1fr; } }
+    .division-col {
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .division-col-head {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .division-col.ana-col .division-col-head { background: var(--navy); }
+    .division-col.esp-col .division-col-head { background: var(--gold); }
+    .division-col-head .dch-icon { font-size: 20px; }
+    .division-col-head .dch-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .ana-col .dch-title { color: var(--white); }
+    .esp-col .dch-title { color: var(--navy); }
+    .division-col-head .dch-sub { font-size: 11px; }
+    .ana-col .dch-sub { color: rgba(255,255,255,0.5); }
+    .esp-col .dch-sub { color: rgba(11,23,36,0.55); }
+
+    .division-list {
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      list-style: none;
+    }
+    .division-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+    .division-list li:last-child { border-bottom: none; }
+    .division-list li::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .ana-col .division-list li::before { background: var(--navy3); }
+    .esp-col .division-list li::before { background: var(--gold); }
+
+    /* ── DISEASES ────────────────────────────────── */
+    .diseases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 8px;
+    }
+    .disease-item {
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .disease-item::before {
+      content: '●';
+      color: var(--gold);
+      font-size: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ── RULES ───────────────────────────────────── */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 560px) { .rules-grid { grid-template-columns: 1fr; } }
+    .rule-card {
+      background: var(--white);
+      border: 1px solid var(--line-soft);
+      border-radius: 6px;
+      padding: 20px 22px;
+    }
+    .rule-card.rule-hard {
+      border-color: rgba(139,26,26,0.2);
+      background: var(--red-bg);
+    }
+    .rule-card.rule-ok {
+      border-color: rgba(45,106,79,0.2);
+      background: var(--green-bg);
+    }
+    .rule-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .rule-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+    .rule-card.rule-hard h4 { color: var(--red); }
+    .rule-card.rule-ok  h4 { color: var(--green); }
+    .rule-card p {
+      font-size: 12.5px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    /* ── ALERT BOX ───────────────────────────────── */
+    .alert {
+      background: var(--navy);
+      border-radius: 6px;
+      padding: 22px 28px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-top: 24px;
+    }
+    .alert-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .alert-body h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+    .alert-body p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+    }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+    }
+    footer span { color: var(--gold); }
+
+    /* ── PRINT ───────────────────────────────────── */
+    @media print {
+      nav, .cover::before { display: none; }
+      body { font-size: 13px; }
+      .cover { padding: 40px 32px; }
+      main { padding: 32px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════ COVER ═══════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-badge">Farias &amp; Moura Advocacia</div>
+    <h1>Estudo de Funil<br><span>Sistema Ana</span></h1>
+    <p class="cover-sub">Atendimento inteligente via WhatsApp para isenção de IR</p>
+    <div class="cover-rule"></div>
+    <p class="cover-desc">
+      Este documento descreve como o sistema qualifica leads, conduz a triagem e agenda consultas com o especialista — sem precisar de intervenção humana na etapa inicial.
+    </p>
+    <div class="cover-meta" style="margin-top:36px;">
+      <div class="cover-meta-item">
+        <label>Agente</label>
+        <span>Ana — Atendente Virtual</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Canal</label>
+        <span>WhatsApp</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Objetivo</label>
+        <span>Qualificar &amp; Agendar</span>
+      </div>
+      <div class="cover-meta-item">
+        <label>Tema</label>
+        <span>Isenção de IR — Doenças Graves</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ NAV ══════════════════════════════════════ -->
+<nav>
+  <ul>
+    <li><a href="#funil">Funil</a></li>
+    <li><a href="#cenarios">Cenários</a></li>
+    <li><a href="#qualificacao">Qualificação</a></li>
+    <li><a href="#agendamento">Agendamento</a></li>
+    <li><a href="#divisao">Ana vs Especialista</a></li>
+    <li><a href="#doencas">Doenças</a></li>
+    <li><a href="#regras">Regras</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════ MAIN ══════════════════════════════════════ -->
+<main>
+
+  <!-- 0. VISÃO GERAL -->
+  <div class="section">
+    <div class="intro-grid">
+      <div class="intro-card">
+        <h3>O que é o sistema</h3>
+        <p>Ana é uma atendente virtual que opera pelo WhatsApp da Farias &amp; Moura. Ela recebe leads, identifica o perfil, coleta dados de qualificação e agenda a conversa com o advogado especialista — tudo de forma automatizada.</p>
+      </div>
+      <div class="intro-card">
+        <h3>Para quem atende</h3>
+        <p>Aposentados e pensionistas com doenças graves que pagam Imposto de Renda descontado no benefício e podem ter direito à isenção. Público predominantemente idoso — o sistema é projetado para ser paciente e acolhedor.</p>
+      </div>
+      <div class="intro-card">
+        <h3>O limite claro</h3>
+        <p>Ana <strong>não</strong> é a especialista. Ela não emite veredictos jurídicos, não confirma elegibilidade e não dá orientação técnica. Sua única função é <em>acolher, qualificar e agendar</em>.</p>
+      </div>
+      <div class="intro-card">
+        <h3>Por que funciona</h3>
+        <p>O lead entra no WhatsApp já interessado no tema. Ana vai direto ao assunto, sem pedir que a pessoa explique do zero o que precisa. O fluxo elimina atrito e encurta o caminho até o especialista.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. FUNIL VISUAL -->
+  <div class="section" id="funil">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title">
+        Funil de Atendimento
+        <em>Do primeiro contato ao agendamento com o especialista</em>
+      </div>
+    </div>
+
+    <div class="funnel">
+
+      <!-- TOPO -->
+      <div class="funnel-stage stage-top">
+        <div class="funnel-box">
+          <div class="funnel-tag">🔔 Topo — Entrada</div>
+          <h3>Lead entra pelo WhatsApp</h3>
+          <p>O lead manda mensagem. O sistema identifica automaticamente se é um novo contato, retorno, fluxo interrompido ou encaminhamento do Typebot.</p>
+          <div class="funnel-pills">
+            <span class="funnel-pill">Lead novo</span>
+            <span class="funnel-pill">Lead retorno</span>
+            <span class="funnel-pill">Sessão caída</span>
+            <span class="funnel-pill">Vindo do Typebot</span>
+            <span class="funnel-pill">Já tem agendamento</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="funnel-arrow">
+        <div class="funnel-arrow-line"></div>
+        <div class="funnel-arrow-head"></div>
+        <div class="funnel-arrow-label">Ana identifica o cenário</div>
+      </div>
+
+      <!-- MEIO -->
+      <div class="funnel-stage stage-mid">
+        <div class="funnel-box">
+          <div class="funnel-tag">🔍 Meio — Qualificação</div>
+          <h3>Ana coleta os dados do lead</h3>
+          <p>7 perguntas em sequência, uma por vez. Ana nunca pula etapas, nunca repete o que já foi respondido e jamais faz a pessoa se sentir num formulário.</p>
+          <div class="funnel-pills">
+            <span class="funnel-pill">Perfil: aposentado/pensionista</span>
+            <span class="funnel-pill">Paga IR?</span>
+            <span class="funnel-pill">Valor do IR</span>
+            <span class="funnel-pill">Condição de saúde</span>
+            <span class="funnel-pill">Cidade</span>
+            <span class="funnel-pill">Dia disponível</span>
+            <span class="funnel-pill">Turno preferido</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="funnel-arrow">
+        <div class="funnel-arrow-line"></div>
+        <div class="funnel-arrow-head"></div>
+        <div class="funnel-arrow-label">Sistema consulta a agenda</div>
+      </div>
+
+      <!-- FUNDO -->
+      <div class="funnel-stage stage-bottom">
+        <div class="funnel-box">
+          <div class="funnel-tag">✅ Fundo — Agendamento</div>
+          <h3>Conversa agendada com o especialista</h3>
+          <p>O sistema verifica a agenda em tempo real e apresenta os horários disponíveis. O lead escolhe, e Ana confirma apenas após o sistema validar o slot.</p>
+          <div class="funnel-pills">
+            <span class="funnel-pill">Consulta automática de agenda</span>
+            <span class="funnel-pill">Horários reais em tempo real</span>
+            <span class="funnel-pill">Lead escolhe o horário</span>
+            <span class="funnel-pill">Confirmação pelo sistema</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="funnel-arrow">
+        <div class="funnel-arrow-line"></div>
+        <div class="funnel-arrow-head"></div>
+        <div class="funnel-arrow-label">Especialista assume</div>
+      </div>
+
+      <!-- ESPECIALISTA -->
+      <div class="funnel-stage">
+        <div class="funnel-box" style="border-color:rgba(184,148,63,0.35); background: linear-gradient(135deg, #fffdf9, #fff9ef);">
+          <div class="funnel-tag" style="background:var(--gold-dim); color:var(--gold);">⚖ Resultado Final</div>
+          <h3>Especialista entra em contato</h3>
+          <p>Em horário comercial (seg–sex, 9h–18h) o advogado especialista entra em contato pelo mesmo WhatsApp. Chega com todo o contexto do lead já coletado.</p>
+          <div class="funnel-pills">
+            <span class="funnel-pill">Análise do caso</span>
+            <span class="funnel-pill">Orientação jurídica</span>
+            <span class="funnel-pill">Diagnóstico de elegibilidade</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. CENÁRIOS -->
+  <div class="section" id="cenarios">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title">
+        Os 5 Cenários de Atendimento
+        <em>Como Ana reage a cada tipo de entrada</em>
+      </div>
+    </div>
+
+    <div class="scenarios-grid">
+
+      <div class="scenario-card sc-new">
+        <div class="scenario-num">1</div>
+        <div class="scenario-icon">👤</div>
+        <div class="sc-trigger">Cenário 1</div>
+        <h4>Lead já tem agendamento</h4>
+        <p>Quando o sistema detecta que o lead já está agendado, Ana confirma os dados e se coloca à disposição para dúvidas — sem tentar vender nada.</p>
+        <div class="sc-quote">"Você já tem uma conversa agendada com nossa equipe [dia] no período [turno]. Nossa equipe vai entrar em contato por este WhatsApp."</div>
+      </div>
+
+      <div class="scenario-card sc-ret">
+        <div class="scenario-num">2</div>
+        <div class="scenario-icon">🔄</div>
+        <div class="sc-trigger">Cenário 2</div>
+        <h4>Lead retorno / não é primeiro atendimento</h4>
+        <p>Quando o perfil ou patologia já está registrado, Ana retoma do ponto onde parou — sem repetir perguntas já respondidas.</p>
+        <div class="sc-quote">"Olá! Aqui é a Ana, da Farias &amp; Moura. Estou aqui para continuar te ajudando com a isenção do IR."</div>
+      </div>
+
+      <div class="scenario-card sc-drop">
+        <div class="scenario-num">3</div>
+        <div class="scenario-icon">⚡</div>
+        <div class="sc-trigger">Cenário 3</div>
+        <h4>Fluxo interrompido</h4>
+        <p>Se a sessão caiu durante o atendimento, Ana retoma de forma natural e, se já tem dados qualificados, vai direto ao agendamento.</p>
+        <div class="sc-quote">"Parece que nossa conversa caiu por aqui. Estou aqui para continuar. Pelo que vi, você já passou pela nossa triagem — quer verificar um horário?"</div>
+      </div>
+
+      <div class="scenario-card sc-sched">
+        <div class="scenario-num">4</div>
+        <div class="scenario-icon">💬</div>
+        <div class="sc-trigger">Cenário 4</div>
+        <h4>Dúvida aberta / lead novo</h4>
+        <p>Sem dados anteriores, Ana não pergunta "o que você precisa" — vai direto ao tema da isenção e começa a qualificação com a primeira pergunta.</p>
+        <div class="sc-quote">"Você entrou em contato sobre a isenção do IR — posso te ajudar com isso. Você é aposentado(a) ou pensionista?"</div>
+      </div>
+
+      <div class="scenario-card sc-type wide">
+        <div class="scenario-num">5</div>
+        <div class="scenario-icon">📋</div>
+        <div class="sc-trigger">Cenário 5</div>
+        <h4>Encaminhamento do Typebot (dados parciais)</h4>
+        <p>Quando o lead vem do Typebot com dados já coletados, o sistema informa exatamente o que chegou e o que ainda falta. Ana coleta somente as perguntas pendentes, de forma conversacional — nunca menciona "formulário" nem repete o que já foi informado.</p>
+        <div class="sc-quote">Ana age como se estivesse dando continuidade a uma conversa, não preenchendo um cadastro.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. QUALIFICAÇÃO -->
+  <div class="section" id="qualificacao">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title">
+        Sequência de Qualificação
+        <em>7 perguntas obrigatórias — sempre nesta ordem, uma por vez</em>
+      </div>
+    </div>
+
+    <div class="qual-steps">
+
+      <div class="qual-step">
+        <div class="qual-connector"></div>
+        <div class="qual-step-num">1</div>
+        <div class="qual-step-body">
+          <h4>Perfil <span class="qual-tag tag-key">Essencial</span></h4>
+          <p class="q-text">Identifica se é aposentado ou pensionista — define o tipo de benefício.</p>
+          <div class="q-ask">"Você é aposentado(a) ou pensionista?"</div>
+        </div>
+      </div>
+
+      <div class="qual-step">
+        <div class="qual-connector"></div>
+        <div class="qual-step-num">2</div>
+        <div class="qual-step-body">
+          <h4>Desconto de IR <span class="qual-tag tag-key">Essencial</span></h4>
+          <p class="q-text">Confirma se há retenção de IR — só faz sentido buscar isenção se o desconto existir.</p>
+          <div class="q-ask">"Você paga Imposto de Renda descontado diretamente no seu benefício?"</div>
+        </div>
+      </div>
+
+      <div class="qual-step">
+        <div class="qual-connector"></div>
+        <div class="qual-step-num">3</div>
+        <div class="qual-step-body">
+          <h4>Valor do IR <span class="qual-tag tag-optional">Opcional</span></h4>
+          <p class="q-text">Perguntada apenas se a pessoa paga IR. O lead pode responder "não" se não quiser informar.</p>
+          <div class="q-ask">"Aproximadamente quanto é descontado por mês? Se não quiser informar, pode dizer 'não'."</div>
+        </div>
+      </div>
+
+      <div class="qual-step">
+        <div class="qual-connector"></div>
+        <div class="qual-step-num">4</div>
+        <div class="qual-step-body">
+          <h4>Condição de saúde <span class="qual-tag tag-key">Essencial</span></h4>
+          <p class="q-text">Identifica a patologia. Se a pessoa não souber o nome técnico, Ana aceita a descrição. Nunca emite veredicto sobre elegibilidade.</p>
+          <div class="q-ask">"Qual é a sua condição de saúde ou doença grave? Se não souber o nome exato, pode descrever."</div>
+        </div>
+      </div>
+
+      <div class="qual-step">
+        <div class="qual-connector"></div>
+        <div class="qual-step-num">5</div>
+        <div class="qual-step-body">
+          <h4>Cidade</h4>
+          <p class="q-text">Usada para contexto geográfico — leads do Distrito Federal podem ser informados sobre atendimento presencial.</p>
+          <div class="q-ask">"Em qual cidade você mora?"</div>
+        </div>
+      </div>
+
+      <div class="qual-step">
+        <div class="qual-connector"></div>
+        <div class="qual-step-num">6</div>
+        <div class="qual-step-body">
+          <h4>Dia disponível</h4>
+          <p class="q-text">Lead informa o dia. O sistema consulta a agenda automaticamente. Ana não sugere horários — espera o sistema retornar as opções reais.</p>
+          <div class="q-ask">"Para analisar o seu caso com precisão, o melhor é uma conversa rápida com nosso advogado — gratuita e sem compromisso. Qual o melhor dia para você?"</div>
+        </div>
+      </div>
+
+      <div class="qual-step">
+        <div class="qual-step-num">7</div>
+        <div class="qual-step-body">
+          <h4>Turno preferido <span class="qual-tag tag-optional">Se necessário</span></h4>
+          <p class="q-text">Perguntado apenas se o sistema precisar do turno para consultar a agenda. Manhã (9h–12h) ou tarde (13h–17h).</p>
+          <div class="q-ask">"Você prefere de manhã ou à tarde?"</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="alert">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">
+        <h4>Sobre leads que "não se encaixam"</h4>
+        <p>Se o lead não paga IR ou a condição de saúde é dúbida, Ana <strong>não emite veredicto</strong>. A resposta padrão é sempre: <em>"Para isso, o melhor é falar diretamente com nosso especialista. Qual o melhor horário para ele entrar em contato?"</em> — isso garante que nenhum potencial cliente seja descartado por erro do sistema.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. AGENDAMENTO -->
+  <div class="section" id="agendamento">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title">
+        Sistema de Agendamento
+        <em>Como o horário chega até o lead — sem invenção, sem suposição</em>
+      </div>
+    </div>
+
+    <div class="sched-flow">
+
+      <div class="sched-step">
+        <div class="sched-icon">📅</div>
+        <div class="sched-body">
+          <h4>1. Lead informa o dia</h4>
+          <p>Assim que o lead menciona um dia, o sistema consulta a agenda automaticamente. Ana aguarda o retorno — nunca sugere horários por conta própria.</p>
+        </div>
+      </div>
+
+      <div class="sched-step">
+        <div class="sched-icon">🔎</div>
+        <div class="sched-body">
+          <h4>2. Sistema retorna os horários reais</h4>
+          <p>Os horários chegam via instrução do sistema. Ana usa exatamente os horários recebidos — sem arredondamentos, sem estimativas.</p>
+          <div class="sched-sub">
+            <span class="sched-pill"><strong>2 horários / mesmo turno:</strong> "Para [dia] tenho dois horários: às [h1] ou às [h2]. Qual prefere?"</span>
+            <span class="sched-pill"><strong>Manhã e tarde:</strong> "Tenho dois horários para [dia]: às [h] (manhã) ou às [h] (tarde)."</span>
+            <span class="sched-pill"><strong>Só 1 horário:</strong> "Para [dia] tenho um horário disponível: às [h]. Posso confirmar?"</span>
+            <span class="sched-pill"><strong>Nenhum horário:</strong> "Para esse dia não temos horários disponíveis. Qual outro dia funciona?"</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sched-step">
+        <div class="sched-icon">✅</div>
+        <div class="sched-body">
+          <h4>3. Lead escolhe — sistema confirma</h4>
+          <p>Ana só confirma o agendamento depois que o sistema valida o slot. Nunca confirma por conta própria.</p>
+          <div class="sched-sub">
+            <span class="sched-pill"><strong>Após confirmação do sistema:</strong> "Pronto! Agendamento confirmado. Nossa equipe vai entrar em contato por este WhatsApp no horário combinado."</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sched-step">
+        <div class="sched-icon">📞</div>
+        <div class="sched-body">
+          <h4>4. Especialista entra em contato</h4>
+          <p>Horário comercial: segunda a sexta, das 9h às 18h. O contato é feito pelo mesmo WhatsApp onde o lead conversou com Ana.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 5. DIVISÃO DE RESPONSABILIDADES -->
+  <div class="section" id="divisao">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title">
+        Divisão de Responsabilidades
+        <em>O que é da Ana — e o que é do especialista</em>
+      </div>
+    </div>
+
+    <div class="division">
+
+      <div class="division-col ana-col">
+        <div class="division-col-head">
+          <span class="dch-icon">🤖</span>
+          <div>
+            <div class="dch-title">Ana</div>
+            <div class="dch-sub">Atendente virtual — 24/7</div>
+          </div>
+        </div>
+        <ul class="division-list">
+          <li>Recepcionar o lead com acolhimento e segurança</li>
+          <li>Identificar o cenário de entrada automaticamente</li>
+          <li>Conduzir a qualificação em ordem, uma pergunta por vez</li>
+          <li>Verificar disponibilidade de agenda em tempo real</li>
+          <li>Apresentar horários exatos e confirmar o agendamento</li>
+          <li>Continuar atendimento de retornos sem repetir perguntas</li>
+          <li>Encaminhar ao especialista qualquer caso atípico ou dúvida técnica</li>
+          <li>Informar leads do DF sobre a opção de atendimento presencial</li>
+        </ul>
+      </div>
+
+      <div class="division-col esp-col">
+        <div class="division-col-head">
+          <span class="dch-icon">⚖️</span>
+          <div>
+            <div class="dch-title">Especialista</div>
+            <div class="dch-sub">Advogado — horário comercial</div>
+          </div>
+        </div>
+        <ul class="division-list">
+          <li>Analisar o caso com base nos dados coletados por Ana</li>
+          <li>Emitir diagnóstico de elegibilidade para isenção de IR</li>
+          <li>Dar orientação jurídica e técnica ao cliente</li>
+          <li>Decidir sobre patologias que a pessoa não sabe nomear</li>
+          <li>Atender casos de inventário, pensão por morte e situações específicas</li>
+          <li>Organizar atendimento presencial para leads do DF, se solicitado</li>
+          <li>Conduzir as próximas etapas do processo jurídico</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 6. DOENÇAS ELEGÍVEIS -->
+  <div class="section" id="doencas">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title">
+        Doenças Elegíveis
+        <em>Patologias que podem garantir isenção de IR — avaliação final é do especialista</em>
+      </div>
+    </div>
+
+    <div class="diseases-grid">
+      <div class="disease-item">Câncer (neoplasia maligna)</div>
+      <div class="disease-item">Cardiopatia grave</div>
+      <div class="disease-item">Doença de Parkinson</div>
+      <div class="disease-item">AIDS</div>
+      <div class="disease-item">Nefropatia grave</div>
+      <div class="disease-item">Hepatopatia grave</div>
+      <div class="disease-item">Esclerose múltipla</div>
+      <div class="disease-item">Cegueira</div>
+      <div class="disease-item">Paralisia irreversível</div>
+      <div class="disease-item">Alienação mental</div>
+      <div class="disease-item">Espondiloartrose anquilosante</div>
+      <div class="disease-item">Doença de Paget</div>
+      <div class="disease-item">Tuberculose ativa</div>
+      <div class="disease-item">Hanseníase</div>
+      <div class="disease-item">Contaminação por radiação</div>
+      <div class="disease-item">Fibrose cística</div>
+      <div class="disease-item">Acidente de trabalho c/ sequela permanente</div>
+    </div>
+
+    <div class="alert" style="margin-top:20px;">
+      <div class="alert-icon">ℹ️</div>
+      <div class="alert-body">
+        <h4>Ana nunca emite veredicto</h4>
+        <p>Mesmo que a patologia informada pelo lead esteja nesta lista, Ana não diz "você tem direito à isenção". Ela encaminha ao especialista. A avaliação final — inclusive sobre casos limítrofes e condições não nomeadas — é responsabilidade exclusiva do advogado.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. REGRAS -->
+  <div class="section" id="regras">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title">
+        Regras do Sistema
+        <em>O que Ana sempre faz — e o que jamais faz</em>
+      </div>
+    </div>
+
+    <div class="rules-grid">
+
+      <div class="rule-card rule-hard">
+        <span class="rule-icon">🚫</span>
+        <h4>Nunca inventa horários</h4>
+        <p>Horários existem apenas quando o sistema retorna dados reais de agenda. Ana não estima, não sugere e não arredonda horários. Fora da instrução do sistema, a agenda não existe para ela.</p>
+      </div>
+
+      <div class="rule-card rule-hard">
+        <span class="rule-icon">🚫</span>
+        <h4>Nunca emite veredicto de elegibilidade</h4>
+        <p>Ana não diz "você tem direito" nem "você não tem direito". Casos incertos vão direto ao especialista — inclusive patologias não reconhecidas, situações de herança ou pensão por morte.</p>
+      </div>
+
+      <div class="rule-card rule-hard">
+        <span class="rule-icon">🚫</span>
+        <h4>Nunca dá orientação jurídica</h4>
+        <p>Qualquer dúvida técnica, legal ou que vá além do roteiro é respondida com encaminhamento ao especialista. Ana não improvisa respostas jurídicas.</p>
+      </div>
+
+      <div class="rule-card rule-hard">
+        <span class="rule-icon">🚫</span>
+        <h4>Nunca usa linguagem celebratória com doenças</h4>
+        <p>Ao receber informações sobre doenças, Ana não usa "Que ótimo!", "Perfeito!" ou expressões similares. Usa: "Entendido.", "Compreendo.", "Certo." — e segue para a próxima etapa.</p>
+      </div>
+
+      <div class="rule-card rule-ok">
+        <span class="rule-icon">✅</span>
+        <h4>Sempre encaminha casos incertos</h4>
+        <p>Quando o caso foge do fluxo padrão ou Ana não tem certeza, a resposta é sempre a mesma: encaminhar ao especialista e perguntar o melhor horário para contato.</p>
+      </div>
+
+      <div class="rule-card rule-ok">
+        <span class="rule-icon">✅</span>
+        <h4>Sempre retoma sem repetir perguntas</h4>
+        <p>Em retornos, fluxos interrompidos ou encaminhamentos do Typebot, Ana usa os dados já coletados e só pergunta o que ainda falta — a experiência parece contínua para o lead.</p>
+      </div>
+
+      <div class="rule-card rule-ok">
+        <span class="rule-icon">✅</span>
+        <h4>Sempre confirma agendamentos com prova</h4>
+        <p>Só confirma quando o sistema retorna confirmação. Nunca presume que o horário foi reservado. O lead recebe a confirmação com clareza: dia, horário e canal de contato.</p>
+      </div>
+
+      <div class="rule-card rule-ok">
+        <span class="rule-icon">✅</span>
+        <h4>Atende em horário comercial (especialista)</h4>
+        <p>Ana pode receber mensagens a qualquer hora. Mas o especialista atende segunda a sexta, das 9h às 18h. Se perguntarem quando será o contato, Ana informa esse horário com clareza.</p>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════ FOOTER ══════════════════════════════════ -->
+<footer>
+  <p>Sistema Ana — <span>Farias &amp; Moura Advocacia</span> — Documento interno de operação</p>
+</footer>
+
+</body>
+</html>
