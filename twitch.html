@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPOS AI — Seu negócio ao vivo. 24h. Nunca offline.</title>
+  <meta name="description" content="Marketing digital com IA. Campanhas, automação, identidade e tráfego num sistema que nunca para. Qualifica leads e agenda consultas enquanto você dorme.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0E0E10;
+      --bg2: #18181B;
+      --bg3: #1F1F23;
+      --bg4: #26262C;
+      --purple: #9146FF;
+      --purple-light: #BF94FF;
+      --purple-dim: rgba(145,70,255,0.12);
+      --purple-border: rgba(145,70,255,0.25);
+      --purple-glow: rgba(145,70,255,0.4);
+      --teal: #00C8AA;
+      --teal-dim: rgba(0,200,170,0.1);
+      --live: #E91916;
+      --text: #EFEFF1;
+      --text-muted: #ADADB8;
+      --text-dim: #53535F;
+      --max: 1140px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* SCANLINE EFFECT */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(145,70,255,0.01) 3px,
+        rgba(145,70,255,0.01) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 clamp(20px, 4vw, 60px); }
+
+    /* LIVE BADGE */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--live);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 5px 10px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(14,14,16,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--purple-border);
+      padding: 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .nav-logo span { color: var(--purple); }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .viewer-count {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      background: var(--purple);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--purple-light); transform: translateY(-1px); box-shadow: 0 4px 20px var(--purple-glow); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 100px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow-left {
+      position: absolute;
+      top: -20%;
+      left: -15%;
+      width: 70vw;
+      height: 70vw;
+      background: radial-gradient(ellipse, rgba(145,70,255,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-glow-right {
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(ellipse, rgba(0,200,170,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s ease forwards;
+    }
+
+    .hero-category {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .hero-h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(52px, 8vw, 108px);
+      font-weight: 800;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .hero-h1 .line {
+      display: block;
+      opacity: 0;
+    }
+
+    .hero-h1 .line:nth-child(1) { animation: fadeUp 0.9s 0.3s ease forwards; }
+    .hero-h1 .line:nth-child(2) {
+      color: var(--purple);
+      animation: fadeUp 0.9s 0.45s ease forwards;
+      text-shadow: 0 0 60px rgba(145,70,255,0.5);
+    }
+    .hero-h1 .line:nth-child(3) { animation: fadeUp 0.9s 0.6s ease forwards; }
+
+    .hero-sub {
+      font-size: clamp(16px, 1.8vw, 19px);
+      color: var(--text-muted);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 44px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.75s ease forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.9s ease forwards;
+    }
+
+    .btn-go-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 40px;
+      background: var(--purple);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-go-live:hover {
+      background: var(--purple-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px var(--purple-glow);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 36px;
+      border: 1px solid var(--purple-border);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-ghost:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* STATS */
+    #stats {
+      background: var(--bg2);
+      border-top: 1px solid var(--purple-border);
+      border-bottom: 1px solid var(--purple-border);
+      padding: 36px 0;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    .stat-block {
+      padding: 0 36px;
+      border-right: 1px solid var(--bg4);
+    }
+
+    .stat-block:last-child { border-right: none; }
+
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800;
+      color: var(--purple);
+      line-height: 1;
+      margin-bottom: 4px;
+      text-shadow: 0 0 30px rgba(145,70,255,0.4);
+    }
+
+    .stat-lbl {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* SECTIONS */
+    section { padding: clamp(64px, 9vw, 112px) 0; }
+
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border: 1px solid var(--purple-border);
+      border-radius: 20px;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 24px;
+    }
+
+    .section-h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    /* FEATURES */
+    #services { background: var(--bg2); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--purple-border);
+      border: 1px solid var(--purple-border);
+    }
+
+    .feature-card {
+      background: var(--bg2);
+      padding: 36px 32px;
+      transition: background 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px;
+      height: 0;
+      background: var(--purple);
+      transition: height 0.4s ease;
+    }
+
+    .feature-card:hover { background: var(--bg3); }
+    .feature-card:hover::before { height: 100%; }
+
+    .feature-card.hero-feature {
+      grid-column: 1 / -1;
+      background: var(--bg3);
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .feature-card.hero-feature::before { display: none; }
+    .feature-card.hero-feature::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 100% at 0% 50%, rgba(145,70,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .feature-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--purple);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .feature-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .tag-pill {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--purple-light);
+      background: var(--purple-dim);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .hero-feature-stat {
+      font-family: 'Syne', sans-serif;
+      font-size: 80px;
+      font-weight: 800;
+      color: var(--purple);
+      opacity: 0.12;
+      line-height: 1;
+    }
+
+    /* VISUAL IMPACT */
+    #visual {
+      background: var(--bg);
+      border-top: 1px solid var(--purple-border);
+      border-bottom: 1px solid var(--purple-border);
+    }
+
+    .visual-twitch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--purple-border);
+      border: 1px solid var(--purple-border);
+    }
+
+    .visual-left {
+      background: var(--bg3);
+      padding: 56px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visual-left::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse 80% 80% at 0% 100%, rgba(145,70,255,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .visual-eyebrow {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .visual-eyebrow::before { content: '▶'; font-size: 8px; }
+
+    .visual-quote-big {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(26px, 3.5vw, 42px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      line-height: 1.05;
+    }
+
+    .visual-quote-big .highlight { color: var(--purple); text-shadow: 0 0 40px rgba(145,70,255,0.5); }
+
+    .visual-right {
+      background: var(--bg2);
+      padding: 56px 48px;
+    }
+
+    .visual-right p {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .visual-right strong { color: var(--text); font-weight: 500; }
+
+    .visual-callout {
+      padding: 18px 20px;
+      border-left: 2px solid var(--purple);
+      background: var(--purple-dim);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-top: 24px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* HOW */
+    #how { background: var(--bg2); }
+
+    .stream-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--purple-border);
+      border: 1px solid var(--purple-border);
+    }
+
+    .stream-step {
+      background: var(--bg2);
+      padding: 44px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stream-step-glow {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--purple);
+      box-shadow: 0 0 12px var(--purple);
+    }
+
+    .stream-phase {
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 14px;
+    }
+
+    .stream-step-bg-num {
+      position: absolute;
+      top: 20px; right: 24px;
+      font-family: 'Syne', sans-serif;
+      font-size: 80px;
+      font-weight: 800;
+      color: var(--purple);
+      opacity: 0.05;
+      line-height: 1;
+    }
+
+    .stream-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      line-height: 1.1;
+    }
+
+    .stream-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .stream-events {
+      list-style: none;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stream-events li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .event-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+    }
+
+    /* FOR WHOM */
+    #for-whom { background: var(--bg); }
+
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--purple-border);
+      border: 1px solid var(--purple-border);
+    }
+
+    .channel-card {
+      background: var(--bg);
+      padding: 28px 24px;
+      transition: background 0.2s;
+      cursor: default;
+    }
+
+    .channel-card:hover { background: var(--bg3); }
+
+    .channel-icon { font-size: 26px; margin-bottom: 12px; display: block; }
+
+    .channel-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .channel-pain {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* PRICING */
+    #pricing { background: var(--bg2); }
+
+    .pricing-tw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--purple-border);
+      border: 1px solid var(--purple-border);
+    }
+
+    .pricing-tw-card {
+      background: var(--bg2);
+      padding: 48px 44px;
+      position: relative;
+    }
+
+    .pricing-tw-card.featured {
+      background: var(--bg3);
+    }
+
+    .pricing-tw-card.featured::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--purple);
+      box-shadow: 0 0 12px var(--purple);
+    }
+
+    .pricing-tier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 20px;
+    }
+
+    .pricing-tw-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .pricing-tw-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .pricing-tw-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(44px, 5vw, 60px);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .pricing-tw-period { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+    .pricing-tw-divider { height: 1px; background: var(--bg4); margin-bottom: 24px; }
+
+    .pricing-tw-list {
+      list-style: none;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pricing-tw-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .pricing-tw-list li .check { color: var(--teal); flex-shrink: 0; font-size: 14px; margin-top: 1px; }
+
+    .btn-go-live-full {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      text-align: center;
+      background: var(--purple);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-go-live-full:hover { background: var(--purple-light); box-shadow: 0 4px 24px var(--purple-glow); }
+
+    .btn-go-live-full.outline {
+      background: transparent;
+      border: 1px solid var(--purple-border);
+      color: var(--text-muted);
+    }
+
+    .btn-go-live-full.outline:hover { border-color: var(--purple); color: var(--purple); background: transparent; box-shadow: none; }
+
+    /* FAQ */
+    #faq { background: var(--bg); }
+
+    .faq-tw-list {
+      max-width: 760px;
+      margin: 0 auto;
+      border: 1px solid var(--purple-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .faq-tw-item { border-bottom: 1px solid var(--purple-border); }
+    .faq-tw-item:last-child { border-bottom: none; }
+
+    .faq-tw-btn {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 28px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    .faq-tw-btn:hover { color: var(--purple); }
+
+    .faq-tw-icon { color: var(--purple); font-size: 18px; transition: transform 0.3s; flex-shrink: 0; margin-top: 2px; }
+    .faq-tw-item.open .faq-tw-icon { transform: rotate(45deg); }
+
+    .faq-tw-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .faq-tw-answer-inner { padding: 0 28px 22px; font-size: 15px; color: var(--text-muted); line-height: 1.75; }
+
+    /* CTA FINAL */
+    #cta-final {
+      background: var(--bg);
+      padding: clamp(80px, 12vw, 140px) 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(145,70,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-final-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(40px, 7vw, 88px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      line-height: 0.95;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .cta-final-title .purple {
+      color: var(--purple);
+      text-shadow: 0 0 60px rgba(145,70,255,0.5);
+    }
+
+    .cta-final-sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    /* FOOTER */
+    footer {
+      background: var(--bg2);
+      padding: 32px 0;
+      border-top: 1px solid var(--purple-border);
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-tw-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .footer-tw-logo span { color: var(--purple); }
+
+    .footer-tw-copy {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* WA FLOAT */
+    .wa-float {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 200;
+      width: 56px; height: 56px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.35);
+      transition: transform 0.2s;
+      text-decoration: none;
+    }
+
+    .wa-float:hover { transform: scale(1.1); }
+    .wa-float svg { width: 28px; height: 28px; fill: #fff; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1000px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .feature-card.hero-feature { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .stat-block { padding: 16px 24px; border-bottom: 1px solid var(--bg4); }
+      .stat-block:nth-child(2) { border-right: none; }
+      .stream-steps { grid-template-columns: 1fr; }
+      .channels-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-tw-grid { grid-template-columns: 1fr; }
+      .visual-twitch { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-actions { flex-direction: column; }
+      .features-grid { grid-template-columns: 1fr; }
+      .channels-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">EPOS <span>AI</span></a>
+        <div class="nav-status">
+          <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+          <span class="viewer-count">Sistema ativo</span>
+        </div>
+        <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="nav-cta" target="_blank" rel="noopener">Go Live →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-glow-left"></div>
+    <div class="hero-glow-right"></div>
+    <div class="container">
+      <div class="hero-top">
+        <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+        <span class="hero-category">Marketing Digital com IA · Sistema Completo</span>
+      </div>
+      <h1 class="hero-h1">
+        <span class="line">Seu negócio</span>
+        <span class="line">ao vivo.</span>
+        <span class="line">Nunca offline.</span>
+      </h1>
+      <p class="hero-sub">
+        Estratégia, identidade, tráfego e IA num único sistema. Leads qualificados, consultas agendadas — 24 horas por dia, sem pausar.
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="btn-go-live" target="_blank" rel="noopener">
+          ▶ Quero esse sistema
+        </a>
+        <a href="#services" class="btn-ghost">Ver funcionalidades</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div id="stats">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-block reveal">
+          <div class="stat-val" data-count="24">0</div>
+          <div class="stat-lbl">Horas ativo por dia</div>
+        </div>
+        <div class="stat-block reveal" style="transition-delay:0.1s">
+          <div class="stat-val" data-count="7">0</div>
+          <div class="stat-lbl">Pilares entregues</div>
+        </div>
+        <div class="stat-block reveal" style="transition-delay:0.2s">
+          <div class="stat-val">2min</div>
+          <div class="stat-lbl">Para qualificar um lead</div>
+        </div>
+        <div class="stat-block reveal" style="transition-delay:0.3s">
+          <div class="stat-val">0</div>
+          <div class="stat-lbl">Leads perdidos por demora</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="services">
+    <div class="container">
+      <div class="section-badge reveal">FUNCIONALIDADES</div>
+      <h2 class="section-h2 reveal">SETE PILARES.<br>UM SISTEMA.</h2>
+      <p class="section-sub reveal">Cada pilar alimenta o próximo. Da atração ao cliente fechado — sem lacunas.</p>
+
+      <div class="features-grid">
+
+        <div class="feature-card reveal">
+          <span class="feature-num">01 · ESTRATÉGIA</span>
+          <span class="feature-icon">🧭</span>
+          <h3 class="feature-title">Estratégia Digital</h3>
+          <p class="feature-desc">Diagnóstico, posicionamento, persona e calendário editorial. A base que determina se tudo o que vem depois vai funcionar.</p>
+          <div class="feature-tags"><span class="tag-pill">Diagnóstico</span><span class="tag-pill">Persona</span></div>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.05s">
+          <span class="feature-num">02 · COPY</span>
+          <span class="feature-icon">✍️</span>
+          <h3 class="feature-title">Copy & Conteúdo</h3>
+          <p class="feature-desc">Anúncios, landing pages, scripts do bot. As palavras que transformam scroll em clique e clique em lead.</p>
+          <div class="feature-tags"><span class="tag-pill">Anúncios</span><span class="tag-pill">Scripts IA</span></div>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.1s">
+          <span class="feature-num">03 · VISUAL</span>
+          <span class="feature-icon">🎬</span>
+          <h3 class="feature-title">Audiovisual & Identidade</h3>
+          <p class="feature-desc">E se o cliente, ao ver qualquer peça sua, já sentisse que seu preço é justo? Vídeos, fotos e identidade que comunicam valor antes das palavras.</p>
+          <div class="feature-tags"><span class="tag-pill">Percepção de Valor</span><span class="tag-pill">Vídeos</span></div>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.15s">
+          <span class="feature-num">04 · TRÁFEGO</span>
+          <span class="feature-icon">📡</span>
+          <h3 class="feature-title">Gestão de Tráfego</h3>
+          <p class="feature-desc">Meta Ads + Google Ads com dados reais de conversão via CAPI server-side. Cada real rastreado até o agendamento.</p>
+          <div class="feature-tags"><span class="tag-pill">Meta Ads</span><span class="tag-pill">CAPI</span></div>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.2s">
+          <span class="feature-num">05 · COMUNIDADE</span>
+          <span class="feature-icon">🌐</span>
+          <h3 class="feature-title">Comunidade Online</h3>
+          <p class="feature-desc">Instagram, TikTok e LinkedIn com conteúdo estratégico. Autoridade que traz leads sem depender só de anúncios.</p>
+          <div class="feature-tags"><span class="tag-pill">Instagram</span><span class="tag-pill">TikTok</span></div>
+        </div>
+
+        <div class="feature-card reveal" style="transition-delay:0.25s">
+          <span class="feature-num">06 · SITE</span>
+          <span class="feature-icon">💻</span>
+          <h3 class="feature-title">Site Profissional</h3>
+          <p class="feature-desc">Landing page ou site construído para converter. Pixel instalado, rastreamento ativo desde o primeiro acesso.</p>
+          <div class="feature-tags"><span class="tag-pill">Landing Page</span><span class="tag-pill">Rastreamento</span></div>
+        </div>
+
+        <div class="feature-card hero-feature reveal" style="transition-delay:0.3s">
+          <div>
+            <div class="hero-feature-stat">07</div>
+          </div>
+          <div>
+            <span class="feature-num">07 · O CORE</span>
+            <div class="live-badge" style="margin-bottom: 14px;"><div class="live-dot"></div>SEMPRE ATIVO</div>
+            <h3 class="feature-title" style="font-size: 22px;">Sistema WhatsApp IA</h3>
+            <p class="feature-desc" style="font-size: 15px; max-width: 640px;">Qualificação automática, agendamento real no Google Calendar, Meta CAPI server-side e handoff inteligente para humanos. Quando sua equipe assume no Chatwoot, a IA recua. Sem sobreposição. Sempre funcionando.</p>
+            <div class="feature-tags" style="margin-top: 16px;">
+              <span class="tag-pill">Qualificação 24h</span>
+              <span class="tag-pill">Agendamento real</span>
+              <span class="tag-pill">Meta CAPI</span>
+              <span class="tag-pill">Handoff humano</span>
+              <span class="tag-pill">Silêncio inteligente</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- VISUAL IMPACT -->
+  <section id="visual">
+    <div class="container">
+      <div class="visual-twitch reveal">
+        <div class="visual-left">
+          <div class="visual-eyebrow">PILAR 03 · AUDIOVISUAL & IDENTIDADE</div>
+          <blockquote class="visual-quote-big">
+            E SE SEU CLIENTE VIR QUALQUER PEÇA SUA E JÁ SOUBER QUE <span class="highlight">SEU PREÇO É JUSTO?</span>
+          </blockquote>
+        </div>
+        <div class="visual-right">
+          <p>O visual não é decoração. <strong>É o argumento de venda que opera antes de qualquer palavra.</strong></p>
+          <p>Quando cada frame tem peso, quando cada foto transmite profissionalismo, quando cada arte nas redes comunica exatamente quem você é — o cliente chega pré-convencido.</p>
+          <p>A negociação começa com o cliente querendo fechar. Não pedindo desconto.</p>
+          <div class="visual-callout">
+            Produzimos cada elemento visual para que a primeira impressão já justifique o seu posicionamento — antes de qualquer conversa.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT STREAMS -->
+  <section id="how">
+    <div class="container">
+      <div class="section-badge reveal">COMO FUNCIONA</div>
+      <h2 class="section-h2 reveal">TRÊS FASES.<br>DO CLIQUE AO FECHADO.</h2>
+      <p class="section-sub reveal">Cada fase é conectada. O que acontece em uma alimenta a próxima — tudo rastreado.</p>
+      <div class="stream-steps reveal">
+
+        <div class="stream-step">
+          <div class="stream-step-glow"></div>
+          <div class="stream-step-bg-num">01</div>
+          <div class="stream-phase">FASE 01 · ATRAÇÃO</div>
+          <h3 class="stream-title">Campanha no ar.<br>Lead no WhatsApp.</h3>
+          <p class="stream-desc">Anúncio com copy estratégico. Clicou, caiu direto no número dedicado.</p>
+          <ul class="stream-events">
+            <li><span class="event-dot"></span>Meta CAPI registra no servidor</li>
+            <li><span class="event-dot"></span>UTM identifica a origem</li>
+            <li><span class="event-dot"></span>Sistema classifica automaticamente</li>
+          </ul>
+        </div>
+
+        <div class="stream-step">
+          <div class="stream-step-glow" style="background: var(--teal); box-shadow: 0 0 12px var(--teal);"></div>
+          <div class="stream-step-bg-num">02</div>
+          <div class="stream-phase" style="color: var(--teal);">FASE 02 · QUALIFICAÇÃO</div>
+          <h3 class="stream-title">IA qualifica.<br>Horário agendado.</h3>
+          <p class="stream-desc">A Ana atende, entende a necessidade e verifica disponibilidade real. Em menos de 2 minutos.</p>
+          <ul class="stream-events">
+            <li><span class="event-dot" style="background: var(--teal);"></span>Fluxo coleta dados essenciais</li>
+            <li><span class="event-dot" style="background: var(--teal);"></span>IA qualifica por perfil</li>
+            <li><span class="event-dot" style="background: var(--teal);"></span>Evento criado no Google Calendar</li>
+          </ul>
+        </div>
+
+        <div class="stream-step">
+          <div class="stream-step-glow" style="background: #FFD700; box-shadow: 0 0 12px rgba(255,215,0,0.5);"></div>
+          <div class="stream-step-bg-num">03</div>
+          <div class="stream-phase" style="color: #FFD700;">FASE 03 · CONVERSÃO</div>
+          <h3 class="stream-title">Humano fecha.<br>Sistema aprende.</h3>
+          <p class="stream-desc">Sua equipe recebe notificação com dados do lead e assume. A IA para — sem conflito.</p>
+          <ul class="stream-events">
+            <li><span class="event-dot" style="background: #FFD700;"></span>Vendedores notificados no WhatsApp</li>
+            <li><span class="event-dot" style="background: #FFD700;"></span>IA silencia quando humano assume</li>
+            <li><span class="event-dot" style="background: #FFD700;"></span>Histórico salvo no Chatwoot</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR WHOM -->
+  <section id="for-whom">
+    <div class="container">
+      <div class="section-badge reveal">PARA QUEM É</div>
+      <h2 class="section-h2 reveal">SE VOCÊ VENDE<br>PELO WHATSAPP.</h2>
+      <p class="section-sub reveal">Para qualquer negócio que receba leads e precise qualificar antes de atender.</p>
+      <div class="channels-grid reveal">
+        <div class="channel-card"><span class="channel-icon">⚖️</span><div class="channel-name">Advocacia</div><div class="channel-pain">"Perco tempo com casos que não atendo."</div></div>
+        <div class="channel-card"><span class="channel-icon">🦷</span><div class="channel-name">Odontologia</div><div class="channel-pain">"Equipe passa o dia respondendo WhatsApp."</div></div>
+        <div class="channel-card"><span class="channel-icon">🩺</span><div class="channel-name">Medicina</div><div class="channel-pain">"Lead de madrugada vai para a concorrência."</div></div>
+        <div class="channel-card"><span class="channel-icon">🏠</span><div class="channel-name">Imobiliárias</div><div class="channel-pain">"Não escalo sem contratar mais corretores."</div></div>
+        <div class="channel-card"><span class="channel-icon">💆</span><div class="channel-name">Estética</div><div class="channel-pain">"Mais tempo no celular do que atendendo."</div></div>
+        <div class="channel-card"><span class="channel-icon">🎓</span><div class="channel-name">Educação</div><div class="channel-pain">"Quero focar nos clientes certos."</div></div>
+        <div class="channel-card"><span class="channel-icon">🏗️</span><div class="channel-name">Serviços</div><div class="channel-pain">"Lead sem resposta em 5min vai embora."</div></div>
+        <div class="channel-card"><span class="channel-icon">💼</span><div class="channel-name">Consultoria</div><div class="channel-pain">"Preciso qualificar antes da primeira reunião."</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-badge reveal">INVESTIMENTO</div>
+      <h2 class="section-h2 reveal">PREÇO JUSTO.<br>RESULTADO CLARO.</h2>
+      <p class="section-sub reveal">Transparência total. Mínimo de 3 meses para o sistema atingir a maturidade.</p>
+      <div class="pricing-tw-grid reveal">
+        <div class="pricing-tw-card featured">
+          <div class="pricing-tier-badge">▶ FASE 2 · DISPONÍVEL AGORA</div>
+          <div class="pricing-tw-name">Sistema Completo</div>
+          <div class="pricing-tw-desc">Tudo que é essencial para vender pelo WhatsApp com IA, tráfego e identidade.</div>
+          <div class="pricing-tw-amount">R$6.000</div>
+          <div class="pricing-tw-period">/mês · setup incluso nos primeiros 2 meses</div>
+          <div class="pricing-tw-divider"></div>
+          <ul class="pricing-tw-list">
+            <li><span class="check">✓</span> Estratégia digital completa</li>
+            <li><span class="check">✓</span> Identidade visual (logo, paleta, tipografia)</li>
+            <li><span class="check">✓</span> Copy de anúncios e landing page</li>
+            <li><span class="check">✓</span> Audiovisual para campanhas</li>
+            <li><span class="check">✓</span> Site de 1 página</li>
+            <li><span class="check">✓</span> Gestão de tráfego Meta + Google</li>
+            <li><span class="check">✓</span> Conteúdo orgânico mensal</li>
+            <li><span class="check">✓</span> Sistema WhatsApp IA completo</li>
+            <li><span class="check">✓</span> Meta CAPI configurado</li>
+            <li><span class="check">✓</span> Suporte e manutenção mensal</li>
+          </ul>
+          <a href="https://wa.me/5561985545598?text=Quero+o+sistema+EPOS+AI" class="btn-go-live-full" target="_blank" rel="noopener">▶ QUERO ESSE SISTEMA</a>
+        </div>
+        <div class="pricing-tw-card">
+          <div class="pricing-tier-badge" style="color: var(--text-muted);">FASE 3 · EM BREVE</div>
+          <div class="pricing-tw-name" style="color: var(--text-muted);">Sistema Elite</div>
+          <div class="pricing-tw-desc">CRM, dashboard de ROI em tempo real, email marketing automatizado.</div>
+          <div class="pricing-tw-amount" style="color: var(--text-dim);">R$8.000</div>
+          <div class="pricing-tw-period">/mês</div>
+          <div class="pricing-tw-divider"></div>
+          <ul class="pricing-tw-list">
+            <li><span class="check" style="color: var(--text-dim);">✓</span> <span style="opacity:0.45">Tudo do Sistema Completo</span></li>
+            <li><span class="check" style="color: var(--text-dim);">✓</span> <span style="opacity:0.45">CRM integrado</span></li>
+            <li><span class="check" style="color: var(--text-dim);">✓</span> <span style="opacity:0.45">Dashboard de ROI em tempo real</span></li>
+            <li><span class="check" style="color: var(--text-dim);">✓</span> <span style="opacity:0.45">Email marketing automatizado</span></li>
+            <li><span class="check" style="color: var(--text-dim);">✓</span> <span style="opacity:0.45">API oficial WhatsApp Business</span></li>
+          </ul>
+          <a href="https://wa.me/5561985545598?text=Interesse+no+Sistema+Elite" class="btn-go-live-full outline" target="_blank" rel="noopener">LISTA DE ESPERA</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-badge reveal">FAQ</div>
+      <h2 class="section-h2 reveal" style="margin-bottom: 40px;">DÚVIDAS DIRETAS.</h2>
+      <div class="faq-tw-list reveal">
+        <div class="faq-tw-item"><button class="faq-tw-btn">Preciso de um número WhatsApp específico? <span class="faq-tw-icon">+</span></button><div class="faq-tw-answer"><div class="faq-tw-answer-inner">Sim — um chip dedicado (número novo ou secundário). Nunca o principal do negócio. Configuramos tudo para você, sem complicação.</div></div></div>
+        <div class="faq-tw-item"><button class="faq-tw-btn">Minha equipe precisa aprender ferramentas novas? <span class="faq-tw-icon">+</span></button><div class="faq-tw-answer"><div class="faq-tw-answer-inner">Só o Chatwoot — interface simples como WhatsApp Web. Sua equipe só precisa saber entrar e responder. Treinamos no dia do go-live.</div></div></div>
+        <div class="faq-tw-item"><button class="faq-tw-btn">Quanto tempo para funcionar? <span class="faq-tw-icon">+</span></button><div class="faq-tw-answer"><div class="faq-tw-answer-inner">3 a 7 dias úteis para o setup completo. Primeiros leads chegam na primeira semana após a campanha ir ao ar.</div></div></div>
+        <div class="faq-tw-item"><button class="faq-tw-btn">A IA pode responder algo errado e me prejudicar? <span class="faq-tw-icon">+</span></button><div class="faq-tw-answer"><div class="faq-tw-answer-inner">Não. Opera dentro de instruções precisas. Não faz diagnósticos, não promete resultados, não inventa informações. Fora do escopo → redireciona para humano. Quando humano assume → IA para imediatamente.</div></div></div>
+        <div class="faq-tw-item"><button class="faq-tw-btn">Tem contrato de fidelidade? <span class="faq-tw-icon">+</span></button><div class="faq-tw-answer"><div class="faq-tw-answer-inner">Mínimo 3 meses — necessário para o sistema e as campanhas otimizarem. Depois: mensal com 30 dias de aviso. Todo o material criado fica com você.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section id="cta-final">
+    <div class="cta-glow"></div>
+    <div class="container">
+      <h2 class="cta-final-title reveal">SEU NEGÓCIO<br><span class="purple">AO VIVO</span><br>A PARTIR DE AGORA.</h2>
+      <p class="cta-final-sub reveal">Em 15 minutos mostramos exatamente como funciona para o seu caso.</p>
+      <div class="cta-actions reveal">
+        <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="btn-go-live" target="_blank" rel="noopener" style="font-size: 16px; padding: 18px 48px;">▶ FALAR AGORA NO WHATSAPP</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-tw-logo">EPOS <span>AI</span></div>
+      <div class="footer-tw-copy">Nunca offline. Sempre convertendo.</div>
+    </div>
+  </footer>
+
+  <!-- WA FLOAT -->
+  <a href="https://wa.me/5561985545598?text=Quero+saber+mais+sobre+o+sistema+EPOS+AI" class="wa-float" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+  </a>
+
+  <script>
+    // Reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    reveals.forEach(el => observer.observe(el));
+
+    // Counters
+    function animateCounter(el, target) {
+      const start = performance.now();
+      const dur = 1500;
+      const update = (now) => {
+        const p = Math.min((now - start) / dur, 1);
+        const e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(e * target);
+        if (p < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+    const cObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          const t = parseInt(el.dataset.count);
+          if (!isNaN(t)) animateCounter(el, t);
+          cObs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('[data-count]').forEach(el => cObs.observe(el));
+
+    // FAQ
+    document.querySelectorAll('.faq-tw-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const answer = item.querySelector('.faq-tw-answer');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-tw-item.open').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-tw-answer').style.maxHeight = null;
+        });
+        if (!isOpen) { item.classList.add('open'); answer.style.maxHeight = answer.scrollHeight + 'px'; }
+      });
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
