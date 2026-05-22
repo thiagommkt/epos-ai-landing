@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPOS AI — Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:       #0E0E10;
+  --bg2:      #18181B;
+  --bg3:      #1F1F23;
+  --surface:  rgba(145,70,255,0.07);
+  --surface-h:rgba(145,70,255,0.13);
+  --bd:       rgba(145,70,255,0.18);
+  --bd-b:     rgba(145,70,255,0.38);
+  --purple:   #9146FF;
+  --pur-l:    rgba(145,70,255,0.14);
+  --neon:     #00F5A0;
+  --neon-l:   rgba(0,245,160,0.1);
+  --warn:     #FF5E5B;
+  --text:     #EFEFF1;
+  --muted:    rgba(239,239,241,0.55);
+  --dim:      rgba(239,239,241,0.3);
+  --fD:       'Rajdhani', sans-serif;
+  --fB:       'Outfit', sans-serif;
+  --fM:       'DM Mono', monospace;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fB);font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* scanline subtle overlay */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px);pointer-events:none;z-index:0}
+
+/* purple glow */
+body::after{content:'';position:fixed;top:-5%;left:20%;width:800px;height:400px;background:radial-gradient(ellipse,rgba(145,70,255,0.07) 0%,transparent 65%);pointer-events:none;z-index:0}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;position:relative;z-index:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+aside{
+  width:220px;flex-shrink:0;background:var(--bg2);
+  border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;
+}
+
+.sb-logo{
+  padding:22px 18px 20px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:12px;
+}
+
+.sb-icon{
+  width:36px;height:36px;background:var(--purple);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fD);font-size:18px;font-weight:700;color:#fff;
+  position:relative;clip-path:polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+
+.sb-name{
+  font-family:var(--fD);font-size:20px;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+
+.sb-name span{color:var(--purple)}
+
+nav{flex:1;padding:12px 0;overflow-y:auto}
+
+nav a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;font-size:13px;font-weight:500;
+  font-family:var(--fD);letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  border-left:3px solid transparent;
+  transition:all 0.15s;cursor:pointer;
+}
+
+nav a:hover{color:var(--text);background:rgba(145,70,255,0.06)}
+
+nav a.active{
+  color:var(--text);
+  border-left-color:var(--purple);
+  background:var(--pur-l);
+}
+
+nav a svg{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+nav a.active svg{opacity:1;filter:drop-shadow(0 0 4px var(--purple))}
+
+.nav-section{
+  font-size:8.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--dim);padding:14px 16px 5px;font-family:var(--fB);
+}
+
+.sb-footer{padding:14px 16px;border-top:1px solid var(--bd)}
+.sb-c-name{font-family:var(--fD);font-size:14px;font-weight:600;color:var(--text);letter-spacing:0.04em;text-transform:uppercase}
+.sb-c-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.sb-live{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;font-family:var(--fM);color:var(--neon)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--neon)}50%{opacity:0.5;box-shadow:0 0 2px var(--neon)}}
+
+/* ── MAIN ── */
+main{flex:1;overflow-y:auto;background:var(--bg)}
+
+.section{display:none;padding:28px 32px 48px;min-height:100%}
+.section.active{display:block}
+
+.sec-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between}
+
+.sec-title{
+  font-family:var(--fD);font-size:30px;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;color:var(--text);line-height:1;
+}
+
+.sec-title span{color:var(--purple)}
+
+.sec-sub{font-size:11px;color:var(--muted);font-family:var(--fM);margin-top:4px;letter-spacing:0.04em}
+
+.sec-badge{
+  padding:4px 10px;background:var(--pur-l);
+  border:1px solid var(--bd-b);
+  font-family:var(--fM);font-size:10px;color:var(--purple);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+
+/* ── DIVIDER ── */
+.rule{
+  width:100%;height:1px;background:var(--bd);margin:0 0 24px;
+  position:relative;overflow:visible;
+}
+.rule::before{
+  content:'';position:absolute;left:0;top:-1px;width:60px;height:3px;
+  background:linear-gradient(90deg,var(--purple),transparent);
+}
+
+/* ── KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+
+.kpi{
+  background:var(--bg2);border:1px solid var(--bd);
+  padding:20px 18px 14px;position:relative;overflow:hidden;
+  cursor:default;transition:border-color 0.2s,box-shadow 0.2s;
+}
+
+.kpi:hover{border-color:var(--purple);box-shadow:0 0 16px rgba(145,70,255,0.12)}
+
+.kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--purple),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.kpi:hover::before{opacity:0.8}
+
+.kpi-lbl{font-family:var(--fD);font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+
+.kpi-val{font-family:var(--fD);font-size:50px;font-weight:700;line-height:1;color:var(--text);margin-bottom:4px}
+.kpi-val.g{color:var(--purple)}
+.kpi-val.n{color:var(--neon)}
+.kpi-unit{font-family:var(--fB);font-size:20px;font-weight:400;color:var(--muted)}
+.kpi-note{font-size:10.5px;color:var(--dim);font-family:var(--fM)}
+.kpi-note.up{color:var(--neon)}
+.kpi-bar{position:absolute;bottom:0;left:0;height:2px;width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1) .4s}
+
+/* ── LAYOUT ── */
+.two-col{display:grid;grid-template-columns:290px 1fr;gap:12px;margin-bottom:12px}
+.two-col-eq{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+
+.card{
+  background:var(--bg2);border:1px solid var(--bd);padding:20px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.card:hover{border-color:rgba(145,70,255,0.3);box-shadow:0 0 12px rgba(145,70,255,0.06)}
+
+.card-ttl{
+  font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--dim);
+  margin-bottom:18px;display:flex;align-items:center;gap:10px;
+}
+.card-ttl::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ── FUNNEL ── */
+.funnel{display:flex;flex-direction:column}
+.f-row{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.f-lbl{font-size:10.5px;color:var(--muted);width:76px;flex-shrink:0;font-family:var(--fB)}
+.f-track{flex:1;height:26px;background:rgba(145,70,255,0.05);overflow:hidden;position:relative}
+.f-fill{height:100%;position:absolute;left:0;top:0;width:0;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;transition:width 1.2s cubic-bezier(.16,1,.3,1) .3s}
+.f1{background:linear-gradient(90deg,rgba(145,70,255,.7),rgba(145,70,255,.3))}
+.f2{background:linear-gradient(90deg,rgba(145,70,255,.55),rgba(145,70,255,.22))}
+.f3{background:linear-gradient(90deg,rgba(145,70,255,.42),rgba(0,245,160,.15))}
+.f4{background:linear-gradient(90deg,rgba(0,245,160,.42),rgba(0,245,160,.2))}
+.f5{background:linear-gradient(90deg,rgba(0,245,160,.6),rgba(0,245,160,.3))}
+.f-pct{font-family:var(--fM);font-size:10px;color:rgba(239,239,241,.85);white-space:nowrap}
+.f-n{font-family:var(--fM);font-size:17px;font-weight:300;color:var(--dim);width:26px;text-align:right;flex-shrink:0}
+.f-gap{height:12px;padding-left:86px;display:flex;align-items:center;gap:6px}
+.f-gline{width:1px;height:12px;background:var(--bd)}
+.f-gdrop{font-family:var(--fM);font-size:9px;color:var(--dim);border:1px solid var(--bd);padding:0 5px}
+
+/* ── TABLES ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead th{font-family:var(--fD);font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--dim);padding:0 8px 10px 0;text-align:left;border-bottom:1px solid var(--bd)}
+.tbl tbody tr{border-bottom:1px solid rgba(145,70,255,0.05);transition:background 0.15s}
+.tbl tbody tr:hover{background:rgba(145,70,255,0.05)}
+.tbl tbody td{padding:10px 8px 10px 0;font-size:12px;color:var(--muted);vertical-align:middle}
+.td-hi{color:var(--text)!important;font-weight:500}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;font-size:9px;font-family:var(--fM);letter-spacing:0.04em}
+.badge::before{content:'';width:4px;height:4px;border-radius:50%}
+.b-ag{background:rgba(0,245,160,.09);color:var(--neon);border:1px solid rgba(0,245,160,.2)}
+.b-ag::before{background:var(--neon)}
+.b-ql{background:rgba(145,70,255,.09);color:var(--purple);border:1px solid rgba(145,70,255,.2)}
+.b-ql::before{background:var(--purple)}
+.b-ct{background:rgba(239,239,241,.04);color:var(--dim);border:1px solid var(--bd)}
+.b-ct::before{background:var(--dim)}
+.b-ds{background:rgba(255,94,91,.09);color:var(--warn);border:1px solid rgba(255,94,91,.2)}
+.b-ds::before{background:var(--warn)}
+.score{font-family:var(--fM);font-size:11px;color:var(--purple)}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{
+  padding:5px 12px;font-size:11px;font-family:var(--fD);font-weight:600;
+  letter-spacing:0.08em;text-transform:uppercase;
+  border:1px solid var(--bd);background:transparent;color:var(--muted);
+  cursor:pointer;transition:all 0.15s;
+}
+.filter-btn:hover{border-color:var(--purple);color:var(--text)}
+.filter-btn.active{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
+
+/* ── CRM ── */
+.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.kanban::-webkit-scrollbar{height:4px}
+.kanban::-webkit-scrollbar-track{background:var(--bg2)}
+.kanban::-webkit-scrollbar-thumb{background:var(--purple)}
+.col{flex-shrink:0;width:210px;background:var(--bg2);border:1px solid var(--bd);padding:12px}
+.col-head{font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.col-count{width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:var(--pur-l);border:1px solid var(--bd-b);font-family:var(--fM);font-size:10px;color:var(--purple)}
+.krm-card{background:var(--bg3);border:1px solid var(--bd);border-top:2px solid transparent;padding:10px;margin-bottom:8px;cursor:default;transition:border-color 0.2s,box-shadow 0.2s}
+.krm-card:hover{border-color:var(--purple);box-shadow:0 0 10px rgba(145,70,255,0.1)}
+.krm-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.krm-path{font-size:10px;color:var(--muted);margin-bottom:8px}
+.krm-foot{display:flex;justify-content:space-between;align-items:center}
+.krm-time{font-family:var(--fM);font-size:9px;color:var(--dim)}
+.krm-score{font-family:var(--fM);font-size:11px;color:var(--purple)}
+
+/* ── CHAT ── */
+.chat-tabs{display:flex;border-bottom:1px solid var(--bd)}
+.chat-tab{padding:10px 16px;font-family:var(--fD);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all 0.15s}
+.chat-tab:hover{color:var(--text)}
+.chat-tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+.chat-view{display:none}
+.chat-view.active{display:flex}
+.chat-wa{display:flex;height:520px;border:1px solid var(--bd);border-top:none}
+.chat-list{width:220px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+.chat-search{padding:8px}
+.chat-search input{width:100%;background:var(--bg3);border:1px solid var(--bd);padding:7px 10px;font-size:11px;color:var(--text);font-family:var(--fB);outline:none}
+.chat-search input::placeholder{color:var(--dim)}
+.conv-list{flex:1;overflow-y:auto}
+.conv{display:flex;gap:8px;padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(145,70,255,0.05);transition:background 0.15s}
+.conv:hover{background:rgba(145,70,255,0.06)}
+.conv.active{background:var(--pur-l);border-left:2px solid var(--purple)}
+.conv-av{width:32px;height:32px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-family:var(--fD);font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.conv-info{flex:1;min-width:0}
+.conv-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-last{font-size:10px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-time{font-family:var(--fM);font-size:9px;color:var(--dim)}
+.chat-main{flex:1;display:flex;flex-direction:column;background:var(--bg)}
+.chat-mhead{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);background:var(--bg2)}
+.chat-mname{font-family:var(--fD);font-size:15px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--text)}
+.chat-mstatus{font-size:10px;color:var(--muted);font-family:var(--fM);margin-top:2px}
+.ia-badge{padding:3px 10px;background:var(--pur-l);border:1px solid var(--bd-b);font-family:var(--fM);font-size:9px;color:var(--purple);letter-spacing:0.08em;text-transform:uppercase}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{display:flex;gap:8px;max-width:80%}
+.msg.out{flex-direction:row-reverse;align-self:flex-end}
+.msg.in{align-self:flex-start}
+.msg-bubble{padding:8px 12px;font-size:12px;line-height:1.5;border-radius:2px}
+.msg.in .msg-bubble{background:var(--bg2);border:1px solid var(--bd);color:var(--text)}
+.msg.out .msg-bubble{background:var(--pur-l);border:1px solid var(--bd-b);color:var(--text)}
+.msg-bot .msg-bubble{background:rgba(145,70,255,0.08);border:1px solid rgba(145,70,255,0.2)}
+.msg-time{font-family:var(--fM);font-size:8.5px;color:var(--dim);margin-top:3px;text-align:right}
+.msg-sender{font-family:var(--fD);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:3px;color:var(--purple)}
+.chat-footer{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:8px;background:var(--bg2)}
+.chat-input-fake{flex:1;background:var(--bg3);border:1px solid var(--bd);padding:8px 12px;font-size:11.5px;color:var(--dim);font-family:var(--fB)}
+.btn-assumir{padding:8px 14px;background:transparent;border:1px solid var(--purple);color:var(--purple);font-size:10.5px;font-family:var(--fD);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.btn-assumir:hover{background:var(--pur-l);box-shadow:0 0 10px rgba(145,70,255,0.2)}
+
+/* ── API OFICIAL ── */
+.api-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.tmpl{background:var(--bg2);border:1px solid var(--bd);padding:14px;cursor:pointer;transition:all 0.15s}
+.tmpl:hover{border-color:var(--purple);box-shadow:0 0 12px rgba(145,70,255,0.12)}
+.tmpl-icon{font-size:18px;margin-bottom:8px}
+.tmpl-name{font-family:var(--fD);font-size:13px;font-weight:600;color:var(--text);letter-spacing:0.04em;margin-bottom:4px}
+.tmpl-desc{font-size:10.5px;color:var(--muted)}
+.tmpl-status{display:inline-block;margin-top:8px;padding:2px 7px;font-family:var(--fM);font-size:8.5px;letter-spacing:0.08em;background:rgba(0,245,160,.09);border:1px solid rgba(0,245,160,.2);color:var(--neon)}
+
+/* ── PLANILHAS ── */
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.btn-export{padding:7px 14px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.btn-export:hover{border-color:var(--purple);color:var(--purple)}
+.sheet-wrap{overflow-x:auto}
+.sheet{border-collapse:collapse;width:100%;min-width:900px}
+.sheet th{background:rgba(145,70,255,0.08);font-family:var(--fD);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--dim);padding:9px 12px;text-align:left;border:1px solid var(--bd);white-space:nowrap}
+.sheet td{font-size:11px;color:var(--muted);padding:8px 12px;border:1px solid rgba(145,70,255,0.05);vertical-align:middle}
+.sheet tr:nth-child(even) td{background:rgba(145,70,255,0.02)}
+.sheet tr:hover td{background:rgba(145,70,255,0.06)}
+
+/* ── CAMPANHAS ── */
+.camp-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.m-card{background:var(--bg2);border:1px solid var(--bd);padding:16px;border-top:2px solid var(--purple)}
+.m-lbl{font-family:var(--fD);font-size:9.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.m-val{font-family:var(--fD);font-size:28px;font-weight:700;color:var(--text)}
+.m-val.g{color:var(--purple)}
+.m-val.n{color:var(--neon)}
+.m-delta{font-size:10px;color:var(--dim);margin-top:4px;font-family:var(--fM)}
+
+/* ── CONFIGURAÇÕES ── */
+.cfg-grid{display:flex;flex-direction:column;gap:12px}
+.cfg-sec{background:var(--bg2);border:1px solid var(--bd);padding:18px}
+.cfg-sec-title{font-family:var(--fD);font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(145,70,255,0.04)}
+.cfg-row:last-child{border-bottom:none}
+.cfg-key{font-size:12.5px;color:var(--text);font-weight:500}
+.cfg-val{font-family:var(--fM);font-size:11px;color:var(--muted)}
+.cfg-toggle{width:36px;height:20px;background:var(--bg3);border:1px solid var(--bd);position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s}
+.cfg-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:var(--dim);transition:all 0.2s}
+.cfg-toggle.on{background:var(--pur-l);border-color:var(--purple)}
+.cfg-toggle.on::after{left:19px;background:var(--purple);box-shadow:0 0 6px var(--purple)}
+
+/* ── METRICS ── */
+.metrics-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.ms-card{background:var(--bg2);border:1px solid var(--bd);padding:16px;position:relative;overflow:hidden}
+.ms-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),transparent)}
+.ms-lbl{font-family:var(--fD);font-size:9.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.ms-val{font-family:var(--fD);font-size:32px;font-weight:700;color:var(--text)}
+.ms-val.g{color:var(--purple)}
+.ms-val.n{color:var(--neon)}
+.ms-sub{font-size:10px;color:var(--dim);margin-top:4px;font-family:var(--fM)}
+
+.utm-list{display:flex;flex-direction:column;gap:12px}
+.utm-row{display:grid;grid-template-columns:90px 1fr 42px 42px;gap:10px;align-items:center}
+.utm-src{font-family:var(--fM);font-size:11px;color:var(--text)}
+.utm-track{height:5px;background:rgba(145,70,255,0.08);position:relative;overflow:hidden}
+.utm-fill{position:absolute;left:0;top:0;height:100%;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1) .3s}
+.utm-n{font-family:var(--fM);font-size:11px;color:var(--muted);text-align:right}
+.utm-p{font-family:var(--fM);font-size:10px;color:var(--dim);text-align:right}
+.uf-meta{background:#4AAEFF}
+.uf-direct{background:var(--purple)}
+.uf-google{background:#E05D4B}
+.uf-organic{background:var(--neon)}
+
+canvas{display:block;width:100%!important}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside>
+  <div class="sb-logo">
+    <div class="sb-icon">E</div>
+    <div class="sb-name">EPOS <span>AI</span></div>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <a class="active" data-sec="dashboard">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>
+      Dashboard
+    </a>
+    <a data-sec="metricas">
+      <svg viewBox="0 0 16 16" fill="currentColor"><polyline points="1,12 5,6 9,9 13,2 15,4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      Métricas
+    </a>
+    <div class="nav-section">Leads</div>
+    <a data-sec="dados">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
+      Dados
+    </a>
+    <a data-sec="crm">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="3" height="14"/><rect x="6" y="1" width="3" height="10"/><rect x="11" y="1" width="3" height="7"/></svg>
+      CRM
+    </a>
+    <a data-sec="planilhas">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="5" x2="15" y2="5" stroke="currentColor" stroke-width="1"/><line x1="1" y1="9" x2="15" y2="9" stroke="currentColor" stroke-width="1"/><line x1="6" y1="5" x2="6" y2="15" stroke="currentColor" stroke-width="1"/><line x1="11" y1="5" x2="11" y2="15" stroke="currentColor" stroke-width="1"/></svg>
+      Planilhas
+    </a>
+    <div class="nav-section">Comunicação</div>
+    <a data-sec="chat">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v9H9l-3 3V11H1V2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      Chat
+    </a>
+    <a data-sec="campanhas">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 8l5-5 3 3 5-5v12H1V8z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      Campanhas
+    </a>
+    <div class="nav-section">Sistema</div>
+    <a data-sec="relatorios">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h7l4 4v10H3V1z" fill="none" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1"/><line x1="5" y1="11" x2="11" y2="11" stroke="currentColor" stroke-width="1"/></svg>
+      Relatórios
+    </a>
+    <a data-sec="config">
+      <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M3.2 12.8l1.4-1.4M11.4 4.6l1.4-1.4" stroke="currentColor" stroke-width="1.2"/></svg>
+      Config
+    </a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-c-name">Farias &amp; Moura</div>
+    <div class="sb-c-sub">Auditoria Forense · Brasília</div>
+    <div class="sb-live"><div class="live-dot"></div>LIVE · Sistema ativo</div>
+  </div>
+</aside>
+
+<main>
+
+<!-- DASHBOARD -->
+<section class="section active" id="s-dashboard">
+  <div class="sec-head">
+    <div><div class="sec-title">DASHBOARD <span>EPOS</span></div><div class="sec-sub">MAIO 2026 · VISÃO CONSOLIDADA EM TEMPO REAL</div></div>
+    <div class="sec-badge">● LIVE</div>
+  </div>
+  <div class="rule"></div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-lbl">Leads Recebidos</div><div class="kpi-val g"><span class="ct" data-to="23">0</span></div><div class="kpi-note">total no período</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" data-w="62%"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Conversão</div><div class="kpi-val"><span class="ct" data-to="17.4" data-dec="1">0</span><span class="kpi-unit">%</span></div><div class="kpi-note up">↑ +4.2 pp</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" data-w="17.4%"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Agendamentos</div><div class="kpi-val n"><span class="ct" data-to="4">0</span></div><div class="kpi-note">confirmados</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" data-w="20%"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Qualidade IA</div><div class="kpi-val"><span class="ct" data-to="84.6" data-dec="1">0</span><span class="kpi-unit">%</span></div><div class="kpi-note">sem humano</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" data-w="84.6%"></div></div>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-ttl">Funil de Conversão</div>
+      <div class="funnel">
+        <div class="f-row"><div class="f-lbl">Landing Page</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">23</div></div>
+        <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−13%</div></div>
+        <div class="f-row"><div class="f-lbl">WhatsApp</div><div class="f-track"><div class="f-fill f2" data-w="87%"><span class="f-pct">87%</span></div></div><div class="f-n">20</div></div>
+        <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−30%</div></div>
+        <div class="f-row"><div class="f-lbl">Qualificado</div><div class="f-track"><div class="f-fill f3" data-w="57%"><span class="f-pct">57%</span></div></div><div class="f-n">13</div></div>
+        <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−26%</div></div>
+        <div class="f-row"><div class="f-lbl">Agendou</div><div class="f-track"><div class="f-fill f4" data-w="30%"><span class="f-pct">30%</span></div></div><div class="f-n">7</div></div>
+        <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−13%</div></div>
+        <div class="f-row"><div class="f-lbl">Fechou</div><div class="f-track"><div class="f-fill f5" data-w="17%"><span class="f-pct">17%</span></div></div><div class="f-n">4</div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-ttl">Leads por Dia da Semana</div><canvas id="wk-chart" height="170"></canvas></div>
+  </div>
+  <div class="two-col-eq">
+    <div class="card">
+      <div class="card-ttl">Origem dos Leads</div>
+      <div class="utm-list">
+        <div class="utm-row"><div class="utm-src">Meta Ads</div><div class="utm-track"><div class="utm-fill uf-meta" data-w="78%"></div></div><div class="utm-n">18</div><div class="utm-p">78%</div></div>
+        <div class="utm-row"><div class="utm-src">Direto</div><div class="utm-track"><div class="utm-fill uf-direct" data-w="13%"></div></div><div class="utm-n">3</div><div class="utm-p">13%</div></div>
+        <div class="utm-row"><div class="utm-src">Google</div><div class="utm-track"><div class="utm-fill uf-google" data-w="5%"></div></div><div class="utm-n">1</div><div class="utm-p">5%</div></div>
+        <div class="utm-row"><div class="utm-src">Orgânico</div><div class="utm-track"><div class="utm-fill uf-organic" data-w="4%"></div></div><div class="utm-n">1</div><div class="utm-p">4%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-ttl">Leads Recentes</div>
+      <table class="tbl">
+        <thead><tr><th>Nome</th><th>Patologia</th><th>Score</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-hi">Marcos S.</td><td>Hérnia de disco</td><td><span class="score">87</span></td><td><span class="badge b-ag">agendou</span></td></tr>
+          <tr><td class="td-hi">Fernanda L.</td><td>Hérnia de disco</td><td><span class="score">91</span></td><td><span class="badge b-ag">agendou</span></td></tr>
+          <tr><td class="td-hi">Ana P.</td><td>Psoríase</td><td><span class="score">72</span></td><td><span class="badge b-ql">qualificado</span></td></tr>
+          <tr><td class="td-hi">Roberto C.</td><td>—</td><td><span class="score">45</span></td><td><span class="badge b-ct">contato</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- MÉTRICAS -->
+<section class="section" id="s-metricas">
+  <div class="sec-head"><div><div class="sec-title">MÉTRICAS <span>DE PERFORMANCE</span></div><div class="sec-sub">ANÁLISE TEMPORAL · MAIO 2026</div></div></div>
+  <div class="rule"></div>
+  <div class="metrics-stats">
+    <div class="ms-card"><div class="ms-lbl">Score Médio</div><div class="ms-val g">62</div><div class="ms-sub">↑ +8 vs abril</div></div>
+    <div class="ms-card"><div class="ms-lbl">Ticket Médio</div><div class="ms-val">R$3.2k</div><div class="ms-sub">projeção fechamento</div></div>
+    <div class="ms-card"><div class="ms-lbl">Resp. IA (avg)</div><div class="ms-val n">1.8s</div><div class="ms-sub">tempo médio</div></div>
+    <div class="ms-card"><div class="ms-lbl">Sessões IA</div><div class="ms-val g">147</div><div class="ms-sub">conversas gerenciadas</div></div>
+  </div>
+  <div class="two-col-eq">
+    <div class="card"><div class="card-ttl">Leads por Dia (30 dias)</div><canvas id="line-chart" height="180"></canvas></div>
+    <div class="card"><div class="card-ttl">Conversão Semanal</div><canvas id="conv-chart" height="180"></canvas></div>
+  </div>
+</section>
+
+<!-- DADOS -->
+<section class="section" id="s-dados">
+  <div class="sec-head"><div><div class="sec-title">BASE DE <span>LEADS</span></div><div class="sec-sub">23 REGISTROS · MAIO 2026</div></div></div>
+  <div class="rule"></div>
+  <div class="filters">
+    <button class="filter-btn active">Todos (23)</button>
+    <button class="filter-btn">Qualificado (9)</button>
+    <button class="filter-btn">Agendou (7)</button>
+    <button class="filter-btn">Fechou (4)</button>
+    <button class="filter-btn">Descartado (3)</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="tbl">
+      <thead style="background:rgba(145,70,255,0.06)"><tr><th style="padding:12px 12px">Nome</th><th>Telefone</th><th>Patologia</th><th>Score</th><th>Canal</th><th>Status</th><th>Criado Em</th></tr></thead>
+      <tbody>
+        <tr><td class="td-hi" style="padding-left:12px">Marcos S.</td><td>(61) 9****-8712</td><td>Hérnia de disco</td><td><span class="score">87</span></td><td>WhatsApp</td><td><span class="badge b-ag">agendou</span></td><td style="font-family:var(--fM);font-size:10px">21/05 14:32</td></tr>
+        <tr><td class="td-hi" style="padding-left:12px">Fernanda L.</td><td>(61) 9****-5529</td><td>Hérnia de disco</td><td><span class="score">91</span></td><td>WhatsApp</td><td><span class="badge b-ag">agendou</span></td><td style="font-family:var(--fM);font-size:10px">22/05 09:14</td></tr>
+        <tr><td class="td-hi" style="padding-left:12px">Ana P.</td><td>(61) 9****-3341</td><td>Psoríase</td><td><span class="score">72</span></td><td>WhatsApp</td><td><span class="badge b-ql">qualificado</span></td><td style="font-family:var(--fM);font-size:10px">21/05 16:55</td></tr>
+        <tr><td class="td-hi" style="padding-left:12px">Carlos M.</td><td>(61) 9****-7790</td><td>Psoríase</td><td><span class="score">63</span></td><td>WhatsApp</td><td><span class="badge b-ql">qualificado</span></td><td style="font-family:var(--fM);font-size:10px">20/05 11:20</td></tr>
+        <tr><td class="td-hi" style="padding-left:12px">Roberto C.</td><td>(61) 9****-2210</td><td>—</td><td><span class="score">45</span></td><td>WhatsApp</td><td><span class="badge b-ct">contato</span></td><td style="font-family:var(--fM);font-size:10px">22/05 08:03</td></tr>
+        <tr><td class="td-hi" style="padding-left:12px">José A.</td><td>(61) 9****-9988</td><td>—</td><td><span class="score">38</span></td><td>WhatsApp</td><td><span class="badge b-ct">contato</span></td><td style="font-family:var(--fM);font-size:10px">20/05 17:44</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CRM -->
+<section class="section" id="s-crm">
+  <div class="sec-head"><div><div class="sec-title">PIPELINE <span>CRM</span></div><div class="sec-sub">KANBAN · 23 LEADS ATIVOS</div></div></div>
+  <div class="rule"></div>
+  <div class="kanban">
+    <div class="col">
+      <div class="col-head">Novo Lead <div class="col-count">5</div></div>
+      <div class="krm-card" style="border-top-color:var(--muted)"><div class="krm-name">Roberto C.</div><div class="krm-path">Canal direto</div><div class="krm-foot"><div class="krm-time">há 2h</div><div class="krm-score">45</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--muted)"><div class="krm-name">José A.</div><div class="krm-path">Meta Ads</div><div class="krm-foot"><div class="krm-time">há 4h</div><div class="krm-score">38</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--muted)"><div class="krm-name">Paula T.</div><div class="krm-path">Meta Ads</div><div class="krm-foot"><div class="krm-time">há 6h</div><div class="krm-score">41</div></div></div>
+    </div>
+    <div class="col">
+      <div class="col-head">Em Conversa <div class="col-count">5</div></div>
+      <div class="krm-card" style="border-top-color:var(--purple)"><div class="krm-name">Carlos M.</div><div class="krm-path">Psoríase</div><div class="krm-foot"><div class="krm-time">há 1h</div><div class="krm-score">63</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--purple)"><div class="krm-name">Sílvia R.</div><div class="krm-path">Aposentada</div><div class="krm-foot"><div class="krm-time">ontem</div><div class="krm-score">55</div></div></div>
+    </div>
+    <div class="col">
+      <div class="col-head">Qualificado <div class="col-count">6</div></div>
+      <div class="krm-card" style="border-top-color:var(--purple)"><div class="krm-name">Ana P.</div><div class="krm-path">Psoríase</div><div class="krm-foot"><div class="krm-time">ontem</div><div class="krm-score">72</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--purple)"><div class="krm-name">Lucas V.</div><div class="krm-path">Hérnia</div><div class="krm-foot"><div class="krm-time">há 2 dias</div><div class="krm-score">68</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--purple)"><div class="krm-name">Marina S.</div><div class="krm-path">INSS</div><div class="krm-foot"><div class="krm-time">há 3 dias</div><div class="krm-score">80</div></div></div>
+    </div>
+    <div class="col">
+      <div class="col-head">Agendado <div class="col-count">3</div></div>
+      <div class="krm-card" style="border-top-color:var(--neon)"><div class="krm-name">Marcos S.</div><div class="krm-path">Sex 23/05 · 14h</div><div class="krm-foot"><div class="krm-time">amanhã</div><div class="krm-score">87</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--neon)"><div class="krm-name">Fernanda L.</div><div class="krm-path">Sex 23/05 · 16h</div><div class="krm-foot"><div class="krm-time">amanhã</div><div class="krm-score">91</div></div></div>
+    </div>
+    <div class="col">
+      <div class="col-head">Fechado <div class="col-count">4</div></div>
+      <div class="krm-card" style="border-top-color:var(--neon)"><div class="krm-name">Paulo R.</div><div class="krm-path">Contrato assinado</div><div class="krm-foot"><div class="krm-time">18/05</div><div class="krm-score">95</div></div></div>
+      <div class="krm-card" style="border-top-color:var(--neon)"><div class="krm-name">Teresa M.</div><div class="krm-path">Contrato assinado</div><div class="krm-foot"><div class="krm-time">15/05</div><div class="krm-score">88</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section class="section" id="s-chat">
+  <div class="sec-head"><div><div class="sec-title">CENTRAL DE <span>CONVERSAS</span></div><div class="sec-sub">WHATSAPP · API OFICIAL · HISTÓRICO</div></div></div>
+  <div class="chat-tabs">
+    <div class="chat-tab active" data-tab="wa">WhatsApp</div>
+    <div class="chat-tab" data-tab="api">API Oficial</div>
+  </div>
+  <div class="chat-view active" id="tab-wa">
+    <div class="chat-wa">
+      <div class="chat-list">
+        <div class="chat-search"><input type="text" placeholder="Buscar…"></div>
+        <div class="conv-list">
+          <div class="conv active"><div class="conv-av">M</div><div class="conv-info"><div class="conv-name">Marcos S.</div><div class="conv-last">Então até amanhã às 14h!</div></div><div class="conv-time">14:38</div></div>
+          <div class="conv"><div class="conv-av">A</div><div class="conv-info"><div class="conv-name">Ana P.</div><div class="conv-last">Vou pensar e retorno</div></div><div class="conv-time">13:21</div></div>
+          <div class="conv"><div class="conv-av">F</div><div class="conv-info"><div class="conv-name">Fernanda L.</div><div class="conv-last">Perfeito, até sexta!</div></div><div class="conv-time">11:05</div></div>
+          <div class="conv"><div class="conv-av">R</div><div class="conv-info"><div class="conv-name">Roberto C.</div><div class="conv-last">Vim pelo anúncio do Facebook</div></div><div class="conv-time">09:03</div></div>
+          <div class="conv"><div class="conv-av">S</div><div class="conv-info"><div class="conv-name">Sílvia R.</div><div class="conv-last">A Ana me disse que você pode ajudar</div></div><div class="conv-time">ontem</div></div>
+        </div>
+      </div>
+      <div class="chat-main">
+        <div class="chat-mhead">
+          <div><div class="chat-mname">Marcos S.</div><div class="chat-mstatus">Hérnia de disco · score 87 · agendado Sex 23/05 14h</div></div>
+          <div class="ia-badge">IA ATIVA</div>
+        </div>
+        <div class="msgs">
+          <div class="msg in"><div><div class="msg-bubble">Olá! Vi o anúncio e tenho interesse em saber mais sobre o processo para INSS por hérnia de disco. É muito difícil?</div><div class="msg-time">14:02</div></div></div>
+          <div class="msg out msg-bot"><div><div class="msg-sender">Ana · IA</div><div class="msg-bubble">Olá, Marcos! Fico feliz em ajudar. Hérnia de disco é uma das causas mais comuns de benefício por incapacidade. Posso te fazer algumas perguntas rápidas para entender melhor seu caso?</div><div class="msg-time">14:02</div></div></div>
+          <div class="msg in"><div><div class="msg-bubble">Pode sim! Tenho 47 anos, trabalho como motorista há 20 anos e a hérnia está me impedindo de trabalhar há 3 meses.</div><div class="msg-time">14:05</div></div></div>
+          <div class="msg out msg-bot"><div><div class="msg-sender">Ana · IA</div><div class="msg-bubble">Seu perfil é muito favorável, Marcos. Profissão de risco + tempo de contribuição + impedimento documentado = base sólida. Gostaria de agendar uma consulta gratuita?</div><div class="msg-time">14:06</div></div></div>
+          <div class="msg in"><div><div class="msg-bubble">Com certeza! Como funciona?</div><div class="msg-time">14:10</div></div></div>
+          <div class="msg out msg-bot"><div><div class="msg-sender">Ana · IA</div><div class="msg-bubble">Tenho disponibilidade na sexta, dia 23, às 14h00 ou 16h00. Qual prefere?</div><div class="msg-time">14:11</div></div></div>
+          <div class="msg in"><div><div class="msg-bubble">Às 14h fica ótimo!</div><div class="msg-time">14:15</div></div></div>
+          <div class="msg out msg-bot"><div><div class="msg-sender">Ana · IA</div><div class="msg-bubble">Perfeito! ✅ Agendado: Sexta-feira, 23/05, às 14h00. Você receberá uma confirmação por aqui.</div><div class="msg-time">14:15</div></div></div>
+          <div class="msg in"><div><div class="msg-bubble">Então até amanhã às 14h! 🙌</div><div class="msg-time">14:38</div></div></div>
+        </div>
+        <div class="chat-footer">
+          <div class="chat-input-fake">Conversa gerenciada pela Ana IA · clique para assumir</div>
+          <button class="btn-assumir">Assumir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-view" id="tab-api">
+    <div style="padding:20px 0;width:100%">
+      <div class="card-ttl">Templates Aprovados · WhatsApp Business</div>
+      <div class="api-grid">
+        <div class="tmpl"><div class="tmpl-icon">📋</div><div class="tmpl-name">Reativação de Lead</div><div class="tmpl-desc">Para leads sem resposta em 48h</div><div class="tmpl-status">APROVADO</div></div>
+        <div class="tmpl"><div class="tmpl-icon">📅</div><div class="tmpl-name">Lembrete de Consulta</div><div class="tmpl-desc">24h antes do agendamento</div><div class="tmpl-status">APROVADO</div></div>
+        <div class="tmpl"><div class="tmpl-icon">⚖️</div><div class="tmpl-name">Promoção Especial</div><div class="tmpl-desc">Consulta gratuita + análise</div><div class="tmpl-status">APROVADO</div></div>
+        <div class="tmpl"><div class="tmpl-icon">🔔</div><div class="tmpl-name">Novidade Legislativa</div><div class="tmpl-desc">Alertas de mudanças INSS</div><div class="tmpl-status">APROVADO</div></div>
+        <div class="tmpl"><div class="tmpl-icon">✅</div><div class="tmpl-name">Pós-Reunião</div><div class="tmpl-desc">Follow-up após consulta</div><div class="tmpl-status">APROVADO</div></div>
+        <div class="tmpl"><div class="tmpl-icon">📊</div><div class="tmpl-name">Status do Processo</div><div class="tmpl-desc">Atualização processual</div><div class="tmpl-status">APROVADO</div></div>
+      </div>
+      <div class="card-ttl" style="margin-top:20px">Disparos Recentes</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl">
+          <thead style="background:rgba(145,70,255,0.08)"><tr><th style="padding:10px 12px">Template</th><th>Público</th><th>Enviados</th><th>Entregues</th><th>Respondidos</th><th>Data</th></tr></thead>
+          <tbody>
+            <tr><td class="td-hi" style="padding-left:12px">Reativação de Lead</td><td>Leads 48h+</td><td>12</td><td><span style="color:var(--neon)">11</span></td><td>4</td><td style="font-family:var(--fM);font-size:10px">21/05</td></tr>
+            <tr><td class="td-hi" style="padding-left:12px">Lembrete de Consulta</td><td>Agendados</td><td>3</td><td><span style="color:var(--neon)">3</span></td><td>2</td><td style="font-family:var(--fM);font-size:10px">20/05</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANILHAS -->
+<section class="section" id="s-planilhas">
+  <div class="sec-head"><div><div class="sec-title">PLANILHAS <span>DE DADOS</span></div><div class="sec-sub">EXPORTAÇÃO COMPLETA · SUPABASE FM_LEADS</div></div></div>
+  <div class="rule"></div>
+  <div class="sheet-head">
+    <div style="font-size:12px;color:var(--muted);font-family:var(--fM)">23 registros · atualizado agora</div>
+    <button class="btn-export">↓ Exportar CSV</button>
+  </div>
+  <div class="sheet-wrap">
+    <table class="sheet">
+      <thead><tr><th>#</th><th>Nome</th><th>Telefone</th><th>Patologia</th><th>Score</th><th>Perfil</th><th>Cidade</th><th>Canal</th><th>UTM Source</th><th>Agendou</th><th>Dify Ativo</th><th>Criado Em</th></tr></thead>
+      <tbody>
+        <tr><td>001</td><td class="td-hi">Marcos S.</td><td style="font-family:var(--fM)">556199...712</td><td>Hérnia de disco</td><td><span class="score">87</span></td><td>CLT</td><td>Sobradinho</td><td>whatsapp</td><td style="font-family:var(--fM);font-size:10px">fb_ad_inss</td><td><span class="badge b-ag">sim</span></td><td><span class="badge b-ds">não</span></td><td style="font-family:var(--fM);font-size:10px">21/05 14:32</td></tr>
+        <tr><td>002</td><td class="td-hi">Fernanda L.</td><td style="font-family:var(--fM)">556199...529</td><td>Hérnia de disco</td><td><span class="score">91</span></td><td>CLT</td><td>Brasília</td><td>whatsapp</td><td style="font-family:var(--fM);font-size:10px">fb_ad_inss</td><td><span class="badge b-ag">sim</span></td><td><span class="badge b-ds">não</span></td><td style="font-family:var(--fM);font-size:10px">22/05 09:14</td></tr>
+        <tr><td>003</td><td class="td-hi">Ana P.</td><td style="font-family:var(--fM)">556199...341</td><td>Psoríase</td><td><span class="score">72</span></td><td>MEI</td><td>Guará</td><td>whatsapp</td><td style="font-family:var(--fM);font-size:10px">fb_ad_inss</td><td><span class="badge b-ct">não</span></td><td><span class="badge b-ql">sim</span></td><td style="font-family:var(--fM);font-size:10px">21/05 16:55</td></tr>
+        <tr><td>004</td><td class="td-hi">Carlos M.</td><td style="font-family:var(--fM)">556199...790</td><td>Psoríase</td><td><span class="score">63</span></td><td>Aposentado</td><td>Ceilândia</td><td>whatsapp</td><td style="font-family:var(--fM);font-size:10px">organic</td><td><span class="badge b-ct">não</span></td><td><span class="badge b-ql">sim</span></td><td style="font-family:var(--fM);font-size:10px">20/05 11:20</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CAMPANHAS -->
+<section class="section" id="s-campanhas">
+  <div class="sec-head"><div><div class="sec-title">CAMPANHAS <span>META & GOOGLE</span></div><div class="sec-sub">PERFORMANCE DE ADS · MAIO 2026</div></div></div>
+  <div class="rule"></div>
+  <div class="camp-metrics">
+    <div class="m-card"><div class="m-lbl">Impressões</div><div class="m-val">12.840</div><div class="m-delta">↑ +18% vs abril</div></div>
+    <div class="m-card"><div class="m-lbl">Cliques</div><div class="m-val g">487</div><div class="m-delta">CTR: 3.79%</div></div>
+    <div class="m-card"><div class="m-lbl">Custo por Lead</div><div class="m-val">R$47</div><div class="m-delta">↓ −12% vs abril</div></div>
+    <div class="m-card"><div class="m-lbl">ROAS Estimado</div><div class="m-val n">4.2x</div><div class="m-delta">projeção mensal</div></div>
+  </div>
+  <div class="card">
+    <div class="card-ttl">Desempenho por Campanha</div>
+    <table class="tbl">
+      <thead><tr><th>Campanha</th><th>Plataforma</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>Leads</th><th>CPL</th></tr></thead>
+      <tbody>
+        <tr><td class="td-hi">INSS Hérnia Disco</td><td>Meta Ads</td><td>8.240</td><td>312</td><td style="color:var(--purple);font-family:var(--fM)">3.79%</td><td>14</td><td style="font-family:var(--fM)">R$44</td></tr>
+        <tr><td class="td-hi">INSS Psoríase</td><td>Meta Ads</td><td>3.100</td><td>98</td><td style="color:var(--purple);font-family:var(--fM)">3.16%</td><td>4</td><td style="font-family:var(--fM)">R$62</td></tr>
+        <tr><td class="td-hi">Auditoria Geral</td><td>Google</td><td>1.500</td><td>77</td><td style="color:var(--purple);font-family:var(--fM)">5.13%</td><td>1</td><td style="font-family:var(--fM)">R$120</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- RELATÓRIOS -->
+<section class="section" id="s-relatorios">
+  <div class="sec-head"><div><div class="sec-title">RELATÓRIOS <span>MENSAIS</span></div><div class="sec-sub">EXPORTAÇÃO E HISTÓRICO</div></div></div>
+  <div class="rule"></div>
+  <div class="three-col">
+    <div class="card" style="cursor:pointer"><div class="card-ttl">Maio 2026</div><div style="font-family:var(--fD);font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:0.04em">Relatório Completo</div><div style="font-size:11px;color:var(--muted)">23 leads · 4 fechamentos · 17.4% conv.</div><div style="margin-top:14px"><button class="btn-export">↓ PDF</button></div></div>
+    <div class="card" style="cursor:pointer"><div class="card-ttl">Abril 2026</div><div style="font-family:var(--fD);font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:0.04em">Relatório Completo</div><div style="font-size:11px;color:var(--muted)">18 leads · 2 fechamentos · 11.1% conv.</div><div style="margin-top:14px"><button class="btn-export">↓ PDF</button></div></div>
+    <div class="card" style="cursor:pointer"><div class="card-ttl">Março 2026</div><div style="font-family:var(--fD);font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:0.04em">Relatório Completo</div><div style="font-size:11px;color:var(--muted)">15 leads · 1 fechamento · 6.7% conv.</div><div style="margin-top:14px"><button class="btn-export">↓ PDF</button></div></div>
+  </div>
+</section>
+
+<!-- CONFIGURAÇÕES -->
+<section class="section" id="s-config">
+  <div class="sec-head"><div><div class="sec-title">CONFIG <span>DO SISTEMA</span></div><div class="sec-sub">INTEGRAÇÕES · IA · NOTIFICAÇÕES</div></div></div>
+  <div class="rule"></div>
+  <div class="cfg-grid">
+    <div class="cfg-sec">
+      <div class="cfg-sec-title">Assistente IA — Ana</div>
+      <div class="cfg-row"><div class="cfg-key">Dify ativo</div><div class="cfg-val">Resposta automática</div><div class="cfg-toggle on"></div></div>
+      <div class="cfg-row"><div class="cfg-key">Silêncio após humano</div><div class="cfg-val">24 horas</div><div class="cfg-toggle on"></div></div>
+      <div class="cfg-row"><div class="cfg-key">Remarketing auto</div><div class="cfg-val">9h BRT · leads do dia anterior</div><div class="cfg-toggle on"></div></div>
+    </div>
+    <div class="cfg-sec">
+      <div class="cfg-sec-title">Integrações</div>
+      <div class="cfg-row"><div class="cfg-key">Evolution API</div><div class="cfg-val">FariasMoura_Update · ativo</div><div class="cfg-toggle on"></div></div>
+      <div class="cfg-row"><div class="cfg-key">Chatwoot</div><div class="cfg-val">Inbox #3 · webhook ativo</div><div class="cfg-toggle on"></div></div>
+      <div class="cfg-row"><div class="cfg-key">Google Calendar</div><div class="cfg-val">agenda@fariaemoura.com.br</div><div class="cfg-toggle on"></div></div>
+    </div>
+    <div class="cfg-sec">
+      <div class="cfg-sec-title">Meta CAPI</div>
+      <div class="cfg-row"><div class="cfg-key">Pixel ID</div><div class="cfg-val" style="font-family:var(--fM)">2047813996163251</div></div>
+      <div class="cfg-row"><div class="cfg-key">Eventos ativos</div><div class="cfg-val">Contact · Lead · Schedule</div></div>
+      <div class="cfg-row"><div class="cfg-key">Server-Side</div><div class="cfg-val">Ativo via n8n</div><div class="cfg-toggle on"></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const sec = document.getElementById('s-' + id);
+  if (sec) { sec.classList.add('active'); document.querySelector('[data-sec="' + id + '"]')?.classList.add('active'); initSection(id); }
+}
+
+document.querySelectorAll('nav a[data-sec]').forEach(a => {
+  a.addEventListener('click', e => { e.preventDefault(); show(a.dataset.sec); });
+});
+
+document.querySelectorAll('.chat-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.chat-view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab)?.classList.add('active');
+  });
+});
+
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('filter-btn')) {
+    e.target.closest('.filters').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
+
+function runCtrs(parent) {
+  parent.querySelectorAll('.ct').forEach(el => {
+    const to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec || 0);
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / 1500, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = dec ? (e * to).toFixed(dec) : Math.floor(e * to);
+      if (p < 1) requestAnimationFrame(tick); else el.textContent = dec ? to.toFixed(dec) : to;
+    })(t0);
+  });
+  parent.querySelectorAll('[data-w]').forEach(b => setTimeout(() => b.style.width = b.dataset.w, 250));
+}
+
+function bar(id, labels, vals, c1, c2) {
+  const cv = document.getElementById(id); if (!cv) return;
+  const ctx = cv.getContext('2d'), dpr = devicePixelRatio || 1;
+  const W = cv.parentElement.clientWidth, H = parseInt(cv.getAttribute('height') || 170);
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.scale(dpr, dpr);
+  const MAX = Math.max(...vals) + 1, pL = 20, pR = 20, pT = 14, pB = 28, aW = W - pL - pR, aH = H - pT - pB;
+  const step = aW / vals.length, bW = step * 0.55; let prog = 0;
+  (function frame() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 1; i <= 3; i++) {
+      const gy = pT + aH - aH * i / MAX;
+      ctx.strokeStyle = 'rgba(145,70,255,0.08)'; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 5]); ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke(); ctx.setLineDash([]);
+    }
+    vals.forEach((v, i) => {
+      const x = pL + step * i + (step - bW) / 2, fH = (v / MAX) * aH * Math.min(prog, 1), y = pT + aH - fH;
+      const gr = ctx.createLinearGradient(x, y, x, pT + aH);
+      gr.addColorStop(0, c1); gr.addColorStop(1, c2);
+      ctx.fillStyle = gr; ctx.fillRect(x, y, bW, fH);
+      ctx.fillStyle = c1.replace('0.75)', '1)'); ctx.fillRect(x, y, bW, 2);
+      ctx.fillStyle = 'rgba(239,239,241,0.3)'; ctx.font = '10px Outfit,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x + bW / 2, H - pB + 16);
+      if (prog >= 1) { ctx.fillStyle = c1.replace('0.75)', '0.8)'); ctx.font = '9px "DM Mono",monospace'; ctx.fillText(v, x + bW / 2, y - 4); }
+    });
+    if (prog < 1) { prog += 0.04; requestAnimationFrame(frame); }
+  })();
+}
+
+function lineChart(id, data, c1, c2) {
+  const cv = document.getElementById(id); if (!cv) return;
+  const ctx = cv.getContext('2d'), dpr = devicePixelRatio || 1;
+  const W = cv.parentElement.clientWidth, H = parseInt(cv.getAttribute('height') || 180);
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.scale(dpr, dpr);
+  const MAX = Math.max(...data) + 1, pL = 24, pR = 16, pT = 12, pB = 24, aW = W - pL - pR, aH = H - pT - pB;
+  const pts = data.map((v, i) => [pL + (i / (data.length - 1)) * aW, pT + aH - (v / MAX) * aH]);
+  let prog = 0;
+  (function frame() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 1; i <= 3; i++) {
+      const gy = pT + aH - aH * i / MAX;
+      ctx.strokeStyle = 'rgba(145,70,255,0.08)'; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 5]); ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(W - pR, gy); ctx.stroke(); ctx.setLineDash([]);
+    }
+    const end = Math.floor(prog * (pts.length - 1)), frac = prog * (pts.length - 1) - end;
+    const vp = [...pts.slice(0, end + 1)];
+    if (end < pts.length - 1) vp.push([pts[end][0]+(pts[end+1][0]-pts[end][0])*frac, pts[end][1]+(pts[end+1][1]-pts[end][1])*frac]);
+    if (vp.length > 1) {
+      ctx.beginPath(); ctx.moveTo(vp[0][0], vp[0][1]); vp.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+      ctx.strokeStyle = c1; ctx.lineWidth = 2; ctx.shadowColor = c1; ctx.shadowBlur = 6; ctx.stroke(); ctx.shadowBlur = 0;
+      const grad = ctx.createLinearGradient(0, pT, 0, pT + aH);
+      grad.addColorStop(0, c2); grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath(); ctx.moveTo(vp[0][0], vp[0][1]); vp.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+      ctx.lineTo(vp[vp.length-1][0], pT+aH); ctx.lineTo(vp[0][0], pT+aH); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+    }
+    if (prog < 1) { prog += 0.025; requestAnimationFrame(frame); }
+  })();
+}
+
+const initialized = {};
+function initSection(id) {
+  if (initialized[id]) return; initialized[id] = true;
+  if (id === 'dashboard') {
+    runCtrs(document.getElementById('s-dashboard'));
+    bar('wk-chart', ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], [2,5,6,4,3,2,1], 'rgba(145,70,255,0.75)', 'rgba(145,70,255,0.08)');
+  }
+  if (id === 'metricas') {
+    lineChart('line-chart', [1,2,1,3,2,4,3,5,2,3,4,3,5,4,6,3,4,5,3,2,4,5,3,4,6,5,4,3,5,4], '#9146FF', 'rgba(145,70,255,0.18)');
+    lineChart('conv-chart', [10,12,9,14,11,16,13,18,15,17,20,18,17], '#00F5A0', 'rgba(0,245,160,0.15)');
+  }
+}
+
+initSection('dashboard');
+window.addEventListener('resize', () => { if (document.querySelector('#s-dashboard.active')) bar('wk-chart', ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], [2,5,6,4,3,2,1], 'rgba(145,70,255,0.75)', 'rgba(145,70,255,0.08)'); });
+
+document.querySelectorAll('.cfg-toggle').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+</script>
+</body>
+</html>
