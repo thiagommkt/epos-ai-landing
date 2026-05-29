@@ -463,6 +463,7 @@ footer{border-top:1px solid var(--bd);padding:32px;display:flex;justify-content:
     <p class="cta-sub">Demonstração gratuita de 30 minutos. Sem compromisso. Você vê o sistema configurado para o seu negócio.</p>
     <div class="cta-actions">
       <a href="#demo" class="btn-primary" style="font-size:18px;padding:18px 40px">Quero minha demonstração →</a>
+      <a href="https://wa.me/5561985545598?text=Ol%C3%A1%21+Quero+saber+mais+sobre+o+sistema+de+atendimento+IA+no+WhatsApp." target="_blank" class="btn-sec" style="font-size:16px;padding:18px 28px">💬 Falar no WhatsApp</a>
     </div>
     <p style="margin-top:20px;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em">SEM COMPROMISSO · SEM CARTÃO DE CRÉDITO · RESPOSTA EM MENOS DE 24H</p>
   </div>
@@ -487,15 +488,30 @@ const obs = new IntersectionObserver(entries => {
 },{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// Form handler
-function handleForm(e) {
+// Form handler — conectado ao n8n + notificação WhatsApp
+async function handleForm(e) {
   e.preventDefault();
-  const btn = e.target.querySelector('.btn-form');
-  btn.textContent = '✓ Enviado! Em breve entramos em contato.';
+  const form = e.target;
+  const btn = form.querySelector('.btn-form');
+  const fields = form.querySelectorAll('input,select');
+  const data = {
+    nome: fields[0].value,
+    telefone: fields[1].value,
+    segmento: fields[2].value,
+    origem: 'LP Vendas — ia-whatsapp.html'
+  };
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+  try {
+    await fetch('https://webhook.eposmktfilmsia.com.br/webhook/captura-lead-lp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } catch(err) {}
+  btn.textContent = '✓ Recebido! Em breve entramos em contato.';
   btn.style.background = 'var(--neon)';
   btn.style.color = 'var(--bg)';
-  btn.disabled = true;
-  // Aqui conectar ao webhook n8n ou WhatsApp
 }
 
 // Smooth scroll para âncoras
