@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atendimento IA no WhatsApp — EPOS Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0E0E10;--bg2:#18181B;--bg3:#1F1F23;
+  --purple:#9146FF;--pur-l:rgba(145,70,255,0.12);--pur-m:rgba(145,70,255,0.25);
+  --bd:rgba(145,70,255,0.18);--bd-b:rgba(145,70,255,0.42);
+  --neon:#00F5A0;--neon-l:rgba(0,245,160,0.1);
+  --text:#EFEFF1;--muted:rgba(239,239,241,0.6);--dim:rgba(239,239,241,0.3);
+  --fD:'Rajdhani',sans-serif;--fB:'Outfit',sans-serif;--fM:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fB);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px)}
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.ambient::before{content:'';position:absolute;top:-5%;left:20%;width:800px;height:400px;background:radial-gradient(ellipse,rgba(145,70,255,0.07) 0%,transparent 65%);animation:glow 8s ease-in-out infinite alternate}
+.ambient::after{content:'';position:absolute;bottom:0;right:-5%;width:600px;height:500px;background:radial-gradient(ellipse,rgba(0,245,160,0.04) 0%,transparent 70%)}
+@keyframes glow{0%{opacity:.6;transform:scale(1)}100%{opacity:1;transform:scale(1.08)}}
+.page{position:relative;z-index:1}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 32px;background:rgba(14,14,16,0.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--bd);
+}
+.nav-logo{font-family:var(--fD);font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.nav-logo span{color:var(--purple)}
+.nav-cta{
+  padding:9px 22px;background:var(--purple);color:#fff;border:none;cursor:pointer;
+  font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+  transition:opacity .2s,box-shadow .2s;text-decoration:none;display:inline-block;
+}
+.nav-cta:hover{opacity:.9;box-shadow:0 0 20px rgba(145,70,255,.5)}
+
+/* HERO */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding:100px 32px 60px;max-width:1200px;margin:0 auto;
+  gap:64px;
+}
+.hero-left{flex:1;min-width:0}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--fM);font-size:11px;color:var(--neon);
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:20px;
+  padding:5px 12px;border:1px solid rgba(0,245,160,.25);background:var(--neon-l);
+}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px var(--neon);opacity:1}50%{box-shadow:0 0 2px var(--neon);opacity:.4}}
+h1{
+  font-family:var(--fD);font-size:clamp(42px,6vw,80px);font-weight:700;
+  line-height:.95;letter-spacing:.02em;text-transform:uppercase;margin-bottom:24px;
+}
+h1 em{
+  font-style:normal;display:block;
+  background:linear-gradient(135deg,var(--purple) 0%,var(--neon) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:18px;color:var(--muted);line-height:1.65;margin-bottom:36px;
+  max-width:480px;font-weight:300;
+}
+.hero-sub strong{color:var(--text);font-weight:600}
+
+/* STATS INLINE */
+.hero-stats{display:flex;gap:32px;margin-bottom:40px;flex-wrap:wrap}
+.hstat{border-left:2px solid var(--purple);padding-left:14px}
+.hstat-val{font-family:var(--fD);font-size:32px;font-weight:700;color:var(--neon);line-height:1}
+.hstat-lbl{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+/* HERO CTA */
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{
+  padding:16px 36px;background:var(--purple);color:#fff;border:none;cursor:pointer;
+  font-family:var(--fD);font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  transition:box-shadow .2s,transform .15s;text-decoration:none;display:inline-block;
+}
+.btn-primary:hover{box-shadow:0 0 32px rgba(145,70,255,.6);transform:translateY(-1px)}
+.btn-sec{
+  padding:16px 28px;border:1px solid var(--bd-b);color:var(--text);background:transparent;cursor:pointer;
+  font-family:var(--fD);font-size:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .2s;
+}
+.btn-sec:hover{background:var(--pur-l)}
+
+/* HERO FORM CARD */
+.hero-right{
+  width:380px;flex-shrink:0;
+  background:var(--bg2);border:1px solid var(--bd);
+  padding:36px 32px;position:relative;overflow:hidden;
+}
+.hero-right::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon))}
+.form-title{font-family:var(--fD);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.5}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.field input, .field select{
+  width:100%;background:var(--bg3);border:1px solid var(--bd);
+  padding:12px 14px;font-size:14px;color:var(--text);font-family:var(--fB);
+  outline:none;transition:border-color .2s;
+}
+.field input:focus, .field select:focus{border-color:var(--purple)}
+.field input::placeholder{color:var(--dim)}
+.field select option{background:var(--bg3)}
+.btn-form{
+  width:100%;padding:16px;background:var(--purple);color:#fff;border:none;cursor:pointer;
+  font-family:var(--fD);font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  margin-top:8px;transition:box-shadow .2s;
+  clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px));
+}
+.btn-form:hover{box-shadow:0 0 24px rgba(145,70,255,.5)}
+.form-trust{display:flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--fM);font-size:10px;color:var(--dim);justify-content:center;letter-spacing:.06em}
+.form-trust::before{content:'🔒';font-size:12px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--bd);margin:0;position:relative}
+.divider::before{content:'';position:absolute;left:0;top:-1px;width:120px;height:3px;background:linear-gradient(90deg,var(--purple),transparent)}
+
+/* SECTIONS */
+.sec{padding:88px 32px;max-width:1200px;margin:0 auto}
+.sec-label{font-family:var(--fM);font-size:10px;color:var(--purple);letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-label::before{content:'';width:24px;height:1px;background:var(--purple)}
+h2{font-family:var(--fD);font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1;margin-bottom:16px}
+h2 span{color:var(--purple)}
+.sec-sub{font-size:16px;color:var(--muted);max-width:560px;line-height:1.6;margin-bottom:52px}
+
+/* DORES */
+.dores-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bd);margin-bottom:12px}
+.dore{background:var(--bg2);padding:28px 24px;position:relative;overflow:hidden}
+.dore::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--warn:255,94,91),transparent)}
+.dore-icon{font-size:24px;margin-bottom:12px;display:block}
+.dore-title{font-family:var(--fD);font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;color:var(--text)}
+.dore-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.dore-tag{display:inline-block;margin-top:12px;padding:2px 8px;font-family:var(--fM);font-size:9px;letter-spacing:.08em;background:rgba(255,94,91,.08);border:1px solid rgba(255,94,91,.2);color:#FF5E5B;text-transform:uppercase}
+
+/* SOLUCAO */
+.sol-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.sol-card{
+  border:1px solid var(--bd);padding:32px 28px;position:relative;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.sol-card:hover{border-color:var(--purple);box-shadow:0 0 24px rgba(145,70,255,.08)}
+.sol-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--purple),transparent);opacity:0;transition:opacity .3s}
+.sol-card:hover::before{opacity:1}
+.sol-num{font-family:var(--fD);font-size:48px;font-weight:700;color:rgba(145,70,255,.15);position:absolute;top:16px;right:20px;line-height:1}
+.sol-icon{font-size:26px;margin-bottom:14px;display:block}
+.sol-title{font-family:var(--fD);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.sol-desc{font-size:13px;color:var(--muted);line-height:1.7}
+.sol-tag{display:inline-block;margin-top:14px;padding:3px 8px;font-family:var(--fM);font-size:9px;letter-spacing:.08em;background:var(--neon-l);border:1px solid rgba(0,245,160,.2);color:var(--neon);text-transform:uppercase}
+
+/* PROVA SOCIAL */
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.proof-card{background:var(--bg2);border:1px solid var(--bd);padding:28px 24px;position:relative}
+.proof-card::before{content:'"';position:absolute;top:16px;right:20px;font-family:var(--fD);font-size:60px;font-weight:700;color:rgba(145,70,255,.1);line-height:1}
+.proof-stars{color:var(--neon);font-size:14px;margin-bottom:14px;letter-spacing:2px}
+.proof-text{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px;position:relative;z-index:1}
+.proof-author{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.proof-role{font-size:11px;color:var(--purple);margin-top:2px}
+
+/* NUMEROS */
+.nums-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);margin-bottom:48px}
+.num-card{background:var(--bg2);padding:32px 24px;text-align:center;position:relative;overflow:hidden}
+.num-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon),transparent);opacity:.6}
+.num-val{font-family:var(--fD);font-size:52px;font-weight:700;color:var(--neon);line-height:1;margin-bottom:4px}
+.num-val.p{color:var(--purple)}
+.num-lbl{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+
+/* COMO FUNCIONA */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.steps::before{content:'';position:absolute;top:32px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,var(--purple),var(--neon),var(--purple));opacity:.3;z-index:0}
+.step{text-align:center;padding:0 16px;position:relative;z-index:1}
+.step-n{
+  width:64px;height:64px;border:2px solid var(--purple);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fD);font-size:24px;font-weight:700;color:var(--purple);
+  margin:0 auto 20px;background:var(--bg);
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  transition:background .2s,box-shadow .2s;
+}
+.step:hover .step-n{background:var(--pur-l);box-shadow:0 0 20px rgba(145,70,255,.3)}
+.step-title{font-family:var(--fD);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* CTA FINAL */
+.cta-sec{
+  background:var(--bg2);border:1px solid var(--bd);
+  padding:72px 48px;text-align:center;position:relative;overflow:hidden;margin:80px 0 0;
+}
+.cta-sec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon),var(--purple))}
+.cta-sec::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center top,rgba(145,70,255,0.06),transparent 60%)}
+.cta-label{font-family:var(--fM);font-size:10px;color:var(--neon);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;position:relative;z-index:1}
+.cta-title{font-family:var(--fD);font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px;position:relative;z-index:1}
+.cta-sub{font-size:16px;color:var(--muted);margin-bottom:40px;position:relative;z-index:1}
+.cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+
+/* FOOTER */
+footer{border-top:1px solid var(--bd);padding:32px;display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto}
+.ft-brand{font-family:var(--fD);font-size:18px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ft-brand span{color:var(--purple)}
+.ft-links{display:flex;gap:24px}
+.ft-links a{font-family:var(--fM);font-size:10px;color:var(--dim);text-decoration:none;letter-spacing:.08em;transition:color .2s}
+.ft-links a:hover{color:var(--purple)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media(max-width:960px){
+  .hero{flex-direction:column;gap:40px;padding-top:88px}
+  .hero-right{width:100%}
+  .dores-grid,.social-grid,.nums-grid,.steps{grid-template-columns:1fr 1fr}
+  .sol-grid{grid-template-columns:1fr}
+  .steps::before{display:none}
+}
+@media(max-width:600px){
+  nav{padding:14px 20px}
+  .hero{padding:88px 20px 40px}
+  .sec{padding:60px 20px}
+  .dores-grid,.social-grid,.nums-grid,.steps,.sol-grid{grid-template-columns:1fr}
+  .cta-sec{padding:48px 24px}
+}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">EPOS <span>Marketing</span></div>
+  <a href="#demo" class="nav-cta">Quero uma demonstração</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Inteligência Artificial no WhatsApp</div>
+    <h1>Seu negócio<br>atendendo leads<br><em>24h por dia</em></h1>
+    <p class="hero-sub">Qualificação automática, agendamento inteligente e nutrição de leads — tudo pelo WhatsApp, sem depender da disponibilidade da sua equipe. <strong>Enquanto você dorme, o sistema trabalha.</strong></p>
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-val">&lt;30s</div>
+        <div class="hstat-lbl">Resposta média</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">24h</div>
+        <div class="hstat-lbl">Disponibilidade</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">0</div>
+        <div class="hstat-lbl">Planilhas manuais</div>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a href="#demo" class="btn-primary">Quero ver funcionando</a>
+      <a href="#como-funciona" class="btn-sec">↓ Como funciona</a>
+    </div>
+  </div>
+
+  <div class="hero-right" id="demo">
+    <div class="form-title">Demonstração gratuita</div>
+    <div class="form-sub">Sem compromisso. Em 30 minutos você vê o sistema funcionando para o seu negócio.</div>
+    <form onsubmit="handleForm(event)">
+      <div class="field">
+        <label>Seu nome</label>
+        <input type="text" placeholder="Nome completo" required>
+      </div>
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="tel" placeholder="(61) 9 0000-0000" required>
+      </div>
+      <div class="field">
+        <label>Segmento</label>
+        <select required>
+          <option value="" disabled selected>Selecione seu segmento</option>
+          <option>Advocacia / Jurídico</option>
+          <option>Medicina / Saúde</option>
+          <option>Odontologia</option>
+          <option>Imóveis</option>
+          <option>Educação / Cursos</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-form">Quero minha demonstração →</button>
+    </form>
+    <div class="form-trust">Seus dados estão seguros. Sem spam.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DORES -->
+<section class="sec reveal">
+  <div class="sec-label">O problema</div>
+  <h2>O que está <span>custando leads</span></h2>
+  <p class="sec-sub">Sem automação, cada lead perdido fora do horário comercial é dinheiro deixado na mesa.</p>
+  <div class="dores-grid">
+    <div class="dore">
+      <span class="dore-icon">😴</span>
+      <div class="dore-title">Leads sem resposta</div>
+      <div class="dore-desc">A maioria dos leads qualificados chega fora do horário comercial. Sem resposta em menos de 5 minutos, a chance de conversão cai 80%.</div>
+      <span class="dore-tag">Alta perda</span>
+    </div>
+    <div class="dore">
+      <span class="dore-icon">📋</span>
+      <div class="dore-title">Triagem manual</div>
+      <div class="dore-desc">Sua equipe gasta horas qualificando leads que nunca vão converter — tempo que deveria estar sendo usado em quem está pronto para fechar.</div>
+      <span class="dore-tag">Ineficiência</span>
+    </div>
+    <div class="dore">
+      <span class="dore-icon">🗑️</span>
+      <div class="dore-title">Leads esquecidos</div>
+      <div class="dore-desc">Leads que não fecharam na primeira abordagem simplesmente somem da lista. Sem nutrição, você perde contatos que poderiam fechar em semanas ou meses.</div>
+      <span class="dore-tag">Receita perdida</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SOLUCAO -->
+<section class="sec reveal">
+  <div class="sec-label">A solução</div>
+  <h2>Sistema <span>completo</span> de atendimento</h2>
+  <p class="sec-sub">Uma plataforma integrada que qualifica, agenda e nutre seus leads — automaticamente, 24 horas por dia.</p>
+  <div class="sol-grid">
+    <div class="sol-card">
+      <div class="sol-num">01</div>
+      <span class="sol-icon">📱</span>
+      <div class="sol-title">Qualificação automática no WhatsApp</div>
+      <div class="sol-desc">Assim que o lead entra em contato, o sistema faz a triagem estruturada: perfil, necessidade, disponibilidade. Só leads com perfil real chegam até você.</div>
+      <span class="sol-tag">Filtra 100% dos leads</span>
+    </div>
+    <div class="sol-card">
+      <div class="sol-num">02</div>
+      <span class="sol-icon">🤖</span>
+      <div class="sol-title">Assistente IA conversacional</div>
+      <div class="sol-desc">A IA responde dúvidas, propõe horários disponíveis e agenda consultas direto no seu calendário — com contexto completo de cada lead.</div>
+      <span class="sol-tag">Agendamento automático</span>
+    </div>
+    <div class="sol-card">
+      <div class="sol-num">03</div>
+      <span class="sol-icon">📊</span>
+      <div class="sol-title">Pipeline visual no CRM</div>
+      <div class="sol-desc">Cada lead vira um card no kanban: de Novo Lead a Fechado. Arrastar o card dispara as automações certas — lembrete, follow-up, nutrição.</div>
+      <span class="sol-tag">Visibilidade total</span>
+    </div>
+    <div class="sol-card">
+      <div class="sol-num">04</div>
+      <span class="sol-icon">🔄</span>
+      <div class="sol-title">Nutrição automática de até 30 dias</div>
+      <div class="sol-desc">Leads que não fecharam entram em sequências automáticas de WhatsApp — personalizadas por situação, com cadência respeitosa e sem spam.</div>
+      <span class="sol-tag">Zero lead perdido</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- NUMEROS -->
+<section class="sec reveal">
+  <div class="sec-label">Resultados</div>
+  <h2>Em <span>números</span></h2>
+  <div class="nums-grid">
+    <div class="num-card">
+      <div class="num-val">30s</div>
+      <div class="num-lbl">Tempo de resposta</div>
+    </div>
+    <div class="num-card">
+      <div class="num-val p">↑3x</div>
+      <div class="num-lbl">Taxa de qualificação</div>
+    </div>
+    <div class="num-card">
+      <div class="num-val">24h</div>
+      <div class="num-lbl">Presença comercial</div>
+    </div>
+    <div class="num-card">
+      <div class="num-val p">↓40%</div>
+      <div class="num-lbl">CPL com campanha ativa</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COMO FUNCIONA -->
+<section class="sec reveal" id="como-funciona">
+  <div class="sec-label">Processo</div>
+  <h2>Como <span>funciona</span></h2>
+  <p class="sec-sub" style="margin-bottom:56px">Do primeiro contato ao fechamento — tudo automatizado.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">01</div>
+      <div class="step-title">Lead chega</div>
+      <div class="step-desc">Anúncio no Meta, indicação ou orgânico — todos chegam pelo WhatsApp.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">02</div>
+      <div class="step-title">IA qualifica</div>
+      <div class="step-desc">Triagem automática em segundos. Perfil, necessidade, disponibilidade — tudo coletado.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">03</div>
+      <div class="step-title">Agenda consulta</div>
+      <div class="step-desc">Horários disponíveis apresentados e confirmados direto no calendário do especialista.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">04</div>
+      <div class="step-title">CRM atualizado</div>
+      <div class="step-desc">Sua equipe vê o pipeline completo e recebe notificação de cada novo agendamento.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROVA SOCIAL -->
+<section class="sec reveal">
+  <div class="sec-label">Quem já usa</div>
+  <h2>O que nossos <span>clientes dizem</span></h2>
+  <div class="social-grid">
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">"Antes perdíamos pelo menos 30% dos leads por falta de resposta rápida. Hoje o sistema responde em segundos e já agenda direto no meu calendário."</p>
+      <div class="proof-author">Dr. Ricardo M.</div>
+      <div class="proof-role">Advocacia — Brasília/DF</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">"Minha equipe parou de perder tempo com leads que nunca iam fechar. Agora só chegam os qualificados — isso mudou completamente nossa eficiência."</p>
+      <div class="proof-author">Dra. Camila S.</div>
+      <div class="proof-role">Clínica Médica — Goiânia/GO</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">"O relatório diário no WhatsApp me dá visibilidade total do funil sem planilha nenhuma. Simples e direto — é o que eu precisava."</p>
+      <div class="proof-author">Paulo T.</div>
+      <div class="proof-role">Imobiliária — São Paulo/SP</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA FINAL -->
+<section class="sec reveal" style="padding-bottom:0">
+  <div class="cta-sec">
+    <div class="cta-label">Próximo passo</div>
+    <h2 class="cta-title" style="font-size:clamp(28px,4vw,52px)">Pronto para ver<br><span>funcionando ao vivo?</span></h2>
+    <p class="cta-sub">Demonstração gratuita de 30 minutos. Sem compromisso. Você vê o sistema configurado para o seu negócio.</p>
+    <div class="cta-actions">
+      <a href="#demo" class="btn-primary" style="font-size:18px;padding:18px 40px">Quero minha demonstração →</a>
+    </div>
+    <p style="margin-top:20px;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em">SEM COMPROMISSO · SEM CARTÃO DE CRÉDITO · RESPOSTA EM MENOS DE 24H</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-brand">EPOS <span>Marketing</span></div>
+  <div class="ft-links">
+    <a href="https://eposmktfilmsia.com.br">Site</a>
+    <a href="mailto:contato@eposmktfilmsia.com.br">Contato</a>
+    <a href="#">Política de Privacidade</a>
+  </div>
+</footer>
+
+</div>
+
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)} });
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Form handler
+function handleForm(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-form');
+  btn.textContent = '✓ Enviado! Em breve entramos em contato.';
+  btn.style.background = 'var(--neon)';
+  btn.style.color = 'var(--bg)';
+  btn.disabled = true;
+  // Aqui conectar ao webhook n8n ou WhatsApp
+}
+
+// Smooth scroll para âncoras
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+</script>
+</body>
+</html>
