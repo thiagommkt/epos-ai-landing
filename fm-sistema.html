@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farias & Moura — Sistema IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:       #0E0E10;
+  --bg2:      #18181B;
+  --bg3:      #1F1F23;
+  --purple:   #9146FF;
+  --pur-l:    rgba(145,70,255,0.12);
+  --pur-m:    rgba(145,70,255,0.25);
+  --bd:       rgba(145,70,255,0.18);
+  --bd-b:     rgba(145,70,255,0.4);
+  --neon:     #00F5A0;
+  --neon-l:   rgba(0,245,160,0.1);
+  --warn:     #FF5E5B;
+  --text:     #EFEFF1;
+  --muted:    rgba(239,239,241,0.6);
+  --dim:      rgba(239,239,241,0.3);
+  --fD: 'Rajdhani', sans-serif;
+  --fB: 'Outfit', sans-serif;
+  --fM: 'DM Mono', monospace;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--fB);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+
+/* scanlines */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px);
+}
+
+/* ambient glow */
+.ambient{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.ambient::before{content:'';position:absolute;top:-10%;left:10%;width:80%;height:50%;background:radial-gradient(ellipse,rgba(145,70,255,0.06) 0%,transparent 70%);animation:glowPulse 8s ease-in-out infinite alternate}
+.ambient::after{content:'';position:absolute;bottom:20%;right:-10%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(0,245,160,0.04) 0%,transparent 70%)}
+@keyframes glowPulse{0%{opacity:.6;transform:scale(1)}100%{opacity:1;transform:scale(1.1)}}
+
+/* ─── LAYOUT ─── */
+.page{position:relative;z-index:1}
+
+/* ─── HERO ─── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;text-align:center;
+  padding:80px 24px 60px;position:relative;overflow:hidden;
+}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border:1px solid var(--bd-b);background:var(--pur-l);
+  font-family:var(--fM);font-size:11px;color:var(--purple);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:28px;
+  animation:fadeDown .6s ease both;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--neon)}50%{opacity:.4;box-shadow:0 0 2px var(--neon)}}
+
+.hero-eyebrow{
+  font-family:var(--fM);font-size:12px;color:var(--muted);
+  letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px;
+  animation:fadeDown .6s .1s ease both;
+}
+
+.hero-title{
+  font-family:var(--fD);font-size:clamp(48px,8vw,96px);font-weight:700;
+  line-height:.95;letter-spacing:.02em;text-transform:uppercase;
+  margin-bottom:24px;animation:fadeDown .7s .2s ease both;
+}
+.hero-title em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--purple),var(--neon));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  position:relative;
+}
+.hero-title em::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--purple),var(--neon));
+  animation:lineIn 1s .8s ease both;transform-origin:left;
+}
+@keyframes lineIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.hero-sub{
+  font-size:18px;color:var(--muted);max-width:600px;line-height:1.6;
+  margin-bottom:56px;font-weight:300;animation:fadeDown .7s .3s ease both;
+}
+
+.hero-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  border:1px solid var(--bd);background:var(--bd);
+  max-width:800px;width:100%;animation:fadeUp .8s .5s ease both;
+}
+.hstat{
+  background:var(--bg2);padding:28px 20px;text-align:center;
+  position:relative;overflow:hidden;transition:background .2s;
+}
+.hstat:hover{background:var(--bg3)}
+.hstat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--purple),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.hstat:hover::before{opacity:1}
+.hstat-val{
+  font-family:var(--fD);font-size:42px;font-weight:700;line-height:1;
+  color:var(--neon);margin-bottom:4px;
+}
+.hstat-val.purple{color:var(--purple)}
+.hstat-val.white{color:var(--text)}
+.hstat-lbl{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+
+/* ─── SECTION ─── */
+section{padding:100px 24px;max-width:1200px;margin:0 auto}
+.sec-label{
+  font-family:var(--fM);font-size:10px;color:var(--purple);
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.sec-label::before{content:'';width:24px;height:1px;background:var(--purple)}
+.sec-title{
+  font-family:var(--fD);font-size:clamp(32px,5vw,56px);font-weight:700;
+  text-transform:uppercase;line-height:1;margin-bottom:16px;
+  letter-spacing:.04em;
+}
+.sec-title span{color:var(--purple)}
+.sec-sub{font-size:16px;color:var(--muted);max-width:560px;line-height:1.6;margin-bottom:56px}
+
+/* ─── DIVIDER ─── */
+.divider{
+  height:1px;background:var(--bd);position:relative;margin:0 24px;
+}
+.divider::before{
+  content:'';position:absolute;left:0;top:-1px;width:120px;height:3px;
+  background:linear-gradient(90deg,var(--purple),transparent);
+}
+
+/* ─── STACK GRID ─── */
+.stack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bd)}
+.stack-card{
+  background:var(--bg2);padding:32px;position:relative;overflow:hidden;
+  transition:background .2s;cursor:default;
+}
+.stack-card:hover{background:var(--bg3)}
+.stack-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(145,70,255,0.06),transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.stack-card:hover::after{opacity:1}
+.card-icon{font-size:28px;margin-bottom:16px;display:block}
+.card-name{
+  font-family:var(--fD);font-size:18px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--text);
+  margin-bottom:8px;
+}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.card-tag{
+  display:inline-block;margin-top:14px;padding:3px 8px;
+  font-family:var(--fM);font-size:9px;letter-spacing:.08em;
+  background:var(--neon-l);border:1px solid rgba(0,245,160,.2);color:var(--neon);
+  text-transform:uppercase;
+}
+
+/* ─── FLOW ─── */
+.flow-wrap{display:grid;grid-template-columns:1fr 80px 1fr 80px 1fr 80px 1fr;gap:0;align-items:center}
+.flow-node{
+  background:var(--bg2);border:1px solid var(--bd);padding:24px 16px;
+  text-align:center;position:relative;
+}
+.flow-node:hover{border-color:var(--purple);box-shadow:0 0 20px rgba(145,70,255,.1)}
+.fn-icon{font-size:24px;margin-bottom:10px;display:block}
+.fn-name{font-family:var(--fD);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text)}
+.fn-desc{font-size:11px;color:var(--dim);margin-top:4px}
+.flow-arrow{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fM);font-size:14px;color:var(--purple);
+  position:relative;
+}
+.flow-arrow::before{content:'';position:absolute;left:10px;right:10px;height:1px;background:var(--bd)}
+.flow-arrow span{background:var(--bg);padding:0 4px;position:relative;z-index:1}
+
+/* ─── PILARES ─── */
+.pilar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
+.pilar{
+  border:1px solid var(--bd);padding:32px 28px;position:relative;overflow:hidden;
+  transition:border-color .2s, box-shadow .2s;
+}
+.pilar:hover{border-color:var(--purple);box-shadow:0 0 24px rgba(145,70,255,.08)}
+.pilar-num{
+  font-family:var(--fD);font-size:64px;font-weight:700;
+  color:rgba(145,70,255,.12);position:absolute;top:16px;right:20px;
+  line-height:1;letter-spacing:-.02em;user-select:none;
+}
+.pilar-icon{font-size:24px;margin-bottom:16px;display:block}
+.pilar-name{font-family:var(--fD);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.pilar-text{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* ─── METRICS TABLE ─── */
+.mtable{width:100%;border-collapse:collapse;margin-top:8px}
+.mtable thead th{
+  font-family:var(--fD);font-size:9px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);padding:0 12px 12px;
+  text-align:left;border-bottom:1px solid var(--bd);
+}
+.mtable tbody tr{border-bottom:1px solid rgba(145,70,255,.06);transition:background .15s}
+.mtable tbody tr:hover{background:rgba(145,70,255,.04)}
+.mtable td{padding:14px 12px;font-size:13px;color:var(--muted);vertical-align:middle}
+.mtable td:first-child{color:var(--text);font-weight:500;font-size:14px}
+.mtable td.hi{color:var(--neon);font-family:var(--fM);font-size:12px}
+
+/* ─── UX RULES ─── */
+.ux-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd);margin-bottom:48px}
+.ux-cell{background:var(--bg2);padding:28px 24px}
+.ux-hd{
+  font-family:var(--fD);font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--bd);
+}
+.rule-row{
+  display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(145,70,255,.05);
+  align-items:flex-start;
+}
+.rule-row:last-child{border-bottom:none}
+.rule-icon{
+  width:28px;height:28px;flex-shrink:0;border:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  margin-top:1px;
+}
+.rule-icon.green{border-color:rgba(0,245,160,.3);background:var(--neon-l)}
+.rule-icon.purple{border-color:var(--bd-b);background:var(--pur-l)}
+.rule-icon.red{border-color:rgba(255,94,91,.3);background:rgba(255,94,91,.06)}
+.rule-body{}
+.rule-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.rule-desc{font-size:11.5px;color:var(--dim);line-height:1.5}
+
+/* ─── CADENCIA ─── */
+.cad-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cad-card{
+  border:1px solid var(--bd);padding:24px 18px;position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.cad-card:hover{border-color:var(--purple)}
+.cad-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.cad-card.c1::before{background:linear-gradient(90deg,var(--purple),transparent)}
+.cad-card.c2::before{background:linear-gradient(90deg,var(--neon),transparent)}
+.cad-card.c3::before{background:linear-gradient(90deg,#4AAEFF,transparent)}
+.cad-card.c4::before{background:linear-gradient(90deg,rgba(239,239,241,.4),transparent)}
+.cad-label{
+  font-family:var(--fM);font-size:9px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:10px;
+}
+.cad-title{font-family:var(--fD);font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.cad-steps{}
+.cad-step{
+  display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;
+  font-size:12px;color:var(--muted);
+}
+.cad-step::before{
+  content:'';width:4px;height:4px;border-radius:50%;background:var(--purple);
+  flex-shrink:0;margin-top:5px;
+}
+
+/* ─── RESULTADO ─── */
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.res-card{
+  border:1px solid var(--bd);padding:32px 24px;position:relative;overflow:hidden;
+  transition:all .2s;
+}
+.res-card:hover{border-color:var(--bd-b);box-shadow:0 0 32px rgba(145,70,255,.08);transform:translateY(-2px)}
+.res-val{
+  font-family:var(--fD);font-size:52px;font-weight:700;line-height:1;
+  margin-bottom:6px;
+}
+.res-val.p{color:var(--purple)}
+.res-val.n{color:var(--neon)}
+.res-val.w{color:var(--text)}
+.res-lbl{font-family:var(--fM);font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:12px}
+.res-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ─── QUOTE ─── */
+.quote-wrap{
+  border-left:3px solid var(--purple);padding:28px 32px;
+  background:var(--pur-l);margin:64px 0 0;
+  position:relative;overflow:hidden;
+}
+.quote-wrap::after{
+  content:'"';position:absolute;right:24px;top:-20px;
+  font-family:var(--fD);font-size:120px;font-weight:700;
+  color:rgba(145,70,255,.08);line-height:1;user-select:none;
+}
+.quote-text{
+  font-family:var(--fD);font-size:clamp(18px,2.5vw,24px);
+  font-weight:600;line-height:1.4;letter-spacing:.02em;
+  color:var(--text);position:relative;z-index:1;
+}
+.quote-src{
+  font-family:var(--fM);font-size:11px;color:var(--purple);
+  letter-spacing:.1em;text-transform:uppercase;margin-top:16px;
+}
+
+/* ─── FOOTER ─── */
+footer{
+  border-top:1px solid var(--bd);padding:40px 24px;
+  display:flex;justify-content:space-between;align-items:center;
+  max-width:1200px;margin:0 auto;
+}
+.ft-brand{font-family:var(--fD);font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.ft-brand span{color:var(--purple)}
+.ft-copy{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.06em}
+.live-badge{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--fM);font-size:10px;color:var(--neon);
+  padding:6px 12px;border:1px solid rgba(0,245,160,.2);background:var(--neon-l);
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .stack-grid,.ux-grid,.pilar-grid,.result-grid,.cad-grid{grid-template-columns:1fr 1fr}
+  .flow-wrap{grid-template-columns:1fr;gap:8px}
+  .flow-arrow{transform:rotate(90deg)}
+  .hero-stats{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .stack-grid,.ux-grid,.pilar-grid,.result-grid,.cad-grid{grid-template-columns:1fr}
+  .hero-stats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="page">
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" style="max-width:none;padding:100px 24px 80px">
+  <div class="hero-badge"><div class="badge-dot"></div>Sistema ativo — Em produção</div>
+  <div class="hero-eyebrow">Farias & Moura Advocacia</div>
+  <h1 class="hero-title">Atendimento<br><em>Inteligente</em><br>24 horas</h1>
+  <p class="hero-sub">Uma plataforma completa de captação, qualificação e gestão de leads — integrada ao CRM, ao WhatsApp e ao calendário do escritório.</p>
+  <div class="hero-stats">
+    <div class="hstat">
+      <div class="hstat-val n ct" data-to="30">0</div>
+      <div class="hstat-lbl">seg — resposta média</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val purple">24h</div>
+      <div class="hstat-lbl">disponibilidade</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val ct" data-to="6">0</div>
+      <div class="hstat-lbl">sistemas integrados</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val n">100%</div>
+      <div class="hstat-lbl">automático</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ STACK ═══ -->
+<section class="reveal">
+  <div class="sec-label">O que foi construído</div>
+  <h2 class="sec-title">Stack <span>Completo</span></h2>
+  <p class="sec-sub">Seis componentes integrados, cada um com função específica na jornada do lead.</p>
+  <div class="stack-grid">
+    <div class="stack-card">
+      <span class="card-icon">📱</span>
+      <div class="card-name">WhatsApp + Qualificação</div>
+      <div class="card-desc">Triagem estruturada na primeira conversa via WhatsApp. Coleta perfil, condição de saúde, disponibilidade e qualifica automaticamente. Uma vez — nunca repete.</div>
+      <span class="card-tag">Qualificação</span>
+    </div>
+    <div class="stack-card">
+      <span class="card-icon">🤖</span>
+      <div class="card-name">Ana — IA Conversacional</div>
+      <div class="card-desc">Atendente virtual que responde 24h, propõe horários, confirma agendamentos e sempre sabe o histórico completo de cada lead.</div>
+      <span class="card-tag">Atendimento</span>
+    </div>
+    <div class="stack-card">
+      <span class="card-icon">📊</span>
+      <div class="card-name">CRM</div>
+      <div class="card-desc">Pipeline visual completo. Cada lead é um card no kanban — de Novo Lead a Fechado. Arrastar o card dispara automações no sistema.</div>
+      <span class="card-tag">CRM</span>
+    </div>
+    <div class="stack-card">
+      <span class="card-icon">🗄️</span>
+      <div class="card-name">Base de Dados</div>
+      <div class="card-desc">Banco de dados centralizado com histórico completo: canal de origem, score de qualificação, perfil, agendamentos e fechamentos. Nenhum dado se perde.</div>
+      <span class="card-tag">Dados</span>
+    </div>
+    <div class="stack-card">
+      <span class="card-icon">🔄</span>
+      <div class="card-name">Nutrição Automática</div>
+      <div class="card-desc">Sequências de WhatsApp para não compareceu (D+1/3/7), desqualificado (educativo), fechou (indicação) e leads parados há 30 dias.</div>
+      <span class="card-tag">Retenção</span>
+    </div>
+    <div class="stack-card">
+      <span class="card-icon">📈</span>
+      <div class="card-name">Relatório Diário</div>
+      <div class="card-desc">Resumo enviado às 9h todo dia: novos leads, em conversa, agendamentos de hoje, fechamentos. Visibilidade total sem planilha manual.</div>
+      <span class="card-tag">Gestão</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ SINCRONIA ═══ -->
+<section class="reveal">
+  <div class="sec-label">Sincronização de dados</div>
+  <h2 class="sec-title">Tudo <span>Conectado</span></h2>
+  <p class="sec-sub">Cada interação é registrada e sincronizada em tempo real entre todos os sistemas.</p>
+  <div class="flow-wrap">
+    <div class="flow-node">
+      <span class="fn-icon">📲</span>
+      <div class="fn-name">Lead chega</div>
+      <div class="fn-desc">WhatsApp</div>
+    </div>
+    <div class="flow-arrow"><span>→</span></div>
+    <div class="flow-node">
+      <span class="fn-icon">🤖</span>
+      <div class="fn-name">Ana qualifica</div>
+      <div class="fn-desc">Assistente IA + Triagem</div>
+    </div>
+    <div class="flow-arrow"><span>→</span></div>
+    <div class="flow-node">
+      <span class="fn-icon">🗄️</span>
+      <div class="fn-name">Dados salvos</div>
+      <div class="fn-desc">Base de dados</div>
+    </div>
+    <div class="flow-arrow"><span>→</span></div>
+    <div class="flow-node">
+      <span class="fn-icon">📊</span>
+      <div class="fn-name">CRM atualizado</div>
+      <div class="fn-desc">Pipeline comercial</div>
+    </div>
+  </div>
+  <div style="height:16px"></div>
+  <div style="background:var(--bg2);border:1px solid var(--bd);padding:24px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+    <div>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">Cada lead registra</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">Canal de origem (anúncio)<br>Perfil + patologia + score<br>Histórico de conversa com Ana<br>Agendamentos e comparecimentos<br>Status no funil comercial</div>
+    </div>
+    <div>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">Vendedor vê no CRM</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">Card com todos os dados<br>Histórico completo<br>Status atual (qualificado, agendou...)<br>Notificação de novos agendamentos<br>Relatório diário no WhatsApp</div>
+    </div>
+    <div>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">Ação no CRM dispara</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">Arrastar "Compareceu" → registra<br>Arrastar "Fechou" → bot silencia<br>Arrastar "Perdido" → bot para<br>Lead qualificou → contato criado<br>Agendamento → lembrete automático</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ CAMPANHA ═══ -->
+<section class="reveal">
+  <div class="sec-label">Por que a campanha ativa é fundamental</div>
+  <h2 class="sec-title">Dados que <span>Aprendem</span></h2>
+  <p class="sec-sub">O sistema só mostra seu valor real com volume. Cada lead que entra alimenta três mecanismos que melhoram os resultados ao longo do tempo.</p>
+  <div class="pilar-grid">
+    <div class="pilar">
+      <div class="pilar-num">01</div>
+      <span class="pilar-icon">🎯</span>
+      <div class="pilar-name">Segmentação Progressiva</div>
+      <div class="pilar-text">Com dados reais de quem qualifica e quem fecha, o pixel CAPI alimenta o algoritmo do Meta. Quanto mais leads qualificados registra, mais preciso o público lookalike fica — o Meta aprende sozinho quem são os aposentados e pensionistas com perfil para isenção de IR.</div>
+    </div>
+    <div class="pilar">
+      <div class="pilar-num">02</div>
+      <span class="pilar-icon">🔄</span>
+      <div class="pilar-name">Nutrição Inteligente</div>
+      <div class="pilar-text">Leads que não fecharam na primeira consulta não são descartados — entram em sequências automáticas por até 30 dias. Cada lead se torna um ativo trabalhado no longo prazo. Sem campanha ativa, essas sequências ficam vazias.</div>
+    </div>
+    <div class="pilar">
+      <div class="pilar-num">03</div>
+      <span class="pilar-icon">📉</span>
+      <div class="pilar-name">CPL Decrescente</div>
+      <div class="pilar-text">Quanto mais o pixel registra eventos `Lead`, `Schedule` e `Purchase`, mais o algoritmo otimiza a entrega. O custo por lead qualificado tende a cair progressivamente enquanto a qualidade do público aumenta.</div>
+    </div>
+  </div>
+  <table class="mtable">
+    <thead>
+      <tr>
+        <th>Métrica</th>
+        <th>O que o sistema entrega</th>
+        <th>Impacto esperado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Tempo de resposta</td><td>Menos de 30 segundos, 24h</td><td class="hi">↑ Conversão no 1º contato</td></tr>
+      <tr><td>Taxa de qualificação</td><td>Triagem automática — só perfis elegíveis avançam</td><td class="hi">↓ Tempo do vendedor</td></tr>
+      <tr><td>Aproveitamento de leads</td><td>Nurturing automático por até 30 dias</td><td class="hi">↑ Leads reaproveitados</td></tr>
+      <tr><td>Custo por lead</td><td>Pixel com dados reais → lookalike mais preciso</td><td class="hi">↓ CPL ao longo do tempo</td></tr>
+      <tr><td>Visibilidade comercial</td><td>CRM + relatório diário sem planilha</td><td class="hi">↑ Controle do funil</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ UX INTELIGENTE ═══ -->
+<section class="reveal">
+  <div class="sec-label">Inteligência de interação</div>
+  <h2 class="sec-title">Quando <span>Falar</span>, Quando <span>Parar</span></h2>
+  <p class="sec-sub">O maior erro de sistemas automáticos é não saber se calar. O sistema foi projetado para respeitar o tempo, o formato e a plataforma de cada lead.</p>
+
+  <div class="ux-grid">
+    <div class="ux-cell">
+      <div class="ux-hd">🤝 Humano primeiro — sempre</div>
+      <div class="rule-row">
+        <div class="rule-icon green">📱</div>
+        <div class="rule-body">
+          <div class="rule-title">Vendedor responde no WhatsApp direto</div>
+          <div class="rule-desc">Bot detecta a mensagem e silencia imediatamente por 48 horas — sem sobreposição.</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon green">💬</div>
+        <div class="rule-body">
+          <div class="rule-title">Vendedor responde pela central de atendimento</div>
+          <div class="rule-desc">Mesmo resultado — 48h de silêncio independente da plataforma usada.</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon green">📊</div>
+        <div class="rule-body">
+          <div class="rule-title">Vendedor move card no CRM</div>
+          <div class="rule-desc">Qualquer ação intencional no kanban sinaliza presença humana — bot respeita.</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon purple">⏱️</div>
+        <div class="rule-body">
+          <div class="rule-title">Após 48h sem nova interação humana</div>
+          <div class="rule-desc">Ana retoma naturalmente — com contexto completo do histórico anterior.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ux-cell">
+      <div class="ux-hd">📎 Mídia e formatos — sem ignorar, sem robô</div>
+      <div class="rule-row">
+        <div class="rule-icon purple">🎙️</div>
+        <div class="rule-body">
+          <div class="rule-title">Lead manda áudio</div>
+          <div class="rule-desc">"Recebi seu áudio! Em breve um atendente vai te responder." → 48h silêncio. Humano assume.</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon purple">📷</div>
+        <div class="rule-body">
+          <div class="rule-title">Lead manda foto, vídeo ou documento</div>
+          <div class="rule-desc">Mesmo tratamento — ack imediato + silêncio para o humano analisar e responder.</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon red">👍</div>
+        <div class="rule-body">
+          <div class="rule-title">Lead reage com emoji (👍, ❤️)</div>
+          <div class="rule-desc">Ignorado silenciosamente. Não perturba o fluxo, não dispara mensagem de bot.</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon red">🚫</div>
+        <div class="rule-body">
+          <div class="rule-title">"Não tenho interesse" / "Para de me mandar"</div>
+          <div class="rule-desc">Marcado permanentemente — nunca mais recebe mensagem automática.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:40px">
+    <div class="sec-label" style="margin-bottom:16px">Memória que não esquece</div>
+    <div style="background:var(--bg2);border:1px solid var(--bd);padding:24px 28px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd)">
+        <div style="background:var(--bg3);padding:18px;text-align:center">
+          <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">1ª mensagem</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">Ana se apresenta, entende o perfil</div>
+        </div>
+        <div style="background:var(--bg3);padding:18px;text-align:center">
+          <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">2ª mensagem</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">Já sabe o perfil, propõe horário</div>
+        </div>
+        <div style="background:var(--bg3);padding:18px;text-align:center">
+          <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Após agendar</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">Confirma consulta, orienta sobre o processo</div>
+        </div>
+        <div style="background:var(--bg3);padding:18px;text-align:center">
+          <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Após consulta</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">CRM atualizado — Ana sabe que foi atendido</div>
+        </div>
+      </div>
+      <div style="padding:14px 0 0;font-size:13px;color:var(--dim);text-align:center">O lead nunca precisa repetir o que já disse.</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-bottom:16px">Cadência de nutrição — sem spam, sem abandono</div>
+  <div class="cad-grid">
+    <div class="cad-card c1">
+      <div class="cad-label">Não compareceu</div>
+      <div class="cad-title">Reagendamento</div>
+      <div class="cad-steps">
+        <div class="cad-step">D+1 — Empático, sem cobrança</div>
+        <div class="cad-step">D+3 — Propõe novo horário</div>
+        <div class="cad-step">D+7 — Urgência suave</div>
+        <div class="cad-step">Após D+7 → silêncio</div>
+      </div>
+    </div>
+    <div class="cad-card c2">
+      <div class="cad-label">Desqualificado agora</div>
+      <div class="cad-title">Educativo</div>
+      <div class="cad-steps">
+        <div class="cad-step">D+7 — Conteúdo sobre IR</div>
+        <div class="cad-step">D+30 — "Critérios mudaram?"</div>
+        <div class="cad-step">Pode se qualificar no futuro</div>
+      </div>
+    </div>
+    <div class="cad-card c3">
+      <div class="cad-label">Fechou contrato</div>
+      <div class="cad-title">Indicação</div>
+      <div class="cad-steps">
+        <div class="cad-step">D+15 — Pedido de indicação</div>
+        <div class="cad-step">Tom pessoal, não template</div>
+        <div class="cad-step">Relacionamento pós-fechamento</div>
+      </div>
+    </div>
+    <div class="cad-card c4">
+      <div class="cad-label">Parado há 30 dias</div>
+      <div class="cad-title">Reativação</div>
+      <div class="cad-steps">
+        <div class="cad-step">Uma mensagem — única</div>
+        <div class="cad-step">Sem repetição</div>
+        <div class="cad-step">Resposta → Ana retoma</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ RESULTADO ═══ -->
+<section class="reveal">
+  <div class="sec-label">O que o cliente recebe</div>
+  <h2 class="sec-title">Resultados <span>Mensuráveis</span></h2>
+  <p class="sec-sub">Visibilidade total, automação completa, sem depender de disponibilidade humana para os primeiros estágios.</p>
+  <div class="result-grid">
+    <div class="res-card">
+      <div class="res-val n">&lt;30s</div>
+      <div class="res-lbl">Tempo de resposta</div>
+      <div class="res-desc">Qualquer lead que chegar — de madrugada, fim de semana, feriado — recebe resposta imediata e qualificada.</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val p">100%</div>
+      <div class="res-lbl">Leads trabalhados</div>
+      <div class="res-desc">Nenhum lead é perdido por falta de acompanhamento. As sequências de nutrição trabalham o lead por semanas automaticamente.</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val w">0</div>
+      <div class="res-lbl">Planilhas manuais</div>
+      <div class="res-desc">CRM com pipeline visual, relatório diário no WhatsApp, histórico completo. O vendedor foca em fechar, não em organizar dados.</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val n">↓</div>
+      <div class="res-lbl">CPL ao longo do tempo</div>
+      <div class="res-desc">Pixel alimentado com conversões reais otimiza as campanhas progressivamente. O custo por lead qualificado diminui com o volume.</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val p">↑</div>
+      <div class="res-lbl">Taxa de conversão</div>
+      <div class="res-desc">Triagem automática garante que apenas leads com perfil real chegam ao vendedor. Menos tempo desperdiçado, mais consultas que fecham.</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val w">24h</div>
+      <div class="res-lbl">Presença comercial</div>
+      <div class="res-desc">O escritório está presente e respondendo em todos os momentos — sem aumentar a equipe ou o esforço dos advogados.</div>
+    </div>
+  </div>
+
+  <div class="quote-wrap">
+    <div class="quote-text">"O sistema aprende quando o lead quer conversar, quando prefere silêncio e quando precisa de um humano — e respeita essas preferências automaticamente, 24 horas por dia, sem treinamento adicional."</div>
+    <div class="quote-src">Sistema WhatsApp IA — Farias & Moura Advocacia</div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="divider"></div>
+<footer>
+  <div class="ft-brand">EPOS <span>Marketing</span></div>
+  <div class="live-badge"><div class="badge-dot"></div>Sistema ativo</div>
+  <div class="ft-copy">Farias &amp; Moura Advocacia · 2026</div>
+</footer>
+
+</div>
+
+<script>
+// Counter animation
+function animateCount(el) {
+  const to = parseFloat(el.dataset.to), dec = parseInt(el.dataset.dec || 0);
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / 1800, 1), e = 1 - Math.pow(1 - p, 4);
+    el.textContent = dec ? (e * to).toFixed(dec) : Math.floor(e * to);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = dec ? to.toFixed(dec) : to;
+  })(t0);
+}
+document.querySelectorAll('.ct').forEach(el => animateCount(el));
+
+// Scroll reveals
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
