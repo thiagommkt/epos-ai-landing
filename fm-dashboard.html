@@ -199,26 +199,62 @@ canvas{display:block;width:100%!important}
 
 /* ── MOBILE ── */
 @media(max-width:768px){
-  .app{flex-direction:column;height:auto;overflow:visible}
-  .mobile-header{display:flex}
-  aside{position:fixed;left:-240px;top:0;bottom:0;z-index:300;width:240px!important;transition:left .25s ease;overflow-y:auto}
-  aside nav a{-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;min-height:44px}
+  /* Layout principal */
+  .app{flex-direction:column;height:auto;overflow:visible;min-height:calc(100dvh - 56px)}
+  .mobile-header{display:flex;height:56px;flex-shrink:0}
+
+  /* Sidebar fora do .app agora, mas estilos ficam aqui */
+  aside{position:fixed;left:-240px;top:56px;bottom:0;z-index:300;width:240px!important;transition:left .25s ease;overflow-y:auto}
+  aside nav a{-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;min-height:48px}
   aside.open{left:0}
+  .sidebar-overlay.show{top:56px}
+
+  /* Main e sections */
   main{flex:none;width:100%;overflow-y:auto}
-  .section{padding:20px 16px 40px}
-  .kpi-row{grid-template-columns:repeat(2,1fr)!important}
-  .two-col,.two-col-eq,.three-col{grid-template-columns:1fr!important}
-  .sec-title{font-size:22px!important}
-  .sec-head{flex-direction:column;align-items:flex-start}
-  .chat-wrap{height:auto;flex-direction:column}
-  .chat-iframe{height:500px}
-  .utm-row{grid-template-columns:70px 1fr 34px 34px;gap:6px}
-  .kanban{gap:10px}
-  .col{width:200px}
+  .section{padding:16px 14px 48px}
+  .sec-title{font-size:20px!important}
+  .sec-head{flex-direction:column;align-items:flex-start;gap:8px}
+  .sec-badge{font-size:9px}
+
+  /* Grids */
+  .kpi-row{grid-template-columns:1fr 1fr!important;gap:8px}
+  .kpi{padding:14px 12px 10px}
+  .kpi-val{font-size:38px!important}
+  .kpi-lbl{font-size:9px}
+  .two-col,.two-col-eq,.three-col{grid-template-columns:1fr!important;gap:8px}
+
+  /* Chat — preenche tela toda disponível */
+  .section#s-chat{padding:0!important}
+  .chat-wrap{
+    height:calc(100dvh - 56px);
+    height:calc(100vh - 56px); /* fallback */
+    border:none;
+  }
+  .chat-iframe{
+    height:calc(100dvh - 56px);
+    height:calc(100vh - 56px);
+    width:100%;
+  }
+
+  /* Kanban scroll */
+  .kanban{gap:8px;padding-bottom:16px}
+  .col{width:180px}
+  .krm-card{padding:8px}
+
+  /* UTM */
+  .utm-row{grid-template-columns:60px 1fr 28px 28px;gap:4px;font-size:11px}
+
+  /* Tabelas */
+  .tbl thead th{font-size:8px;padding:0 6px 8px 0}
+  .tbl tbody td{font-size:11px;padding:8px 6px 8px 0}
+
+  /* Metabase */
+  .mb-iframe{height:420px!important}
 }
 @media(max-width:480px){
   .kpi-row{grid-template-columns:1fr 1fr!important}
-  .kpi-val{font-size:36px!important}
+  .kpi-val{font-size:32px!important}
+  .section{padding:12px 12px 40px}
 }
 </style>
 </head>
