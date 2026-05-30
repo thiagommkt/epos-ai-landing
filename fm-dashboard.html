@@ -298,14 +298,15 @@ canvas{display:block;width:100%!important}
 </head>
 <body>
 
-<!-- Painel de detalhe do lead -->
-<div class="lead-panel-overlay" id="lead-overlay" onclick="closeLeadPanel()"></div>
-<div class="lead-panel" id="lead-panel">
-  <div class="panel-header">
-    <div class="panel-title" id="panel-name">Lead</div>
-    <button class="panel-close" onclick="closeLeadPanel()">✕</button>
+<!-- Modal de detalhe do lead -->
+<div class="lead-panel-overlay" id="lead-overlay" onclick="closeLeadPanel()">
+  <div class="lead-panel" id="lead-panel" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title" id="panel-name">Lead</div>
+      <button class="panel-close" onclick="closeLeadPanel()">✕</button>
+    </div>
+    <div class="panel-body" id="panel-body"></div>
   </div>
-  <div class="panel-body" id="panel-body"></div>
 </div>
 
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
