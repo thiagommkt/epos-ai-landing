@@ -27,7 +27,7 @@ body::after{content:'';position:fixed;top:-5%;left:20%;width:800px;height:400px;
 .menu-toggle{background:transparent;border:1px solid var(--bd);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:18px;flex-shrink:0}
 .mobile-logo{font-family:var(--fD);font-size:18px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .mobile-logo span{color:var(--purple)}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:149}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:190;touch-action:manipulation}
 .sidebar-overlay.show{display:block}
 
 /* ── LAYOUT ── */
@@ -201,7 +201,8 @@ canvas{display:block;width:100%!important}
 @media(max-width:768px){
   .app{flex-direction:column;height:auto;overflow:visible}
   .mobile-header{display:flex}
-  aside{position:fixed;left:-240px;top:0;bottom:0;z-index:200;width:240px!important;transition:left .25s ease;overflow-y:auto}
+  aside{position:fixed;left:-240px;top:0;bottom:0;z-index:300;width:240px!important;transition:left .25s ease;overflow-y:auto}
+  aside nav a{-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;min-height:44px}
   aside.open{left:0}
   main{flex:none;width:100%;overflow-y:auto}
   .section{padding:20px 16px 40px}
@@ -923,18 +924,38 @@ function setPeriod(btn, period, label) {
 
 // ═══ MOBILE SIDEBAR ═══
 function toggleSidebar(){
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
-  document.body.style.overflow = document.getElementById('sidebar').classList.contains('open') ? 'hidden' : '';
+  const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');
+  sb.classList.toggle('open');ov.classList.toggle('show');
+  document.body.style.overflow=sb.classList.contains('open')?'hidden':'';
 }
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('show');
-  document.body.style.overflow = '';
+  document.body.style.overflow='';
 }
+// Overlay: fechar ao tocar fora
+document.getElementById('overlay').addEventListener('touchend',e=>{e.preventDefault();closeSidebar();});
+document.getElementById('overlay').addEventListener('click',closeSidebar);
+
+// Nav: touchend para resposta imediata no mobile + click para desktop
 document.querySelectorAll('nav a[data-sec]').forEach(a=>{
-  a.addEventListener('click',()=>{ if(window.innerWidth<=768) closeSidebar(); });
+  a.addEventListener('touchend',e=>{
+    e.stopPropagation();e.preventDefault();
+    show(a.dataset.sec);
+    if(window.innerWidth<=768)setTimeout(closeSidebar,60);
+  });
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    show(a.dataset.sec);
+    if(window.innerWidth<=768)setTimeout(closeSidebar,60);
+  });
 });
+// Swipe esquerda para fechar
+let _sx=0;
+document.getElementById('sidebar').addEventListener('touchstart',e=>{_sx=e.touches[0].clientX;},{passive:true});
+document.getElementById('sidebar').addEventListener('touchend',e=>{
+  if(e.changedTouches[0].clientX-_sx<-60)closeSidebar();
+},{passive:true});
 
 // ═══ INIT + AUTO-REFRESH ═══
 loadDashboard();
