@@ -238,31 +238,31 @@ canvas{display:block;width:100%!important}
   </div>
   <nav>
     <div class="nav-section">Visão Geral</div>
-    <a class="active" data-sec="dashboard">
+    <a class="active" data-sec="dashboard" onclick="navTo('dashboard')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>
       Dashboard
     </a>
     <div class="nav-section">Leads</div>
-    <a data-sec="dados">
+    <a data-sec="dados" onclick="navTo('dados')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
       Leads
     </a>
-    <a data-sec="crm">
+    <a data-sec="crm" onclick="navTo('crm')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="3" height="14"/><rect x="6" y="1" width="3" height="10"/><rect x="11" y="1" width="3" height="7"/></svg>
       CRM
     </a>
     <div class="nav-section">Atendimento</div>
-    <a data-sec="chat">
+    <a data-sec="chat" onclick="navTo('chat')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v9H9l-3 3V11H1V2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
       Chat
     </a>
     <div class="nav-section">Analytics</div>
-    <a data-sec="analises">
+    <a data-sec="analises" onclick="navTo('analises')">
       <svg viewBox="0 0 16 16" fill="currentColor"><polyline points="1,12 5,6 9,9 13,2 15,4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       Análises
     </a>
     <div class="nav-section">Sistema</div>
-    <a data-sec="status">
+    <a data-sec="status" onclick="navTo('status')">
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2"/></svg>
       Status
     </a>
@@ -883,6 +883,12 @@ async function updateCRMStage(crm_person_id, newStage, telefone) {
   const d = await r.json();
   if (d.error) throw new Error(d.error);
   return d;
+}
+
+// navTo: função global chamada pelo onclick inline dos links de nav
+function navTo(id) {
+  show(id);
+  if (window.innerWidth <= 768) closeSidebar();
 }
 
 // ═══ METABASE TABS ═══
