@@ -156,8 +156,8 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .toast.err{border-color:rgba(255,94,91,.3);color:var(--warn)}
 
 /* ── CHAT ── */
-.chat-wrap{display:flex;height:600px;border:1px solid var(--bd)}
-.chat-iframe{flex:1;border:none;background:var(--bg3)}
+.chat-wrap{display:flex;height:calc(100vh - 80px);border:1px solid var(--bd)}
+.chat-iframe{flex:1;border:none;background:var(--bg3);height:100%}
 .chat-noframe{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg3);padding:40px}
 .chat-noframe h3{font-family:var(--fD);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .chat-noframe p{font-size:13px;color:var(--muted);text-align:center;max-width:360px;line-height:1.6}
