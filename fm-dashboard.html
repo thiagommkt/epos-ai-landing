@@ -237,8 +237,8 @@ canvas{display:block;width:100%!important}
 
 /* ── MOBILE ── */
 @media(max-width:768px){
-  /* Layout principal */
-  .app{flex-direction:column;height:auto;overflow:visible;min-height:calc(100dvh - 56px)}
+  /* Layout principal — z-index:auto remove o stacking context, sidebar pode superar o overlay */
+  .app{flex-direction:column;height:auto;overflow:visible;min-height:calc(100dvh - 56px);z-index:auto!important}
   .mobile-header{display:flex;height:56px;flex-shrink:0}
 
   /* Sidebar fora do .app agora, mas estilos ficam aqui */
@@ -315,6 +315,7 @@ canvas{display:block;width:100%!important}
   <div class="mobile-logo">F&M <span>IA</span></div>
 </div>
 
+<div class="app">
 <aside id="sidebar">
   <div class="sb-logo">
     <div class="sb-icon">F</div>
@@ -357,8 +358,6 @@ canvas{display:block;width:100%!important}
     <div class="sb-live"><div class="live-dot"></div>LIVE · Sistema ativo</div>
   </div>
 </aside>
-
-<div class="app">
 <main>
 
 <!-- ══ DASHBOARD ══ -->
