@@ -1010,6 +1010,21 @@ function openLeadPanel(lead) {
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
     ${lead.notas?`<div class="panel-section">Observações</div><div style="font-size:13px;color:var(--muted);line-height:1.6;padding:8px 0">${lead.notas}</div>`:''}
 
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--bd)">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Controle do Bot</div>
+      ${lead.em_atendimento
+        ? `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', true)"
+            style="width:100%;padding:12px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
+            ✅ Bot desativado — Reativar
+          </button>
+          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Bot silenciado permanentemente para este lead.</div>`
+        : `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', false)"
+            style="width:100%;padding:12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.3);color:var(--warn);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
+            🚫 Desativar bot para este lead
+          </button>
+          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">O bot vai parar de responder este contato.</div>`
+      }
+    </div>
   `;
 
   document.getElementById('lead-panel').classList.add('open');
@@ -1018,9 +1033,42 @@ function openLeadPanel(lead) {
 }
 
 function closeLeadPanel() {
-  document.getElementById('lead-panel').classList.remove('open');
   document.getElementById('lead-overlay').classList.remove('show');
   document.body.style.overflow = '';
+}
+
+async function toggleBot(telefone, currentlyDisabled) {
+  const btn = document.getElementById('bot-toggle-btn');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+  try {
+    const patch = currentlyDisabled
+      ? { em_atendimento: false, dify_ativo: true }
+      : { em_atendimento: true, dify_ativo: false };
+
+    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch)
+    });
+
+    // Atualizar lead no cache local
+    const lead = allLeads.find(l => l.telefone === telefone);
+    if (lead) { lead.em_atendimento = patch.em_atendimento; lead.dify_ativo = patch.dify_ativo; }
+
+    toast(currentlyDisabled ? '✅ Bot reativado para este lead' : '🚫 Bot desativado para este lead',
+          currentlyDisabled ? 'ok' : 'err');
+
+    // Reabrir o modal atualizado
+    const updatedLead = allLeads.find(l => l.telefone === telefone) || {};
+    Object.assign(updatedLead, patch);
+    setTimeout(() => openLeadPanel(updatedLead), 200);
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Erro — tente novamente';
+    toast('Erro ao salvar', 'err');
+  }
 }
 
 // navTo: função global chamada pelo onclick inline dos links de nav
