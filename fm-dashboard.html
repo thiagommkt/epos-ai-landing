@@ -372,10 +372,7 @@ canvas{display:block;width:100%!important}
 <section class="section" id="s-crm">
   <div class="sec-head">
     <div><div class="sec-title">PIPELINE <span>CRM</span></div><div class="sec-sub" id="crm-count">Carregando...</div></div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.06em">Visualização — arraste os cards no CRM</span>
-      <a href="https://crm.eposmktfilmsia.com.br" target="_blank" style="padding:6px 16px;border:1px solid var(--bd-b);color:var(--purple);text-decoration:none;font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:background .2s" onmouseover="this.style.background='var(--pur-l)'" onmouseout="this.style.background='transparent'">Abrir CRM →</a>
-    </div>
+    <a href="https://crm.eposmktfilmsia.com.br" target="_blank" style="padding:6px 16px;border:1px solid var(--bd-b);color:var(--purple);text-decoration:none;font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:background .2s" onmouseover="this.style.background='var(--pur-l)'" onmouseout="this.style.background='transparent'">Abrir CRM →</a>
   </div>
   <div class="rule"></div>
   <div class="kanban" id="kanban-board"><div class="loading"></div></div>
@@ -770,19 +767,22 @@ async function loadCRM() {
   const board = document.getElementById('kanban-board');
   board.innerHTML = STAGES.map(st => {
     const cards = (stageMap[st.key] || []);
-    const cardsHtml = cards.map(l =>
-      `<div class="krm-card" style="border-top-color:${st.color}"
-        draggable="true"
-        data-id="${l.crm_person_id||''}"
-        data-tel="${l.telefone||''}"
-        data-stage="${st.key}"
-        ondragstart="onDragStart(event)"
-        ondragend="onDragEnd(event)">
+    const cardsHtml = cards.map(l => {
+      const tel = (l.telefone||'').replace(/^55/,'');
+      const telFmt = tel.length >= 10 ? `(${tel.slice(0,2)}) ${tel.slice(2,7)}-${tel.slice(7)}` : tel;
+      return `<div class="krm-card" style="border-top-color:${st.color}">
         <div class="krm-name">${l.nome||'Lead sem nome'}</div>
-        <div class="krm-path">${l.patologia||l.crm_stage||'—'}</div>
-        <div class="krm-foot"><div class="krm-time">${relTime(l.criado_em)}</div><div class="krm-score">${l.score||0}</div></div>
-      </div>`
-    ).join('') || '';
+        <div class="krm-path">${l.patologia||'—'}</div>
+        ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px">📱 ${telFmt}</div>` : ''}
+        <div class="krm-foot">
+          <div class="krm-time">${relTime(l.criado_em)}</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            ${l.qualificado ? `<span style="width:6px;height:6px;border-radius:50%;background:var(--neon);display:inline-block" title="Qualificado"></span>` : ''}
+            <span class="krm-score">${l.score||0}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('') || '';
     return `<div class="col"
       data-stage="${st.key}"
       ondragover="onDragOver(event)"
