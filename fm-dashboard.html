@@ -196,6 +196,13 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 /* ── CHAT ── */
 .chat-wrap{display:flex;height:calc(100vh - 80px);border:1px solid var(--bd)}
 .chat-iframe{flex:1;border:none;background:var(--bg3);height:100%}
+
+/* ── AGENDA ── */
+.agenda-wrap{border:1px solid var(--bd);position:relative;overflow:hidden;background:var(--bg2)}
+.agenda-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:2}
+.agenda-iframe{width:100%;height:calc(100vh - 180px);min-height:520px;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.2) brightness(0.92)}
+.agenda-notice{background:rgba(145,70,255,.07);border:1px solid var(--bd);padding:12px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);line-height:1.5}
+.agenda-notice strong{color:var(--purple);display:block;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
 .chat-noframe{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg3);padding:40px}
 .chat-noframe h3{font-family:var(--fD);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .chat-noframe p{font-size:13px;color:var(--muted);text-align:center;max-width:360px;line-height:1.6}
@@ -273,6 +280,8 @@ canvas{display:block;width:100%!important}
     height:calc(100vh - 56px);
     width:100%;
   }
+  /* Agenda mobile */
+  .agenda-iframe{height:420px!important;min-height:380px!important}
 
   /* Kanban scroll */
   .kanban{gap:8px;padding-bottom:16px}
@@ -340,6 +349,10 @@ canvas{display:block;width:100%!important}
     <a data-sec="chat" onclick="navTo('chat')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v9H9l-3 3V11H1V2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
       Chat
+    </a>
+    <a data-sec="agenda" onclick="navTo('agenda')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5 1v4M11 1v4M1 7h14" stroke="currentColor" stroke-width="1.2"/></svg>
+      Agenda
     </a>
     <div class="nav-section">Analytics</div>
     <a data-sec="analises" onclick="navTo('analises')">
@@ -452,6 +465,50 @@ canvas{display:block;width:100%!important}
       allow="microphone; camera; clipboard-write"
       title="Chatwoot — Atendimento FM"
     ></iframe>
+  </div>
+</section>
+
+<!-- ══ AGENDA ══ -->
+<section class="section" id="s-agenda">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">AGENDA <span>DE CONSULTAS</span></div>
+      <div class="sec-sub">GOOGLE CALENDAR · AGENDAMENTOS FM</div>
+    </div>
+    <div class="sec-badge">● SINCRONIZADO</div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="agenda-notice">
+    <span style="font-size:16px;flex-shrink:0">📅</span>
+    <div>
+      <strong>Google Calendar — Farias &amp; Moura</strong>
+      Agendamentos criados pela Ana via WhatsApp aparecem aqui automaticamente. Para que o calendário seja visível nesta tela, ele precisa estar configurado como público nas configurações do Google Calendar.
+    </div>
+  </div>
+
+  <div class="agenda-wrap">
+    <iframe
+      class="agenda-iframe"
+      id="agenda-iframe"
+      src="https://calendar.google.com/calendar/embed?src=8a7c220d41617259a1ad6c457ef56b46bab8bb2ef513cde77d0b76871ecd00b3%40group.calendar.google.com&ctz=America%2FSao_Paulo&bgcolor=%230e0e10&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=1&hl=pt_BR"
+      frameborder="0"
+      scrolling="no"
+      title="Agenda Farias &amp; Moura"
+    ></iframe>
+  </div>
+
+  <div style="margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.06em">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);animation:pulse 2s ease infinite;flex-shrink:0"></span>
+      Google Calendar · Agendamentos automáticos via WhatsApp IA
+    </div>
+    <a href="https://calendar.google.com" target="_blank"
+      style="font-family:var(--fM);font-size:10px;color:var(--purple);text-decoration:none;letter-spacing:.06em;border:1px solid var(--bd);padding:3px 10px;transition:border-color .15s"
+      onmouseover="this.style.borderColor='var(--purple)'"
+      onmouseout="this.style.borderColor='var(--bd)'">
+      ↗ Abrir no Google Calendar
+    </a>
   </div>
 </section>
 
