@@ -819,11 +819,20 @@ async function loadCRM() {
       const tel = (l.telefone||'').replace(/^55/,'');
       const telFmt = tel.length >= 10 ? `(${tel.slice(0,2)}) ${tel.slice(2,7)}-${tel.slice(7)}` : tel;
       const leadJson = encodeURIComponent(JSON.stringify(l));
-      return `<div class="krm-card" style="border-top-color:${st.color};cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))">
-        <div class="krm-name">${l.nome||'Lead sem nome'}</div>
-        <div class="krm-path">${l.patologia||'—'}</div>
-        ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px">📱 ${telFmt}</div>` : ''}
-        <div class="krm-foot">
+      return `<div class="krm-card"
+        style="border-top-color:${st.color}"
+        draggable="true"
+        data-id="${l.crm_person_id||''}"
+        data-tel="${l.telefone||''}"
+        data-stage="${st.key}"
+        ondragstart="onDragStart(event)"
+        ondragend="onDragEnd(event)"
+        onmousedown="_dragOrClick=false"
+        onclick="if(!_dragging)openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))">
+        <div class="krm-name" style="pointer-events:none">${l.nome||'Lead sem nome'}</div>
+        <div class="krm-path" style="pointer-events:none">${l.patologia||'—'}</div>
+        ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px;pointer-events:none">📱 ${telFmt}</div>` : ''}
+        <div class="krm-foot" style="pointer-events:none">
           <div class="krm-time">${relTime(l.criado_em)}</div>
           <div style="display:flex;align-items:center;gap:4px">
             ${l.qualificado ? `<span style="width:6px;height:6px;border-radius:50%;background:var(--neon);display:inline-block"></span>` : ''}
@@ -834,8 +843,8 @@ async function loadCRM() {
     }).join('') || '';
     return `<div class="col"
       data-stage="${st.key}"
-      ondragover="onDragOver(event)"
-      ondragleave="onDragLeave(event)"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
       ondrop="onDrop(event)">
       <div class="col-head">${st.label} <div class="col-count" id="count-${st.key}">${cards.length}</div></div>
       <div class="col-cards">${cardsHtml}</div>
@@ -845,8 +854,10 @@ async function loadCRM() {
 
 // ═══ DRAG & DROP ═══
 let dragEl = null;
+let _dragging = false;
 
 function onDragStart(e) {
+  _dragging = true;
   dragEl = e.currentTarget;
   dragEl.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
@@ -856,6 +867,7 @@ function onDragEnd(e) {
   if (dragEl) dragEl.classList.remove('dragging');
   document.querySelectorAll('.col').forEach(c => c.classList.remove('drag-over'));
   dragEl = null;
+  setTimeout(() => { _dragging = false; }, 50);
 }
 function onDragOver(e) {
   e.preventDefault();
@@ -1009,6 +1021,18 @@ function openLeadPanel(lead) {
     ${lead.notas?`<div class="panel-section">Observações</div><div style="font-size:13px;color:var(--muted);line-height:1.6;padding:8px 0">${lead.notas}</div>`:''}
 
     <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--bd)">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Enviar Mensagem</div>
+      <textarea id="msg-input" placeholder="Digite a mensagem para enviar via WhatsApp..."
+        style="width:100%;height:80px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px;padding:10px 12px;resize:vertical;outline:none;margin-bottom:8px;transition:border-color .2s"
+        onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
+      <button onclick="enviarMensagem('${lead.telefone}')"
+        style="width:100%;padding:11px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s"
+        onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='var(--pur-l)';this.style.color='var(--purple)'">
+        💬 Enviar pelo WhatsApp
+      </button>
+    </div>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
       <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Controle do Bot</div>
       ${lead.em_atendimento
         ? `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', true)"
@@ -1033,6 +1057,28 @@ function openLeadPanel(lead) {
 function closeLeadPanel() {
   document.getElementById('lead-overlay').classList.remove('show');
   document.body.style.overflow = '';
+}
+
+async function enviarMensagem(telefone) {
+  const input = document.getElementById('msg-input');
+  const mensagem = input?.value?.trim();
+  if (!mensagem) { toast('Digite uma mensagem antes de enviar', 'err'); return; }
+  try {
+    input.disabled = true;
+    const r = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, acao: 'enviar_mensagem', telefone, mensagem })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    input.value = '';
+    toast('✅ Mensagem enviada — bot silenciado por 48h', 'ok');
+  } catch(e) {
+    toast('Erro ao enviar — ' + e.message, 'err');
+  } finally {
+    if (input) input.disabled = false;
+  }
 }
 
 async function toggleBot(telefone, currentlyDisabled) {
