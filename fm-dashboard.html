@@ -468,8 +468,16 @@ canvas{display:block;width:100%!important}
 
 <!-- ══ LEADS ══ -->
 <section class="section" id="s-dados">
-  <div class="sec-head"><div><div class="sec-title">BASE DE <span>LEADS</span></div><div class="sec-sub" id="dados-count">Carregando...</div></div></div>
+  <div class="sec-head">
+    <div><div class="sec-title">BASE DE <span>LEADS</span></div><div class="sec-sub" id="dados-count">Carregando...</div></div>
+    <button onclick="exportCSV()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↓ Exportar CSV</button>
+  </div>
   <div class="rule"></div>
+  <div style="margin-bottom:10px">
+    <input type="text" id="leads-search" placeholder="🔍  Buscar por nome ou telefone..." oninput="searchLeads(this.value)"
+      style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px;outline:none;transition:border-color .2s"
+      onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+  </div>
   <div class="filters" id="dados-filters">
     <button class="filter-btn active" data-filter="todos" onclick="filterLeads(this)">Todos</button>
     <button class="filter-btn" data-filter="qualificado" onclick="filterLeads(this)">Qualificados</button>
@@ -478,7 +486,7 @@ canvas{display:block;width:100%!important}
     <button class="filter-btn" data-filter="em_conversa" onclick="filterLeads(this)">Em Conversa</button>
   </div>
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bd)">
-    <table class="tbl" style="min-width:600px">
+    <table class="tbl" style="min-width:720px">
       <thead style="background:rgba(145,70,255,0.06)"><tr>
         <th style="padding:12px;white-space:nowrap">Nome</th>
         <th style="white-space:nowrap">Perfil</th>
@@ -486,9 +494,10 @@ canvas{display:block;width:100%!important}
         <th style="white-space:nowrap">Score</th>
         <th style="white-space:nowrap">Cidade</th>
         <th style="white-space:nowrap">Status</th>
+        <th style="white-space:nowrap">Agendamento</th>
         <th style="white-space:nowrap">Chegou em</th>
       </tr></thead>
-      <tbody id="leads-table"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody>
+      <tbody id="leads-table"><tr><td colspan="8" class="empty">Carregando...</td></tr></tbody>
     </table>
   </div>
 </section>
@@ -784,6 +793,7 @@ function animCount(el, to) {
 // ═══ LOAD DASHBOARD ═══
 let allLeads = [];
 let leadsFilter = 'todos';
+let leadsSearch = '';
 
 async function loadDashboard() {
   const now = new Date();
@@ -796,13 +806,14 @@ async function loadDashboard() {
   document.getElementById('db-date').textContent =
     brt.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric', timeZone:'America/Sao_Paulo' }).toUpperCase();
 
-  const [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30] = await Promise.all([
+  const [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu] = await Promise.all([
     sbCount('descartado=eq.false'),
     sbCount(`criado_em=gte.${mesISO}&descartado=eq.false`),
     sbCount('agendou=eq.true'),
     sbCount('fechou=eq.true'),
     sbCount('dify_ativo=eq.true&agendou=eq.false&em_atendimento=eq.false'),
-    sbCount(`criado_em=gte.${dia30ISO}`)
+    sbCount(`criado_em=gte.${dia30ISO}`),
+    sbCount('compareceu=eq.true')
   ]);
 
   animCount(document.getElementById('kpi-leads'), leadsMonth);
@@ -822,6 +833,8 @@ async function loadDashboard() {
   }, 300);
 
   document.getElementById('kpi-leads-note').textContent = `${leadsTotal} total histórico`;
+  const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
+  document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
 
   // Funil
   const [q, ag, comp, fech] = await Promise.all([
@@ -889,14 +902,25 @@ async function loadLeads() {
 }
 
 function renderLeads() {
-  const filtered = leadsFilter === 'todos' ? allLeads :
+  let filtered = leadsFilter === 'todos' ? allLeads :
     leadsFilter === 'qualificado' ? allLeads.filter(l => l.qualificado && !l.agendou) :
     leadsFilter === 'agendou' ? allLeads.filter(l => l.agendou && !l.fechou) :
     leadsFilter === 'fechou' ? allLeads.filter(l => l.fechou) :
     allLeads.filter(l => !l.qualificado && !l.agendou && (l.dify_conversation_id || l.dify_ativo));
 
+  if (leadsSearch) {
+    const q = leadsSearch.toLowerCase();
+    filtered = filtered.filter(l =>
+      (l.nome||'').toLowerCase().includes(q) ||
+      (l.telefone||'').includes(q)
+    );
+  }
+
   const html = filtered.map(l => {
     const leadJson = encodeURIComponent(JSON.stringify(l));
+    const agenda = l.data_agendamento
+      ? `<span style="color:var(--neon)">${new Date(l.data_agendamento).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}</span>`
+      : '<span style="color:var(--dim)">—</span>';
     return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
       <td class="td-hi" style="padding-left:12px">${l.nome||'—'}</td>
       <td>${l.perfil||'—'}</td>
@@ -904,9 +928,10 @@ function renderLeads() {
       <td><span class="score">${l.score||0}</span></td>
       <td>${l.cidade||'—'}</td>
       <td>${statusBadge(l)}</td>
+      <td style="font-family:var(--fM);font-size:10px">${agenda}</td>
       <td style="font-family:var(--fM);font-size:10px">${fmtDate(l.criado_em)}</td>
     </tr>`;
-  }).join('') || `<tr><td colspan="7" class="empty">Nenhum lead neste filtro</td></tr>`;
+  }).join('') || `<tr><td colspan="8" class="empty">Nenhum lead neste filtro</td></tr>`;
 
   document.getElementById('leads-table').innerHTML = html;
 }
@@ -916,6 +941,34 @@ function filterLeads(btn) {
   btn.classList.add('active');
   leadsFilter = btn.dataset.filter;
   renderLeads();
+}
+
+function searchLeads(val) {
+  leadsSearch = val.trim();
+  renderLeads();
+}
+
+function exportCSV() {
+  if (!allLeads.length) { toast('Sem dados para exportar', 'err'); return; }
+  const cols = ['nome','telefone','perfil','patologia','score','cidade','status','agendamento','criado_em'];
+  const headers = ['Nome','Telefone','Perfil','Condição','Score','Cidade','Status','Agendamento','Chegou em'];
+  const rows = allLeads.map(l => [
+    l.nome||'',
+    l.telefone||'',
+    l.perfil||'',
+    l.patologia||'',
+    l.score||0,
+    l.cidade||'',
+    l.fechou?'Fechou':l.agendou?'Agendou':l.qualificado?'Qualificado':l.em_atendimento?'Humano':'Contato',
+    l.data_agendamento ? new Date(l.data_agendamento).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) : '',
+    l.criado_em ? new Date(l.criado_em).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) : ''
+  ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv = '﻿' + [headers.join(','), ...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='fm-leads-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('✅ CSV exportado com sucesso', 'ok');
 }
 
 // ═══ TOAST ═══
