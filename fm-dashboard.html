@@ -452,6 +452,18 @@ canvas{display:block;width:100%!important}
     <div id="meta-ads-content"><div class="loading"></div></div>
   </div>
 
+  <!-- ── TOP CRIATIVOS (A5b) ── -->
+  <div class="card" style="margin-top:0">
+    <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      Top Criativos — Desempenho por Anúncio
+      <div style="display:flex;gap:6px">
+        <button id="sort-spend" onclick="loadCreativos('spend')" style="padding:4px 10px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Maior Gasto</button>
+        <button id="sort-ctr" onclick="loadCreativos('ctr')" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Maior CTR</button>
+      </div>
+    </div>
+    <div id="criativos-content"><div class="loading"></div></div>
+  </div>
+
   <!-- ── AÇÕES RÁPIDAS (A3) ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl">Ações Rápidas</div>
@@ -846,6 +858,7 @@ async function loadDashboard() {
   document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
 
   loadMetaAds();
+  loadCreativos('spend');
 
   // Funil
   const [q, ag, comp, fech] = await Promise.all([
@@ -1216,6 +1229,7 @@ function getDBDateFilter() {
 }
 
 function setDBPeriod(btn, period, label) {
+
   dbPeriod = period;
   document.querySelectorAll('.db-period').forEach(b => {
     b.style.background='transparent'; b.style.borderColor='var(--bd)'; b.style.color='var(--muted)';
@@ -1223,6 +1237,7 @@ function setDBPeriod(btn, period, label) {
   btn.style.background='var(--pur-l)'; btn.style.borderColor='var(--bd-b)'; btn.style.color='var(--purple)';
   document.getElementById('db-period-label').textContent='· '+label;
   loadDashboard();
+  loadCreativos(currentSortBy);
 }
 
 // ═══ PAINEL DE LEAD ═══
@@ -1570,6 +1585,64 @@ async function loadMetaAds() {
       '</div>';
   } catch(e) {
     box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads: ' + e.message + '</div>';
+  }
+}
+
+// ═══ TOP CRIATIVOS (A5b) ═══
+let currentSortBy = 'spend';
+async function loadCreativos(sortBy) {
+  currentSortBy = sortBy || 'spend';
+  document.getElementById('sort-spend').style.background = sortBy === 'spend' ? 'var(--pur-l)' : 'transparent';
+  document.getElementById('sort-spend').style.color = sortBy === 'spend' ? 'var(--purple)' : 'var(--muted)';
+  document.getElementById('sort-spend').style.borderColor = sortBy === 'spend' ? 'var(--bd-b)' : 'var(--bd)';
+  document.getElementById('sort-ctr').style.background = sortBy === 'ctr' ? 'var(--pur-l)' : 'transparent';
+  document.getElementById('sort-ctr').style.color = sortBy === 'ctr' ? 'var(--purple)' : 'var(--muted)';
+  document.getElementById('sort-ctr').style.borderColor = sortBy === 'ctr' ? 'var(--bd-b)' : 'var(--bd)';
+  const box = document.getElementById('criativos-content');
+  box.innerHTML = '<div class="loading"></div>';
+  const presetMap = { this_month: 'this_month', last_30: 'last_30_days', last_7: 'last_7_days', all: 'maximum' };
+  const preset = presetMap[dbPeriod] || 'last_30_days';
+  try {
+    const r = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_creatives', date_preset: preset, sort_by: currentSortBy })
+    });
+    const d = await r.json();
+    if (!d.success || !d.ads || d.ads.length === 0) { box.innerHTML = '<div class="empty">Sem dados de criativos para este período</div>'; return; }
+    const rows = d.ads.map((ad, i) => {
+      const thumb = ad.thumbnail_url
+        ? `<img src="${ad.thumbnail_url}" style="width:48px;height:48px;object-fit:cover;border:1px solid var(--bd);flex-shrink:0" onerror="this.style.display='none'">`
+        : `<div style="width:48px;height:48px;background:var(--bg3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🎨</div>`;
+      const spend = parseFloat(ad.spend || 0);
+      const ctr = parseFloat(ad.ctr || 0);
+      const cpc = parseFloat(ad.cpc || 0);
+      const impressions = parseInt(ad.impressions || 0);
+      const clicks = parseInt(ad.clicks || 0);
+      const adName = (ad.ad_name || 'Sem nome').substring(0, 40) + ((ad.ad_name||'').length > 40 ? '…' : '');
+      const campName = (ad.campaign_name || '').substring(0, 30) + ((ad.campaign_name||'').length > 30 ? '…' : '');
+      return `<tr style="border-bottom:1px solid var(--bd)">
+        <td style="padding:10px 8px"><div style="display:flex;align-items:center;gap:10px">${thumb}<div><div style="font-family:var(--fD);font-size:12px;font-weight:600;color:var(--text)">${adName}</div><div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:2px">${campName}</div></div></div></td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:var(--warn)">R$${spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:var(--neon)">${ctr.toFixed(2)}%</td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:var(--purple)">R$${cpc.toFixed(2)}</td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:11px;color:var(--muted)">${impressions.toLocaleString('pt-BR')}</td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:11px;color:var(--muted)">${clicks.toLocaleString('pt-BR')}</td>
+      </tr>`;
+    }).join('');
+    box.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-bottom:2px solid var(--bd)">
+        <th style="padding:8px;text-align:left;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Criativo / Campanha</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Gasto</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">CTR</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">CPC</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Impressões</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Cliques</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) {
+    box.innerHTML = '<div class="empty" style="font-size:11px">Criativos: ' + e.message + '</div>';
   }
 }
 
