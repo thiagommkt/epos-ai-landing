@@ -232,6 +232,17 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .status-dot.green{background:var(--neon);box-shadow:0 0 6px var(--neon)}
 .status-dot.yellow{background:#FFB800;box-shadow:0 0 6px #FFB800}
 
+/* ── ACTION BUTTONS (A3) ── */
+.actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.action-btn{background:var(--bg3);border:1px solid var(--bd);padding:16px 12px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
+.action-btn:hover{border-color:var(--purple);background:var(--pur-l)}
+.action-btn:hover .action-icon{transform:scale(1.15)}
+.action-btn:disabled{opacity:.55;cursor:not-allowed}
+.action-icon{font-size:22px;line-height:1;transition:transform .2s}
+.action-lbl{font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.action-sub{font-family:var(--fM);font-size:9px;color:var(--muted);letter-spacing:.04em}
+@media(max-width:600px){.actions-grid{grid-template-columns:1fr}}
+
 /* ── LOADING ── */
 .loading{display:flex;align-items:center;justify-content:center;height:200px;font-family:var(--fM);font-size:12px;color:var(--dim);gap:8px}
 .loading::before{content:'';width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
@@ -414,6 +425,28 @@ canvas{display:block;width:100%!important}
       <tbody id="leads-recentes"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody></table>
     </div>
   </div>
+
+  <!-- ── AÇÕES RÁPIDAS (A3) ── -->
+  <div class="card" style="margin-top:0">
+    <div class="card-ttl">Ações Rápidas</div>
+    <div class="actions-grid">
+      <button class="action-btn" onclick="executarAcao(this,'reativar_parados','Reativando...')">
+        <div class="action-icon">🔄</div>
+        <div class="action-lbl">Reativar Parados</div>
+        <div class="action-sub">Leads sem contato há 30+ dias</div>
+      </button>
+      <button class="action-btn" onclick="executarAcao(this,'lembrete_amanha','Enviando...')">
+        <div class="action-icon">📅</div>
+        <div class="action-lbl">Lembrete Amanhã</div>
+        <div class="action-sub">Agendamentos de amanhã</div>
+      </button>
+      <button class="action-btn" onclick="executarAcao(this,'qualificados_sem_agenda','Enviando...')">
+        <div class="action-icon">🎯</div>
+        <div class="action-lbl">Convidar Qualificados</div>
+        <div class="action-sub">Qualificados sem agendamento</div>
+      </button>
+    </div>
+  </div>
 </section>
 
 <!-- ══ LEADS ══ -->
@@ -578,9 +611,20 @@ canvas{display:block;width:100%!important}
 
 <!-- ══ STATUS ══ -->
 <section class="section" id="s-status">
-  <div class="sec-head"><div><div class="sec-title">STATUS DO <span>SISTEMA</span></div><div class="sec-sub">INTEGRAÇÕES ATIVAS</div></div></div>
+  <div class="sec-head">
+    <div><div class="sec-title">STATUS DO <span>SISTEMA</span></div><div class="sec-sub">INTEGRAÇÕES ATIVAS</div></div>
+    <button onclick="loadStatus()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↻ Verificar agora</button>
+  </div>
   <div class="rule"></div>
   <div class="cfg-grid">
+    <!-- Status em Tempo Real -->
+    <div class="cfg-sec">
+      <div class="cfg-sec-title" style="display:flex;align-items:center;gap:8px">
+        Status em Tempo Real
+        <span id="status-ts" style="font-family:var(--fM);font-size:9px;color:var(--dim);font-weight:400;letter-spacing:.04em;text-transform:none"></span>
+      </div>
+      <div id="status-realtime"><div class="loading"></div></div>
+    </div>
     <div class="cfg-sec">
       <div class="cfg-sec-title">Assistente IA — Ana</div>
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Atendimento automático</div><div class="cfg-val">Ativo 24h</div></div>
@@ -1030,6 +1074,7 @@ function show(id) {
     initialized[id]=true;
     if(id==='dados') loadLeads();
     if(id==='crm') loadCRM();
+    if(id==='status') loadStatus();
   }
 }
 document.querySelectorAll('nav a[data-sec]').forEach(a => {
@@ -1381,6 +1426,66 @@ document.getElementById('sidebar').addEventListener('touchstart',e=>{_sx=e.touch
 document.getElementById('sidebar').addEventListener('touchend',e=>{
   if(e.changedTouches[0].clientX-_sx<-60)closeSidebar();
 },{passive:true});
+
+// ═══ AÇÕES RÁPIDAS (A3) ═══
+const ACOES_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-dashboard-acoes';
+
+async function executarAcao(btn, action, loadingMsg) {
+  btn.disabled = true;
+  const lbl = btn.querySelector('.action-lbl');
+  const orig = lbl.textContent;
+  lbl.textContent = loadingMsg;
+  try {
+    const r = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action })
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Erro desconhecido');
+    toast('✅ ' + d.action + ': ' + d.count + ' mensagem(ns) enviada(s)', 'ok');
+    lbl.textContent = '✅ ' + d.count + ' enviadas';
+    setTimeout(() => { lbl.textContent = orig; btn.disabled = false; }, 3000);
+  } catch(e) {
+    toast('Erro: ' + e.message, 'err');
+    lbl.textContent = orig;
+    btn.disabled = false;
+  }
+}
+
+// ═══ STATUS EM TEMPO REAL (B5) ═══
+async function loadStatus() {
+  const container = document.getElementById('status-realtime');
+  const ts = document.getElementById('status-ts');
+  if (container) container.innerHTML = '<div class="loading"></div>';
+  try {
+    const r = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'health_status' })
+    });
+    const d = await r.json();
+    if (d.checks && container) {
+      const allOk = d.allOk;
+      container.innerHTML = d.checks.map(c =>
+        '<div class="cfg-row">' +
+        '<div class="cfg-key"><span class="status-dot ' + (c.ok ? 'green' : 'yellow') + '"></span>' + c.name + '</div>' +
+        '<div class="cfg-val" style="color:' + (c.ok ? 'var(--neon)' : 'var(--warn)') + '">' + c.detail + '</div>' +
+        '</div>'
+      ).join('') +
+      '<div class="cfg-row" style="margin-top:6px">' +
+      '<div class="cfg-key" style="font-size:11px;color:' + (allOk ? 'var(--neon)' : 'var(--warn)') + '">' +
+      (allOk ? '✅ Todos os serviços operando' : '⚠️ Atenção: verificar serviço(s)') +
+      '</div></div>';
+      if (ts) {
+        const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+        ts.textContent = '· verificado às ' + now;
+      }
+    }
+  } catch(e) {
+    if (container) container.innerHTML = '<div class="empty">Erro ao verificar — ' + e.message + '</div>';
+  }
+}
 
 // ═══ INIT + AUTO-REFRESH ═══
 loadDashboard();
