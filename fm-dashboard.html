@@ -443,6 +443,15 @@ canvas{display:block;width:100%!important}
     </div>
   </div>
 
+  <!-- ── CUSTOS META ADS (A5) ── -->
+  <div class="card" style="margin-top:0" id="meta-ads-card">
+    <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center">
+      Custo de Anúncios — Meta Ads
+      <span id="meta-period-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.06em;text-transform:none;font-weight:400">últimos 30 dias</span>
+    </div>
+    <div id="meta-ads-content"><div class="loading"></div></div>
+  </div>
+
   <!-- ── AÇÕES RÁPIDAS (A3) ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl">Ações Rápidas</div>
@@ -835,6 +844,8 @@ async function loadDashboard() {
   document.getElementById('kpi-leads-note').textContent = `${leadsTotal} total histórico`;
   const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
   document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
+
+  loadMetaAds();
 
   // Funil
   const [q, ag, comp, fech] = await Promise.all([
@@ -1516,6 +1527,51 @@ document.getElementById('sidebar').addEventListener('touchstart',e=>{_sx=e.touch
 document.getElementById('sidebar').addEventListener('touchend',e=>{
   if(e.changedTouches[0].clientX-_sx<-60)closeSidebar();
 },{passive:true});
+
+// ═══ CUSTOS META ADS (A5) ═══
+async function loadMetaAds() {
+  const box = document.getElementById('meta-ads-content');
+  if (!box) return;
+  box.innerHTML = '<div class="loading"></div>';
+  const presetMap = { this_month: 'this_month', last_30: 'last_30_days', last_7: 'last_7_days', all: 'maximum' };
+  const preset = presetMap[dbPeriod] || 'last_30_days';
+  const labelMap = { this_month: 'este mês', last_30: 'últimos 30 dias', last_7: 'últimos 7 dias', all: 'todo o histórico' };
+  const periodLabel = document.getElementById('meta-period-label');
+  if (periodLabel) periodLabel.textContent = labelMap[dbPeriod] || 'últimos 30 dias';
+  try {
+    const r = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_insights', date_preset: preset })
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Erro');
+    const spend = d.spend || 0;
+    const leads = parseInt(document.getElementById('kpi-leads')?.textContent || '0') || 1;
+    const cpl = spend > 0 ? (spend / leads).toFixed(2) : '—';
+    box.innerHTML =
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">' +
+        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Gasto Total</div>' +
+          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--warn)">R$' + spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
+        '</div>' +
+        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Custo por Lead</div>' +
+          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--purple)">R$' + (spend > 0 ? parseFloat(cpl).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—') + '</div>' +
+        '</div>' +
+        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Impressões</div>' +
+          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--text)">' + (d.impressions||0).toLocaleString('pt-BR') + '</div>' +
+        '</div>' +
+        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">CTR</div>' +
+          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--neon)">' + (d.ctr||0).toFixed(2) + '<span style="font-size:16px;color:var(--muted)">%</span></div>' +
+        '</div>' +
+      '</div>';
+  } catch(e) {
+    box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads: ' + e.message + '</div>';
+  }
+}
 
 // ═══ AÇÕES RÁPIDAS (A3) ═══
 const ACOES_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-dashboard-acoes';
