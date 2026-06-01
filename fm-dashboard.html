@@ -232,6 +232,18 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .status-dot.green{background:var(--neon);box-shadow:0 0 6px var(--neon)}
 .status-dot.yellow{background:#FFB800;box-shadow:0 0 6px #FFB800}
 
+/* ── CAMPANHAS (A4) ── */
+.camp-block{background:var(--bg2);border:1px solid var(--bd);padding:20px;margin-bottom:12px}
+.camp-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.camp-step{background:var(--bg3);border:1px solid var(--bd);padding:14px;margin-bottom:8px}
+.camp-step:last-child{margin-bottom:0}
+.camp-step-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:4px}
+.camp-textarea{width:100%;background:var(--bg2);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;padding:10px 12px;resize:vertical;outline:none;line-height:1.6;transition:border-color .2s}
+.camp-textarea:focus{border-color:var(--purple)}
+.camp-save-btn{padding:6px 14px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);cursor:pointer;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.camp-save-btn:hover{background:var(--purple);color:#fff}
+.camp-save-btn:disabled{opacity:.6;cursor:not-allowed}
+
 /* ── ACTION BUTTONS (A3) ── */
 .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .action-btn{background:var(--bg3);border:1px solid var(--bd);padding:16px 12px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
@@ -367,6 +379,11 @@ canvas{display:block;width:100%!important}
     <a data-sec="analises" onclick="navTo('analises')">
       <svg viewBox="0 0 16 16" fill="currentColor"><polyline points="1,12 5,6 9,9 13,2 15,4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       Análises
+    </a>
+    <div class="nav-section">Automação</div>
+    <a data-sec="campanhas" onclick="navTo('campanhas')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
+      Campanhas
     </a>
     <div class="nav-section">Sistema</div>
     <a data-sec="status" onclick="navTo('status')">
@@ -607,6 +624,25 @@ canvas{display:block;width:100%!important}
     <span style="width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);animation:pulse 2s ease infinite;flex-shrink:0"></span>
     Metabase · Dados em tempo real · <span id="period-footer">Últimos 7 dias</span>
   </div>
+</section>
+
+<!-- ══ CAMPANHAS (A4) ══ -->
+<section class="section" id="s-campanhas">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">MENSAGENS DE <span>NUTRIÇÃO</span></div>
+      <div class="sec-sub">EDITAR TEMPLATES · SEQUÊNCIAS AUTOMÁTICAS</div>
+    </div>
+    <button onclick="loadCampanhas()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↻ Recarregar</button>
+  </div>
+  <div class="rule"></div>
+
+  <div style="background:rgba(145,70,255,.06);border:1px solid var(--bd);padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);line-height:1.6;font-family:var(--fB)">
+    <strong style="color:var(--text);font-family:var(--fD);font-size:11px;letter-spacing:.08em;text-transform:uppercase">Como funciona:</strong>
+    Edite as mensagens abaixo e clique em <strong style="color:var(--purple)">Salvar</strong>. Use <code style="font-family:var(--fM);background:var(--bg3);padding:1px 5px;color:var(--neon)">{nome}</code> para inserir o primeiro nome do lead automaticamente. As sequências são disparadas automaticamente pelos workflows de nutrição.
+  </div>
+
+  <div id="campanhas-container"><div class="loading"></div></div>
 </section>
 
 <!-- ══ STATUS ══ -->
@@ -1075,6 +1111,7 @@ function show(id) {
     if(id==='dados') loadLeads();
     if(id==='crm') loadCRM();
     if(id==='status') loadStatus();
+    if(id==='campanhas') loadCampanhas();
   }
 }
 document.querySelectorAll('nav a[data-sec]').forEach(a => {
@@ -1450,6 +1487,95 @@ async function executarAcao(btn, action, loadingMsg) {
     toast('Erro: ' + e.message, 'err');
     lbl.textContent = orig;
     btn.disabled = false;
+  }
+}
+
+// ═══ CAMPANHAS — TEMPLATES DE NUTRIÇÃO (A4) ═══
+const TIPO_META = {
+  nao_compareceu: { label: 'Não Compareceu', desc: 'Leads que agendaram mas não foram à consulta', icon: '📅', cor: 'var(--warn)' },
+  desqualificado:  { label: 'Desqualificado',  desc: 'Leads com score abaixo do mínimo esperado',   icon: '🔄', cor: 'var(--muted)' },
+  fechou:          { label: 'Fechou',           desc: 'Clientes que assinaram — pedido de indicação', icon: '✅', cor: 'var(--neon)' },
+  parado_30d:      { label: 'Parado 30 dias',   desc: 'Leads sem contato há mais de 30 dias',         icon: '💤', cor: 'var(--purple)' }
+};
+
+async function loadCampanhas() {
+  const box = document.getElementById('campanhas-container');
+  if (box) box.innerHTML = '<div class="loading"></div>';
+  try {
+    const r = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'listar_templates' })
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Sem dados');
+    renderCampanhas(d.templates || []);
+  } catch(e) {
+    if (box) box.innerHTML = '<div class="empty">Erro ao carregar — ' + e.message + '</div>';
+  }
+}
+
+function renderCampanhas(templates) {
+  const box = document.getElementById('campanhas-container');
+  if (!box) return;
+  const grupos = {};
+  templates.forEach(t => { if (!grupos[t.tipo]) grupos[t.tipo] = []; grupos[t.tipo].push(t); });
+  const ordem = ['nao_compareceu', 'desqualificado', 'fechou', 'parado_30d'];
+  box.innerHTML = ordem.map(tipo => {
+    const m = TIPO_META[tipo] || { label: tipo, desc: '', icon: '📧', cor: 'var(--purple)' };
+    const steps = grupos[tipo] || [];
+    return '<div class="camp-block">' +
+      '<div class="camp-head">' +
+        '<span style="font-size:22px;line-height:1">' + m.icon + '</span>' +
+        '<div><div style="font-family:var(--fD);font-size:15px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text)">' + m.label + '</div>' +
+        '<div style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">' + m.desc + '</div></div>' +
+      '</div>' +
+      steps.map(t =>
+        '<div class="camp-step">' +
+          '<div class="camp-step-head">' +
+            '<span style="font-family:var(--fM);font-size:10px;color:' + m.cor + ';letter-spacing:.08em;text-transform:uppercase">Step ' + t.step + ' · Dia ' + (t.dias_apos > 0 ? '+' + t.dias_apos : t.dias_apos) + '</span>' +
+            '<span style="font-family:var(--fM);font-size:10px;color:var(--dim)">' + (t.titulo || '') + '</span>' +
+          '</div>' +
+          '<textarea class="camp-textarea" id="tmpl-' + tipo + '-' + t.step + '" rows="4">' + (t.mensagem || '') + '</textarea>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-top:8px">' +
+            '<span style="font-family:var(--fM);font-size:9px;color:var(--dim);flex:1">' +
+              '<code style="background:var(--bg2);padding:1px 5px;color:var(--neon)">{nome}</code> = primeiro nome do lead' +
+            '</span>' +
+            '<button class="camp-save-btn" id="btn-' + tipo + '-' + t.step + '" onclick="salvarTemplate(\'' + tipo + '\',' + t.step + ',\'' + (t.titulo || '').replace(/'/g, "\\'") + '\')">💾 Salvar</button>' +
+          '</div>' +
+        '</div>'
+      ).join('') +
+    '</div>';
+  }).join('');
+}
+
+async function salvarTemplate(tipo, step, titulo) {
+  const ta = document.getElementById('tmpl-' + tipo + '-' + step);
+  const btn = document.getElementById('btn-' + tipo + '-' + step);
+  const mensagem = ta ? ta.value.trim() : '';
+  if (!mensagem) { toast('Digite a mensagem antes de salvar', 'err'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+  try {
+    const r = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'salvar_template', tipo, step, mensagem, titulo })
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Erro');
+    toast('✅ Template salvo com sucesso', 'ok');
+    if (btn) {
+      btn.textContent = '✅ Salvo!';
+      btn.style.background = 'rgba(0,245,160,.12)';
+      btn.style.color = 'var(--neon)';
+      btn.style.borderColor = 'rgba(0,245,160,.3)';
+      setTimeout(() => {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar'; btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }
+      }, 2500);
+    }
+  } catch(e) {
+    toast('Erro ao salvar — ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar'; }
   }
 }
 
