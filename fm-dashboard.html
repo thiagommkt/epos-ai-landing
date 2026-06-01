@@ -1766,6 +1766,21 @@ async function loadStatus() {
   const container = document.getElementById('status-realtime');
   const ts = document.getElementById('status-ts');
   if (container) container.innerHTML = '<div class="loading"></div>';
+
+  // Banco: checa direto via Supabase (sem workflow, mais confiável)
+  let bancoOk = false;
+  let bancoDetail = 'offline';
+  try {
+    const sbCheck = await fetch(SUPABASE_URL + '/rest/v1/fm_leads?select=id&limit=1', {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+    });
+    bancoOk = sbCheck.ok;
+    bancoDetail = sbCheck.ok ? 'online' : 'erro ' + sbCheck.status;
+  } catch(e) { bancoDetail = 'sem conexão'; }
+
+  // WhatsApp: checa via workflow (Evolution API fica server-side)
+  let waOk = false;
+  let waDetail = 'verificando...';
   try {
     const r = await fetch(ACOES_URL, {
       method: 'POST',
@@ -1773,25 +1788,34 @@ async function loadStatus() {
       body: JSON.stringify({ token: PROXY_TOKEN, action: 'health_status' })
     });
     const d = await r.json();
-    if (d.checks && container) {
-      const allOk = d.allOk;
-      container.innerHTML = d.checks.map(c =>
-        '<div class="cfg-row">' +
-        '<div class="cfg-key"><span class="status-dot ' + (c.ok ? 'green' : 'yellow') + '"></span>' + c.name + '</div>' +
-        '<div class="cfg-val" style="color:' + (c.ok ? 'var(--neon)' : 'var(--warn)') + '">' + c.detail + '</div>' +
-        '</div>'
-      ).join('') +
-      '<div class="cfg-row" style="margin-top:6px">' +
-      '<div class="cfg-key" style="font-size:11px;color:' + (allOk ? 'var(--neon)' : 'var(--warn)') + '">' +
-      (allOk ? '✅ Todos os serviços operando' : '⚠️ Atenção: verificar serviço(s)') +
-      '</div></div>';
-      if (ts) {
-        const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-        ts.textContent = '· verificado às ' + now;
-      }
+    if (d.checks && d.checks.length > 0) {
+      const wa = d.checks.find(c => c.name === 'WhatsApp') || d.checks[0];
+      waOk = wa.ok;
+      waDetail = wa.detail || 'desconhecido';
     }
-  } catch(e) {
-    if (container) container.innerHTML = '<div class="empty">Erro ao verificar — ' + e.message + '</div>';
+  } catch(e) { waDetail = 'erro de rede'; }
+
+  const checks = [
+    { name: 'WhatsApp Business', ok: waOk, detail: waDetail },
+    { name: 'Banco de Dados', ok: bancoOk, detail: bancoDetail }
+  ];
+  const allOk = checks.every(c => c.ok);
+
+  if (container) {
+    container.innerHTML = checks.map(c =>
+      '<div class="cfg-row">' +
+      '<div class="cfg-key"><span class="status-dot ' + (c.ok ? 'green' : 'yellow') + '"></span>' + c.name + '</div>' +
+      '<div class="cfg-val" style="color:' + (c.ok ? 'var(--neon)' : 'var(--warn)') + '">' + c.detail + '</div>' +
+      '</div>'
+    ).join('') +
+    '<div class="cfg-row" style="margin-top:6px"><div class="cfg-key" style="font-size:11px;color:' +
+    (allOk ? 'var(--neon)' : 'var(--warn)') + '">' +
+    (allOk ? '✅ Todos os serviços operando' : '⚠️ Atenção: verificar serviço(s)') +
+    '</div></div>';
+  }
+  if (ts) {
+    const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    ts.textContent = '· verificado às ' + now;
   }
 }
 
