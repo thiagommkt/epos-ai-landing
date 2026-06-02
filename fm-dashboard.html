@@ -1613,9 +1613,7 @@ async function loadMetaAds() {
     try {
       const cache = JSON.parse(localStorage.getItem('fm_meta_ads_cache') || 'null');
       if (cache) {
-        const dias = Math.round((Date.now() - cache.ts) / 86400000);
-        const badge = '<div style="font-family:var(--fM);font-size:9px;color:var(--warn);margin-top:8px;text-align:center">⚠️ Dados de ' + (dias > 0 ? dias + ' dia(s) atrás' : 'hoje') + ' — token desatualizado</div>';
-        box.innerHTML = renderMetaAdsGrid(parseFloat(cache.spend||0), cache.cpl||'—', parseInt(cache.impressions||0), parseFloat(cache.ctr||0), badge);
+        box.innerHTML = renderMetaAdsGrid(parseFloat(cache.spend||0), cache.cpl||'—', parseInt(cache.impressions||0), parseFloat(cache.ctr||0), null);
       } else {
         box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads indisponível — aguarde renovação do token</div>';
       }
@@ -1662,15 +1660,12 @@ async function loadCampeoes() {
     });
     const dAds = await rAds.json();
     if (!dAds.success) {
-      // Token expirado — mostrar cache
       try {
         const cacheC = JSON.parse(localStorage.getItem('fm_criativos_cache') || 'null');
         if (cacheC && cacheC.ads && cacheC.ads.length) {
-          const diasC = Math.round((Date.now() - cacheC.ts) / 86400000);
-          box.innerHTML = '<div style="font-family:var(--fM);font-size:9px;color:var(--warn);margin-bottom:8px;text-align:right">⚠️ Dados de ' + (diasC > 0 ? diasC + ' dia(s) atrás' : 'hoje') + '</div>';
           renderCriativosTable(cacheC.ads, box, true);
-        } else { box.innerHTML = '<div class="empty">Criativos indisponíveis — aguarde renovação do token</div>'; }
-      } catch(ec) { box.innerHTML = '<div class="empty">Criativos indisponíveis</div>'; }
+        } else { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; }
+      } catch(ec) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; }
       return;
     }
     if (!dAds.ads || !dAds.ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
