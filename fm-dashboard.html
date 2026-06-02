@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Farias & Moura — Painel IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -736,7 +736,7 @@ canvas{display:block;width:100%!important}
             <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#EFEFF1;margin-bottom:6px">F&M <span style="color:#9146FF">IA</span></div>
             <div style="font-size:12px;color:rgba(239,239,241,.4);margin-bottom:32px;font-family:'DM Mono',monospace;letter-spacing:.06em">PAINEL DE GESTÃO · ACESSO RESTRITO</div>
             <input id="pwd-input" type="password" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')checkPwd()"
-              style="width:100%;padding:12px 14px;background:#1F1F23;border:1px solid rgba(145,70,255,.25);color:#EFEFF1;font-size:14px;font-family:'Outfit',sans-serif;outline:none;margin-bottom:8px">
+              style="width:100%;padding:12px 14px;background:#1F1F23;border:1px solid rgba(145,70,255,.25);color:#EFEFF1;font-size:16px;font-family:'Outfit',sans-serif;outline:none;margin-bottom:8px">
             <div id="pwd-err" style="font-size:11px;color:#FF5E5B;font-family:'DM Mono',monospace;height:16px;margin-bottom:12px"></div>
             <button onclick="checkPwd()" style="width:100%;padding:13px;background:#9146FF;color:#fff;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">
               Entrar →
@@ -1817,14 +1817,14 @@ async function loadCampanhas() {
   const box = document.getElementById('campanhas-container');
   if (box) box.innerHTML = '<div class="loading"></div>';
   try {
-    const r = await fetch(ACOES_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: PROXY_TOKEN, action: 'listar_templates' })
+    // Supabase direto — RLS permite SELECT para anon
+    const r = await fetch(SUPABASE_URL + '/rest/v1/fm_nutricao_templates?select=*&order=tipo.asc,step.asc', {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
     });
-    const d = await r.json();
-    if (!d.success) throw new Error(d.error || 'Sem dados');
-    renderCampanhas(d.templates || []);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const templates = await r.json();
+    if (!Array.isArray(templates)) throw new Error('Resposta inesperada');
+    renderCampanhas(templates);
   } catch(e) {
     if (box) box.innerHTML = '<div class="empty">Erro ao carregar — ' + e.message + '</div>';
   }
