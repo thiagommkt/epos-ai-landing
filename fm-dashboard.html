@@ -835,15 +835,26 @@ async function loadDashboard() {
   document.getElementById('db-date').textContent =
     brt.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric', timeZone:'America/Sao_Paulo' }).toUpperCase();
 
+  // Filtros de período para agendou/fechou/compareceu
+  const agFilter = periodoISO ? `agendou=eq.true&criado_em=gte.${mesISO}` : 'agendou=eq.true';
+  const fchFilter = periodoISO ? `fechou=eq.true&criado_em=gte.${mesISO}` : 'fechou=eq.true';
+  const cmpFilter = periodoISO ? `compareceu=eq.true&criado_em=gte.${mesISO}` : 'compareceu=eq.true';
+
   const [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu] = await Promise.all([
     sbCount('descartado=eq.false'),
     sbCount(`criado_em=gte.${mesISO}&descartado=eq.false`),
-    sbCount('agendou=eq.true'),
-    sbCount('fechou=eq.true'),
+    sbCount(agFilter),
+    sbCount(fchFilter),
     sbCount('dify_ativo=eq.true&agendou=eq.false&em_atendimento=eq.false'),
     sbCount(`criado_em=gte.${dia30ISO}`),
-    sbCount('compareceu=eq.true')
+    sbCount(cmpFilter)
   ]);
+
+  // Label dinâmico do período
+  const periodoLabels = { this_month:'este mês', last_30:'30d', last_60:'60d', last_90:'90d', last_14:'14d', last_7:'7d', all:'histórico' };
+  const pLabel = periodoLabels[dbPeriod] || '30d';
+  const kpiLeadsEl = document.querySelector('.kpi-lbl');
+  if (kpiLeadsEl) kpiLeadsEl.textContent = `Leads (${pLabel})`;
 
   animCount(document.getElementById('kpi-leads'), leadsMonth);
   animCount(document.getElementById('kpi-agendou'), agendou);
@@ -868,12 +879,13 @@ async function loadDashboard() {
   loadMetaAds();
   loadCreativos('spend');
 
-  // Funil
+  // Funil — filtrado pelo período
+  const qFilter = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}` : 'qualificado=eq.true';
   const [q, ag, comp, fech] = await Promise.all([
-    sbCount('qualificado=eq.true'),
-    sbCount('agendou=eq.true'),
-    sbCount('compareceu=eq.true'),
-    sbCount('fechou=eq.true')
+    sbCount(qFilter),
+    sbCount(agFilter),
+    sbCount(cmpFilter),
+    sbCount(fchFilter)
   ]);
   const T = leadsTotal || 1;
   const funil = document.getElementById('funnel-container');
