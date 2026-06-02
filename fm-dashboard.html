@@ -416,6 +416,7 @@ canvas{display:block;width:100%!important}
     <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
     <button class="db-period" onclick="setDBPeriod(this,'this_month','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este mês</button>
     <button class="db-period active" onclick="setDBPeriod(this,'last_30','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">30 dias</button>
+    <button class="db-period" onclick="setDBPeriod(this,'last_14','Últimos 14 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">14 dias</button>
     <button class="db-period" onclick="setDBPeriod(this,'last_7','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">7 dias</button>
     <button class="db-period" onclick="setDBPeriod(this,'all','Todo o histórico')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Tudo</button>
     <span id="db-period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);flex-shrink:0">· Este mês</span>
@@ -1215,7 +1216,7 @@ async function updateCRMStage(crm_person_id, newStage, telefone) {
 }
 
 // ═══ PERÍODO DO DASHBOARD ═══
-let dbPeriod = 'last_30'; // padrão 30 dias — Meta API tem delay de 24-48h no "este mês"
+let dbPeriod = 'last_30';
 
 function getDBDateFilter() {
   const brt = new Date(Date.now() - 3*60*60*1000);
@@ -1588,9 +1589,9 @@ async function loadMetaAds() {
   const box = document.getElementById('meta-ads-content');
   if (!box) return;
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_7: 'last_7d', all: 'maximum' };
+  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
-  const labelMap = { this_month: 'este mês (dados com delay 24-48h)', last_30: 'últimos 30 dias', last_7: 'últimos 7 dias', all: 'todo o histórico' };
+  const labelMap = { this_month: 'este mês', last_30: 'últimos 30 dias', last_14: 'últimos 14 dias', last_7: 'últimos 7 dias', all: 'todo o histórico' };
   const periodLabel = document.getElementById('meta-period-label');
   if (periodLabel) periodLabel.textContent = labelMap[dbPeriod] || 'últimos 30 dias';
   try {
@@ -1633,7 +1634,7 @@ async function loadCampeoes() {
   const box = document.getElementById('campeoes-content');
   if (!box) return;
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_7: 'last_7d', all: 'maximum' };
+  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
   try {
     // 1. Buscar dados de anúncios na Meta API
@@ -1729,7 +1730,7 @@ async function loadCreativos(sortBy) {
   document.getElementById('sort-ctr').style.borderColor = sortBy === 'ctr' ? 'var(--bd-b)' : 'var(--bd)';
   const box = document.getElementById('criativos-content');
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_7: 'last_7d', all: 'maximum' };
+  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
   try {
     const r = await fetch(ACOES_URL, {
