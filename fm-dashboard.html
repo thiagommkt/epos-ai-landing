@@ -452,12 +452,6 @@ canvas{display:block;width:100%!important}
     <div id="meta-ads-content"><div class="loading"></div></div>
   </div>
 
-  <!-- ── TOP CAMPEÕES — CPL REAL (A6) ── -->
-  <div class="card" style="margin-top:0">
-    <div class="card-ttl">🏆 Top Campeões — CPL Real por Anúncio</div>
-    <div id="campeoes-content"><div class="loading"></div></div>
-  </div>
-
   <!-- ── TOP CRIATIVOS (A5b) ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -863,7 +857,6 @@ async function loadDashboard() {
   const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
   document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
 
-  loadCampeoes();
   loadMetaAds();
   loadCreativos('spend');
 
@@ -1244,7 +1237,6 @@ function setDBPeriod(btn, period, label) {
   btn.style.background='var(--pur-l)'; btn.style.borderColor='var(--bd-b)'; btn.style.color='var(--purple)';
   document.getElementById('db-period-label').textContent='· '+label;
   loadDashboard();
-  loadCampeoes();
   loadCreativos(currentSortBy);
 }
 
