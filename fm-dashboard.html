@@ -324,6 +324,10 @@ canvas{display:block;width:100%!important}
   .kpi-val{font-size:32px!important}
   .section{padding:12px 12px 40px}
 }
+@media(max-width:768px){
+  .meta-ads-grid{grid-template-columns:1fr 1fr!important}
+  .meta-ads-grid > div > div:last-child{font-size:22px!important}
+}
 </style>
 </head>
 <body>
@@ -753,7 +757,7 @@ canvas{display:block;width:100%!important}
   }
 })();
 
-// ═══ CONFIG ═══
+// ═══ CONFIG v2026-06-02 ═══
 const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
 const TABLE = 'fm_leads';
@@ -1601,7 +1605,7 @@ async function loadMetaAds() {
     const leads = parseInt(document.getElementById('kpi-leads')?.textContent || '0') || 1;
     const cpl = spend > 0 ? (spend / leads).toFixed(2) : '—';
     box.innerHTML =
-      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="meta-ads-grid">' +
         '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
           '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Gasto Total</div>' +
           '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--warn)">R$' + spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
