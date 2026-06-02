@@ -1588,8 +1588,8 @@ async function loadMetaAds() {
   const box = document.getElementById('meta-ads-content');
   if (!box) return;
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_30: 'last_30_days', last_7: 'last_7_days', all: 'maximum' };
-  const preset = presetMap[dbPeriod] || 'last_30_days';
+  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_7: 'last_7d', all: 'maximum' };
+  const preset = presetMap[dbPeriod] || 'last_30d';
   const labelMap = { this_month: 'este mês (dados com delay 24-48h)', last_30: 'últimos 30 dias', last_7: 'últimos 7 dias', all: 'todo o histórico' };
   const periodLabel = document.getElementById('meta-period-label');
   if (periodLabel) periodLabel.textContent = labelMap[dbPeriod] || 'últimos 30 dias';
@@ -1633,8 +1633,8 @@ async function loadCampeoes() {
   const box = document.getElementById('campeoes-content');
   if (!box) return;
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_30: 'last_30_days', last_7: 'last_7_days', all: 'maximum' };
-  const preset = presetMap[dbPeriod] || 'last_30_days';
+  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_7: 'last_7d', all: 'maximum' };
+  const preset = presetMap[dbPeriod] || 'last_30d';
   try {
     // 1. Buscar dados de anúncios na Meta API
     const rAds = await fetch(ACOES_URL, {
@@ -1729,8 +1729,8 @@ async function loadCreativos(sortBy) {
   document.getElementById('sort-ctr').style.borderColor = sortBy === 'ctr' ? 'var(--bd-b)' : 'var(--bd)';
   const box = document.getElementById('criativos-content');
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_30: 'last_30_days', last_7: 'last_7_days', all: 'maximum' };
-  const preset = presetMap[dbPeriod] || 'last_30_days';
+  const presetMap = { this_month: 'this_month', last_30: 'last_30d', last_7: 'last_7d', all: 'maximum' };
+  const preset = presetMap[dbPeriod] || 'last_30d';
   try {
     const r = await fetch(ACOES_URL, {
       method: 'POST',
