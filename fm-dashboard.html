@@ -452,6 +452,12 @@ canvas{display:block;width:100%!important}
     <div id="meta-ads-content"><div class="loading"></div></div>
   </div>
 
+  <!-- ── TOP CAMPEÕES — CPL REAL (A6) ── -->
+  <div class="card" style="margin-top:0">
+    <div class="card-ttl">🏆 Top Campeões — CPL Real por Anúncio</div>
+    <div id="campeoes-content"><div class="loading"></div></div>
+  </div>
+
   <!-- ── TOP CRIATIVOS (A5b) ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -857,6 +863,7 @@ async function loadDashboard() {
   const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
   document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
 
+  loadCampeoes();
   loadMetaAds();
   loadCreativos('spend');
 
@@ -1237,6 +1244,7 @@ function setDBPeriod(btn, period, label) {
   btn.style.background='var(--pur-l)'; btn.style.borderColor='var(--bd-b)'; btn.style.color='var(--purple)';
   document.getElementById('db-period-label').textContent='· '+label;
   loadDashboard();
+  loadCampeoes();
   loadCreativos(currentSortBy);
 }
 
@@ -1337,6 +1345,21 @@ function openLeadPanel(lead) {
           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">O bot vai parar de responder este contato.</div>`
       }
     </div>
+
+    ${lead.agendou ? `
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Presença na Consulta</div>
+      ${lead.compareceu
+        ? `<div style="padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.06em">
+            ✅ Compareceu — confirmado
+           </div>`
+        : `<button id="compareceu-btn" onclick="marcarCompareceu('${lead.telefone}')"
+            style="width:100%;padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
+            ✅ Confirmar presença na consulta
+           </button>
+           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marca o lead como compareceu na reunião.</div>`
+      }
+    </div>` : ''}
   `;
 
   document.getElementById('lead-panel').classList.add('open');
@@ -1368,6 +1391,27 @@ async function enviarMensagem(telefone) {
     toast('Erro ao enviar — ' + e.message, 'err');
   } finally {
     if (input) input.disabled = false;
+  }
+}
+
+// ═══ MARCAR COMPARECEU ═══
+async function marcarCompareceu(telefone) {
+  const btn = document.getElementById('compareceu-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ compareceu: true })
+    });
+    if (!r.ok) throw new Error('Erro ' + r.status);
+    toast('✅ Presença confirmada', 'ok');
+    // Atualiza o lead localmente e reabre o painel
+    const lead = allLeads.find(l => l.telefone === telefone);
+    if (lead) { lead.compareceu = true; setTimeout(() => openLeadPanel(lead), 200); }
+  } catch(e) {
+    toast('Erro ao marcar compareceu: ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Confirmar presença na consulta'; }
   }
 }
 
@@ -1585,6 +1629,95 @@ async function loadMetaAds() {
       '</div>';
   } catch(e) {
     box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads: ' + e.message + '</div>';
+  }
+}
+
+// ═══ TOP CAMPEÕES — CPL REAL (A6) ═══
+async function loadCampeoes() {
+  const box = document.getElementById('campeoes-content');
+  if (!box) return;
+  box.innerHTML = '<div class="loading"></div>';
+  const presetMap = { this_month: 'this_month', last_30: 'last_30_days', last_7: 'last_7_days', all: 'maximum' };
+  const preset = presetMap[dbPeriod] || 'last_30_days';
+  try {
+    // 1. Buscar dados de anúncios na Meta API
+    const rAds = await fetch(ACOES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_creatives', date_preset: preset, sort_by: 'spend' })
+    });
+    const dAds = await rAds.json();
+    if (!dAds.success || !dAds.ads || !dAds.ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
+
+    // 2. Buscar contagem de leads por utm_content no Supabase
+    const rLeads = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+    });
+    const leadRows = await rLeads.json();
+    const leadsByAd = {};
+    (Array.isArray(leadRows) ? leadRows : []).forEach(r => {
+      const k = (r.utm_content || '').trim();
+      if (k) leadsByAd[k] = (leadsByAd[k] || 0) + 1;
+    });
+
+    // 3. Cruzar dados e calcular CPL real
+    const ads = dAds.ads.map(ad => {
+      const nome = (ad.ad_name || '').trim();
+      const spend = parseFloat(ad.spend || 0);
+      const leads = leadsByAd[nome] || 0;
+      const cplReal = leads > 0 ? spend / leads : null;
+      return { ...ad, leads_reais: leads, cpl_real: cplReal };
+    }).filter(ad => parseFloat(ad.spend || 0) > 0);
+
+    // Ordena por CPL real (menor = melhor) — sem CPL vai para o fim
+    ads.sort((a, b) => {
+      if (a.cpl_real === null && b.cpl_real === null) return b.spend - a.spend;
+      if (a.cpl_real === null) return 1;
+      if (b.cpl_real === null) return -1;
+      return a.cpl_real - b.cpl_real;
+    });
+
+    if (!ads.length) { box.innerHTML = '<div class="empty">Sem dados suficientes</div>'; return; }
+
+    const rows = ads.map((ad, i) => {
+      const spend = parseFloat(ad.spend || 0);
+      const cplReal = ad.cpl_real;
+      const ctr = parseFloat(ad.ctr || 0);
+      const nome = (ad.ad_name || 'Sem nome').substring(0, 35) + ((ad.ad_name||'').length > 35 ? '…' : '');
+      const camp = (ad.campaign_name || '').substring(0, 30) + ((ad.campaign_name||'').length > 30 ? '…' : '');
+      const thumb = ad.thumbnail_url
+        ? `<img src="${ad.thumbnail_url}" style="width:44px;height:44px;object-fit:cover;border:1px solid var(--bd);flex-shrink:0" onerror="this.style.display='none'">`
+        : `<div style="width:44px;height:44px;background:var(--bg3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">🎨</div>`;
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}º`;
+      const cplColor = cplReal !== null ? (cplReal < 50 ? 'var(--neon)' : cplReal < 150 ? 'var(--text)' : 'var(--warn)') : 'var(--dim)';
+      return `<tr style="border-bottom:1px solid var(--bd)">
+        <td style="padding:10px 6px;text-align:center;font-size:16px">${medal}</td>
+        <td style="padding:10px 8px"><div style="display:flex;align-items:center;gap:10px">${thumb}
+          <div><div style="font-family:var(--fD);font-size:12px;font-weight:600;color:var(--text)">${nome}</div>
+          <div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:2px">${camp}</div></div></div></td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:${cplColor}">
+          ${cplReal !== null ? 'R$' + cplReal.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}
+        </td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:var(--neon)">${ad.leads_reais}</td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:var(--warn)">R$${spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+        <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:11px;color:var(--muted)">${ctr.toFixed(2)}%</td>
+      </tr>`;
+    }).join('');
+
+    box.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-bottom:2px solid var(--bd)">
+        <th style="padding:8px 6px;text-align:center;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">#</th>
+        <th style="padding:8px;text-align:left;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Criativo / Campanha</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">CPL Real</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Leads</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Gasto</th>
+        <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">CTR</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div style="font-family:var(--fM);font-size:9px;color:var(--dim);padding:8px 0;text-align:right">CPL Real = Gasto ÷ Leads atribuídos por utm_content · ${preset.replace('_',' ')}</div>`;
+  } catch(e) {
+    box.innerHTML = '<div class="empty" style="font-size:11px">Campeões: ' + e.message + '</div>';
   }
 }
 
