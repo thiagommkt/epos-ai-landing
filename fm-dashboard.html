@@ -265,11 +265,13 @@ canvas{display:block;width:100%!important}
 
 /* ── MOBILE ── */
 @media(min-width:769px){
-  .mb-iframe{height:calc(100vh - 340px)!important;min-height:500px}
   .mb-expand-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--bg3);border-bottom:1px solid var(--bd)}
   .mb-frame-expanded{overflow:hidden}
-  .mb-frame-expanded .mb-iframe{height:calc(100vh - 48px)!important;min-height:unset}
+  .mb-frame-expanded .mb-iframe-wrapper{height:calc(100vh - 48px)!important}
+  .mb-frame-expanded .mb-iframe-wrapper iframe{transform-origin:top left}
   .mb-frame-expanded .mb-expand-bar{height:48px;padding:8px 16px;background:var(--bg2);border-bottom:2px solid var(--bd-b)}
+  /* Wrapper que segura o iframe escalado */
+  .mb-iframe-wrapper{width:100%;overflow:hidden;position:relative}
 }
 @media(max-width:768px){
   /* Layout principal — z-index:auto remove o stacking context, sidebar pode superar o overlay */
@@ -640,31 +642,31 @@ canvas{display:block;width:100%!important}
 
   <!-- Iframes -->
   <div id="mb-campanhas" class="mb-frame" style="display:block"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📊 Campanhas</span><button onclick="toggleMBExpand('mb-campanhas')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-campanhas" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/2729e7fe-88d5-45ae-8726-56dcbecd6714" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/2729e7fe-88d5-45ae-8726-56dcbecd6714?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-campanhas" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/2729e7fe-88d5-45ae-8726-56dcbecd6714" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/2729e7fe-88d5-45ae-8726-56dcbecd6714?date=past7days#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div id="mb-funil" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📉 Funil</span><button onclick="toggleMBExpand('mb-funil')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-funil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/fa1a6254-a58c-48af-91bd-20b979b2eabf" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/fa1a6254-a58c-48af-91bd-20b979b2eabf?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-funil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/fa1a6254-a58c-48af-91bd-20b979b2eabf" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/fa1a6254-a58c-48af-91bd-20b979b2eabf?date=past7days#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div id="mb-perfil" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">👤 Perfil</span><button onclick="toggleMBExpand('mb-perfil')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-perfil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/68e9c94f-c846-4999-9f1d-0eac7ecb6bec" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/68e9c94f-c846-4999-9f1d-0eac7ecb6bec?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-perfil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/68e9c94f-c846-4999-9f1d-0eac7ecb6bec" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/68e9c94f-c846-4999-9f1d-0eac7ecb6bec?date=past7days#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div id="mb-saude" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">💚 Saúde</span><button onclick="toggleMBExpand('mb-saude')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-saude" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/2a7bf41f-6c52-4cf0-ad54-d109089a283e" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/2a7bf41f-6c52-4cf0-ad54-d109089a283e?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-saude" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/2a7bf41f-6c52-4cf0-ad54-d109089a283e" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/2a7bf41f-6c52-4cf0-ad54-d109089a283e?date=past7days#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div id="mb-volume" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📈 Volume</span><button onclick="toggleMBExpand('mb-volume')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-volume" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/f67de9b2-d23e-422a-8d15-e9fe60c42044" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/f67de9b2-d23e-422a-8d15-e9fe60c42044?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-volume" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/f67de9b2-d23e-422a-8d15-e9fe60c42044" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/f67de9b2-d23e-422a-8d15-e9fe60c42044?date=past7days#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div id="mb-leads-fonte" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">🎯 Origem</span><button onclick="toggleMBExpand('mb-leads-fonte')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-leads-fonte" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/795a6543-133a-4231-8d27-7d0b62af4ccc" src="https://metabase.eposmktfilmsia.com.br/public/question/795a6543-133a-4231-8d27-7d0b62af4ccc#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-leads-fonte" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/795a6543-133a-4231-8d27-7d0b62af4ccc" src="https://metabase.eposmktfilmsia.com.br/public/question/795a6543-133a-4231-8d27-7d0b62af4ccc#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div id="mb-pago-org" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">⚖️ Pago/Org</span><button onclick="toggleMBExpand('mb-pago-org')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;border:1px solid var(--bd);background:var(--bg2);overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-pago-org" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/b04844f9-e636-4ac2-88de-3a9705c2d752" src="https://metabase.eposmktfilmsia.com.br/public/question/b04844f9-e636-4ac2-88de-3a9705c2d752#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;margin-top:2px;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
+    <div class="mb-iframe-wrapper"><iframe id="ifr-pago-org" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/b04844f9-e636-4ac2-88de-3a9705c2d752" src="https://metabase.eposmktfilmsia.com.br/public/question/b04844f9-e636-4ac2-88de-3a9705c2d752#bordered=false&titled=false&theme=night" style="border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe></div>
   </div></div>
 
   <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.06em">
@@ -1219,6 +1221,7 @@ function show(id) {
     if(id==='crm') loadCRM();
     if(id==='status') loadStatus();
     if(id==='campanhas') loadCampanhas();
+    if(id==='analises') setTimeout(scaleMBIframes, 100);
   }
 }
 document.querySelectorAll('nav a[data-sec]').forEach(a => {
@@ -1994,6 +1997,32 @@ async function loadStatus() {
     ts.textContent = '· verificado às ' + now;
   }
 }
+
+// ═══ ANÁLISES — ESCALONAMENTO UNIFORME ═══
+const MB_NARROW = 760; // largura que aciona layout single-column do Metabase
+const MB_HEIGHT = 680; // altura base do iframe
+
+function scaleMBIframes() {
+  if (window.innerWidth <= 768) return; // mobile: não escalar
+  document.querySelectorAll('.mb-iframe-wrapper').forEach(wrapper => {
+    const containerW = wrapper.parentElement.offsetWidth || wrapper.offsetWidth;
+    if (!containerW) return;
+    const scale = containerW / MB_NARROW;
+    const iframe = wrapper.querySelector('iframe');
+    if (!iframe) return;
+    iframe.style.width = MB_NARROW + 'px';
+    iframe.style.height = MB_HEIGHT + 'px';
+    iframe.style.transform = `scale(${scale})`;
+    iframe.style.transformOrigin = 'top left';
+    // Ajusta altura do wrapper para acomodar o iframe escalado
+    wrapper.style.height = Math.round(MB_HEIGHT * scale) + 'px';
+    wrapper.style.overflow = 'hidden';
+  });
+}
+
+window.addEventListener('resize', scaleMBIframes);
+window.addEventListener('load', () => setTimeout(scaleMBIframes, 200));
+document.addEventListener('DOMContentLoaded', () => setTimeout(scaleMBIframes, 100));
 
 // ═══ ANÁLISES — MAXIMIZAR ═══
 function toggleMBExpand(frameId) {
