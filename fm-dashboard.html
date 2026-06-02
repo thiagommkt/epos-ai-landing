@@ -1605,28 +1605,45 @@ async function loadMetaAds() {
     const spend = d.spend || 0;
     const leads = parseInt(document.getElementById('kpi-leads')?.textContent || '0') || 1;
     const cpl = spend > 0 ? (spend / leads).toFixed(2) : '—';
-    box.innerHTML =
-      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="meta-ads-grid">' +
-        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Gasto Total</div>' +
-          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--warn)">R$' + spend.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
-        '</div>' +
-        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Custo por Lead</div>' +
-          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--purple)">R$' + (spend > 0 ? parseFloat(cpl).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—') + '</div>' +
-        '</div>' +
-        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Impressões</div>' +
-          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--text)">' + (d.impressions||0).toLocaleString('pt-BR') + '</div>' +
-        '</div>' +
-        '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-          '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">CTR</div>' +
-          '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--neon)">' + (d.ctr||0).toFixed(2) + '<span style="font-size:16px;color:var(--muted)">%</span></div>' +
-        '</div>' +
-      '</div>';
+    // Salvar cache no localStorage
+    try { localStorage.setItem('fm_meta_ads_cache', JSON.stringify({spend: d.spend, impressions: d.impressions, ctr: d.ctr, cpl, ts: Date.now(), period: dbPeriod})); } catch(ec) {}
+    box.innerHTML = renderMetaAdsGrid(spend, cpl, d.impressions||0, d.ctr||0, null);
   } catch(e) {
-    box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads: ' + e.message + '</div>';
+    // Exibir último valor cacheado com badge de aviso
+    try {
+      const cache = JSON.parse(localStorage.getItem('fm_meta_ads_cache') || 'null');
+      if (cache) {
+        const dias = Math.round((Date.now() - cache.ts) / 86400000);
+        const badge = '<div style="font-family:var(--fM);font-size:9px;color:var(--warn);margin-top:8px;text-align:center">⚠️ Dados de ' + (dias > 0 ? dias + ' dia(s) atrás' : 'hoje') + ' — token desatualizado</div>';
+        box.innerHTML = renderMetaAdsGrid(parseFloat(cache.spend||0), cache.cpl||'—', parseInt(cache.impressions||0), parseFloat(cache.ctr||0), badge);
+      } else {
+        box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads indisponível — aguarde renovação do token</div>';
+      }
+    } catch(ec2) {
+      box.innerHTML = '<div class="empty" style="font-size:11px">Meta Ads indisponível</div>';
+    }
   }
+}
+
+function renderMetaAdsGrid(spend, cpl, impressions, ctr, badge) {
+  return '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="meta-ads-grid">' +
+    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Gasto Total</div>' +
+      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--warn)">R$' + parseFloat(spend||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
+    '</div>' +
+    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Custo por Lead</div>' +
+      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--purple)">' + (parseFloat(spend||0) > 0 ? 'R$' + parseFloat(cpl).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : 'R$—') + '</div>' +
+    '</div>' +
+    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Impressões</div>' +
+      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--text)">' + parseInt(impressions||0).toLocaleString('pt-BR') + '</div>' +
+    '</div>' +
+    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">CTR</div>' +
+      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--neon)">' + parseFloat(ctr||0).toFixed(2) + '<span style="font-size:16px;color:var(--muted)">%</span></div>' +
+    '</div>' +
+  '</div>' + (badge || '');
 }
 
 // ═══ TOP CAMPEÕES — CPL REAL (A6) ═══
@@ -1644,7 +1661,20 @@ async function loadCampeoes() {
       body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_creatives', date_preset: preset, sort_by: 'spend' })
     });
     const dAds = await rAds.json();
-    if (!dAds.success || !dAds.ads || !dAds.ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
+    if (!dAds.success) {
+      // Token expirado — mostrar cache
+      try {
+        const cacheC = JSON.parse(localStorage.getItem('fm_criativos_cache') || 'null');
+        if (cacheC && cacheC.ads && cacheC.ads.length) {
+          const diasC = Math.round((Date.now() - cacheC.ts) / 86400000);
+          box.innerHTML = '<div style="font-family:var(--fM);font-size:9px;color:var(--warn);margin-bottom:8px;text-align:right">⚠️ Dados de ' + (diasC > 0 ? diasC + ' dia(s) atrás' : 'hoje') + '</div>';
+          renderCriativosTable(cacheC.ads, box, true);
+        } else { box.innerHTML = '<div class="empty">Criativos indisponíveis — aguarde renovação do token</div>'; }
+      } catch(ec) { box.innerHTML = '<div class="empty">Criativos indisponíveis</div>'; }
+      return;
+    }
+    if (!dAds.ads || !dAds.ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
+    try { localStorage.setItem('fm_criativos_cache', JSON.stringify({ads: dAds.ads, ts: Date.now()})); } catch(ec) {}
 
     // 2. Buscar contagem de leads por utm_content no Supabase
     const rLeads = await fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, {
