@@ -479,8 +479,8 @@ canvas{display:block;width:100%!important}
     </div>
     <div class="card">
       <div class="card-ttl">Leads Recentes</div>
-      <table class="tbl"><thead><tr><th>Nome</th><th>Patologia</th><th>Score</th><th>Status</th></tr></thead>
-      <tbody id="leads-recentes"><tr><td colspan="4" class="empty">Carregando...</td></tr></tbody></table>
+      <table class="tbl"><thead><tr><th>Nome</th><th>Patologia</th><th>Score</th><th>Canal</th><th>Status</th></tr></thead>
+      <tbody id="leads-recentes"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table>
     </div>
   </div>
 
@@ -555,11 +555,12 @@ canvas{display:block;width:100%!important}
         <th style="white-space:nowrap">Patologia</th>
         <th style="white-space:nowrap">Score</th>
         <th style="white-space:nowrap">Cidade</th>
+        <th style="white-space:nowrap">Canal</th>
         <th style="white-space:nowrap">Status</th>
         <th style="white-space:nowrap">Agendamento</th>
         <th style="white-space:nowrap">Chegou em</th>
       </tr></thead>
-      <tbody id="leads-table"><tr><td colspan="8" class="empty">Carregando...</td></tr></tbody>
+      <tbody id="leads-table"><tr><td colspan="9" class="empty">Carregando...</td></tr></tbody>
     </table>
   </div>
 </section>
@@ -857,6 +858,11 @@ function fmtDate(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'America/Sao_Paulo' });
 }
+function canalBadge(l) {
+  if (l.canal === 'chatwoot_auditoria') return '<span class="badge b-ct" style="background:rgba(145,70,255,.09);color:var(--purple);border-color:rgba(145,70,255,.2)">👤 Manual</span>';
+  if (l.typebot_concluido) return '<span class="badge b-ql" style="background:rgba(0,245,160,.09);color:var(--neon);border-color:rgba(0,245,160,.2)">🤖 Typebot IA</span>';
+  return '<span class="badge b-ct" style="background:rgba(74,174,255,.09);color:#4AAEFF;border-color:rgba(74,174,255,.2)">📱 WA Direto</span>';
+}
 function statusBadge(l) {
   if (l.fechou) return '<span class="badge b-ag">fechou</span>';
   if (l.compareceu) return '<span class="badge b-ag">compareceu</span>';
@@ -980,24 +986,45 @@ async function loadDashboard() {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
   }, 250);
 
-  // Origem (UTM)
-  const { data: origemData } = await sb(`${TABLE}?select=utm_source&utm_source=not.is.null`);
+  // Origem: canal + UTM
+  const [origemData, canalData] = await Promise.all([
+    sb(`${TABLE}?select=utm_source&utm_source=not.is.null`).then(r => r.data || []),
+    sb(`${TABLE}?select=canal,typebot_concluido`).then(r => r.data || [])
+  ]);
+  let nIA = 0, nManual = 0, nDireto = 0;
+  canalData.forEach(l => {
+    if (l.canal === 'chatwoot_auditoria') nManual++;
+    else if (l.typebot_concluido) nIA++;
+    else nDireto++;
+  });
+  const totalCanal = canalData.length || 1;
+  const canalHtml = `<div style="margin-bottom:14px">` +
+    [['🤖 Typebot IA', nIA, 'var(--neon)', 'rgba(0,245,160,.15)'],
+     ['👤 Manual FM', nManual, 'var(--purple)', 'rgba(145,70,255,.15)'],
+     ['📱 WA Direto', nDireto, '#4AAEFF', 'rgba(74,174,255,.15)']
+    ].map(([lbl,n,cor,bg]) => {
+      const pct = Math.round(n/totalCanal*100);
+      return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor}">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
+    }).join('') + `</div>`;
   const origemMap = {};
-  (origemData || []).forEach(r => { origemMap[r.utm_source] = (origemMap[r.utm_source]||0)+1; });
+  origemData.forEach(r => { origemMap[r.utm_source] = (origemMap[r.utm_source]||0)+1; });
   const origemTotal = Object.values(origemMap).reduce((a,b)=>a+b,0) || 1;
   const cores = { 'fb_ad': 'uf-meta', 'meta': 'uf-meta', 'google': 'uf-google', 'organico': 'uf-organic', 'direct': 'uf-direct' };
-  const utmHtml = Object.entries(origemMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([src,n]) => {
+  const utmRows = Object.entries(origemMap).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([src,n]) => {
     const cor = cores[src] || 'uf-direct';
     const pct = Math.round(n/origemTotal*100);
     return `<div class="utm-row"><div class="utm-src">${src}</div><div class="utm-track"><div class="utm-fill ${cor}" style="width:${pct}%"></div></div><div class="utm-n">${n}</div><div class="utm-p">${pct}%</div></div>`;
-  }).join('') || '<div class="empty">Sem dados de origem</div>';
-  document.getElementById('utm-list').innerHTML = utmHtml;
+  }).join('');
+  const utmSection = utmRows
+    ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">UTM Source</div>${utmRows}`
+    : `<div class="empty" style="font-size:10px;padding:8px 0">Sem UTMs — leads sem rastreamento de LP</div>`;
+  document.getElementById('utm-list').innerHTML = canalHtml + utmSection;
 
   // Leads recentes
   const { data: recentes } = await sb(`${TABLE}?select=nome,patologia,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu&order=criado_em.desc&limit=6`);
   const recentesHtml = (recentes || []).map(l =>
-    `<tr><td class="td-hi">${l.nome||'—'}</td><td>${l.patologia||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${statusBadge(l)}</td></tr>`
-  ).join('') || '<tr><td colspan="4" class="empty">Sem leads</td></tr>';
+    `<tr><td class="td-hi">${l.nome||'—'}</td><td>${l.patologia||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${canalBadge(l)}</td><td>${statusBadge(l)}</td></tr>`
+  ).join('') || '<tr><td colspan="5" class="empty">Sem leads</td></tr>';
   document.getElementById('leads-recentes').innerHTML = recentesHtml;
 
   // Gráfico barras leads por dia
@@ -1053,11 +1080,12 @@ function renderLeads() {
       <td>${l.patologia||'—'}</td>
       <td><span class="score">${l.score||0}</span></td>
       <td>${l.cidade||'—'}</td>
+      <td>${canalBadge(l)}</td>
       <td>${statusBadge(l)}</td>
       <td style="font-family:var(--fM);font-size:10px">${agenda}</td>
       <td style="font-family:var(--fM);font-size:10px">${fmtDate(l.criado_em)}</td>
     </tr>`;
-  }).join('') || `<tr><td colspan="8" class="empty">Nenhum lead neste filtro</td></tr>`;
+  }).join('') || `<tr><td colspan="9" class="empty">Nenhum lead neste filtro</td></tr>`;
 
   document.getElementById('leads-table').innerHTML = html;
 }
