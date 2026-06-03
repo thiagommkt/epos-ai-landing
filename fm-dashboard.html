@@ -762,12 +762,35 @@ canvas{display:block;width:100%!important}
     <button onclick="loadAnalista(true)" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↻ Atualizar</button>
   </div>
   <div class="rule"></div>
+
+  <!-- Seletor de período -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:4px">
+    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
+    <button class="an-period active" onclick="setAnPeriod(this,'all')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">Tudo</button>
+    <button class="an-period" onclick="setAnPeriod(this,'30')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">30 dias</button>
+    <button class="an-period" onclick="setAnPeriod(this,'60')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">60 dias</button>
+    <button class="an-period" onclick="setAnPeriod(this,'90')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">90 dias</button>
+    <button class="an-period" onclick="setAnPeriod(this,'7')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">7 dias</button>
+  </div>
+
   <div class="kpi-row" style="margin-bottom:14px">
-    <div class="kpi"><div class="kpi-lbl">Total Leads</div><div class="kpi-val g" id="an-total">—</div><div class="kpi-note">base completa</div></div>
+    <div class="kpi"><div class="kpi-lbl">Total Leads</div><div class="kpi-val g" id="an-total">—</div><div class="kpi-note" id="an-total-note">base completa</div></div>
     <div class="kpi"><div class="kpi-lbl">Sistema IA</div><div class="kpi-val n" id="an-ai">—</div><div class="kpi-note">Typebot + Ana</div></div>
     <div class="kpi"><div class="kpi-lbl">Manual</div><div class="kpi-val" id="an-manual">—</div><div class="kpi-note">atendimento humano</div></div>
     <div class="kpi"><div class="kpi-lbl">Auditados</div><div class="kpi-val g" id="an-auditados">—</div><div class="kpi-note">pelo GPT-4o-mini</div></div>
   </div>
+
+  <!-- Filtro de etapa -->
+  <div class="filters" style="margin-bottom:12px">
+    <button class="filter-btn active" data-an-filter="todos" onclick="setAnFilter(this,'todos')">Todos</button>
+    <button class="filter-btn" data-an-filter="qualificado" onclick="setAnFilter(this,'qualificado')">Qualificados</button>
+    <button class="filter-btn" data-an-filter="agendou" onclick="setAnFilter(this,'agendou')">Agendaram</button>
+    <button class="filter-btn" data-an-filter="fechou" onclick="setAnFilter(this,'fechou')">Fecharam</button>
+    <button class="filter-btn" data-an-filter="objection" onclick="setAnFilter(this,'objection')">Com Objeção</button>
+    <button class="filter-btn" data-an-filter="ia" onclick="setAnFilter(this,'ia')">Sistema IA</button>
+    <button class="filter-btn" data-an-filter="manual" onclick="setAnFilter(this,'manual')">Manual FM</button>
+  </div>
+
   <div class="two-col-eq">
     <div class="card">
       <div class="card-ttl">Eficiência — IA vs Manual</div>
@@ -779,7 +802,7 @@ canvas{display:block;width:100%!important}
     </div>
   </div>
   <div class="card">
-    <div class="card-ttl">Últimas Análises — O Analista</div>
+    <div class="card-ttl">Análises — O Analista <span id="an-count-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px"></span></div>
     <div id="an-recentes"><div class="loading"></div></div>
   </div>
 </section>
@@ -906,8 +929,8 @@ async function loadDashboard() {
 
   // Filtros de período para agendou/fechou/compareceu
   const agFilter = periodoISO ? `agendou=eq.true&criado_em=gte.${mesISO}` : 'agendou=eq.true';
-  const fchFilter = periodoISO ? `fechou=eq.true&criado_em=gte.${mesISO}` : 'fechou=eq.true';
-  const cmpFilter = periodoISO ? `compareceu=eq.true&criado_em=gte.${mesISO}` : 'compareceu=eq.true';
+  const fchFilter = 'fechou=eq.true'; // sempre total histórico — não filtra por período
+  const cmpFilter = 'compareceu=eq.true'; // sempre total histórico
 
   const [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu] = await Promise.all([
     sbCount('descartado=eq.false'),
@@ -2126,6 +2149,65 @@ document.addEventListener('keydown', e => {
 });
 
 // ═══ O ANALISTA ═══
+let anLeadsCache = [];
+let anPeriodVal = 'all';
+let anFilterVal = 'todos';
+
+function setAnPeriod(btn, period) {
+  anPeriodVal = period;
+  document.querySelectorAll('.an-period').forEach(b => {
+    b.style.background = 'transparent'; b.style.borderColor = 'var(--bd)'; b.style.color = 'var(--muted)';
+  });
+  btn.style.background = 'var(--pur-l)'; btn.style.borderColor = 'var(--bd-b)'; btn.style.color = 'var(--purple)';
+  loadAnalista(true);
+}
+
+function setAnFilter(btn, filter) {
+  anFilterVal = filter;
+  document.querySelectorAll('[data-an-filter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAnRecentes();
+}
+
+function renderAnRecentes() {
+  const recBox = document.getElementById('an-recentes');
+  const lbl = document.getElementById('an-count-label');
+  if (!recBox) return;
+  let filtered = anLeadsCache;
+  if (anFilterVal === 'qualificado') filtered = filtered.filter(l => l.qualificado);
+  else if (anFilterVal === 'agendou') filtered = filtered.filter(l => l.agendou);
+  else if (anFilterVal === 'fechou') filtered = filtered.filter(l => l.fechou);
+  else if (anFilterVal === 'objection') filtered = filtered.filter(l => l.auditoria_ia_motivo_perda);
+  else if (anFilterVal === 'ia') filtered = filtered.filter(l => l.canal !== 'chatwoot_auditoria');
+  else if (anFilterVal === 'manual') filtered = filtered.filter(l => l.canal === 'chatwoot_auditoria');
+  const sorted = filtered.sort((a,b) => new Date(b.auditoria_ia_em||b.criado_em) - new Date(a.auditoria_ia_em||a.criado_em));
+  if (lbl) lbl.textContent = sorted.length + ' lead(s)';
+  if (!sorted.length) { recBox.innerHTML = '<div class="empty">Nenhum lead neste filtro</div>'; return; }
+  recBox.innerHTML = '<div style="overflow-x:auto"><table class="tbl" style="min-width:680px"><thead><tr>' +
+    '<th>Nome</th><th>Canal</th><th>Score</th><th>Etapa</th><th>Resumo IA</th><th>Objeção</th>' +
+    '</tr></thead><tbody>' +
+    sorted.map(l => {
+      const leadJson = encodeURIComponent(JSON.stringify(l));
+      const isManual = l.canal === 'chatwoot_auditoria';
+      const canalBg = isManual ? 'rgba(145,70,255,.1)' : 'rgba(0,245,160,.1)';
+      const canalCor = isManual ? 'var(--purple)' : 'var(--neon)';
+      const canalTxt = isManual ? '👤 Manual' : '🤖 IA';
+      let etapa = '<span class="badge b-ct">contato</span>';
+      if (l.fechou) etapa = '<span class="badge b-ag">fechou</span>';
+      else if (l.compareceu) etapa = '<span class="badge b-ag">compareceu</span>';
+      else if (l.agendou) etapa = '<span class="badge b-ag">agendou</span>';
+      else if (l.qualificado) etapa = '<span class="badge b-ql">qualificado</span>';
+      return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
+        <td class="td-hi">${l.nome||'—'}</td>
+        <td><span style="font-family:var(--fM);font-size:9px;padding:2px 6px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg}">${canalTxt}</span></td>
+        <td style="font-family:var(--fM);color:var(--purple)">${l.score||'—'}</td>
+        <td>${etapa}</td>
+        <td style="font-size:11px;color:var(--muted);max-width:180px;word-break:break-word">${l.auditoria_ia_resumo||'—'}</td>
+        <td style="font-size:11px;color:var(--warn)">${l.auditoria_ia_motivo_perda||'—'}</td>
+      </tr>`;
+    }).join('') + '</tbody></table></div>';
+}
+
 async function loadAnalista(force) {
   ['an-total','an-ai','an-manual','an-auditados'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
   const compEl=document.getElementById('an-comparativo'), objBox=document.getElementById('an-objections'), recBox=document.getElementById('an-recentes');
@@ -2133,16 +2215,28 @@ async function loadAnalista(force) {
   if(objBox)objBox.innerHTML='<div class="loading"></div>';
   if(recBox)recBox.innerHTML='<div class="loading"></div>';
   try {
-    const r = await fetch(SB_URL+'/rest/v1/'+TABLE+'?select=canal,qualificado,agendou,compareceu,fechou,score,nome,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+    // Filtro de período
+    let periodoParam = '';
+    if (anPeriodVal !== 'all') {
+      const d = new Date(); d.setDate(d.getDate() - parseInt(anPeriodVal));
+      periodoParam = '&criado_em=gte.' + d.toISOString();
+    }
+    const fields = 'select=canal,qualificado,agendou,compareceu,fechou,score,nome,telefone,perfil,patologia,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,typebot_concluido,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
+    const r = await fetch(SB_URL+'/rest/v1/'+TABLE+'?'+fields+periodoParam+'&order=criado_em.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const leads = await r.json();
+    anLeadsCache = leads;
+
     const ai=leads.filter(l=>l.canal!=='chatwoot_auditoria');
     const manual=leads.filter(l=>l.canal==='chatwoot_auditoria');
     const auditados=leads.filter(l=>l.auditoria_ia_em);
     document.getElementById('an-total').textContent=leads.length;
+    const noteEl = document.getElementById('an-total-note');
+    if(noteEl) noteEl.textContent = anPeriodVal==='all'?'base completa':'últimos '+anPeriodVal+'d';
     document.getElementById('an-ai').textContent=ai.length;
     document.getElementById('an-manual').textContent=manual.length;
     document.getElementById('an-auditados').textContent=auditados.length;
+
     function calcM(g){const n=g.length||1;return{total:g.length,pctQual:((g.filter(l=>l.qualificado).length/n)*100).toFixed(1),pctAg:((g.filter(l=>l.agendou).length/n)*100).toFixed(1),pctCo:((g.filter(l=>l.compareceu).length/n)*100).toFixed(1),pctFe:((g.filter(l=>l.fechou).length/n)*100).toFixed(1),score:g.length?(g.reduce((s,l)=>s+(l.score||0),0)/g.length).toFixed(1):'—'};}
     const ma=calcM(ai), mm=calcM(manual);
     if(compEl) compEl.innerHTML=`<table class="tbl" style="width:100%"><thead><tr><th>Métrica</th><th style="text-align:right;color:var(--neon)">Sistema IA (${ma.total})</th><th style="text-align:right;color:var(--purple)">Manual (${mm.total})</th></tr></thead><tbody>
@@ -2152,8 +2246,10 @@ async function loadAnalista(force) {
       <tr><td>% Compareceram</td><td style="text-align:right;font-family:var(--fM);color:var(--neon)">${ma.pctCo}%</td><td style="text-align:right;font-family:var(--fM);color:var(--purple)">${mm.pctCo}%</td></tr>
       <tr><td class="td-hi">% Fecharam</td><td style="text-align:right;font-family:var(--fD);font-size:15px;font-weight:700;color:var(--neon)">${ma.pctFe}%</td><td style="text-align:right;font-family:var(--fD);font-size:15px;font-weight:700;color:var(--purple)">${mm.pctFe}%</td></tr>
     </tbody></table>`;
+
     if(objBox){const oc={};leads.filter(l=>l.auditoria_ia_motivo_perda).forEach(l=>{oc[l.auditoria_ia_motivo_perda]=(oc[l.auditoria_ia_motivo_perda]||0)+1;});const sorted=Object.entries(oc).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!sorted.length){objBox.innerHTML='<div class="empty">Nenhuma objeção registrada ainda</div>';}else{const max=sorted[0][1];objBox.innerHTML=sorted.map(([m,n])=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--text)">${m}</span><span style="font-family:var(--fM);font-size:11px;color:var(--muted)">${n}</span></div><div style="height:4px;background:rgba(145,70,255,.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:${(n/max*100).toFixed(0)}%;background:var(--purple)"></div></div></div>`).join('');}}
-    if(recBox){const rec=leads.filter(l=>l.auditoria_ia_em).sort((a,b)=>new Date(b.auditoria_ia_em)-new Date(a.auditoria_ia_em)).slice(0,10);if(!rec.length){recBox.innerHTML='<div class="empty">Rode O Analista para ver os resumos</div>';}else{recBox.innerHTML='<div style="overflow-x:auto"><table class="tbl" style="min-width:600px"><thead><tr><th>Nome</th><th>Canal</th><th>Score</th><th>Resumo IA</th><th>Objeção</th></tr></thead><tbody>'+rec.map(l=>`<tr><td class="td-hi">${l.nome||'—'}</td><td><span style="font-family:var(--fM);font-size:9px;padding:2px 6px;background:${l.canal==='chatwoot_auditoria'?'rgba(145,70,255,.1)':'rgba(0,245,160,.1)'};color:${l.canal==='chatwoot_auditoria'?'var(--purple)':'var(--neon)'};border:1px solid ${l.canal==='chatwoot_auditoria'?'rgba(145,70,255,.2)':'rgba(0,245,160,.2)'}">${l.canal==='chatwoot_auditoria'?'Manual':'IA'}</span></td><td style="font-family:var(--fM);color:var(--purple)">${l.score||'—'}</td><td style="font-size:11px;color:var(--muted);max-width:200px;word-break:break-word">${l.auditoria_ia_resumo||'—'}</td><td style="font-size:11px;color:var(--warn)">${l.auditoria_ia_motivo_perda||'—'}</td></tr>`).join('')+'</tbody></table></div>';}}
+
+    renderAnRecentes();
   } catch(e) {
     if(compEl)compEl.innerHTML='<div class="empty">Erro: '+e.message+'</div>';
   }
