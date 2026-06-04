@@ -1010,10 +1010,10 @@ async function loadDashboard() {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
   }, 250);
 
-  // Origem: canal + ctwa + UTM
+  // Origem: canal + atribuição Meta (fbclid) + utm_source
   const [canalData, atribData] = await Promise.all([
-    sb(`${TABLE}?select=canal,typebot_concluido`).then(r => r.data || []),
-    sb(`${TABLE}?select=ctwa_clid,utm_source`).then(r => r.data || [])
+    sb(`${TABLE}?select=canal,typebot_concluido`).then(r => Array.isArray(r.data) ? r.data : []),
+    sb(`${TABLE}?select=fbclid,utm_source`).then(r => Array.isArray(r.data) ? r.data : [])
   ]);
   let nIA = 0, nManual = 0, nDireto = 0;
   canalData.forEach(l => {
@@ -1030,15 +1030,15 @@ async function loadDashboard() {
       const pct = Math.round(n/totalCanal*100);
       return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor}">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
     }).join('') + `</div>`;
-  // Atribuição Meta: ctwa_clid + utm_source
-  const nCtwa = atribData.filter(r => r.ctwa_clid).length;
-  const nUtm  = atribData.filter(r => r.utm_source).length;
-  const nSem  = atribData.length - Math.max(nCtwa, nUtm);
+  // Atribuição Meta: fbclid = clique em anúncio, utm_source = veio por LP
+  const nFbclid = atribData.filter(r => r.fbclid).length;
+  const nUtm    = atribData.filter(r => r.utm_source).length;
+  const nSem    = Math.max(0, atribData.length - nFbclid - atribData.filter(r => !r.fbclid && r.utm_source).length);
   const totalAtrib = atribData.length || 1;
   const atribRows = [
-    ['🎯 Via Anúncio Meta (ctwa)', nCtwa, 'var(--warn)', 'rgba(255,94,91,.12)'],
+    ['🎯 Meta Ads (fbclid)', nFbclid, 'var(--warn)', 'rgba(255,94,91,.12)'],
     ['🔗 Via LP (utm)', nUtm, 'var(--neon)', 'rgba(0,245,160,.10)'],
-    ['❓ Sem rastreamento', Math.max(0, nSem), 'var(--dim)', 'rgba(145,70,255,.06)']
+    ['❓ Sem rastreamento', nSem, 'var(--dim)', 'rgba(145,70,255,.06)']
   ].map(([lbl,n,cor,bg]) => {
     const pct = Math.round(n/totalAtrib*100);
     return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor};font-size:10px">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
@@ -2205,7 +2205,9 @@ function renderAnRecentes() {
       const isManual = l.canal === 'chatwoot_auditoria';
       const canalBg = isManual ? 'rgba(145,70,255,.1)' : 'rgba(0,245,160,.1)';
       const canalCor = isManual ? 'var(--purple)' : 'var(--neon)';
-      const canalTxt = isManual ? '👤 Manual' : '🤖 IA';
+      const canalTxt = isManual
+        ? `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--fM);font-size:9px;padding:3px 7px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg}"><span style="font-size:13px;line-height:1">👤</span><span>Manual</span></span>`
+        : `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--fM);font-size:9px;padding:3px 7px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg}"><span style="font-size:13px;line-height:1">🤖</span><span>IA</span></span>`;
       let etapa = '<span class="badge b-ct">contato</span>';
       if (l.fechou) etapa = '<span class="badge b-ag">fechou</span>';
       else if (l.compareceu) etapa = '<span class="badge b-ag">compareceu</span>';
@@ -2213,7 +2215,7 @@ function renderAnRecentes() {
       else if (l.qualificado) etapa = '<span class="badge b-ql">qualificado</span>';
       return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
         <td class="td-hi">${l.nome||'—'}</td>
-        <td><span style="font-family:var(--fM);font-size:9px;padding:2px 6px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg}">${canalTxt}</span></td>
+        <td>${canalTxt}</td>
         <td style="font-family:var(--fM);color:var(--purple)">${l.score||'—'}</td>
         <td>${etapa}</td>
         <td style="font-size:11px;color:var(--muted);width:200px;max-width:200px;word-break:break-word;overflow-wrap:break-word;white-space:normal">${l.auditoria_ia_resumo||'—'}</td>
