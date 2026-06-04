@@ -1010,10 +1010,10 @@ async function loadDashboard() {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
   }, 250);
 
-  // Origem: canal + UTM
-  const [origemData, canalData] = await Promise.all([
-    sb(`${TABLE}?select=utm_source&utm_source=not.is.null`).then(r => r.data || []),
-    sb(`${TABLE}?select=canal,typebot_concluido`).then(r => r.data || [])
+  // Origem: canal + ctwa + UTM
+  const [canalData, atribData] = await Promise.all([
+    sb(`${TABLE}?select=canal,typebot_concluido`).then(r => r.data || []),
+    sb(`${TABLE}?select=ctwa_clid,utm_source`).then(r => r.data || [])
   ]);
   let nIA = 0, nManual = 0, nDireto = 0;
   canalData.forEach(l => {
@@ -1030,19 +1030,21 @@ async function loadDashboard() {
       const pct = Math.round(n/totalCanal*100);
       return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor}">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
     }).join('') + `</div>`;
-  const origemMap = {};
-  origemData.forEach(r => { origemMap[r.utm_source] = (origemMap[r.utm_source]||0)+1; });
-  const origemTotal = Object.values(origemMap).reduce((a,b)=>a+b,0) || 1;
-  const cores = { 'fb_ad': 'uf-meta', 'meta': 'uf-meta', 'google': 'uf-google', 'organico': 'uf-organic', 'direct': 'uf-direct' };
-  const utmRows = Object.entries(origemMap).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([src,n]) => {
-    const cor = cores[src] || 'uf-direct';
-    const pct = Math.round(n/origemTotal*100);
-    return `<div class="utm-row"><div class="utm-src">${src}</div><div class="utm-track"><div class="utm-fill ${cor}" style="width:${pct}%"></div></div><div class="utm-n">${n}</div><div class="utm-p">${pct}%</div></div>`;
+  // Atribuição Meta: ctwa_clid + utm_source
+  const nCtwa = atribData.filter(r => r.ctwa_clid).length;
+  const nUtm  = atribData.filter(r => r.utm_source).length;
+  const nSem  = atribData.length - Math.max(nCtwa, nUtm);
+  const totalAtrib = atribData.length || 1;
+  const atribRows = [
+    ['🎯 Via Anúncio Meta (ctwa)', nCtwa, 'var(--warn)', 'rgba(255,94,91,.12)'],
+    ['🔗 Via LP (utm)', nUtm, 'var(--neon)', 'rgba(0,245,160,.10)'],
+    ['❓ Sem rastreamento', Math.max(0, nSem), 'var(--dim)', 'rgba(145,70,255,.06)']
+  ].map(([lbl,n,cor,bg]) => {
+    const pct = Math.round(n/totalAtrib*100);
+    return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor};font-size:10px">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
   }).join('');
-  const utmSection = utmRows
-    ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">UTM Source</div>${utmRows}`
-    : '';
-  document.getElementById('utm-list').innerHTML = canalHtml + utmSection;
+  const atribSection = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;margin-top:4px">Atribuição</div>${atribRows}`;
+  document.getElementById('utm-list').innerHTML = canalHtml + atribSection;
 
   // Leads recentes
   const { data: recentes } = await sb(`${TABLE}?select=nome,patologia,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu&order=criado_em.desc&limit=6`);
