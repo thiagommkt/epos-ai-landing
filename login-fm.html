@@ -169,7 +169,7 @@ function hashSimples(s) {
 // Cookies persistem 30 dias — localStorage é apagado em alguns browsers mobile ao fechar
 function setCookie(name, value, days) {
   const d = new Date();
-  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+  d.setTime(d.getTime() + (days || 3650) * 24 * 60 * 60 * 1000); // padrão 10 anos
   document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
 }
 
@@ -301,7 +301,7 @@ async function registrarBio() {
 
     if (credential) {
       const idBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-      setCookie(BIO_KEY, idBase64, 365);
+      setCookie(BIO_KEY, idBase64, 3650);
       localStorage.setItem(BIO_KEY, idBase64);
       showMsg('reg-msg', '✓ Face ID / Touch ID ativado!', 'ok');
       setTimeout(() => location.href = DASHBOARD_URL, 800);
