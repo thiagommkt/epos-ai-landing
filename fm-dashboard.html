@@ -776,20 +776,9 @@ canvas{display:block;width:100%!important}
 
   <div class="kpi-row" style="margin-bottom:14px">
     <div class="kpi"><div class="kpi-lbl">Total Leads</div><div class="kpi-val g" id="an-total">—</div><div class="kpi-note" id="an-total-note">base completa</div></div>
-    <div class="kpi"><div class="kpi-lbl">Sistema IA</div><div class="kpi-val n" id="an-ai">—</div><div class="kpi-note">Typebot + Ana</div></div>
+    <div class="kpi"><div class="kpi-lbl">Sistema IA</div><div class="kpi-val n" id="an-ai">—</div><div class="kpi-note">Atendimento Ana</div></div>
     <div class="kpi"><div class="kpi-lbl">Manual</div><div class="kpi-val" id="an-manual">—</div><div class="kpi-note">atendimento humano</div></div>
-    <div class="kpi"><div class="kpi-lbl">Auditados</div><div class="kpi-val g" id="an-auditados">—</div><div class="kpi-note">pelo GPT-4o-mini</div></div>
-  </div>
-
-  <!-- Filtro de etapa -->
-  <div class="filters" style="margin-bottom:12px">
-    <button class="filter-btn active" data-an-filter="todos" onclick="setAnFilter(this,'todos')">Todos</button>
-    <button class="filter-btn" data-an-filter="qualificado" onclick="setAnFilter(this,'qualificado')">Qualificados</button>
-    <button class="filter-btn" data-an-filter="agendou" onclick="setAnFilter(this,'agendou')">Agendaram</button>
-    <button class="filter-btn" data-an-filter="fechou" onclick="setAnFilter(this,'fechou')">Fecharam</button>
-    <button class="filter-btn" data-an-filter="objection" onclick="setAnFilter(this,'objection')">Com Objeção</button>
-    <button class="filter-btn" data-an-filter="ia" onclick="setAnFilter(this,'ia')">Sistema IA</button>
-    <button class="filter-btn" data-an-filter="manual" onclick="setAnFilter(this,'manual')">Manual FM</button>
+    <div class="kpi"><div class="kpi-lbl">Auditados</div><div class="kpi-val g" id="an-auditados">—</div><div class="kpi-note">via O Analista</div></div>
   </div>
 
   <div class="two-col-eq">
@@ -804,6 +793,16 @@ canvas{display:block;width:100%!important}
   </div>
   <div class="card">
     <div class="card-ttl">Análises — O Analista <span id="an-count-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px"></span></div>
+    <!-- Filtro de etapa -->
+    <div class="filters" style="margin-bottom:14px">
+      <button class="filter-btn active" data-an-filter="todos" onclick="setAnFilter(this,'todos')">Todos</button>
+      <button class="filter-btn" data-an-filter="qualificado" onclick="setAnFilter(this,'qualificado')">Qualificados</button>
+      <button class="filter-btn" data-an-filter="agendou" onclick="setAnFilter(this,'agendou')">Agendaram</button>
+      <button class="filter-btn" data-an-filter="fechou" onclick="setAnFilter(this,'fechou')">Fecharam</button>
+      <button class="filter-btn" data-an-filter="objection" onclick="setAnFilter(this,'objection')">Com Objeção</button>
+      <button class="filter-btn" data-an-filter="ia" onclick="setAnFilter(this,'ia')">Sistema IA</button>
+      <button class="filter-btn" data-an-filter="manual" onclick="setAnFilter(this,'manual')">Manual FM</button>
+    </div>
     <div id="an-recentes"><div class="loading"></div></div>
   </div>
 </section>
@@ -1502,7 +1501,6 @@ function openLeadPanel(lead) {
       }
     </div>
 
-    ${lead.agendou ? `
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
       <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Presença na Consulta</div>
       ${lead.compareceu
@@ -1513,9 +1511,9 @@ function openLeadPanel(lead) {
             style="width:100%;padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
             ✅ Confirmar presença na consulta
            </button>
-           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marca o lead como compareceu na reunião.</div>`
+           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando o lead comparecer à consulta ou reunião.</div>`
       }
-    </div>` : ''}
+    </div>
   `;
 
   document.getElementById('lead-panel').classList.add('open');
