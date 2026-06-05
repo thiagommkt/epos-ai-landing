@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -813,37 +814,12 @@ canvas{display:block;width:100%!important}
 <script>
 // ═══ AUTENTICAÇÃO ═══
 (function() {
-  const SENHA_HASH = '9b5c3f2a8e1d4b6c'; // hash da senha 'fmpainel2026'
+  const SENHA = 'fmpainel2026';
   function hashSimples(s) { let h=0; for(let i=0;i<s.length;i++) h=((h<<5)-h)+s.charCodeAt(i); return Math.abs(h).toString(16); }
-  const SENHA = 'fmpainel2026'; // ← trocar aqui para sua senha
-  if (sessionStorage.getItem('fm_auth') !== hashSimples(SENHA)) {
-    document.addEventListener('DOMContentLoaded', () => {
-      document.body.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0E0E10;font-family:'Outfit',sans-serif">
-          <div style="background:#18181B;border:1px solid rgba(145,70,255,.3);padding:48px 40px;text-align:center;max-width:360px;width:90%">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#EFEFF1;margin-bottom:6px">F&M <span style="color:#9146FF">IA</span></div>
-            <div style="font-size:12px;color:rgba(239,239,241,.4);margin-bottom:32px;font-family:'DM Mono',monospace;letter-spacing:.06em">PAINEL DE GESTÃO · ACESSO RESTRITO</div>
-            <input id="pwd-input" type="password" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')checkPwd()"
-              style="width:100%;padding:12px 14px;background:#1F1F23;border:1px solid rgba(145,70,255,.25);color:#EFEFF1;font-size:16px;font-family:'Outfit',sans-serif;outline:none;margin-bottom:8px">
-            <div id="pwd-err" style="font-size:11px;color:#FF5E5B;font-family:'DM Mono',monospace;height:16px;margin-bottom:12px"></div>
-            <button onclick="checkPwd()" style="width:100%;padding:13px;background:#9146FF;color:#fff;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">
-              Entrar →
-            </button>
-          </div>
-        </div>`;
-    });
-    window.checkPwd = function() {
-      const v = document.getElementById('pwd-input').value;
-      if (hashSimples(v) === hashSimples(SENHA)) {
-        sessionStorage.setItem('fm_auth', hashSimples(SENHA));
-        location.reload();
-      } else {
-        document.getElementById('pwd-err').textContent = 'Senha incorreta';
-        document.getElementById('pwd-input').value = '';
-      }
-    };
-    document.addEventListener('DOMContentLoaded', () => document.getElementById('pwd-input')?.focus());
-    throw new Error('auth_required'); // Para execução do resto do script
+  const AUTH_KEY = 'fm_auth_v2';
+  if (localStorage.getItem(AUTH_KEY) !== hashSimples(SENHA + '_v2')) {
+    location.replace('login-fm.html');
+    throw new Error('auth_required');
   }
 })();
 
@@ -1183,7 +1159,7 @@ function getStage(l) {
 }
 
 async function loadCRM() {
-  const { data } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento&order=criado_em.desc&limit=200`);
+  const { data } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano&order=criado_em.desc&limit=200`);
   const leads = data || [];
   const stageMap = {};
   leads.forEach(l => {
@@ -1418,6 +1394,13 @@ function openLeadPanel(lead) {
 
   document.getElementById('panel-body').innerHTML = `
     <div class="panel-score">${lead.score||0}<small>score de qualificação</small></div>
+
+    ${lead.chatwoot_conversation_id ? `
+    <a href="https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/conversations/${lead.chatwoot_conversation_id}" target="_blank"
+      style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(145,70,255,.08);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;margin-bottom:16px;transition:all .2s"
+      onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='rgba(145,70,255,.08)';this.style.color='var(--purple)'">
+      💬 Abrir conversa no Chatwoot →
+    </a>` : `<div style="margin-bottom:16px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Conversa Chatwoot ainda não vinculada — será vinculada na próxima auditoria</div>`}
 
     <div class="panel-section">Identificação</div>
     <div class="panel-row"><div class="panel-key">WhatsApp</div><div class="panel-val">${telFmt}</div></div>
@@ -2269,9 +2252,26 @@ async function loadAnalista(force) {
   }
 }
 
-// ═══ INIT + AUTO-REFRESH ═══
+// ═══ INIT + AUTO-REFRESH + SUPABASE REALTIME ═══
 loadDashboard();
-setInterval(loadDashboard, 60000); // atualiza a cada 60s
+setInterval(loadDashboard, 30000); // fallback polling a cada 30s
+
+// Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
+(function initRealtime() {
+  try {
+    const sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+    let realtimeDebounce;
+    sbClient.channel('db-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, () => {
+        clearTimeout(realtimeDebounce);
+        realtimeDebounce = setTimeout(loadDashboard, 800);
+      })
+      .subscribe((status) => {
+        const dot = document.querySelector('.live-dot');
+        if (dot) dot.style.background = status === 'SUBSCRIBED' ? 'var(--neon)' : 'var(--warn)';
+      });
+  } catch(e) { /* Realtime não disponível — fallback para polling */ }
+})();
 
 window.addEventListener('resize', () => {
   if(document.querySelector('#s-dashboard.active')) {

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>F&M IA — Acesso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0A0C;--bg2:#111114;--bg3:#18181C;
+  --purple:#9146FF;--pur-l:rgba(145,70,255,.12);--pur-b:rgba(145,70,255,.3);
+  --neon:#00F5A0;--warn:#FF5E5B;
+  --text:#EFEFF1;--muted:rgba(239,239,241,.55);--dim:rgba(239,239,241,.25);
+  --fD:'Rajdhani',sans-serif;--fB:'Outfit',sans-serif;--fM:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--fB);-webkit-font-smoothing:antialiased;overflow:hidden}
+
+/* Background */
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-glow::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:600px;height:500px;background:radial-gradient(ellipse,rgba(145,70,255,.08) 0%,transparent 70%);animation:breathe 6s ease-in-out infinite}
+.bg-glow::after{content:'';position:absolute;bottom:-10%;right:-10%;width:400px;height:400px;background:radial-gradient(ellipse,rgba(0,245,160,.04) 0%,transparent 70%)}
+@keyframes breathe{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.08)}}
+
+/* Scanlines */
+.scanlines{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:0}
+
+/* Main */
+.wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+
+/* Card */
+.card{width:100%;max-width:380px;background:var(--bg2);border:1px solid rgba(145,70,255,.2);position:relative;overflow:hidden;animation:slideUp .5s cubic-bezier(.16,1,.3,1) both}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.card-inner{padding:44px 36px 36px}
+
+/* Logo */
+.logo{text-align:center;margin-bottom:36px}
+.logo-mark{display:inline-flex;align-items:center;gap:0;margin-bottom:10px}
+.logo-box{width:44px;height:44px;background:var(--purple);display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));flex-shrink:0}
+.logo-box svg{width:22px;height:22px;fill:#fff}
+.logo-name{font-family:var(--fD);font-size:24px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding-left:10px}
+.logo-name span{color:var(--purple)}
+.logo-sub{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.18em;text-transform:uppercase}
+
+/* Biometria */
+.bio-section{margin-bottom:28px;text-align:center;display:none}
+.bio-section.show{display:block}
+.bio-btn{display:inline-flex;flex-direction:column;align-items:center;gap:10px;padding:24px 32px;background:var(--pur-l);border:1px solid var(--pur-b);cursor:pointer;width:100%;transition:all .2s;position:relative;overflow:hidden}
+.bio-btn:hover{background:rgba(145,70,255,.2);border-color:var(--purple)}
+.bio-btn:active{transform:scale(.97)}
+.bio-icon{font-size:48px;line-height:1;filter:drop-shadow(0 0 12px rgba(145,70,255,.6))}
+.bio-label{font-family:var(--fD);font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+.bio-sub{font-family:var(--fM);font-size:10px;color:var(--muted);letter-spacing:.06em}
+.bio-pulse{position:absolute;inset:0;background:radial-gradient(circle,rgba(145,70,255,.3) 0%,transparent 70%);opacity:0;animation:none}
+.bio-btn.scanning .bio-pulse{animation:pulse-scan .8s ease-in-out infinite}
+@keyframes pulse-scan{0%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(145,70,255,.15)}
+.divider span{font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;white-space:nowrap}
+
+/* Form */
+.field{margin-bottom:14px}
+.field input{width:100%;padding:13px 14px;background:var(--bg3);border:1px solid rgba(145,70,255,.18);color:var(--text);font-size:15px;font-family:var(--fB);outline:none;transition:border-color .2s;-webkit-appearance:none;border-radius:0}
+.field input:focus{border-color:var(--purple)}
+.field input::placeholder{color:var(--dim)}
+
+.btn-enter{width:100%;padding:14px;background:var(--purple);color:#fff;border:none;cursor:pointer;font-family:var(--fD);font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;position:relative;overflow:hidden}
+.btn-enter:hover{background:#a855ff}
+.btn-enter:active{transform:scale(.98)}
+.btn-enter::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1) 0%,transparent 50%)}
+
+/* Error / Status */
+.msg{height:18px;margin:8px 0;font-family:var(--fM);font-size:11px;letter-spacing:.04em;text-align:center;transition:all .2s}
+.msg.err{color:var(--warn)}
+.msg.ok{color:var(--neon)}
+
+/* Register bio toggle */
+.bio-register{margin-top:20px;padding-top:16px;border-top:1px solid rgba(145,70,255,.1);text-align:center;display:none}
+.bio-register.show{display:block}
+.bio-register-btn{background:transparent;border:1px solid rgba(145,70,255,.25);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .2s;width:100%}
+.bio-register-btn:hover{border-color:var(--purple);color:var(--text)}
+
+/* Footer */
+.footer{padding:14px 36px 20px;border-top:1px solid rgba(145,70,255,.08);text-align:center}
+.footer span{font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+
+/* Mobile */
+@media(max-width:420px){
+  .card-inner{padding:36px 24px 28px}
+  .bio-btn{padding:20px 24px}
+  .bio-icon{font-size:40px}
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="scanlines"></div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="card-inner">
+
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-mark">
+          <div class="logo-box">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="logo-name">F&M <span>IA</span></div>
+        </div>
+        <div class="logo-sub">Painel de Gestão · Acesso Restrito</div>
+      </div>
+
+      <!-- Biometria (mostrada se registrada) -->
+      <div class="bio-section" id="bio-section">
+        <button class="bio-btn" id="bio-btn" onclick="autenticarBio()">
+          <div class="bio-pulse" id="bio-pulse"></div>
+          <div class="bio-icon" id="bio-icon">🔐</div>
+          <div class="bio-label">Entrar com Biometria</div>
+          <div class="bio-sub" id="bio-sub">Face ID · Touch ID · Senha do Dispositivo</div>
+        </button>
+        <div class="msg" id="bio-msg"></div>
+        <div class="divider" style="margin-top:8px"><span>ou use a senha</span></div>
+      </div>
+
+      <!-- Senha -->
+      <div class="field">
+        <input id="pwd-input" type="password" placeholder="Senha de acesso"
+          onkeydown="if(event.key==='Enter')entrar()"
+          autocomplete="current-password">
+      </div>
+      <div class="msg err" id="pwd-msg"></div>
+      <button class="btn-enter" onclick="entrar()">Entrar →</button>
+
+      <!-- Ativar biometria após login -->
+      <div class="bio-register" id="bio-register">
+        <button class="bio-register-btn" onclick="registrarBio()">＋ Ativar Face ID / Touch ID neste dispositivo</button>
+        <div class="msg" id="reg-msg" style="margin-top:6px"></div>
+      </div>
+
+    </div>
+    <div class="footer">
+      <span>Farias &amp; Moura · Sistema IA · EPOS Marketing</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const SENHA = 'fmpainel2026';
+const DASHBOARD_URL = 'fm-dashboard.html';
+const AUTH_KEY = 'fm_auth_v2';
+const BIO_KEY = 'fm_bio_credential';
+const BIO_RP = { id: location.hostname || 'localhost', name: 'F&M IA' };
+const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Farias & Moura' };
+
+// ─── UTILS ────────────────────────────────────────────────
+function hashSimples(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i);
+  return Math.abs(h).toString(16);
+}
+
+function setAuth() {
+  localStorage.setItem(AUTH_KEY, hashSimples(SENHA + '_v2'));
+}
+
+function checkAuth() {
+  return localStorage.getItem(AUTH_KEY) === hashSimples(SENHA + '_v2');
+}
+
+function showMsg(id, text, type = '') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+// ─── AUTO REDIRECT ────────────────────────────────────────
+if (checkAuth()) {
+  location.href = DASHBOARD_URL;
+}
+
+// ─── BIOMETRIA: INIT ──────────────────────────────────────
+const credId = localStorage.getItem(BIO_KEY);
+const bioSection = document.getElementById('bio-section');
+const bioRegister = document.getElementById('bio-register');
+const bioSupported = window.PublicKeyCredential !== undefined;
+
+if (credId && bioSupported) {
+  bioSection.classList.add('show');
+  // Tenta biometria automática ao abrir (se suportado)
+  setTimeout(() => autenticarBio(true), 400);
+}
+
+// ─── SENHA ────────────────────────────────────────────────
+function entrar() {
+  const v = document.getElementById('pwd-input').value;
+  if (hashSimples(v) === hashSimples(SENHA)) {
+    setAuth();
+    showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
+    // Mostrar opção de ativar biometria se suportado e não registrado
+    if (bioSupported && !credId) {
+      bioRegister.classList.add('show');
+      showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
+    } else {
+      setTimeout(() => location.href = DASHBOARD_URL, 400);
+    }
+  } else {
+    showMsg('pwd-msg', 'Senha incorreta', 'err');
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+    // Shaky animation
+    document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
+    setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
+  }
+}
+
+// ─── BIOMETRIA: AUTENTICAR ────────────────────────────────
+async function autenticarBio(silencioso = false) {
+  if (!bioSupported) return;
+  const storedId = localStorage.getItem(BIO_KEY);
+  if (!storedId) return;
+
+  const btn = document.getElementById('bio-btn');
+  btn.classList.add('scanning');
+  showMsg('bio-msg', 'Aguardando biometria...', '');
+
+  try {
+    const credIdBytes = Uint8Array.from(atob(storedId), c => c.charCodeAt(0));
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials: [{ id: credIdBytes, type: 'public-key' }],
+        userVerification: 'required',
+        timeout: 30000,
+      }
+    });
+
+    if (assertion) {
+      setAuth();
+      showMsg('bio-msg', '✓ Identidade confirmada', 'ok');
+      btn.classList.remove('scanning');
+      setTimeout(() => location.href = DASHBOARD_URL, 500);
+    }
+  } catch (e) {
+    btn.classList.remove('scanning');
+    if (!silencioso) {
+      showMsg('bio-msg', e.name === 'NotAllowedError' ? 'Biometria cancelada' : 'Tente a senha abaixo', 'err');
+    }
+  }
+}
+
+// ─── BIOMETRIA: REGISTRAR ─────────────────────────────────
+async function registrarBio() {
+  if (!bioSupported) {
+    showMsg('reg-msg', 'Biometria não suportada neste dispositivo', 'err');
+    return;
+  }
+
+  showMsg('reg-msg', 'Aguardando confirmação biométrica...', '');
+
+  try {
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rp: BIO_RP,
+        user: BIO_USER,
+        pubKeyCredParams: [
+          { alg: -7, type: 'public-key' },   // ES256
+          { alg: -257, type: 'public-key' }  // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',
+          userVerification: 'required',
+          residentKey: 'preferred'
+        },
+        timeout: 30000,
+        attestation: 'none'
+      }
+    });
+
+    if (credential) {
+      const idBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      localStorage.setItem(BIO_KEY, idBase64);
+      showMsg('reg-msg', '✓ Face ID / Touch ID ativado!', 'ok');
+      setTimeout(() => location.href = DASHBOARD_URL, 800);
+    }
+  } catch (e) {
+    showMsg('reg-msg', e.name === 'NotAllowedError' ? 'Cancelado' : 'Não foi possível ativar — continue com senha', 'err');
+    setTimeout(() => location.href = DASHBOARD_URL, 1200);
+  }
+}
+
+// ─── FOCUS ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (!credId) document.getElementById('pwd-input')?.focus();
+});
+
+// Ícone de biometria adaptivo
+if (bioSupported) {
+  const ua = navigator.userAgent;
+  const icon = document.getElementById('bio-icon');
+  const sub = document.getElementById('bio-sub');
+  if (/iPhone|iPad/.test(ua)) {
+    icon.textContent = '👤';
+    sub.textContent = 'Face ID';
+  } else if (/Android/.test(ua)) {
+    icon.textContent = '👆';
+    sub.textContent = 'Impressão Digital';
+  } else {
+    icon.textContent = '🔐';
+    sub.textContent = 'Windows Hello · Touch ID · Face ID';
+  }
+}
+</script>
+</body>
+</html>
