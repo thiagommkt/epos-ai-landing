@@ -819,8 +819,10 @@ canvas{display:block;width:100%!important}
 (function() {
   const SENHA = 'fmpainel2026';
   function hashSimples(s) { let h=0; for(let i=0;i<s.length;i++) h=((h<<5)-h)+s.charCodeAt(i); return Math.abs(h).toString(16); }
+  function getCookie(n) { const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return m?decodeURIComponent(m.pop()):null; }
   const AUTH_KEY = 'fm_auth_v2';
-  if (localStorage.getItem(AUTH_KEY) !== hashSimples(SENHA + '_v2')) {
+  const hash = hashSimples(SENHA + '_v2');
+  if (getCookie(AUTH_KEY) !== hash && localStorage.getItem(AUTH_KEY) !== hash) {
     location.replace('login-fm.html');
     throw new Error('auth_required');
   }

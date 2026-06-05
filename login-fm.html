@@ -166,12 +166,27 @@ function hashSimples(s) {
   return Math.abs(h).toString(16);
 }
 
+// Cookies persistem 30 dias — localStorage é apagado em alguns browsers mobile ao fechar
+function setCookie(name, value, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
+}
+
+function getCookie(name) {
+  const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return match ? decodeURIComponent(match.pop()) : null;
+}
+
 function setAuth() {
-  localStorage.setItem(AUTH_KEY, hashSimples(SENHA + '_v2'));
+  const hash = hashSimples(SENHA + '_v2');
+  setCookie(AUTH_KEY, hash, 30);
+  localStorage.setItem(AUTH_KEY, hash); // fallback
 }
 
 function checkAuth() {
-  return localStorage.getItem(AUTH_KEY) === hashSimples(SENHA + '_v2');
+  const hash = hashSimples(SENHA + '_v2');
+  return getCookie(AUTH_KEY) === hash || localStorage.getItem(AUTH_KEY) === hash;
 }
 
 function showMsg(id, text, type = '') {
@@ -187,14 +202,13 @@ if (checkAuth()) {
 }
 
 // ─── BIOMETRIA: INIT ──────────────────────────────────────
-const credId = localStorage.getItem(BIO_KEY);
+const credId = getCookie(BIO_KEY) || localStorage.getItem(BIO_KEY);
 const bioSection = document.getElementById('bio-section');
 const bioRegister = document.getElementById('bio-register');
 const bioSupported = window.PublicKeyCredential !== undefined;
 
 if (credId && bioSupported) {
   bioSection.classList.add('show');
-  // Tenta biometria automática ao abrir (se suportado)
   setTimeout(() => autenticarBio(true), 400);
 }
 
@@ -287,6 +301,7 @@ async function registrarBio() {
 
     if (credential) {
       const idBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+      setCookie(BIO_KEY, idBase64, 365);
       localStorage.setItem(BIO_KEY, idBase64);
       showMsg('reg-msg', '✓ Face ID / Touch ID ativado!', 'ok');
       setTimeout(() => location.href = DASHBOARD_URL, 800);
