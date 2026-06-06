@@ -166,10 +166,10 @@ function hashSimples(s) {
   return Math.abs(h).toString(16);
 }
 
-// Cookies persistem 30 dias — localStorage é apagado em alguns browsers mobile ao fechar
+// Cookie sem limite — localStorage é apagado em alguns browsers mobile ao fechar
 function setCookie(name, value, days) {
   const d = new Date();
-  d.setTime(d.getTime() + (days || 3650) * 24 * 60 * 60 * 1000); // padrão 10 anos
+  d.setTime(d.getTime() + (days || 36500) * 24 * 60 * 60 * 1000); // padrão 100 anos
   document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
 }
 
@@ -180,7 +180,7 @@ function getCookie(name) {
 
 function setAuth() {
   const hash = hashSimples(SENHA + '_v2');
-  setCookie(AUTH_KEY, hash, 30);
+  setCookie(AUTH_KEY, hash); // sem limite — usa padrão 100 anos
   localStorage.setItem(AUTH_KEY, hash); // fallback
 }
 
@@ -238,7 +238,7 @@ function entrar() {
 // ─── BIOMETRIA: AUTENTICAR ────────────────────────────────
 async function autenticarBio(silencioso = false) {
   if (!bioSupported) return;
-  const storedId = localStorage.getItem(BIO_KEY);
+  const storedId = getCookie(BIO_KEY) || localStorage.getItem(BIO_KEY);
   if (!storedId) return;
 
   const btn = document.getElementById('bio-btn');
@@ -301,7 +301,7 @@ async function registrarBio() {
 
     if (credential) {
       const idBase64 = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-      setCookie(BIO_KEY, idBase64, 3650);
+      setCookie(BIO_KEY, idBase64); // sem limite — usa padrão 100 anos
       localStorage.setItem(BIO_KEY, idBase64);
       showMsg('reg-msg', '✓ Face ID / Touch ID ativado!', 'ok');
       setTimeout(() => location.href = DASHBOARD_URL, 800);

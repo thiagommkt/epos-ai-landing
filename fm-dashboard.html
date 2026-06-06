@@ -453,7 +453,7 @@ canvas{display:block;width:100%!important}
       <div>
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Ana IA — Ativa</div>
         <div style="font-family:var(--fD);font-size:34px;font-weight:700;color:var(--neon)" id="cnt-ana">—</div>
-        <div style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">dify_ativo = true</div>
+        <div id="cnt-ana-lbl" style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">em atendimento ativo</div>
       </div>
       <div style="font-size:28px;opacity:.4">🤖</div>
     </div>
@@ -461,7 +461,7 @@ canvas{display:block;width:100%!important}
       <div>
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Equipe FM — Atendendo</div>
         <div style="font-family:var(--fD);font-size:34px;font-weight:700;color:var(--purple)" id="cnt-humano">—</div>
-        <div style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">em_atendimento = true</div>
+        <div id="cnt-humano-lbl" style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">em atendimento</div>
       </div>
       <div style="font-size:28px;opacity:.4">👤</div>
     </div>
@@ -582,6 +582,7 @@ canvas{display:block;width:100%!important}
   <div class="rule"></div>
   <div class="chat-wrap">
     <iframe
+      id="chatwoot-iframe"
       class="chat-iframe"
       src="https://chatwoot.eposmktfilmsia.com.br"
       allow="microphone; camera; clipboard-write"
@@ -605,7 +606,7 @@ canvas{display:block;width:100%!important}
     <iframe
       class="agenda-iframe"
       id="agenda-iframe"
-      src="https://calendar.google.com/calendar/embed?src=8a7c220d41617259a1ad6c457ef56b46bab8bb2ef513cde77d0b76871ecd00b3%40group.calendar.google.com&ctz=America%2FSao_Paulo&bgcolor=%23ffffff&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=1&hl=pt_BR&mode=WEEK"
+      src="https://calendar.google.com/calendar/embed?src=8a7c220d41617259a1ad6c457ef56b46bab8bb2ef513cde77d0b76871ecd00b3%40group.calendar.google.com&ctz=America%2FSao_Paulo&bgcolor=%23ffffff&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=1&hl=pt_BR&mode=MONTH"
       frameborder="0"
       scrolling="auto"
       allow="fullscreen"
@@ -643,6 +644,7 @@ canvas{display:block;width:100%!important}
     <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-right:4px">Período:</span>
     <button class="period-btn active" onclick="setPeriod(this,'past7days','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">7 dias</button>
     <button class="period-btn" onclick="setPeriod(this,'past30days','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">30 dias</button>
+    <button class="period-btn" onclick="setPeriod(this,'thismonth','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Este mês</button>
     <button class="period-btn" onclick="setPeriod(this,'past90days','Últimos 90 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">90 dias</button>
     <button class="period-btn" onclick="setPeriod(this,'thisyear','Este ano')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Este ano</button>
     <button class="period-btn" onclick="setPeriod(this,'','Todos os dados')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Tudo</button>
@@ -944,9 +946,13 @@ async function loadDashboard() {
     const elAna = document.getElementById('cnt-ana');
     const elHum = document.getElementById('cnt-humano');
     const elNote = document.getElementById('kpi-ana-note');
+    const elAnaLbl = document.getElementById('cnt-ana-lbl');
+    const elHumLbl = document.getElementById('cnt-humano-lbl');
     if (elAna) elAna.textContent = cAna;
     if (elHum) elHum.textContent = cHumano;
     if (elNote) elNote.textContent = cAna + ' Ana · ' + cHumano + ' humano';
+    if (elAnaLbl) elAnaLbl.textContent = cAna > 0 ? 'em atendimento ativo' : 'sem atendimento ativo';
+    if (elHumLbl) elHumLbl.textContent = cHumano > 0 ? 'em atendimento' : 'sem atendimento';
   }).catch(() => {});
 
   const bar1 = document.getElementById('kpi-bar-1');
@@ -993,9 +999,10 @@ async function loadDashboard() {
   }, 250);
 
   // Origem: canal + atribuição Meta (fbclid) + utm_source
+  const dateClause = periodoISO ? `&criado_em=gte.${mesISO}${endClause}` : '';
   const [canalData, atribData] = await Promise.all([
-    sb(`${TABLE}?select=canal,typebot_concluido`).then(r => Array.isArray(r.data) ? r.data : []),
-    sb(`${TABLE}?select=fbclid,utm_source`).then(r => Array.isArray(r.data) ? r.data : [])
+    sb(`${TABLE}?select=canal,typebot_concluido${dateClause}`).then(r => Array.isArray(r.data) ? r.data : []),
+    sb(`${TABLE}?select=fbclid,utm_source${dateClause}`).then(r => Array.isArray(r.data) ? r.data : [])
   ]);
   let nIA = 0, nManual = 0, nDireto = 0;
   canalData.forEach(l => {
@@ -1026,13 +1033,15 @@ async function loadDashboard() {
     return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor};font-size:10px">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
   }).join('');
   const atribSection = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;margin-top:4px">Atribuição</div>${atribRows}`;
-  document.getElementById('utm-list').innerHTML = canalHtml + atribSection;
+  const legendHtml = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);line-height:1.7;margin-bottom:12px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd)"><div><span style="color:#4AAEFF">📱 WA Direto</span> — lead escreveu direto no WhatsApp, sem clicar em anúncio</div><div><span style="color:var(--purple)">👤 Manual FM</span> — adicionado via auditoria do Chatwoot, sem fluxo automático</div><div><span style="color:var(--neon)">🤖 Typebot IA</span> — passou pelo fluxo automático de qualificação</div></div>`;
+  document.getElementById('utm-list').innerHTML = canalHtml + legendHtml + atribSection;
 
   // Leads recentes
-  const { data: recentes } = await sb(`${TABLE}?select=nome,patologia,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu&order=criado_em.desc&limit=6`);
-  const recentesHtml = (recentes || []).map(l =>
-    `<tr><td class="td-hi">${l.nome||'—'}</td><td>${l.patologia||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${canalBadge(l)}</td><td>${statusBadge(l)}</td></tr>`
-  ).join('') || '<tr><td colspan="5" class="empty">Sem leads</td></tr>';
+  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id&order=criado_em.desc&limit=6`);
+  const recentesHtml = (recentes || []).map(l => {
+    const leadJson = encodeURIComponent(JSON.stringify(l));
+    return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''"><td class="td-hi">${l.nome||'—'}</td><td>${l.patologia||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${canalBadge(l)}</td><td>${statusBadge(l)}</td></tr>`;
+  }).join('') || '<tr><td colspan="5" class="empty">Sem leads</td></tr>';
   document.getElementById('leads-recentes').innerHTML = recentesHtml;
 
   // Gráfico barras leads por dia
@@ -1306,8 +1315,8 @@ function drawBar(id, labels, vals, c1, c2) {
       const gr=ctx.createLinearGradient(x,y,x,pT+aH);gr.addColorStop(0,c1);gr.addColorStop(1,c2);
       ctx.fillStyle=gr;ctx.fillRect(x,y,bW,fH);
       ctx.fillStyle=c1.replace('0.75)','1)');ctx.fillRect(x,y,bW,2);
-      ctx.fillStyle='rgba(239,239,241,0.3)';ctx.font='10px Outfit';ctx.textAlign='center';
-      ctx.fillText(labels[i],x+bW/2,H-pB+16);
+      ctx.fillStyle='rgba(239,239,241,0.3)';ctx.font='9px Outfit';ctx.textAlign='center';
+      if(i%2===0) ctx.fillText(labels[i],x+bW/2,H-pB+16);
       if(prog>=1){ctx.fillStyle=c1.replace('0.75)','0.8)');ctx.font='9px "DM Mono"';ctx.fillText(v,x+bW/2,y-4);}
     });
     if(prog<1){prog+=.04; cv._animId=requestAnimationFrame(frame);}
@@ -1425,11 +1434,11 @@ function openLeadPanel(lead) {
     <div class="panel-score">${lead.score||0}<small>score de qualificação</small></div>
 
     ${lead.chatwoot_conversation_id ? `
-    <a href="https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/conversations/${lead.chatwoot_conversation_id}" target="_blank"
-      style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(145,70,255,.08);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;margin-bottom:16px;transition:all .2s"
+    <button onclick="openConversationInChat(${lead.chatwoot_conversation_id})"
+      style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(145,70,255,.08);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-bottom:16px;transition:all .2s"
       onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='rgba(145,70,255,.08)';this.style.color='var(--purple)'">
       💬 Abrir conversa no Chatwoot →
-    </a>` : `<div style="margin-bottom:16px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Conversa Chatwoot ainda não vinculada — será vinculada na próxima auditoria</div>`}
+    </button>` : `<div style="margin-bottom:16px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Conversa Chatwoot ainda não vinculada — será vinculada na próxima auditoria</div>`}
 
     <div class="panel-section">Identificação</div>
     <div class="panel-row"><div class="panel-key">WhatsApp</div><div class="panel-val">${telFmt}</div></div>
@@ -1667,6 +1676,13 @@ async function toggleBot(telefone, currentlyDisabled) {
 function navTo(id) {
   show(id);
   if (window.innerWidth <= 768) closeSidebar();
+}
+
+function openConversationInChat(convId) {
+  const iframe = document.getElementById('chatwoot-iframe');
+  if (iframe) iframe.src = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/conversations/' + convId;
+  navTo('chat');
+  closeLeadPanel();
 }
 
 // ═══ SCROLL HINT ANALYTICS TABS ═══
@@ -1998,10 +2014,10 @@ async function executarAcao(btn, action, loadingMsg) {
 
 // ═══ CAMPANHAS — TEMPLATES DE NUTRIÇÃO (A4) ═══
 const TIPO_META = {
-  nao_compareceu: { label: 'Não Compareceu', desc: 'Leads que agendaram mas não foram à consulta', icon: '📅', cor: 'var(--warn)' },
-  desqualificado:  { label: 'Desqualificado',  desc: 'Leads com score abaixo do mínimo esperado',   icon: '🔄', cor: 'var(--muted)' },
-  fechou:          { label: 'Fechou',           desc: 'Clientes que assinaram — pedido de indicação', icon: '✅', cor: 'var(--neon)' },
-  parado_30d:      { label: 'Parado 30 dias',   desc: 'Leads sem contato há mais de 30 dias',         icon: '💤', cor: 'var(--purple)' }
+  nao_compareceu: { label: 'NÃO COMPARECEU', desc: 'Leads que agendaram mas não foram à consulta', icon: '📅', cor: 'var(--warn)' },
+  desqualificado:  { label: 'DESQUALIFICADO',  desc: 'Leads com score abaixo do mínimo esperado',   icon: '🔄', cor: 'var(--muted)' },
+  fechou:          { label: 'FECHOU',           desc: 'Clientes que assinaram — pedido de indicação', icon: '✅', cor: 'var(--neon)' },
+  parado_30d:      { label: 'PARADO 30 DIAS',   desc: 'Leads sem contato há mais de 30 dias',        icon: '💤', cor: 'var(--purple)' }
 };
 
 async function loadCampanhas() {
@@ -2033,7 +2049,7 @@ function renderCampanhas(templates) {
     return '<div class="camp-block">' +
       '<div class="camp-head">' +
         '<span style="font-size:22px;line-height:1">' + m.icon + '</span>' +
-        '<div><div style="font-family:var(--fD);font-size:15px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text)">' + m.label + '</div>' +
+        '<div><div style="font-family:var(--fD);font-size:15px;font-weight:700;letter-spacing:.05em;color:var(--text)">' + m.label + '</div>' +
         '<div style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">' + m.desc + '</div></div>' +
       '</div>' +
       steps.map(t =>
