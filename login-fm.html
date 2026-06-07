@@ -224,6 +224,8 @@ function entrar() {
       bioRegister.classList.add('show');
       showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
     } else {
+      // Senha é fallback válido quando a biometria já está registrada (ex: Face ID falhou)
+      if (credId) sessionStorage.setItem('fm_bio_verified', '1');
       setTimeout(() => location.href = DASHBOARD_URL, 400);
     }
   } else {
@@ -259,6 +261,7 @@ async function autenticarBio(silencioso = false) {
 
     if (assertion) {
       setAuth();
+      sessionStorage.setItem('fm_bio_verified', '1');
       showMsg('bio-msg', '✓ Identidade confirmada', 'ok');
       btn.classList.remove('scanning');
       setTimeout(() => location.href = DASHBOARD_URL, 500);
