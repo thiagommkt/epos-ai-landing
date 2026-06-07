@@ -196,20 +196,21 @@ function showMsg(id, text, type = '') {
   el.className = 'msg ' + type;
 }
 
-// ─── AUTO REDIRECT ────────────────────────────────────────
-if (checkAuth()) {
-  location.href = DASHBOARD_URL;
-}
-
 // ─── BIOMETRIA: INIT ──────────────────────────────────────
 const credId = getCookie(BIO_KEY) || localStorage.getItem(BIO_KEY);
 const bioSection = document.getElementById('bio-section');
 const bioRegister = document.getElementById('bio-register');
 const bioSupported = window.PublicKeyCredential !== undefined;
 
+// ─── AUTO REDIRECT ────────────────────────────────────────
+// Só redireciona sem pedir nada se biometria NÃO estiver registrada
+if (checkAuth() && !(credId && bioSupported)) {
+  location.href = DASHBOARD_URL;
+}
+
 if (credId && bioSupported) {
   bioSection.classList.add('show');
-  setTimeout(() => autenticarBio(true), 400);
+  setTimeout(() => autenticarBio(false), 400); // false = sempre mostra feedback ao usuário
 }
 
 // ─── SENHA ────────────────────────────────────────────────
