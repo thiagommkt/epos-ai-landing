@@ -422,7 +422,13 @@ canvas{display:block;width:100%!important}
 <section class="section active" id="s-dashboard">
   <div class="sec-head">
     <div><div class="sec-title">PAINEL <span>GERAL</span></div><div class="sec-sub" id="db-date">Carregando...</div></div>
-    <div class="sec-badge" id="db-live">● LIVE</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="robo-toggle-btn" onclick="toggleRobo()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
+        <span class="robo-toggle-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
+        <span class="robo-toggle-label">🤖 Robô: carregando...</span>
+      </button>
+      <div class="sec-badge" id="db-live">● LIVE</div>
+    </div>
   </div>
   <div class="rule"></div>
 
@@ -635,7 +641,13 @@ canvas{display:block;width:100%!important}
       <div class="sec-title">ANÁLISES <span>& MÉTRICAS</span></div>
       <div class="sec-sub">DASHBOARDS EM TEMPO REAL · METABASE</div>
     </div>
-    <div class="sec-badge">● LIVE</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="robo-toggle-btn" onclick="toggleRobo()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
+        <span class="robo-toggle-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
+        <span class="robo-toggle-label">🤖 Robô: carregando...</span>
+      </button>
+      <div class="sec-badge">● LIVE</div>
+    </div>
   </div>
   <div class="rule"></div>
 
@@ -2319,8 +2331,69 @@ async function loadAnalista(force) {
   }
 }
 
+// ═══ TOGGLE ROBÔ ON/OFF (system_config.robo_ativo) — botão replicado em Dashboard + Análises ═══
+function renderRoboStatus(ativo) {
+  document.querySelectorAll('.robo-toggle-btn').forEach(btn => {
+    const dot = btn.querySelector('.robo-toggle-dot');
+    const label = btn.querySelector('.robo-toggle-label');
+    btn.dataset.ativo = ativo === true ? '1' : ativo === false ? '0' : '';
+    if (ativo === true) {
+      dot.style.background = 'var(--neon)'; dot.style.boxShadow = '0 0 6px var(--neon)';
+      label.textContent = '🤖 Robô: Ativo';
+      btn.style.color = 'var(--neon)'; btn.style.borderColor = 'var(--bd-b)';
+    } else if (ativo === false) {
+      dot.style.background = 'var(--warn)'; dot.style.boxShadow = '0 0 6px var(--warn)';
+      label.textContent = '🤖 Robô: Pausado';
+      btn.style.color = 'var(--warn)'; btn.style.borderColor = 'rgba(255,94,91,0.38)';
+    } else {
+      dot.style.background = 'var(--dim)'; dot.style.boxShadow = 'none';
+      label.textContent = '🤖 Robô: erro ao carregar';
+      btn.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--bd)';
+    }
+  });
+}
+
+async function loadRoboStatus() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.fm&select=robo_ativo&limit=1`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+    });
+    const data = await r.json();
+    const ativo = Array.isArray(data) && data[0] ? data[0].robo_ativo : true;
+    renderRoboStatus(ativo);
+  } catch (e) {
+    renderRoboStatus(null);
+  }
+}
+
+async function toggleRobo() {
+  const btns = document.querySelectorAll('.robo-toggle-btn');
+  if (!btns.length || btns[0].dataset.busy === '1') return;
+  const atual = btns[0].dataset.ativo;
+  if (atual !== '0' && atual !== '1') return;
+  const novo = atual !== '1';
+  const msg = novo
+    ? 'Reativar o robô (Typebot/Dify) para os leads do FM?'
+    : 'Pausar o robô (Typebot/Dify)?\n\nO rastreamento (CAPI, fbclid, UTMs, Tintim) continua funcionando normalmente — apenas a IA para de responder os leads.';
+  if (!confirm(msg)) return;
+  btns.forEach(b => { b.dataset.busy = '1'; b.style.opacity = '0.5'; });
+  try {
+    await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.fm`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ robo_ativo: novo, atualizado_em: new Date().toISOString() })
+    });
+    renderRoboStatus(novo);
+  } catch (e) {
+    alert('Erro ao atualizar status do robô: ' + e.message);
+  } finally {
+    btns.forEach(b => { b.dataset.busy = '0'; b.style.opacity = '1'; });
+  }
+}
+
 // ═══ INIT + AUTO-REFRESH + SUPABASE REALTIME ═══
 loadDashboard();
+loadRoboStatus();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
 
 // Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
