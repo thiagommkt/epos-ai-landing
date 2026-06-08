@@ -1060,7 +1060,7 @@ async function loadDashboard() {
   document.getElementById('utm-list').innerHTML = canalHtml + legendHtml + atribSection;
 
   // Leads recentes
-  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id&order=criado_em.desc&limit=6`);
+  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&order=criado_em.desc&limit=6`);
   const recentesHtml = (recentes || []).map(l => {
     const leadJson = encodeURIComponent(JSON.stringify(l));
     return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''"><td class="td-hi">${l.nome||'—'}</td><td>${l.patologia||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${canalBadge(l)}</td><td>${statusBadge(l)}</td></tr>`;
@@ -1198,7 +1198,7 @@ function getStage(l) {
 }
 
 async function loadCRM() {
-  const { data } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano&order=criado_em.desc&limit=200`);
+  const { data } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&order=criado_em.desc&limit=200`);
   const leads = data || [];
   const stageMap = {};
   leads.forEach(l => {
@@ -1483,6 +1483,19 @@ function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Fechou</div><div class="panel-val">${lead.fechou?'✅ Sim':'Não'}</div></div>
     <div class="panel-row"><div class="panel-key">Bot ativo</div><div class="panel-val">${lead.dify_ativo?'✅ Ana ativa':'Pausado'}</div></div>
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
+
+    <div class="panel-section">Contexto Evolutivo (IA)</div>
+    ${(lead.auditoria_ia_resumo || lead.auditoria_ia_motivo_perda) ? `
+      ${lead.auditoria_ia_resumo ? `<div style="padding:10px 12px;background:rgba(145,70,255,.04);border:1px solid var(--bd);margin-bottom:8px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Resumo da conversa (IA)</div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text)">${lead.auditoria_ia_resumo}</div>
+      </div>` : ''}
+      ${lead.auditoria_ia_motivo_perda ? `<div style="padding:10px 12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);margin-bottom:8px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--warn);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">⚠️ Objeção detectada</div>
+        <div style="font-size:12px;line-height:1.5;color:var(--text)">${lead.auditoria_ia_motivo_perda}</div>
+      </div>` : ''}
+      <div class="panel-row"><div class="panel-key">Última auditoria</div><div class="panel-val">${fmtDate(lead.auditoria_ia_em)}</div></div>
+    ` : `<div style="padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Ainda sem análise da IA — aguardando próxima auditoria de O Analista</div>`}
 
     <div class="panel-section">Editar Qualificação</div>
     <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0 4px">
