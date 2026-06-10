@@ -1021,11 +1021,11 @@ async function loadDashboard() {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
   }, 250);
 
-  // Origem: canal + atribuição Meta (fbclid) + utm_source
+  // Origem: canal + atribuição Meta
   const dateClause = periodoISO ? `&criado_em=gte.${mesISO}${endClause}` : '';
   const [canalData, atribData] = await Promise.all([
     sb(`${TABLE}?select=canal,typebot_concluido${dateClause}`).then(r => Array.isArray(r.data) ? r.data : []),
-    sb(`${TABLE}?select=fbclid,utm_source${dateClause}`).then(r => Array.isArray(r.data) ? r.data : [])
+    sb(`${TABLE}?select=fbclid,utm_source,ctwa_clid${dateClause}`).then(r => Array.isArray(r.data) ? r.data : [])
   ]);
   let nIA = 0, nManual = 0, nDireto = 0;
   canalData.forEach(l => {
@@ -1042,14 +1042,14 @@ async function loadDashboard() {
       const pct = Math.round(n/totalCanal*100);
       return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor}">${lbl}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${bg}"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
     }).join('') + `</div>`;
-  // Atribuição Meta: fbclid = clique em anúncio, utm_source = veio por LP
-  const nFbclid = atribData.filter(r => r.fbclid).length;
-  const nUtm    = atribData.filter(r => r.utm_source).length;
-  const nSem    = Math.max(0, atribData.length - nFbclid - atribData.filter(r => !r.fbclid && r.utm_source).length);
+  // Atribuição: ctwa_clid = confirmado via anúncio Meta | fbclid s/ ctwa = LP | resto = sem atribuição confirmada
+  const nMeta = atribData.filter(r => r.ctwa_clid).length;
+  const nLP   = atribData.filter(r => r.fbclid && !r.ctwa_clid).length;
+  const nSem  = atribData.filter(r => !r.ctwa_clid && !r.fbclid).length;
   const totalAtrib = atribData.length || 1;
   const atribRows = [
-    ['🎯 Meta Ads (fbclid)', nFbclid, 'var(--warn)', 'rgba(255,94,91,.12)'],
-    ['🔗 Via LP (utm)', nUtm, 'var(--neon)', 'rgba(0,245,160,.10)'],
+    ...(nMeta > 0 ? [['📡 Anúncio Meta', nMeta, 'var(--warn)', 'rgba(255,94,91,.12)']] : []),
+    ...(nLP   > 0 ? [['🔗 Via Site (LP)', nLP, 'var(--neon)', 'rgba(0,245,160,.10)']] : []),
     ['❓ Sem rastreamento', nSem, 'var(--dim)', 'rgba(145,70,255,.06)']
   ].map(([lbl,n,cor,bg]) => {
     const pct = Math.round(n/totalAtrib*100);
@@ -2386,8 +2386,8 @@ async function toggleRobo() {
   if (atual !== '0' && atual !== '1') return;
   const novo = atual !== '1';
   const msg = novo
-    ? 'Reativar o robô (Typebot/Dify) para os leads do FM?'
-    : 'Pausar o robô (Typebot/Dify)?\n\nO rastreamento (CAPI, fbclid, UTMs, Tintim) continua funcionando normalmente — apenas a IA para de responder os leads.';
+    ? 'Ligar atendimento autônomo?'
+    : 'Desligar atendimento autônomo?\n\nO rastreamento (CAPI, fbclid, UTMs, Tintim) continua funcionando normalmente — apenas a IA para de responder os leads.';
   if (!confirm(msg)) return;
   btns.forEach(b => { b.dataset.busy = '1'; b.style.opacity = '0.5'; });
   try {
