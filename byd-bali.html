@@ -455,8 +455,9 @@
     .model-card-name { font-size: 1.05rem; font-weight: 800; color: var(--white); line-height: 1.3; }
     .model-card-price { font-size: 0.78rem; color: var(--g400); margin-top: 2px; }
     .model-card-audience { font-size: 0.82rem; color: var(--g400); line-height: 1.55; padding-top: 12px; border-top: 1px solid var(--border); }
-    .model-card-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
-    .model-stat { flex: 1; min-width: 84px; background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 8px; text-align: center; }
+    .model-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; }
+    .model-stat { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 8px; text-align: center; }
+    .model-stat.full { grid-column: 1 / -1; }
     .model-stat-val { font-size: 0.88rem; font-weight: 800; color: var(--b400); line-height: 1.2; }
     .model-stat-val.gold { color: var(--gold); }
     .model-stat-label { font-size: 0.6rem; color: var(--g600); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
@@ -1074,9 +1075,17 @@
             e sabe exatamente quanto gasta de combustível. Maior volume de busca e maior urgência de compra.
           </div>
           <div class="model-card-stats">
-            <div class="model-stat">
+            <div class="model-stat full">
               <div class="model-stat-val">R$50–80</div>
               <div class="model-stat-label">CPL</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">35–55 → 65–110</div>
+              <div class="model-stat-label">Visitas à página esperadas</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">15–25 → 30–50</div>
+              <div class="model-stat-label">Conversas iniciadas esperadas</div>
             </div>
             <div class="model-stat">
               <div class="model-stat-val">6–10 → 12–20</div>
@@ -1105,9 +1114,17 @@
             patente, médico ou advogado. Renda estável, troca de carro a cada 4–5 anos, busca sedan executivo.
           </div>
           <div class="model-card-stats">
-            <div class="model-stat">
+            <div class="model-stat full">
               <div class="model-stat-val">R$80–130</div>
               <div class="model-stat-label">CPL</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">20–35 → 45–65</div>
+              <div class="model-stat-label">Visitas à página esperadas</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">10–15 → 20–30</div>
+              <div class="model-stat-label">Conversas iniciadas esperadas</div>
             </div>
             <div class="model-stat">
               <div class="model-stat-val">4–6 → 8–12</div>
@@ -1136,9 +1153,17 @@
             familiar R$22k–45k. Já tem SUV e está cansado do combustível, quer espaço + economia.
           </div>
           <div class="model-card-stats">
-            <div class="model-stat">
+            <div class="model-stat full">
               <div class="model-stat-val">R$100–160</div>
               <div class="model-stat-label">CPL</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">15–30 → 35–55</div>
+              <div class="model-stat-label">Visitas à página esperadas</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">8–13 → 15–25</div>
+              <div class="model-stat-label">Conversas iniciadas esperadas</div>
             </div>
             <div class="model-stat">
               <div class="model-stat-val">3–5 → 6–10</div>
@@ -1167,9 +1192,17 @@
             Entra com base no que os números dos meses 1–2 mostrarem, nutrido pelo robô.
           </div>
           <div class="model-card-stats">
-            <div class="model-stat">
+            <div class="model-stat full">
               <div class="model-stat-val">R$160–250</div>
               <div class="model-stat-label">CPL</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">10–15 → 20–35</div>
+              <div class="model-stat-label">Visitas à página esperadas</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">5–8 → 10–15</div>
+              <div class="model-stat-label">Conversas iniciadas esperadas</div>
             </div>
             <div class="model-stat">
               <div class="model-stat-val">2–3 → 4–6</div>
@@ -1198,9 +1231,17 @@
             pelo elétrico premium. Decisão mais longa, geração de demanda via conteúdo orgânico.
           </div>
           <div class="model-card-stats">
-            <div class="model-stat">
+            <div class="model-stat full">
               <div class="model-stat-val">R$250–400</div>
               <div class="model-stat-label">CPL</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">5–10 → 10–20</div>
+              <div class="model-stat-label">Visitas à página esperadas</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">3–5 → 5–10</div>
+              <div class="model-stat-label">Conversas iniciadas esperadas</div>
             </div>
             <div class="model-stat">
               <div class="model-stat-val">1–2 → 2–4</div>
@@ -1229,9 +1270,17 @@
             da eletrificação. Mesmo perfil de demanda longa, eventos e conteúdo orgânico.
           </div>
           <div class="model-card-stats">
-            <div class="model-stat">
+            <div class="model-stat full">
               <div class="model-stat-val">R$250–400</div>
               <div class="model-stat-label">CPL</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">5–10 → 10–20</div>
+              <div class="model-stat-label">Visitas à página esperadas</div>
+            </div>
+            <div class="model-stat">
+              <div class="model-stat-val">3–5 → 5–10</div>
+              <div class="model-stat-label">Conversas iniciadas esperadas</div>
             </div>
             <div class="model-stat">
               <div class="model-stat-val">1–2 → 2–4</div>
