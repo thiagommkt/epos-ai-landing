@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Epos × BYD — Performance Digital para Consultores</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --n900: #030B18;
+      --n800: #071524;
+      --n700: #0D1E36;
+      --n600: #132845;
+      --n500: #1C3860;
+      --b600: #1560BD;
+      --b500: #1E88E5;
+      --b400: #00A8E8;
+      --b300: #40C4FF;
+      --b200: #B3E5FC;
+      --gold: #F5A623;
+      --green: #00D68F;
+      --red: #FF4757;
+      --white: #FFFFFF;
+      --g400: #B0C4D8;
+      --g600: #607080;
+      --border: rgba(255,255,255,0.07);
+      --glass: rgba(255,255,255,0.04);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 30px rgba(0,0,0,0.4);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--n900);
+      color: var(--white);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    h1 { font-size: clamp(2.2rem,5vw,4rem); font-weight: 900; line-height: 1.1; letter-spacing: -0.03em; }
+    h2 { font-size: clamp(1.6rem,3.5vw,2.6rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
+    h3 { font-size: clamp(1.1rem,2vw,1.4rem); font-weight: 700; }
+    p  { color: var(--g400); }
+
+    .accent { color: var(--b400); }
+    .gold    { color: var(--gold); }
+    .green   { color: var(--green); }
+    .white   { color: var(--white); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 100px 0; }
+
+    /* ── BADGES / TAGS ── */
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .badge-blue  { background: rgba(0,168,232,0.12); color: var(--b400); border: 1px solid rgba(0,168,232,0.25); }
+    .badge-gold  { background: rgba(245,166,35,0.12); color: var(--gold); border: 1px solid rgba(245,166,35,0.25); }
+    .badge-green { background: rgba(0,214,143,0.12); color: var(--green); border: 1px solid rgba(0,214,143,0.25); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-block;
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--b500), var(--b400));
+      color: var(--white);
+      box-shadow: 0 8px 32px rgba(0,168,232,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,168,232,0.5); }
+    .btn-outline {
+      border: 1.5px solid var(--border);
+      color: var(--g400);
+      background: transparent;
+    }
+    .btn-outline:hover { border-color: var(--b400); color: var(--b400); }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(0,168,232,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    /* ── DIVIDERS ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 80px 0;
+    }
+
+    /* ── SCROLL ANIMATION ── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ════════════════════════════════════════
+       HERO
+    ════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(21,96,189,0.18) 0%, transparent 70%), var(--n900);
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 80px;
+    }
+    .hero-brand-byd {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      color: var(--b400);
+    }
+    .hero-brand-epos {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--g400);
+      text-align: right;
+    }
+    .hero-brand-epos span { color: var(--white); }
+    .hero-tag { margin-bottom: 24px; }
+    .hero-h1 { margin-bottom: 28px; max-width: 800px; }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--g400);
+      max-width: 600px;
+      margin-bottom: 48px;
+      line-height: 1.75;
+    }
+    .hero-stat-bar {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-top: 64px;
+      max-width: 700px;
+    }
+    .hsb-item {
+      flex: 1;
+      text-align: center;
+      padding: 20px 12px;
+      border-right: 1px solid var(--border);
+    }
+    .hsb-item:last-child { border-right: none; }
+    .hsb-item:hover { background: var(--glass); }
+    .hsb-num { font-size: 1.6rem; font-weight: 900; color: var(--b400); line-height: 1; }
+    .hsb-label { font-size: 0.68rem; color: var(--g400); letter-spacing: 0.05em; margin-top: 6px; text-transform: uppercase; }
+
+    /* ════════════════════════════════════════
+       MERCADO
+    ════════════════════════════════════════ */
+    #mercado { background: var(--n800); }
+    .section-pre { margin-bottom: 12px; }
+    .section-title { margin-bottom: 16px; }
+    .section-sub { font-size: 1.05rem; color: var(--g400); max-width: 560px; margin-bottom: 56px; line-height: 1.75; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 20px; margin-bottom: 48px; }
+    .stat-card {
+      background: var(--n700);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--b600), var(--b400));
+    }
+    .stat-card.gold-top::before { background: linear-gradient(90deg, var(--gold), #ffcc60); }
+    .stat-card.green-top::before { background: linear-gradient(90deg, #00a86b, var(--green)); }
+    .stat-num {
+      font-size: clamp(2rem,4vw,3.2rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+    .stat-num span.counter { color: var(--b400); }
+    .stat-num span.gold-counter { color: var(--gold); }
+    .stat-label { font-size: 0.85rem; color: var(--g400); line-height: 1.5; }
+
+    .ranking-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .ranking-table thead th {
+      background: var(--n700);
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--g400);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .ranking-table tbody td {
+      padding: 16px 20px;
+      font-size: 0.92rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--g400);
+    }
+    .ranking-table tbody tr:last-child td { border-bottom: none; }
+    .ranking-table tbody tr:hover td { background: var(--glass); }
+    .ranking-table tbody tr.highlight td { color: var(--white); }
+    .ranking-table tbody tr.highlight td:first-child { color: var(--b400); font-weight: 700; }
+    .ranking-table tbody td.byd-row { color: var(--b400); font-weight: 800; }
+    .growth-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(0,214,143,0.12);
+      color: var(--green);
+    }
+
+    /* ════════════════════════════════════════
+       BRASÍLIA
+    ════════════════════════════════════════ */
+    #brasilia {
+      background: linear-gradient(135deg, var(--n900) 0%, var(--n700) 100%);
+    }
+    .bsb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    @media (max-width: 760px) { .bsb-grid { grid-template-columns: 1fr; } }
+    .bsb-highlight {
+      background: linear-gradient(135deg, rgba(21,96,189,0.2), rgba(0,168,232,0.08));
+      border: 1px solid rgba(0,168,232,0.2);
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+    .bsb-big { font-size: 5rem; font-weight: 900; color: var(--b400); line-height: 1; letter-spacing: -0.05em; }
+    .bsb-big-label { font-size: 1rem; color: var(--g400); margin-top: 8px; }
+    .bsb-points { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+    .bsb-points li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .bsb-icon {
+      width: 40px; height: 40px;
+      background: rgba(0,168,232,0.1);
+      border: 1px solid rgba(0,168,232,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .bsb-points h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+    .bsb-points p { font-size: 0.85rem; }
+
+    /* ════════════════════════════════════════
+       FUNIL — A MATEMÁTICA (MOST IMPORTANT)
+    ════════════════════════════════════════ */
+    #funil { background: var(--n800); }
+    .funil-intro { max-width: 680px; margin: 0 auto 72px; text-align: center; }
+    .funil-intro h2 { margin-bottom: 20px; }
+    .funil-intro p { font-size: 1.05rem; }
+
+    .funil-wrapper { max-width: 560px; margin: 0 auto; position: relative; }
+    .funil-step {
+      position: relative;
+      margin-bottom: 0;
+    }
+    .funil-body {
+      border-radius: var(--radius);
+      padding: 28px 36px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      border: 1px solid var(--border);
+      background: var(--n700);
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    .funil-body:hover { border-color: rgba(0,168,232,0.35); background: var(--n600); }
+    .funil-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .fi-budget  { background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.25); }
+    .fi-leads   { background: rgba(0,168,232,0.12);  border: 1px solid rgba(0,168,232,0.25); }
+    .fi-demo    { background: rgba(0,214,143,0.12);  border: 1px solid rgba(0,214,143,0.25); }
+    .fi-sale    { background: rgba(21,96,189,0.2);   border: 1px solid rgba(21,96,189,0.4); }
+    .fi-money   { background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.25); }
+    .fi-reativa { background: rgba(0,214,143,0.12);  border: 1px solid rgba(0,214,143,0.25); }
+
+    .funil-dual-label { text-align: center; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g600); margin-bottom: 12px; }
+    .funil-dual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 560px) { .funil-dual { grid-template-columns: 1fr; } }
+    .funil-dual-item {
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid var(--border);
+      background: var(--n700);
+      transition: all 0.3s ease;
+    }
+    .funil-dual-item:hover { border-color: rgba(0,168,232,0.35); background: var(--n600); }
+    .funil-dual-item .funil-step-title { font-size: 1.1rem; }
+
+    .funil-content { flex: 1; }
+    .funil-step-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g600); margin-bottom: 2px; }
+    .funil-step-title { font-size: 1.35rem; font-weight: 800; line-height: 1.2; }
+    .funil-step-sub { font-size: 0.82rem; color: var(--g400); margin-top: 4px; }
+
+    .funil-arrow {
+      text-align: center;
+      padding: 10px 0;
+      color: var(--b400);
+      font-size: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    .funil-connector {
+      width: 2px;
+      height: 32px;
+      background: linear-gradient(to bottom, var(--b600), var(--b400));
+      margin: 0 auto;
+    }
+
+    .funil-math-box {
+      background: linear-gradient(135deg, rgba(0,168,232,0.08), rgba(21,96,189,0.12));
+      border: 1px solid rgba(0,168,232,0.2);
+      border-radius: var(--radius);
+      padding: 36px;
+      margin-top: 56px;
+      text-align: center;
+    }
+    .funil-math-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--b400); margin-bottom: 16px; }
+    .funil-formula { font-size: clamp(1rem,2.5vw,1.4rem); font-weight: 700; color: var(--white); margin-bottom: 20px; line-height: 1.8; }
+    .funil-formula em { font-style: normal; color: var(--b400); }
+    .funil-formula .sep { color: var(--g600); margin: 0 8px; }
+    .funil-note { font-size: 0.82rem; color: var(--g400); max-width: 480px; margin: 0 auto; }
+
+    /* ════════════════════════════════════════
+       CPL TABLE
+    ════════════════════════════════════════ */
+    #cpl { background: var(--n900); }
+    .cpl-table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table.cpl {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+    table.cpl thead th {
+      background: var(--n700);
+      padding: 14px 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--g400);
+      text-transform: uppercase;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    table.cpl tbody td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    table.cpl tbody tr:last-child td { border-bottom: none; }
+    table.cpl tbody tr:hover td { background: var(--glass); }
+    .cpl-model { font-weight: 700; color: var(--white); }
+    .cpl-price { color: var(--g400); }
+    .pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .pill-green  { background: rgba(0,214,143,0.12); color: var(--green); }
+    .pill-yellow { background: rgba(245,166,35,0.12); color: var(--gold); }
+    .pill-red    { background: rgba(255,71,87,0.12); color: var(--red); }
+    .cpl-rec {
+      background: linear-gradient(135deg, rgba(0,214,143,0.06), rgba(0,168,232,0.06));
+      border: 1px solid rgba(0,214,143,0.2);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-top: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .cpl-rec.warn {
+      background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(245,166,35,0.03));
+      border-color: rgba(245,166,35,0.25);
+    }
+    .cpl-rec-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .cpl-rec-text h4 { font-size: 0.95rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .cpl-rec-text p { font-size: 0.85rem; }
+
+    /* ════════════════════════════════════════
+       PERSONAS
+    ════════════════════════════════════════ */
+    #personas { background: var(--n800); }
+    .personas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 20px; }
+    .persona-card {
+      background: var(--n700);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .persona-card:hover { border-color: rgba(0,168,232,0.3); transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+    .persona-header {
+      padding: 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .persona-emoji {
+      width: 52px; height: 52px;
+      background: rgba(0,168,232,0.1);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .persona-header h3 { font-size: 1rem; line-height: 1.3; }
+    .persona-header p { font-size: 0.75rem; color: var(--b400); margin-top: 2px; }
+    .persona-body { padding: 24px 28px; }
+    .persona-row { margin-bottom: 16px; }
+    .persona-row-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g600); margin-bottom: 4px; }
+    .persona-row-val { font-size: 0.85rem; color: var(--g400); }
+    .persona-trigger {
+      margin-top: 20px;
+      background: rgba(0,168,232,0.06);
+      border: 1px solid rgba(0,168,232,0.15);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 0.82rem;
+      color: var(--b300);
+      line-height: 1.5;
+    }
+
+    /* ════════════════════════════════════════
+       SOLUÇÃO EPOS
+    ════════════════════════════════════════ */
+    #solucao { background: var(--n900); }
+    .solucao-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 20px; margin-bottom: 56px; }
+    .solucao-card {
+      background: var(--n700);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: all 0.3s ease;
+    }
+    .solucao-card:hover { border-color: rgba(0,168,232,0.3); transform: translateY(-4px); }
+    .solucao-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--b400);
+      margin-bottom: 16px;
+    }
+    .solucao-card h3 { font-size: 1rem; margin-bottom: 10px; }
+    .solucao-card p { font-size: 0.83rem; }
+
+    .fluxo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+      background: var(--n700);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .fluxo-step {
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+      padding: 32px 20px;
+      position: relative;
+    }
+    .fluxo-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--b400);
+      font-size: 1.2rem;
+      z-index: 2;
+    }
+    .fluxo-step:hover { background: var(--glass); }
+    .fluxo-icon { font-size: 2rem; margin-bottom: 10px; }
+    .fluxo-title { font-size: 0.8rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .fluxo-sub { font-size: 0.72rem; color: var(--g400); }
+
+    .alinhamento-box {
+      background: linear-gradient(135deg, rgba(21,96,189,0.12), rgba(0,168,232,0.06));
+      border: 1px solid rgba(0,168,232,0.2);
+      border-radius: var(--radius);
+      padding: 40px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    @media (max-width:600px) { .alinhamento-box { flex-direction: column; } }
+    .alinhamento-num {
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: var(--b400);
+      flex-shrink: 0;
+    }
+    .alinhamento-text h3 { font-size: 1.2rem; margin-bottom: 10px; }
+    .alinhamento-text p { font-size: 0.88rem; }
+
+    /* ════════════════════════════════════════
+       CALENDÁRIO
+    ════════════════════════════════════════ */
+    #calendario { background: var(--n800); }
+    .cal-events { display: flex; flex-direction: column; gap: 16px; }
+    .cal-event {
+      display: flex;
+      gap: 24px;
+      background: var(--n700);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      align-items: flex-start;
+      transition: all 0.3s ease;
+    }
+    .cal-event:hover { border-color: rgba(0,168,232,0.3); transform: translateX(6px); }
+    .cal-date {
+      min-width: 70px;
+      text-align: center;
+      background: rgba(0,168,232,0.08);
+      border: 1px solid rgba(0,168,232,0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px 10px;
+      flex-shrink: 0;
+    }
+    .cal-date-day { font-size: 1.6rem; font-weight: 900; color: var(--b400); line-height: 1; }
+    .cal-date-month { font-size: 0.65rem; font-weight: 700; color: var(--g400); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+    .cal-event-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .cal-event-body { font-size: 0.85rem; }
+    .cal-event-tag { margin-top: 10px; }
+    .urgent { border-color: rgba(245,166,35,0.3); }
+    .urgent .cal-date { background: rgba(245,166,35,0.08); border-color: rgba(245,166,35,0.25); }
+    .urgent .cal-date-day { color: var(--gold); }
+
+    /* ════════════════════════════════════════
+       ROI
+    ════════════════════════════════════════ */
+    #roi { background: var(--n900); }
+    .roi-scenarios { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 20px; margin-bottom: 48px; }
+    .roi-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .roi-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+    .roi-card-header { padding: 20px 24px; background: var(--n700); border-bottom: 1px solid var(--border); }
+    .roi-card-header h3 { font-size: 0.95rem; }
+    .roi-card-header p { font-size: 0.75rem; color: var(--g600); margin-top: 2px; }
+    .roi-card-body { padding: 24px; }
+    .roi-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .roi-row:last-child { border-bottom: none; }
+    .roi-row-label { color: var(--g400); }
+    .roi-row-val { font-weight: 700; color: var(--white); }
+    .roi-row-val.accent { color: var(--b400); }
+    .roi-row-val.gold { color: var(--gold); }
+
+    .roi-disclaimer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--g600);
+      margin-top: 16px;
+    }
+
+    /* ════════════════════════════════════════
+       CTA FINAL
+    ════════════════════════════════════════ */
+    #cta-final {
+      background: radial-gradient(ellipse 80% 80% at 50% 100%, rgba(21,96,189,0.25) 0%, transparent 70%), var(--n900);
+      padding: 120px 0;
+      text-align: center;
+    }
+    #cta-final h2 { margin-bottom: 20px; }
+    #cta-final .section-sub { margin: 0 auto 48px; }
+    .cta-steps { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin: 0 auto 48px; max-width: 760px; }
+    .cta-step { text-align: center; }
+    .cta-step-num {
+      width: 48px; height: 48px;
+      background: rgba(0,168,232,0.12);
+      border: 1px solid rgba(0,168,232,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800; color: var(--b400);
+      margin: 0 auto 12px;
+    }
+    .cta-step h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 4px; }
+    .cta-step p { font-size: 0.75rem; }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* ════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════ */
+    footer {
+      background: var(--n800);
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--g600);
+    }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      section { padding: 70px 0; }
+      .hero-topbar { margin-bottom: 48px; }
+      .hsb-num { font-size: 1.2rem; }
+      .fluxo-step:not(:last-child)::after { display: none; }
+      .fluxo-wrap { flex-direction: column; }
+      .fluxo-step { width: 100%; border-bottom: 1px solid var(--border); }
+      .fluxo-step:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-topbar reveal">
+      <div class="hero-brand-byd">BYD</div>
+      <div class="hero-brand-epos">Proposta exclusiva por<br><span>Epos Marketing</span></div>
+    </div>
+
+    <div class="hero-tag reveal">
+      <span class="badge badge-blue">Brasília · DF · Junho 2026</span>
+    </div>
+
+    <h1 class="hero-h1 reveal">
+      Seu próximo cliente<br>
+      está no Instagram <span class="accent">agora.</span><br>
+      Ele ainda não te encontrou.
+    </h1>
+
+    <p class="hero-sub reveal">
+      A BYD cresceu <strong class="white">5.500%</strong> em volume mensal nos últimos 3 anos.
+      Brasília é a capital campeã de vendas BYD no Brasil.
+      O que falta é uma estratégia que conecte esse comprador
+      diretamente a você — antes da concorrência.
+    </p>
+
+    <a href="#funil" class="btn btn-primary reveal">Ver a estratégia completa</a>
+
+    <div class="hero-stat-bar reveal">
+      <div class="hsb-item">
+        <div class="hsb-num"><span class="counter" data-target="21704" data-suffix="">0</span></div>
+        <div class="hsb-label">unidades/mês (mai/26)</div>
+      </div>
+      <div class="hsb-item">
+        <div class="hsb-num"><span class="counter" data-target="5500" data-suffix="%">0%</span></div>
+        <div class="hsb-label">crescimento em 3 anos</div>
+      </div>
+      <div class="hsb-item">
+        <div class="hsb-num"><span class="counter" data-target="73" data-suffix="%">0%</span></div>
+        <div class="hsb-label">do mercado de elétricos</div>
+      </div>
+      <div class="hsb-item">
+        <div class="hsb-num">#<span class="counter" data-target="1" data-suffix="">0</span></div>
+        <div class="hsb-label">no varejo de Brasília</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     MERCADO
+══════════════════════════════════════ -->
+<section id="mercado">
+  <div class="container">
+    <div class="section-pre reveal"><span class="badge badge-blue">Dados de Mercado</span></div>
+    <h2 class="section-title reveal">
+      Não é uma tendência.<br>É o maior crescimento<br>do setor automotivo brasileiro.
+    </h2>
+    <p class="section-sub reveal">
+      Números verificados — fontes oficiais ANFAVEA, BYD Brasil e ABVE.
+      Cada dado abaixo é o argumento que fecha a venda com o comprador hesitante.
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-card reveal">
+        <div class="stat-num"><span class="counter" data-target="390">0</span></div>
+        <div class="stat-label">unidades vendidas em maio de 2023 — o ponto de partida</div>
+      </div>
+      <div class="stat-card gold-top reveal">
+        <div class="stat-num"><span class="gold-counter counter" data-target="21704">0</span></div>
+        <div class="stat-label">unidades em maio de 2026 — <strong class="white">recorde histórico, 4º lugar geral</strong></div>
+      </div>
+      <div class="stat-card green-top reveal">
+        <div class="stat-num"><span class="counter" data-target="62000" data-prefix="">0</span></div>
+        <div class="stat-label">Dolphin Mini vendidos desde o lançamento. 4 meses consecutivos como carro mais vendido no varejo</div>
+      </div>
+      <div class="stat-card reveal">
+        <div class="stat-num">+<span class="counter" data-target="175">0</span>%</div>
+        <div class="stat-label">crescimento de elétricos no Q1/2026 em relação a 2025 — o mercado acelera</div>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto; border-radius:16px; border:1px solid var(--border);" class="reveal">
+      <table class="ranking-table">
+        <thead>
+          <tr>
+            <th>Rank</th><th>Marca</th><th>Mai/2023</th><th>Mai/2026</th><th>Crescimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1º</td><td>FIAT</td><td>~40.000</td><td>45.892</td><td><span class="growth-pill">+15%</span></td></tr>
+          <tr><td>2º</td><td>VW</td><td>~38.000</td><td>42.982</td><td><span class="growth-pill">+13%</span></td></tr>
+          <tr><td>3º</td><td>GM</td><td>~24.000</td><td>27.736</td><td><span class="growth-pill">+16%</span></td></tr>
+          <tr class="highlight"><td class="byd-row">4º</td><td class="byd-row">BYD ⚡</td><td>390</td><td class="byd-row">21.704</td><td><span class="growth-pill">+5.500%</span></td></tr>
+          <tr><td>5º</td><td>HYUNDAI</td><td>~19.000</td><td>20.234</td><td><span class="growth-pill">+7%</span></td></tr>
+          <tr><td>6º</td><td>TOYOTA</td><td>~13.000</td><td>14.636</td><td><span class="growth-pill">+13%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     BRASÍLIA
+══════════════════════════════════════ -->
+<section id="brasilia">
+  <div class="container">
+    <div class="bsb-grid">
+      <div class="reveal">
+        <div class="section-pre" style="margin-bottom:12px"><span class="badge badge-gold">Brasília · DF</span></div>
+        <h2 style="margin-bottom:20px">O epicentro do mercado BYD no Brasil</h2>
+        <p style="margin-bottom:36px; font-size:1rem;">
+          Brasília não é apenas uma das capitais que mais vende BYD — é a capital com a
+          <strong class="white">maior renda per capita do Brasil</strong> e a maior concentração de
+          servidores públicos com estabilidade financeira. Aqui, o comprador tem
+          capacidade de compra. O que falta é ele te encontrar primeiro.
+        </p>
+        <ul class="bsb-points">
+          <li>
+            <div class="bsb-icon">🏆</div>
+            <div>
+              <h4>Líder em emplacamentos no varejo</h4>
+              <p>A BYD foi a marca que mais emplacou no varejo em Brasília em 2025 — à frente de todas as outras montadoras.</p>
+            </div>
+          </li>
+          <li>
+            <div class="bsb-icon">💼</div>
+            <div>
+              <h4>Maior concentração de servidores públicos</h4>
+              <p>Renda estável + aprovação de crédito facilitada = perfil ideal para financiamento de veículos premium.</p>
+            </div>
+          </li>
+          <li>
+            <div class="bsb-icon">🔌</div>
+            <div>
+              <h4>Infraestrutura de recarga crescendo</h4>
+              <p>O medo da recarga é a objeção mais comum — e Brasília já está bem servida de pontos rápidos no Plano Piloto e cidades satélites.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="bsb-highlight">
+          <div class="bsb-big">#1</div>
+          <div class="bsb-big-label">Brasília: capital campeã de vendas BYD no Brasil em 2025</div>
+          <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--border);">
+            <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--g600); margin-bottom:16px;">Modelos mais vendidos no DF</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.9rem; color:var(--white); font-weight:600;">Dolphin Mini GS</span>
+                <span class="badge badge-green">Líder 4 meses</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.9rem; color:var(--white); font-weight:600;">King GS</span>
+                <span class="badge badge-blue">Sedan mais vendido</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.9rem; color:var(--white); font-weight:600;">Song Pro GS</span>
+                <span class="badge badge-blue">C-SUV mais vendido</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FUNIL — A MATEMÁTICA
+══════════════════════════════════════ -->
+<section id="funil">
+  <div class="container">
+    <div class="funil-intro reveal">
+      <div class="section-pre" style="margin-bottom:12px"><span class="badge badge-blue">A Matemática do Lead</span></div>
+      <h2>Você não precisa de milagre.<br>Precisa de dois motores rodando juntos.</h2>
+      <p style="margin-top:16px; font-size:1rem;">
+        No automotivo premium, a taxa de conversão de lead para venda gira entre
+        <strong class="white">10% e 20%</strong> — dados consolidados do setor no Brasil.
+        Mas o ciclo de decisão de compra de um carro leva de 30 a 90 dias: o lead que não
+        fecha no primeiro mês não está perdido, está em nutrição. Combinando tráfego pago
+        com a reativação da base de contatos que a loja já tem, a meta é clara:
+      </p>
+      <div class="badge badge-gold" style="margin-top:20px; display:inline-block;">Meta: 10 vendas regulares/mês até o 3º mês</div>
+    </div>
+
+    <div class="funil-wrapper">
+      <div class="funil-step reveal">
+        <div class="funil-dual-label">Etapa 1 · Dois motores de leads, ao mesmo tempo</div>
+        <div class="funil-dual">
+          <div class="funil-dual-item">
+            <div class="funil-icon-wrap fi-budget">💰</div>
+            <div>
+              <div class="funil-step-label">Tráfego Novo</div>
+              <div class="funil-step-title" style="color:var(--gold)">R$500 → R$1.000/mês</div>
+              <div class="funil-step-sub">Meta Ads (WhatsApp direto + Landing Page) · Dolphin Mini GS · teto realista para investimento próprio</div>
+            </div>
+          </div>
+          <div class="funil-dual-item">
+            <div class="funil-icon-wrap fi-reativa">📂</div>
+            <div>
+              <div class="funil-step-label">Base Reativada</div>
+              <div class="funil-step-title" style="color:var(--green)">Via API Oficial</div>
+              <div class="funil-step-sub">Robô reativa contatos antigos da loja (test-drives e simulações) com disparo em lista — exige número de WhatsApp próprio e dedicado</div>
+            </div>
+          </div>
+        </div>
+        <div class="cpl-rec warn" style="margin-top:16px;">
+          <div class="cpl-rec-icon">⚠️</div>
+          <div class="cpl-rec-text">
+            <h4>Por que API Oficial para reativar a base</h4>
+            <p>Disparo em lista para contatos antigos só pode ser feito pela API Oficial do WhatsApp Business — usar número não-oficial para isso é caminho garantido para bloqueio em massa da conta. É necessário um número de telefone próprio e dedicado a essa operação, homologado na API oficial.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="funil-connector reveal"></div>
+
+      <div class="funil-step reveal">
+        <div class="funil-dual-label">Etapa 2 · Da conversa ao lead</div>
+        <div class="funil-dual">
+          <div class="funil-dual-item">
+            <div class="funil-icon-wrap fi-leads">💬</div>
+            <div>
+              <div class="funil-step-label">Conversas iniciadas</div>
+              <div class="funil-step-title" style="color:var(--b400)">200+ /mês</div>
+              <div class="funil-step-sub">Topo de funil — toda mensagem que chega pelo WhatsApp via Meta Ads + base reativada, com a verba calibrada em R$1.000/mês</div>
+            </div>
+          </div>
+          <div class="funil-dual-item">
+            <div class="funil-icon-wrap fi-demo">🎯</div>
+            <div>
+              <div class="funil-step-label">Leads no funil</div>
+              <div class="funil-step-title" style="color:var(--green)">Quase 100 /mês</div>
+              <div class="funil-step-sub">Depois do robô qualificar 24h. Não é chute: com verba parecida, em campanha já calibrada da Epos, é esse o volume real — veja os números na seção de Custo por Lead</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="funil-connector reveal"></div>
+
+      <div class="funil-step reveal">
+        <div class="funil-body">
+          <div class="funil-icon-wrap fi-demo">🤖</div>
+          <div class="funil-content">
+            <div class="funil-step-label">Etapa 3 · Robô em Ação</div>
+            <div class="funil-step-title" style="color:var(--green)">Atendimento 24h, todos os dias</div>
+            <div class="funil-step-sub">O robô responde, qualifica e organiza cada lead na hora em que ele chega — de madrugada, domingo, feriado. Nada esfria esperando alguém ficar disponível</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="funil-connector reveal"></div>
+
+      <div class="funil-step reveal">
+        <div class="funil-body">
+          <div class="funil-icon-wrap fi-sale">🚗</div>
+          <div class="funil-content">
+            <div class="funil-step-label">Etapa 4 · Fechamento</div>
+            <div class="funil-step-title" style="color:var(--gold)">Objetivo: 10 vendas recorrentes/mês</div>
+            <div class="funil-step-sub">Até o 3º mês · o robô separa os leads de fundo de funil — prontos pra comprar — e é neles que sua taxa de fechamento é mais alta, crescendo conforme a base é nutrida</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="funil-connector reveal"></div>
+
+      <div class="funil-step reveal">
+        <div class="funil-body">
+          <div class="funil-icon-wrap fi-money">⭐</div>
+          <div class="funil-content">
+            <div class="funil-step-label">Etapa 5 · Resultado</div>
+            <div class="funil-step-title" style="color:var(--gold)">Sua comissão por venda</div>
+            <div class="funil-step-sub">Definida por modelo · mais volume = mais resultado</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="funil-math-box reveal">
+        <div class="funil-math-title">Como se chega a 10 vendas/mês</div>
+        <div class="funil-formula">
+          <em>Leads novos + Leads em nutrição</em> <span class="sep">→</span>
+          <em>Robô qualifica 24h</em> <span class="sep">→</span>
+          <em>Vendas recorrentes</em>
+        </div>
+        <p class="funil-note">
+          No mês 3, você não depende só dos leads daquele mês — depende também do pipeline
+          acumulado dos meses 1 e 2, já maduro e trabalhado pelo robô. É assim que o volume
+          cresce <strong class="white">sem precisar aumentar o budget de mídia.</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CPL POR MODELO
+══════════════════════════════════════ -->
+<section id="cpl">
+  <div class="container">
+    <div class="section-pre reveal"><span class="badge badge-blue">Custo por Lead</span></div>
+    <h2 class="section-title reveal">Quanto custa trazer<br>cada comprador até você</h2>
+    <p class="section-sub reveal">
+      Estimativa de CPL (Custo por Lead) para Meta Ads no Distrito Federal, por faixa de modelo.
+      Quanto maior o ticket, maior o custo por lead — e menor a quantidade gerada com o mesmo budget.
+    </p>
+
+    <div class="cpl-rec reveal" style="margin-bottom:24px;">
+      <div class="cpl-rec-icon">📊</div>
+      <div class="cpl-rec-text">
+        <h4>Não é projeção no escuro — é o que a Epos roda agora</h4>
+        <p>
+          Em uma campanha ativa de um cliente nosso no Distrito Federal, só este mês:
+          <strong class="white">R$395,98 investidos geraram 92 conversas iniciadas no WhatsApp e 35 leads</strong>,
+          com CTR de 5,3% — a média do mercado fica entre 1% e 2%. As faixas de CPL abaixo usam essa mesma
+          metodologia de campanha (Meta Ads + robô de qualificação), calibradas para o ticket e a concorrência
+          do automotivo em Brasília.
+        </p>
+      </div>
+    </div>
+
+    <div class="cpl-table-wrap reveal">
+      <table class="cpl">
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Preço (PPS)</th>
+            <th>CPL Estimado</th>
+            <th>Leads novos via Meta Ads (Mês 1 R$500 → Mês 2+ R$1.000)</th>
+            <th>Vendas Estimadas</th>
+            <th>Prioridade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="cpl-model">Dolphin Mini GS</span></td>
+            <td class="cpl-price">R$119.990</td>
+            <td>R$50 – R$80</td>
+            <td><strong>6–10 → 12–20</strong></td>
+            <td>1–2 → 2–4 / mês</td>
+            <td><span class="pill pill-green">✓ Foco do Mês 1</span></td>
+          </tr>
+          <tr>
+            <td><span class="cpl-model">King GS</span></td>
+            <td class="cpl-price">R$175.990</td>
+            <td>R$80 – R$130</td>
+            <td><strong>4–6 → 8–12</strong></td>
+            <td>0–1 → 1–2 / mês</td>
+            <td><span class="pill pill-yellow">Mês 2+</span></td>
+          </tr>
+          <tr>
+            <td><span class="cpl-model">Song Pro GS</span></td>
+            <td class="cpl-price">R$199.990</td>
+            <td>R$100 – R$160</td>
+            <td><strong>3–5 → 6–10</strong></td>
+            <td>0–1 → 1–2 / mês</td>
+            <td><span class="pill pill-yellow">Mês 2+</span></td>
+          </tr>
+          <tr>
+            <td><span class="cpl-model">Song Plus 1.5T</span></td>
+            <td class="cpl-price">R$249.990</td>
+            <td>R$160 – R$250</td>
+            <td><strong>2–3 → 4–6</strong></td>
+            <td>0–1 / mês</td>
+            <td><span class="pill pill-red">Orgânico</span></td>
+          </tr>
+          <tr>
+            <td><span class="cpl-model">Seal / Atto 8</span></td>
+            <td class="cpl-price">R$299k – R$400k</td>
+            <td>R$250 – R$400</td>
+            <td><strong>1–2 → 2–4</strong></td>
+            <td>~0 / mês</td>
+            <td><span class="pill pill-red">Orgânico</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cpl-rec reveal">
+      <div class="cpl-rec-icon">💡</div>
+      <div class="cpl-rec-text">
+        <h4>Estratégia recomendada para o mês 1: Dolphin Mini, 100% do budget</h4>
+        <p>
+          É o modelo com maior volume de busca, menor CPL e maior urgência de compra entre os compradores.
+          Com R$500 focados aqui, você gera o maior número de leads qualificados possível —
+          e os dados do mês 1 mostram exatamente qual budget aumentar para ter resultado consistente.
+          Modelos de ticket alto entram no mês 2 com base no que os números mostrarem.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     PERSONAS
+══════════════════════════════════════ -->
+<section id="personas">
+  <div class="container">
+    <div class="section-pre reveal"><span class="badge badge-blue">Perfis de Comprador</span></div>
+    <h2 class="section-title reveal">Quem compra BYD<br>em Brasília — e por quê</h2>
+    <p class="section-sub reveal">
+      A campanha não fala com todo mundo. Fala com as pessoas certas, no lugar certo,
+      com a mensagem que ressoa com o que elas já estão pensando.
+    </p>
+
+    <div class="personas-grid">
+      <!-- Persona 1 -->
+      <div class="persona-card reveal">
+        <div class="persona-header">
+          <div class="persona-emoji">🧮</div>
+          <div>
+            <h3>O Calculista da Gasolina</h3>
+            <p>Dolphin Mini · R$119.990</p>
+          </div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-row">
+            <div class="persona-row-label">Quem é</div>
+            <div class="persona-row-val">28–45 anos, classe B/C+, renda R$8k–16k. Já tem carro — e sabe exatamente quanto gasta de gasolina por mês.</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Onde mora em Brasília</div>
+            <div class="persona-row-val">Águas Claras, Taguatinga, Samambaia, Guará, Vicente Pires, Ceilândia, Gama</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Comportamento digital</div>
+            <div class="persona-row-val">Instagram, TikTok, YouTube. Pesquisa "dolphin mini brasília", "carro elétrico parcela", "byd preço"</div>
+          </div>
+          <div class="persona-trigger">
+            💬 <em>"Meu carro gasta R$900 por mês de gasolina. Essas 60 parcelas de R$999 me pagam o carro e ainda economizo."</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persona 2 -->
+      <div class="persona-card reveal">
+        <div class="persona-header">
+          <div class="persona-emoji">🏛️</div>
+          <div>
+            <h3>O Servidor Elegante</h3>
+            <p>King GS · R$175.990</p>
+          </div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-row">
+            <div class="persona-row-label">Quem é</div>
+            <div class="persona-row-val">38–58 anos, servidor federal, militar de alta patente, médico, advogado. Renda estável R$15k–35k. Troca de carro a cada 4–5 anos.</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Onde mora em Brasília</div>
+            <div class="persona-row-val">Asa Sul, Asa Norte, Lago Sul, Lago Norte, Sudoeste, Noroeste, Park Way</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Comportamento digital</div>
+            <div class="persona-row-val">Facebook, Instagram, YouTube (reviews). Pesquisa "King BYD test drive", "sedan elétrico vs corolla"</div>
+          </div>
+          <div class="persona-trigger">
+            💬 <em>"Quero um sedan executivo. Não precisa ser fútil — precisa ser inteligente. Híbrido, taxa 0%, sem gasolina na cidade."</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persona 3 -->
+      <div class="persona-card reveal">
+        <div class="persona-header">
+          <div class="persona-emoji">👨‍👩‍👦</div>
+          <div>
+            <h3>A Família que Quer Tudo</h3>
+            <p>Song Pro GS · R$199.990</p>
+          </div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-row">
+            <div class="persona-row-label">Quem é</div>
+            <div class="persona-row-val">Casal 35–52, 2–3 filhos. Renda familiar R$22k–45k. Já tem SUV e está cansado do combustível.</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Onde mora em Brasília</div>
+            <div class="persona-row-val">Lago Sul, Park Way, Noroeste, Jardim Botânico, condomínios de Águas Claras</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Comportamento digital</div>
+            <div class="persona-row-val">Instagram, grupos de família. Pesquisa "melhor SUV híbrido brasil", "Song Pro avaliação"</div>
+          </div>
+          <div class="persona-trigger">
+            💬 <em>"PHEV é perfeito: elétrico na cidade, gasolina de segurança na viagem de férias. Não fico com ansiedade de recarga."</em>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persona 4 -->
+      <div class="persona-card reveal">
+        <div class="persona-header">
+          <div class="persona-emoji">🚕</div>
+          <div>
+            <h3>O Motorista de App</h3>
+            <p>Dolphin GS Táxi · R$129.990</p>
+          </div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-row">
+            <div class="persona-row-label">Quem é</div>
+            <div class="persona-row-val">Motorista profissional Uber/99, 28–50 anos. Faz 300–600km por dia. Gasta R$1.500–3.000/mês de gasolina.</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Onde mora em Brasília</div>
+            <div class="persona-row-val">Taguatinga, Samambaia, Ceilândia, Recanto das Emas, Gama, Santa Maria, Riacho Fundo</div>
+          </div>
+          <div class="persona-row">
+            <div class="persona-row-label">Oferta especial</div>
+            <div class="persona-row-val">Dolphin GS Táxi: R$129.990 com isenção de IPI + Programa Move Brasil BYD</div>
+          </div>
+          <div class="persona-trigger">
+            💬 <em>"Com o que eu gasto de gasolina em 2 meses, pago uma parcela do elétrico. E a manutenção cai pela metade."</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SOLUÇÃO EPOS
+══════════════════════════════════════ -->
+<section id="solucao">
+  <div class="container">
+    <div class="section-pre reveal"><span class="badge badge-green">O que a Epos entrega</span></div>
+    <h2 class="section-title reveal">Um sistema integrado.<br>Não uma peça solta.</h2>
+    <p class="section-sub reveal">
+      A maioria das agências entrega anúncio. A Epos entrega o caminho completo:
+      do clique do comprador até a chegada na sua loja.
+    </p>
+
+    <div class="fluxo-wrap reveal">
+      <div class="fluxo-step">
+        <div class="fluxo-icon">📱</div>
+        <div class="fluxo-title">Meta Ads</div>
+        <div class="fluxo-sub">O comprador vê o anúncio certo</div>
+      </div>
+      <div class="fluxo-step">
+        <div class="fluxo-icon">🌐</div>
+        <div class="fluxo-title">Landing Page</div>
+        <div class="fluxo-sub">Ele acessa e preenche o formulário</div>
+      </div>
+      <div class="fluxo-step">
+        <div class="fluxo-icon">🤖</div>
+        <div class="fluxo-title">Robô WhatsApp</div>
+        <div class="fluxo-sub">Qualifica automaticamente 24h</div>
+      </div>
+      <div class="fluxo-step">
+        <div class="fluxo-icon">👤</div>
+        <div class="fluxo-title">Você fecha</div>
+        <div class="fluxo-sub">Recebe o lead já qualificado</div>
+      </div>
+    </div>
+
+    <div class="campanha-tipos reveal" style="margin-top:32px;">
+      <div class="funil-dual-label">2 tipos de campanha, rodando ao mesmo tempo</div>
+      <div class="funil-dual">
+        <div class="funil-dual-item">
+          <div class="funil-icon-wrap fi-leads">💬</div>
+          <div>
+            <div class="funil-step-label">Campanha Direto WhatsApp</div>
+            <div class="funil-step-title" style="color:var(--b400)">Custo maior, conversão maior</div>
+            <div class="funil-step-sub">O comprador clica no anúncio e cai direto numa conversa com o robô — atendido na hora, qualquer dia, qualquer horário. Ideal para quem está mais perto da decisão (fundo de funil)</div>
+          </div>
+        </div>
+        <div class="funil-dual-item">
+          <div class="funil-icon-wrap fi-budget">🌐</div>
+          <div>
+            <div class="funil-step-label">Campanha Landing Page</div>
+            <div class="funil-step-title" style="color:var(--green)">Centavos por visualização</div>
+            <div class="funil-step-sub">Para quem ainda não conhece a marca ou o modelo. Cada visualização custa centavos — gera volume de topo de funil a um custo muito baixo, alimentando a base que o robô vai nutrir</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="solucao-grid">
+      <div class="solucao-card reveal">
+        <div class="solucao-num">01 · Campanha Meta Ads</div>
+        <h3>Configurada para leads, não curtidas</h3>
+        <p>Campanha com objetivo de geração de lead, criativo focado em conversão, segmentação por comportamento e localização. Sem "impulsionar post".</p>
+      </div>
+      <div class="solucao-card reveal">
+        <div class="solucao-num">02 · Landing Page</div>
+        <h3>Construída para converter, não decorar</h3>
+        <p>Uma página por consultor, com seu nome, sua foto e o modelo foco do mês. Calculadora de economia BYD integrada. CTA direto para WhatsApp.</p>
+      </div>
+      <div class="solucao-card reveal">
+        <div class="solucao-num">03 · Robô de Qualificação</div>
+        <h3>Qualifica enquanto você dorme</h3>
+        <p>Fluxo automático que pergunta modelo de interesse, situação de entrada e perfil de uso — antes mesmo de você atender. Lead chegando quente.</p>
+      </div>
+      <div class="solucao-card reveal">
+        <div class="solucao-num">04 · Relatório Mensal</div>
+        <h3>Números reais. Sem achismo.</h3>
+        <p>Custo por lead, quantidade de leads, taxa de resposta e vendas atribuídas. Você vê exatamente onde está o seu dinheiro e o que melhorar.</p>
+      </div>
+    </div>
+
+    <div class="alinhamento-box reveal">
+      <div class="alinhamento-num">R$200</div>
+      <div class="alinhamento-text">
+        <h3>Por cada carro vendido</h3>
+        <p>
+          A Epos recebe R$200 de comissão por cada venda fechada — independente do modelo.
+          Isso significa que <strong class="white">nosso interesse é idêntico ao seu:</strong>
+          gerar mais conversas, mais leads qualificados, mais fechamentos.
+          Se você não vende, nós não crescemos. Simples assim.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CALENDÁRIO
+══════════════════════════════════════ -->
+<section id="calendario">
+  <div class="container">
+    <div class="section-pre reveal"><span class="badge badge-gold">Junho 2026</span></div>
+    <h2 class="section-title reveal">Junho tem prazo.<br>E três oportunidades que não voltam.</h2>
+    <p class="section-sub reveal">
+      A política comercial BYD de junho oferece as melhores condições do ano — taxa 0%,
+      bônus trade-in, parcelas históricas. Cada dia sem campanha ativa é um comprador
+      que encontrou outro consultor antes de você.
+    </p>
+
+    <div class="cal-events">
+      <div class="cal-event reveal">
+        <div class="cal-date">
+          <div class="cal-date-day">19·20</div>
+          <div class="cal-date-month">Jun</div>
+        </div>
+        <div>
+          <div class="cal-event-title">48H Eletrizantes — Evento oficial BYD</div>
+          <p class="cal-event-body">Evento nacional de 48 horas com condições especiais. Modelos foco: Song Pro GL, Dolphin Mini GL e Dolphin GS. Anúncios ativos antes e durante o evento multiplicam o alcance.</p>
+          <div class="cal-event-tag"><span class="badge badge-blue">Varejo + Venda Direta</span></div>
+        </div>
+      </div>
+
+      <div class="cal-event reveal">
+        <div class="cal-date">
+          <div class="cal-date-day">22–26</div>
+          <div class="cal-date-month">Jun</div>
+        </div>
+        <div>
+          <div class="cal-event-title">VIP Day — BYD Sealion 7</div>
+          <p class="cal-event-body">Evento de relacionamento premium para leads qualificados. Modelo foco: Sealion 7. Ideal para trabalhar com conteúdo orgânico + convite via WhatsApp para leads de ticket alto.</p>
+          <div class="cal-event-tag"><span class="badge badge-blue">Premium</span></div>
+        </div>
+      </div>
+
+      <div class="cal-event urgent reveal">
+        <div class="cal-date">
+          <div class="cal-date-day">30</div>
+          <div class="cal-date-month">Jun</div>
+        </div>
+        <div>
+          <div class="cal-event-title">Último dia da Política Comercial — taxa 0%, bônus trade-in, parcelas especiais</div>
+          <p class="cal-event-body">
+            Todas as condições especiais de junho vencem em 30/06 — taxa 0%, bônus trade-in de até R$20.000, parcelas de R$999 no Dolphin Mini. O financiamento Santander tem pagamento até 06/07. <strong class="white">Use os últimos 5 dias com copy de urgência nos anúncios.</strong>
+          </p>
+          <div class="cal-event-tag"><span class="badge badge-gold">Deadline Final</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     ROI
+══════════════════════════════════════ -->
+<section id="roi">
+  <div class="container">
+    <div class="section-pre reveal"><span class="badge badge-blue">Projeção de Resultados</span></div>
+    <h2 class="section-title reveal">O que esperar<br>em 30, 60 e 90 dias</h2>
+    <p class="section-sub reveal">
+      Projeção baseada em benchmarks do setor automotivo no Brasil com Meta Ads.
+      Resultado real depende do tempo de resposta ao lead, qualidade do atendimento
+      e condições do mês. Estas são médias de mercado — não garantias.
+    </p>
+
+    <div class="roi-scenarios">
+      <div class="roi-card reveal">
+        <div class="roi-card-header">
+          <h3>Mês 1 · Ativação</h3>
+          <p>Dois motores ligados ao mesmo tempo</p>
+        </div>
+        <div class="roi-card-body">
+          <div class="roi-row">
+            <span class="roi-row-label">Budget investido</span>
+            <span class="roi-row-val">R$500</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Conversas iniciadas</span>
+            <span class="roi-row-val">80 a 110</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Leads (novos + reativados)</span>
+            <span class="roi-row-val accent">35 a 45</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Vendas prováveis</span>
+            <span class="roi-row-val">2 a 3</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Objetivo principal</span>
+            <span class="roi-row-val gold">Validar CPL + ativar a base</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roi-card reveal">
+        <div class="roi-card-header">
+          <h3>Mês 2 · Consolidação</h3>
+          <p>Budget no teto + nutrição rodando</p>
+        </div>
+        <div class="roi-card-body">
+          <div class="roi-row">
+            <span class="roi-row-label">Budget investido</span>
+            <span class="roi-row-val">R$1.000 (teto)</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Conversas iniciadas</span>
+            <span class="roi-row-val">180 a 220</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Leads (novos + nutrição)</span>
+            <span class="roi-row-val accent">70 a 90</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Vendas prováveis</span>
+            <span class="roi-row-val">5 a 7</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Objetivo principal</span>
+            <span class="roi-row-val gold">Consistência mensal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="roi-card reveal">
+        <div class="roi-card-header">
+          <h3>Mês 3 · Meta</h3>
+          <p>Pipeline maduro, mesmo budget</p>
+        </div>
+        <div class="roi-card-body">
+          <div class="roi-row">
+            <span class="roi-row-label">Budget investido</span>
+            <span class="roi-row-val">R$1.000 (mantido)</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Conversas iniciadas</span>
+            <span class="roi-row-val">200 a 250</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Leads (novos + pipeline maduro)</span>
+            <span class="roi-row-val accent">85 a 100</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Vendas prováveis</span>
+            <span class="roi-row-val">8 a 10</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-label">Objetivo principal</span>
+            <span class="roi-row-val gold">10 vendas regulares/mês</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="roi-disclaimer reveal">
+      Projeções baseadas em benchmarks do setor automotivo premium — Meta Ads Brasil, 2025–2026 —
+      e no ciclo de decisão de 30 a 90 dias do automotivo, que permite trabalhar o pipeline
+      acumulado dos meses anteriores. Budget travado em R$1.000/mês a partir do mês 2 —
+      o crescimento vem da nutrição da base, não de mais investimento. São médias de mercado, não garantias.
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CTA FINAL
+══════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="container">
+    <div class="reveal"><span class="badge badge-blue" style="margin-bottom:24px; display:inline-block;">Próximos Passos</span></div>
+    <h2 class="reveal">
+      Cada dia sem campanha<br>
+      é um comprador que foi<br>
+      para <span class="accent">outro consultor.</span>
+    </h2>
+    <p class="section-sub reveal" style="text-align:center;">
+      Junho tem prazo, produto e condições. O que falta é o sistema que conecta
+      o comprador certo até você — antes que ele encontre alguém primeiro.
+    </p>
+
+    <div class="cta-steps reveal">
+      <div class="cta-step">
+        <div class="cta-step-num">1</div>
+        <h4>Hoje</h4>
+        <p>Definir modelo foco e WhatsApp Business</p>
+      </div>
+      <div class="cta-step">
+        <div class="cta-step-num">2</div>
+        <h4>Dias 1–5</h4>
+        <p>Landing page + campanha Meta Ads no ar</p>
+      </div>
+      <div class="cta-step">
+        <div class="cta-step-num">3</div>
+        <h4>Dias 5–7</h4>
+        <p>Robô WhatsApp ativo e qualificando</p>
+      </div>
+      <div class="cta-step">
+        <div class="cta-step-num">4</div>
+        <h4>Dia 30</h4>
+        <p>Relatório com CPL real + decisão de budget</p>
+      </div>
+    </div>
+
+    <div class="cta-btns reveal">
+      <a href="#funil" class="btn btn-primary">Revisar a estratégia</a>
+      <a href="#mercado" class="btn btn-outline">Ver os dados de mercado</a>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <div class="container">
+    <p>Proposta preparada por <strong>Epos Marketing</strong> · Dados: BYD Brasil, ANFAVEA, ABVE · Política Comercial BYD Junho 2026</p>
+    <p style="margin-top:8px;">Vigência das condições BYD: 01/06/2026 a 30/06/2026 · Financiamento sujeito à análise de crédito Santander</p>
+  </div>
+</footer>
+
+
+<script>
+  // ── COUNTER ANIMATION ──
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.target || el.innerText.replace(/\D/g,''), 10);
+    const suffix = el.dataset.suffix ?? '';
+    const duration = 2000;
+    const start = performance.now();
+    const startVal = 0;
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const val = Math.floor(startVal + (target - startVal) * eased);
+      el.textContent = val.toLocaleString('pt-BR') + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  // ── INTERSECTION OBSERVER (reveal + counters) ──
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.querySelectorAll('.counter').forEach(animateCounter);
+      counterObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  document.querySelectorAll('.stats-grid, .hero-stat-bar').forEach(el => counterObserver.observe(el));
+</script>
+
+</body>
+</html>
