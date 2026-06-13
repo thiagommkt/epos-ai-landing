@@ -1067,8 +1067,8 @@ async function loadDashboard() {
   }).join('') || '<tr><td colspan="5" class="empty">Sem leads</td></tr>';
   document.getElementById('leads-recentes').innerHTML = recentesHtml;
 
-  // Gráfico barras leads por dia
-  const { data: byDay } = await sb(`${TABLE}?select=criado_em&criado_em=gte.${dia30ISO}&order=criado_em.asc`);
+  // Gráfico barras leads por dia (exclui cold-outreach/auditoria manual — não é "lead novo")
+  const { data: byDay } = await sb(`${TABLE}?select=criado_em&criado_em=gte.${dia30ISO}&canal=neq.chatwoot_auditoria&order=criado_em.asc`);
   const dayMap = {};
   (byDay||[]).forEach(r => {
     const d = new Date(r.criado_em).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', timeZone:'America/Sao_Paulo' });
