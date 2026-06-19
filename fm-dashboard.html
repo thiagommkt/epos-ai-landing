@@ -102,7 +102,9 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .f4{background:linear-gradient(90deg,rgba(0,245,160,.42),rgba(0,245,160,.2))}
 .f5{background:linear-gradient(90deg,rgba(0,245,160,.6),rgba(0,245,160,.3))}
 .f-pct{font-family:var(--fM);font-size:10px;color:rgba(239,239,241,.85);white-space:nowrap}
-.f-n{font-family:var(--fM);font-size:17px;font-weight:300;color:var(--dim);width:26px;text-align:right;flex-shrink:0}
+.f-n{font-family:var(--fD);font-size:15px;font-weight:600;color:var(--text);min-width:32px;text-align:right;flex-shrink:0}
+.f-n-sub{font-family:var(--fM);font-size:9px;color:var(--dim);text-align:right;flex-shrink:0;min-width:32px;margin-top:-2px}
+.f1-5{background:linear-gradient(90deg,rgba(145,70,255,.46),rgba(96,165,250,.2))}
 .f-gap{height:12px;padding-left:86px;display:flex;align-items:center;gap:6px}
 .f-gline{width:1px;height:12px;background:var(--bd)}
 .f-gdrop{font-family:var(--fM);font-size:9px;color:var(--dim);border:1px solid var(--bd);padding:0 5px}
@@ -141,7 +143,7 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .col.drag-over{border-color:var(--purple);background:rgba(145,70,255,.06)}
 .col-head{font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .col-count{width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:var(--pur-l);border:1px solid var(--bd-b);font-family:var(--fM);font-size:10px;color:var(--purple)}
-.krm-card{background:var(--bg3);border:1px solid var(--bd);border-top:2px solid transparent;padding:10px;margin-bottom:8px;cursor:grab;transition:border-color .2s,box-shadow .2s,opacity .2s;user-select:none}
+.krm-card{background:var(--bg3);border:1px solid var(--bd);border-left:3px solid transparent;padding:10px 10px 10px 11px;margin-bottom:8px;cursor:grab;transition:border-color .2s,box-shadow .2s,opacity .2s;user-select:none}
 .krm-card:active{cursor:grabbing}
 .krm-card:hover{border-color:var(--purple);box-shadow:0 0 10px rgba(145,70,255,.1)}
 .krm-card.dragging{opacity:.4;cursor:grabbing}
@@ -754,7 +756,7 @@ canvas{display:block;width:100%!important}
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Atendimento automático</div><div class="cfg-val">Ativo 24h</div></div>
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Silêncio após humano</div><div class="cfg-val">48 horas · qualquer plataforma</div></div>
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Nutrição automática</div><div class="cfg-val">Não Compareceu · Desqualificado · Fechou</div></div>
-      <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Qualificação via WhatsApp</div><div class="cfg-val">Typebot — fluxo hpykuoe</div></div>
+      <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Qualificação via WhatsApp</div><div class="cfg-val">Ana IA — Dify (direto)</div></div>
     </div>
     <div class="cfg-sec">
       <div class="cfg-sec-title">Integrações</div>
@@ -889,7 +891,8 @@ function fmtDate(iso) {
 }
 function canalBadge(l) {
   if (l.canal === 'chatwoot_auditoria') return '<span class="badge b-ct" style="background:rgba(145,70,255,.09);color:var(--purple);border-color:rgba(145,70,255,.2)">👤 Manual</span>';
-  if (l.typebot_concluido) return '<span class="badge b-ql" style="background:rgba(0,245,160,.09);color:var(--neon);border-color:rgba(0,245,160,.2)">🤖 Typebot IA</span>';
+  if (l.canal === 'whatsapp_outreach') return '<span class="badge b-ct" style="background:rgba(255,165,0,.09);color:#FFA500;border-color:rgba(255,165,0,.3)">📤 Outreach</span>';
+  if (l.dify_conversation_id || l.dify_ativo || l.typebot_concluido) return '<span class="badge b-ql" style="background:rgba(0,245,160,.09);color:var(--neon);border-color:rgba(0,245,160,.2)">🤖 Ana IA</span>';
   return '<span class="badge b-ct" style="background:rgba(74,174,255,.09);color:#4AAEFF;border-color:rgba(74,174,255,.2)">📱 WA Direto</span>';
 }
 function statusBadge(l) {
@@ -997,9 +1000,11 @@ async function loadDashboard() {
   loadCreativos('spend');
 
   // Funil — filtrado pelo período
-  const qFilter = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}${endClause}` : 'qualificado=eq.true';
-  const [q, ag, comp, fech] = await Promise.all([
+  const qFilter  = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}${endClause}` : 'qualificado=eq.true';
+  const respFilter = periodoISO ? `dify_conversation_id=not.is.null&criado_em=gte.${mesISO}${endClause}` : 'dify_conversation_id=not.is.null';
+  const [q, resp, ag, comp, fech] = await Promise.all([
     sbCount(qFilter),
+    sbCount(respFilter),
     sbCount(agFilter),
     sbCount(cmpFilter),
     sbCount(fchFilter)
@@ -1007,8 +1012,10 @@ async function loadDashboard() {
   const T = leadsTotal || 1;
   const funil = document.getElementById('funnel-container');
   funil.innerHTML = `
-    <div class="f-row"><div class="f-lbl">Contatos</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
-    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((leadsTotal-q)/T*100)}%</div></div>
+    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((leadsTotal-resp)/T*100)}%</div></div>
+    <div class="f-row"><div class="f-lbl">c/ Ana</div><div class="f-track"><div class="f-fill f1-5" data-w="${Math.round(resp/T*100)}%"><span class="f-pct">${Math.round(resp/T*100)}%</span></div></div><div class="f-n">${resp}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((resp-q)/Math.max(resp,1)*100)}%</div></div>
     <div class="f-row"><div class="f-lbl">Qualificado</div><div class="f-track"><div class="f-fill f2" data-w="${Math.round(q/T*100)}%"><span class="f-pct">${Math.round(q/T*100)}%</span></div></div><div class="f-n">${q}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((q-ag)/Math.max(q,1)*100)}%</div></div>
     <div class="f-row"><div class="f-lbl">Agendou</div><div class="f-track"><div class="f-fill f3" data-w="${Math.round(ag/T*100)}%"><span class="f-pct">${Math.round(ag/T*100)}%</span></div></div><div class="f-n">${ag}</div></div>
@@ -1024,18 +1031,20 @@ async function loadDashboard() {
   // Origem: canal + atribuição Meta
   const dateClause = periodoISO ? `&criado_em=gte.${mesISO}${endClause}` : '';
   const [canalData, atribData] = await Promise.all([
-    sb(`${TABLE}?select=canal,typebot_concluido${dateClause}`).then(r => Array.isArray(r.data) ? r.data : []),
+    sb(`${TABLE}?select=canal,typebot_concluido,dify_ativo,dify_conversation_id${dateClause}`).then(r => Array.isArray(r.data) ? r.data : []),
     sb(`${TABLE}?select=fbclid,utm_source,ctwa_clid${dateClause}`).then(r => Array.isArray(r.data) ? r.data : [])
   ]);
-  let nIA = 0, nManual = 0, nDireto = 0;
+  let nIA = 0, nManual = 0, nDireto = 0, nOutreach = 0;
   canalData.forEach(l => {
     if (l.canal === 'chatwoot_auditoria') nManual++;
-    else if (l.typebot_concluido) nIA++;
+    else if (l.canal === 'whatsapp_outreach') nOutreach++;
+    else if (l.dify_conversation_id || l.dify_ativo || l.typebot_concluido) nIA++;
     else nDireto++;
   });
   const totalCanal = canalData.length || 1;
   const canalHtml = `<div style="margin-bottom:14px">` +
-    [['🤖 Typebot IA', nIA, 'var(--neon)', 'rgba(0,245,160,.15)'],
+    [['🤖 Ana IA', nIA, 'var(--neon)', 'rgba(0,245,160,.15)'],
+     ['📤 Outreach', nOutreach, '#FFA500', 'rgba(255,165,0,.15)'],
      ['👤 Manual FM', nManual, 'var(--purple)', 'rgba(145,70,255,.15)'],
      ['📱 WA Direto', nDireto, '#4AAEFF', 'rgba(74,174,255,.15)']
     ].map(([lbl,n,cor,bg]) => {
@@ -1217,7 +1226,7 @@ async function loadCRM() {
       const telFmt = tel.length >= 10 ? `(${tel.slice(0,2)}) ${tel.slice(2,7)}-${tel.slice(7)}` : tel;
       const leadJson = encodeURIComponent(JSON.stringify(l));
       return `<div class="krm-card"
-        style="border-top-color:${st.color}"
+        style="border-left-color:${st.color}"
         draggable="true"
         data-id="${l.crm_person_id||''}"
         data-tel="${l.telefone||''}"
@@ -1845,24 +1854,46 @@ async function loadMetaAds() {
 }
 
 function renderMetaAdsGrid(spend, cpl, impressions, ctr, badge) {
-  return '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="meta-ads-grid">' +
-    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Gasto Total</div>' +
-      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--warn)">R$' + parseFloat(spend||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
+  const cplV = parseFloat(cpl||0);
+  // Benchmarks para mini bars (referência visual, não absoluta)
+  const cplBar = Math.max(0, Math.min(100, 100 - (cplV / 200 * 100))); // CPL menor = bar maior (melhor)
+  const ctrBar = Math.min(100, parseFloat(ctr||0) / 5 * 100);           // CTR 5% = 100%
+  const impBar = Math.min(100, parseInt(impressions||0) / 200000 * 100); // 200k impressões = 100%
+
+  function miniBar(pct, color) {
+    return `<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:8px;overflow:hidden">
+      <div style="height:100%;width:0;border-radius:2px;background:${color};transition:width 1.2s cubic-bezier(.16,1,.3,1) .5s" data-w="${pct}%"></div>
+    </div>`;
+  }
+
+  const html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="meta-ads-grid">' +
+    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Gasto Total</div>' +
+      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--warn)">R$' + parseFloat(spend||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
     '</div>' +
-    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Custo por Lead</div>' +
-      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--purple)">' + (parseFloat(spend||0) > 0 ? 'R$' + parseFloat(cpl).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : 'R$—') + '</div>' +
+    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">CPL</div>' +
+      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--purple)">' + (parseFloat(spend||0) > 0 ? 'R$' + cplV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—') + '</div>' +
+      miniBar(cplBar, 'var(--purple)') +
     '</div>' +
-    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Impressões</div>' +
-      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--text)">' + parseInt(impressions||0).toLocaleString('pt-BR') + '</div>' +
+    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Impressões</div>' +
+      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--text)">' + parseInt(impressions||0).toLocaleString('pt-BR') + '</div>' +
+      miniBar(impBar, 'rgba(239,239,241,0.4)') +
     '</div>' +
-    '<div style="text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">CTR</div>' +
-      '<div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--neon)">' + parseFloat(ctr||0).toFixed(2) + '<span style="font-size:16px;color:var(--muted)">%</span></div>' +
+    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
+      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">CTR</div>' +
+      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--neon)">' + parseFloat(ctr||0).toFixed(2) + '<span style="font-size:14px;color:var(--muted)">%</span></div>' +
+      miniBar(ctrBar, 'var(--neon)') +
     '</div>' +
   '</div>' + (badge || '');
+
+  // Anima as mini bars depois do DOM inserido
+  setTimeout(() => {
+    document.querySelectorAll('#meta-ads-content [data-w]').forEach(el => { el.style.width = el.dataset.w; });
+  }, 100);
+
+  return html;
 }
 
 // ═══ TOP CAMPEÕES — CPL REAL (A6) ═══
