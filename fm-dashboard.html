@@ -298,6 +298,7 @@ canvas{display:block;width:100%!important}
   .kpi-val{font-size:38px!important}
   .kpi-lbl{font-size:9px}
   .two-col,.two-col-eq,.three-col{grid-template-columns:1fr!important;gap:8px}
+  #main-charts-row{grid-template-columns:1fr!important}
 
   /* Chat — preenche tela toda disponível */
   .section#s-chat{padding:0!important}
@@ -475,13 +476,25 @@ canvas{display:block;width:100%!important}
     </div>
   </div>
 
-  <div class="two-col">
-    <div class="card">
+  <!-- ── BLOCO PRINCIPAL 3 COLUNAS: Leads por Dia · Meta Ads · Funil ── -->
+  <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px" id="main-charts-row">
+    <div class="card" style="padding:18px">
+      <div class="card-ttl">Leads por Dia (30 dias)</div>
+      <div style="position:relative;height:190px;overflow:hidden"><canvas id="wk-chart" height="190" style="position:absolute;top:0;left:0"></canvas></div>
+    </div>
+    <div class="card" style="padding:18px" id="meta-ads-card">
+      <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px">
+        Meta Ads
+        <span id="meta-period-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.04em;text-transform:none;font-weight:400">30 dias</span>
+      </div>
+      <div id="meta-ads-content"><div class="loading"></div></div>
+    </div>
+    <div class="card" style="padding:18px">
       <div class="card-ttl">Funil de Conversão</div>
       <div class="funnel" id="funnel-container"><div class="loading"></div></div>
     </div>
-    <div class="card"><div class="card-ttl">Leads por Dia (30 dias)</div><div style="position:relative;height:170px;overflow:hidden"><canvas id="wk-chart" height="170" style="position:absolute;top:0;left:0"></canvas></div></div>
   </div>
+
   <div class="two-col-eq">
     <div class="card">
       <div class="card-ttl">Origem dos Leads</div>
@@ -492,15 +505,6 @@ canvas{display:block;width:100%!important}
       <table class="tbl"><thead><tr><th>Nome</th><th>Patologia</th><th>Score</th><th>Canal</th><th>Status</th></tr></thead>
       <tbody id="leads-recentes"><tr><td colspan="5" class="empty">Carregando...</td></tr></tbody></table>
     </div>
-  </div>
-
-  <!-- ── CUSTOS META ADS (A5) ── -->
-  <div class="card" style="margin-top:0" id="meta-ads-card">
-    <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center">
-      Custo de Anúncios — Meta Ads
-      <span id="meta-period-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.06em;text-transform:none;font-weight:400">últimos 30 dias</span>
-    </div>
-    <div id="meta-ads-content"><div class="loading"></div></div>
   </div>
 
   <!-- ── TOP CRIATIVOS (A5b) ── -->
@@ -1329,7 +1333,7 @@ function drawBar(id, labels, vals, c1, c2) {
   const W = parent ? parent.clientWidth || parent.offsetWidth : 0;
   if (!W || W < 10) { setTimeout(() => drawBar(id, labels, vals, c1, c2), 100); return; }
   const ctx = cv.getContext('2d'), dpr = window.devicePixelRatio||1;
-  const H = 170;
+  const H = parent ? (parent.clientHeight || parent.offsetHeight || 190) : 190;
   cv.width = W*dpr; cv.height = H*dpr;
   cv.style.width = W+'px'; cv.style.height = H+'px';
   ctx.scale(dpr,dpr);
@@ -1854,46 +1858,39 @@ async function loadMetaAds() {
 }
 
 function renderMetaAdsGrid(spend, cpl, impressions, ctr, badge) {
-  const cplV = parseFloat(cpl||0);
-  // Benchmarks para mini bars (referência visual, não absoluta)
-  const cplBar = Math.max(0, Math.min(100, 100 - (cplV / 200 * 100))); // CPL menor = bar maior (melhor)
-  const ctrBar = Math.min(100, parseFloat(ctr||0) / 5 * 100);           // CTR 5% = 100%
-  const impBar = Math.min(100, parseInt(impressions||0) / 200000 * 100); // 200k impressões = 100%
+  const cplV   = parseFloat(cpl||0);
+  const ctrV   = parseFloat(ctr||0);
+  const impV   = parseInt(impressions||0);
+  const spendV = parseFloat(spend||0);
+  // Barra proporcional ao benchmark (visual, não absoluta)
+  const cplBar = Math.max(0, Math.min(100, 100 - (cplV / 200 * 100)));
+  const ctrBar = Math.min(100, ctrV / 5 * 100);
+  const impBar = Math.min(100, impV / 200000 * 100);
 
-  function miniBar(pct, color) {
-    return `<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:8px;overflow:hidden">
-      <div style="height:100%;width:0;border-radius:2px;background:${color};transition:width 1.2s cubic-bezier(.16,1,.3,1) .5s" data-w="${pct}%"></div>
+  function row(label, val, color, barPct) {
+    const bar = barPct != null
+      ? `<div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:6px;overflow:hidden">
+           <div style="height:100%;width:0;border-radius:2px;background:${color};transition:width 1.3s cubic-bezier(.16,1,.3,1) .4s" data-w="${barPct}%"></div>
+         </div>` : '';
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--bd)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <span style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">${label}</span>
+        <span style="font-family:var(--fD);font-size:18px;font-weight:700;color:${color}">${val}</span>
+      </div>${bar}
     </div>`;
   }
 
-  const html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" class="meta-ads-grid">' +
-    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Gasto Total</div>' +
-      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--warn)">R$' + parseFloat(spend||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
-    '</div>' +
-    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">CPL</div>' +
-      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--purple)">' + (parseFloat(spend||0) > 0 ? 'R$' + cplV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—') + '</div>' +
-      miniBar(cplBar, 'var(--purple)') +
-    '</div>' +
-    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Impressões</div>' +
-      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--text)">' + parseInt(impressions||0).toLocaleString('pt-BR') + '</div>' +
-      miniBar(impBar, 'rgba(239,239,241,0.4)') +
-    '</div>' +
-    '<div style="padding:14px 10px;background:var(--bg3);border:1px solid var(--bd)">' +
-      '<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">CTR</div>' +
-      '<div style="font-family:var(--fD);font-size:26px;font-weight:700;color:var(--neon)">' + parseFloat(ctr||0).toFixed(2) + '<span style="font-size:14px;color:var(--muted)">%</span></div>' +
-      miniBar(ctrBar, 'var(--neon)') +
-    '</div>' +
-  '</div>' + (badge || '');
+  const html =
+    row('Investimento', 'R$' + spendV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), 'var(--warn)', null) +
+    row('CPL', spendV > 0 ? 'R$' + cplV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', 'var(--purple)', cplBar) +
+    row('CTR', ctrV.toFixed(2) + '%', 'var(--neon)', ctrBar) +
+    row('Impressões', impV.toLocaleString('pt-BR'), 'var(--text)', impBar);
 
-  // Anima as mini bars depois do DOM inserido
   setTimeout(() => {
     document.querySelectorAll('#meta-ads-content [data-w]').forEach(el => { el.style.width = el.dataset.w; });
-  }, 100);
+  }, 120);
 
-  return html;
+  return html + (badge || '');
 }
 
 // ═══ TOP CAMPEÕES — CPL REAL (A6) ═══
