@@ -989,7 +989,7 @@ async function loadDashboard() {
   animCount(document.getElementById('kpi-leads'), leadsMonth);
   animCount(document.getElementById('kpi-agendou'), agendou);
   animCount(document.getElementById('kpi-fechou'), fechou);
-  animCount(document.getElementById('kpi-ana'), anaAtiva);
+  // kpi-ana foi substituído por kpi-cpl — sem animCount aqui, valor calculado depois
 
   // Deltas verdes — estilo LP
   const txAgend = leadsMonth > 0 ? (agendou/leadsMonth*100).toFixed(1) : 0;
@@ -1005,8 +1005,7 @@ async function loadDashboard() {
   // CPL real (gasto Meta / agendamentos)
   const kpiCpl = document.getElementById('kpi-cpl');
   if (kpiCpl) {
-    loadMetaAds().then ? null : null; // MetaAds carrega separado
-    // Tentativa via cache Meta se disponível
+    // Tentativa via cache Meta se disponível (MetaAds carrega separado mais abaixo)
     try {
       const cacheM = JSON.parse(localStorage.getItem('fm_meta_cache') || 'null');
       if (cacheM && cacheM.spend && agendou > 0) {
