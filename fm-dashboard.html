@@ -73,12 +73,13 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),transparent);opacity:0;transition:opacity .3s}
 .kpi:hover::before{opacity:.8}
 .kpi-lbl{font-family:var(--fD);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
-.kpi-val{font-family:var(--fD);font-size:50px;font-weight:700;line-height:1;color:var(--text);margin-bottom:4px}
+.kpi-val{font-family:var(--fD);font-size:28px;font-weight:700;line-height:1;color:var(--text);margin-bottom:4px}
 .kpi-val.g{color:var(--purple)}
 .kpi-val.n{color:var(--neon)}
-.kpi-unit{font-family:var(--fB);font-size:20px;font-weight:400;color:var(--muted)}
-.kpi-note{font-size:10.5px;color:var(--dim);font-family:var(--fM)}
+.kpi-unit{font-family:var(--fB);font-size:13px;font-weight:400;color:var(--muted)}
+.kpi-note{font-size:10px;color:var(--dim);font-family:var(--fM)}
 .kpi-note.up{color:var(--neon)}
+.kpi-delta{font-size:10px;color:#3fb950;margin-top:5px;font-family:var(--fM)}
 .kpi-bar{position:absolute;bottom:0;left:0;height:2px;width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1) .4s}
 
 /* ── LAYOUT ── */
@@ -450,10 +451,10 @@ canvas{display:block;width:100%!important}
   </div>
 
   <div class="kpi-row" id="kpi-row">
-    <div class="kpi"><div class="kpi-lbl">Leads este mês</div><div class="kpi-val g" id="kpi-leads">—</div><div class="kpi-note" id="kpi-leads-note">...</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" id="kpi-bar-1"></div></div>
-    <div class="kpi"><div class="kpi-lbl">Agendamentos</div><div class="kpi-val n" id="kpi-agendou">—</div><div class="kpi-note" id="kpi-agendou-note">confirmados</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-2"></div></div>
-    <div class="kpi"><div class="kpi-lbl">Fechamentos</div><div class="kpi-val" id="kpi-fechou">—</div><div class="kpi-note">total histórico</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" id="kpi-bar-3"></div></div>
-    <div class="kpi"><div class="kpi-lbl">Em atendimento</div><div class="kpi-val g" id="kpi-ana">—</div><div class="kpi-note" id="kpi-ana-note">Ana + equipe FM</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" id="kpi-bar-4"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Leads este mês</div><div class="kpi-val g" id="kpi-leads">—</div><div class="kpi-delta" id="kpi-delta-1"></div><div class="kpi-note" id="kpi-leads-note">...</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" id="kpi-bar-1"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Agendamentos</div><div class="kpi-val n" id="kpi-agendou">—</div><div class="kpi-delta" id="kpi-delta-2"></div><div class="kpi-note" id="kpi-agendou-note">confirmados</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-2"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Fechamentos</div><div class="kpi-val" id="kpi-fechou">—</div><div class="kpi-delta" id="kpi-delta-3"></div><div class="kpi-note">total histórico</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" id="kpi-bar-3"></div></div>
+    <div class="kpi"><div class="kpi-lbl">Ana respondeu</div><div class="kpi-val g" id="kpi-ana">—</div><div class="kpi-delta" id="kpi-delta-4"></div><div class="kpi-note" id="kpi-ana-note">conversas abertas</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" id="kpi-bar-4"></div></div>
   </div>
 
   <!-- Card Atendimento Ativo -->
@@ -968,6 +969,18 @@ async function loadDashboard() {
   animCount(document.getElementById('kpi-fechou'), fechou);
   animCount(document.getElementById('kpi-ana'), anaAtiva);
 
+  // Deltas verdes — estilo LP
+  const txAgend = leadsMonth > 0 ? (agendou/leadsMonth*100).toFixed(1) : 0;
+  const txFech  = agendou > 0 ? (fechou/agendou*100).toFixed(1) : 0;
+  const d1 = document.getElementById('kpi-delta-1');
+  const d2 = document.getElementById('kpi-delta-2');
+  const d3 = document.getElementById('kpi-delta-3');
+  const d4 = document.getElementById('kpi-delta-4');
+  if (d1) d1.textContent = leadsMonth > 0 ? `↑ ${leadsMonth} total rastreados` : '';
+  if (d2) d2.textContent = txAgend > 0 ? `↑ ${txAgend}% de conversão` : '';
+  if (d3) d3.textContent = txFech > 0 ? `↑ ${txFech}% dos agendados` : '';
+  if (d4) { const pctAna = leadsMonth > 0 ? (anaAtiva/leadsMonth*100).toFixed(0) : 0; d4.textContent = pctAna > 0 ? `${pctAna}% dos leads` : ''; }
+
   // Breakdown Ana vs Humano (paralelo, não bloqueia o resto)
   Promise.all([
     sbCount('dify_ativo=eq.true'),
@@ -1004,8 +1017,8 @@ async function loadDashboard() {
   loadCreativos('spend');
 
   // Funil — filtrado pelo período
-  const qFilter  = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}${endClause}` : 'qualificado=eq.true';
-  const respFilter = periodoISO ? `dify_conversation_id=not.is.null&criado_em=gte.${mesISO}${endClause}` : 'dify_conversation_id=not.is.null';
+  const qFilter    = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}${endClause}` : 'qualificado=eq.true';
+  const respFilter = periodoISO ? `dify_conversation_id=not.is.null&canal=eq.whatsapp&criado_em=gte.${mesISO}${endClause}` : 'dify_conversation_id=not.is.null&canal=eq.whatsapp';
   const [q, resp, ag, comp, fech] = await Promise.all([
     sbCount(qFilter),
     sbCount(respFilter),
@@ -1867,24 +1880,29 @@ function renderMetaAdsGrid(spend, cpl, impressions, ctr, badge) {
   const ctrBar = Math.min(100, ctrV / 5 * 100);
   const impBar = Math.min(100, impV / 200000 * 100);
 
-  function row(label, val, color, barPct) {
+  function row(label, val, color, barPct, good) {
+    const valColor = good ? '#3fb950' : color;
     const bar = barPct != null
       ? `<div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:6px;overflow:hidden">
-           <div style="height:100%;width:0;border-radius:2px;background:${color};transition:width 1.3s cubic-bezier(.16,1,.3,1) .4s" data-w="${barPct}%"></div>
+           <div style="height:100%;width:0;border-radius:2px;background:${valColor};transition:width 1.3s cubic-bezier(.16,1,.3,1) .4s" data-w="${barPct}%"></div>
          </div>` : '';
     return `<div style="padding:10px 0;border-bottom:1px solid var(--bd)">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
         <span style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">${label}</span>
-        <span style="font-family:var(--fD);font-size:18px;font-weight:700;color:${color}">${val}</span>
+        <span style="font-family:var(--fD);font-size:18px;font-weight:700;color:${valColor}">${val}</span>
       </div>${bar}
     </div>`;
   }
 
+  // CPL bom = abaixo de R$100; CTR bom = acima de 2%
+  const cplGood = cplV > 0 && cplV < 100;
+  const ctrGood = ctrV > 2;
+
   const html =
-    row('Investimento', 'R$' + spendV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), 'var(--warn)', null) +
-    row('CPL', spendV > 0 ? 'R$' + cplV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', 'var(--purple)', cplBar) +
-    row('CTR', ctrV.toFixed(2) + '%', 'var(--neon)', ctrBar) +
-    row('Impressões', impV.toLocaleString('pt-BR'), 'var(--text)', impBar);
+    row('Investimento', 'R$' + spendV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), 'var(--warn)', null, false) +
+    row('CPL', spendV > 0 ? 'R$' + cplV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', 'var(--purple)', cplBar, cplGood) +
+    row('CTR', ctrV.toFixed(2) + '%', 'var(--neon)', ctrBar, ctrGood) +
+    row('Impressões', impV.toLocaleString('pt-BR'), 'var(--text)', impBar, false);
 
   setTimeout(() => {
     document.querySelectorAll('#meta-ads-content [data-w]').forEach(el => { el.style.width = el.dataset.w; });
