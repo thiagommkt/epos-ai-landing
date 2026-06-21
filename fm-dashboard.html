@@ -473,7 +473,7 @@ canvas{display:block;width:100%!important}
       <div style="display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px" id="main-charts-row">
         <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px">
           <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Leads por Dia — últimos 30 dias</div>
-          <div style="position:relative;height:90px;overflow:hidden"><canvas id="wk-chart" height="90" style="position:absolute;top:0;left:0"></canvas></div>
+          <div style="position:relative;height:110px;overflow:hidden"><canvas id="wk-chart" height="110" style="position:absolute;top:0;left:0"></canvas></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <!-- Meta Ads (topo do painel direito) -->
@@ -689,20 +689,16 @@ canvas{display:block;width:100%!important}
     <span id="period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);margin-left:8px;letter-spacing:.06em">· Últimos 7 dias</span>
   </div>
 
-  <!-- Tabs análises — scroll horizontal com indicador visual -->
-  <div style="position:relative;margin-bottom:24px">
-    <div id="mb-tabs-wrap" style="display:flex;gap:0;border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-behavior:smooth">
-      <style>#mb-tabs-wrap::-webkit-scrollbar{display:none}</style>
-      <button class="mb-tab" data-active="true" onclick="showMB(this,'mb-campanhas')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid var(--purple);color:var(--purple);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">📊 Campanhas</button>
-      <button class="mb-tab" onclick="showMB(this,'mb-funil')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">📉 Funil</button>
-      <button class="mb-tab" onclick="showMB(this,'mb-perfil')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">👤 Perfil</button>
-      <button class="mb-tab" onclick="showMB(this,'mb-saude')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">💚 Saúde</button>
-      <button class="mb-tab" onclick="showMB(this,'mb-volume')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">📈 Volume</button>
-      <button class="mb-tab" onclick="showMB(this,'mb-leads-fonte')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">🎯 Origem</button>
-      <button class="mb-tab" onclick="showMB(this,'mb-pago-org')" style="display:flex;align-items:center;gap:5px;padding:9px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0">⚖️ Pago/Org</button>
-    </div>
-    <!-- Indicador de scroll à direita -->
-    <div id="mb-scroll-hint" style="position:absolute;right:0;top:0;bottom:1px;width:32px;background:linear-gradient(to right,transparent,var(--bg2));pointer-events:none"></div>
+  <!-- Tabs análises -->
+  <div style="position:relative;margin-bottom:20px;background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:4px;display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
+    <style>#mb-tabs-wrap::-webkit-scrollbar{display:none}.mb-tab-pill{padding:7px 14px;background:transparent;border:none;border-radius:8px;color:#8b949e;font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}.mb-tab-pill.active,.mb-tab-pill[data-active="true"]{background:rgba(145,70,255,0.15);color:var(--purple)}.mb-tab-pill:hover:not(.active){background:rgba(255,255,255,0.04);color:#e6edf3}</style>
+    <button class="mb-tab-pill" id="mb-tabs-wrap" data-active="true" onclick="showMB(this,'mb-campanhas')">Campanhas</button>
+    <button class="mb-tab-pill" onclick="showMB(this,'mb-funil')">Funil</button>
+    <button class="mb-tab-pill" onclick="showMB(this,'mb-perfil')">Perfil</button>
+    <button class="mb-tab-pill" onclick="showMB(this,'mb-saude')">Saúde</button>
+    <button class="mb-tab-pill" onclick="showMB(this,'mb-volume')">Volume</button>
+    <button class="mb-tab-pill" onclick="showMB(this,'mb-leads-fonte')">Origem</button>
+    <button class="mb-tab-pill" onclick="showMB(this,'mb-pago-org')">Pago/Org</button>
   </div>
 
   <!-- Iframes -->
@@ -1385,19 +1381,29 @@ function drawBar(id, labels, vals, c1, c2) {
     ctx.fillStyle='rgba(239,239,241,0.15)'; ctx.font='12px Outfit';
     ctx.textAlign='center'; ctx.fillText('Sem dados',W/2,H/2); return;
   }
-  const MAX = Math.max(...vals)+1, pL=20,pR=20,pT=14,pB=28,aW=W-pL-pR,aH=H-pT-pB;
-  const step=aW/vals.length, bW=step*.55; let prog=0;
+  const MAX = Math.max(...vals)+1, pL=16,pR=16,pT=10,pB=22,aW=W-pL-pR,aH=H-pT-pB;
+  const step=aW/vals.length, bW=Math.max(step*.6,3), r=3; let prog=0;
+  function roundedBar(ctx,x,y,w,h,radius){
+    if(h<=0) return;
+    if(h<radius*2) radius=h/2;
+    ctx.beginPath();
+    ctx.moveTo(x+radius,y); ctx.lineTo(x+w-radius,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+radius);
+    ctx.lineTo(x+w,y+h); ctx.lineTo(x,y+h);
+    ctx.lineTo(x,y+radius);
+    ctx.quadraticCurveTo(x,y,x+radius,y);
+    ctx.closePath(); ctx.fill();
+  }
   (function frame(){
     ctx.clearRect(0,0,W,H);
-    for(let i=1;i<=3;i++){const gy=pT+aH-aH*i/MAX;ctx.strokeStyle='rgba(145,70,255,0.08)';ctx.lineWidth=1;ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(pL,gy);ctx.lineTo(W-pR,gy);ctx.stroke();ctx.setLineDash([]);}
+    for(let i=1;i<=3;i++){const gy=pT+aH-aH*i/MAX;ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;ctx.setLineDash([3,6]);ctx.beginPath();ctx.moveTo(pL,gy);ctx.lineTo(W-pR,gy);ctx.stroke();ctx.setLineDash([]);}
     vals.forEach((v,i)=>{
       const x=pL+step*i+(step-bW)/2,fH=(v/MAX)*aH*Math.min(prog,1),y=pT+aH-fH;
       const gr=ctx.createLinearGradient(x,y,x,pT+aH);gr.addColorStop(0,c1);gr.addColorStop(1,c2);
-      ctx.fillStyle=gr;ctx.fillRect(x,y,bW,fH);
-      ctx.fillStyle=c1.replace('0.75)','1)');ctx.fillRect(x,y,bW,2);
-      ctx.fillStyle='rgba(239,239,241,0.3)';ctx.font='9px Outfit';ctx.textAlign='center';
-      if(i%2===0) ctx.fillText(labels[i],x+bW/2,H-pB+16);
-      if(prog>=1){ctx.fillStyle=c1.replace('0.75)','0.8)');ctx.font='9px "DM Mono"';ctx.fillText(v,x+bW/2,y-4);}
+      ctx.fillStyle=gr; roundedBar(ctx,x,y,bW,fH,r);
+      ctx.fillStyle='rgba(239,239,241,0.3)';ctx.font='9px "DM Sans"';ctx.textAlign='center';
+      if(i%2===0||vals.length<=15) ctx.fillText(labels[i],x+bW/2,H-4);
+      if(prog>=1&&v>0){ctx.fillStyle='rgba(239,239,241,0.7)';ctx.font='bold 9px "DM Mono"';ctx.fillText(v,x+bW/2,y-4);}
     });
     if(prog<1){prog+=.04; cv._animId=requestAnimationFrame(frame);}
     else { cv._animId=null; }
@@ -1795,13 +1801,15 @@ let currentPeriod = 'past7days';
 
 function showMB(btn, id) {
   document.querySelectorAll('.mb-frame').forEach(f => f.style.display='none');
-  document.querySelectorAll('.mb-tab').forEach(t => {
-    t.style.borderBottomColor='transparent';
-    t.style.color='var(--muted)';
+  document.querySelectorAll('.mb-tab-pill').forEach(t => {
+    t.style.background='transparent';
+    t.style.color='#8b949e';
+    t.dataset.active='';
   });
   document.getElementById(id).style.display='block';
-  btn.style.borderBottomColor='var(--purple)';
+  btn.style.background='rgba(145,70,255,0.15)';
   btn.style.color='var(--purple)';
+  btn.dataset.active='true';
 }
 
 function setPeriod(btn, period, label) {
@@ -1930,7 +1938,7 @@ function renderMetaAdsGrid(spend, cpl, impressions, ctr, badge) {
   const ctrGood = ctrV > 2;
 
   const html =
-    row('Investimento', 'R$' + spendV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), 'var(--warn)', null, false) +
+    row('Investimento', 'R$' + spendV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}), '#e6edf3', null, false) +
     row('CPL', spendV > 0 ? 'R$' + cplV.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—', 'var(--purple)', cplBar, cplGood) +
     row('CTR', ctrV.toFixed(2) + '%', 'var(--neon)', ctrBar, ctrGood) +
     row('Impressões', impV.toLocaleString('pt-BR'), 'var(--text)', impBar, false);
@@ -2042,46 +2050,61 @@ async function loadCampeoes() {
 }
 
 // ═══ HELPER — renderiza cards de criativos (usado em loadCreativos + loadCampeoes cache) ═══
-function renderCriativosCards(ads, box, preset, sortBy) {
+function renderCriativosCards(ads, box, preset, sortBy, sbData) {
   if (!ads || !ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
-  const rankLabels = sortBy === 'ctr'
-    ? ['🥇 #1 Melhor CTR', '🥈 #2', '🥉 #3', '#4']
-    : ['🥇 #1 Maior Gasto', '🥈 #2', '🥉 #3', '#4'];
-  const cards = ads.slice(0, 4).map((ad, i) => {
+  const rankLabels = ['🥇 #1', '🥈 #2', '🥉 #3', '#4', '#5', '#6', '#7', '#8'];
+  const cards = ads.slice(0, 8).map((ad, i) => {
     const thumb = ad.thumbnail_url
-      ? `<img src="${ad.thumbnail_url}" style="width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:10px;display:block" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'height:120px;background:#0d1117;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:center\\'><svg width=\\'24\\' height=\\'24\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'rgba(200,169,110,0.3)\\' stroke-width=\\'1.5\\'><rect x=\\'2\\' y=\\'3\\' width=\\'20\\' height=\\'14\\' rx=\\'2\\'/><path d=\\'m7 21 5-5 5 5\\'/></svg></div>'">`
-      : `<div style="height:120px;background:#0d1117;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(200,169,110,0.3)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m7 21 5-5 5 5"/></svg></div>`;
-    const spend  = parseFloat(ad.spend  || 0);
-    const ctr    = parseFloat(ad.ctr    || 0);
-    const cpc    = parseFloat(ad.cpc    || 0);
-    const clicks = parseInt(ad.clicks   || 0);
-    const impr   = parseInt(ad.impressions || 0);
-    const name   = (ad.ad_name || ad.name || '—').substring(0, 36) + ((ad.ad_name||ad.name||'').length > 36 ? '…' : '');
-    const camp   = (ad.campaign_name || '').substring(0, 28) + ((ad.campaign_name||'').length > 28 ? '…' : '');
-    const ctrC   = ctr > 2 ? '#3fb950' : ctr > 1 ? '#c8a96e' : '#8b949e';
-    const spendS = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
-    return `<div style="background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:0">
-      <div style="font-size:9px;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">${rankLabels[i] || `#${i+1}`}</div>
+      ? `<img src="${ad.thumbnail_url}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;margin-bottom:10px;display:block" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="aspect-ratio:16/9;background:#0d1117;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(145,70,255,0.3)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m7 21 5-5 5 5"/></svg></div>`;
+    const spend    = parseFloat(ad.spend || 0);
+    const ctr      = parseFloat(ad.ctr || 0);
+    const clicks   = parseInt(ad.clicks || 0);
+    const adKey    = (ad.ad_name || ad.name || '').trim();
+    const sbAd     = sbData && sbData[adKey] || {};
+    const leads    = sbAd.leads    || 0;
+    const agendou  = sbAd.agendou  || 0;
+    const fechou   = sbAd.fechou   || 0;
+    const name     = adKey.substring(0, 32) + (adKey.length > 32 ? '…' : '');
+    const camp     = (ad.campaign_name || '').substring(0, 26) + ((ad.campaign_name||'').length > 26 ? '…' : '');
+    const ctrC     = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
+    const spendS   = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
+    return `<div style="background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px;display:flex;flex-direction:column">
+      <div style="font-size:9px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">${rankLabels[i] || `#${i+1}`}</div>
       ${thumb}
-      <div style="font-size:12px;font-weight:600;color:#e6edf3;line-height:1.4;margin-bottom:2px">${name}</div>
-      ${camp ? `<div style="font-size:10px;color:#8b949e;margin-bottom:8px;line-height:1.3">${camp}</div>` : '<div style="margin-bottom:8px"></div>'}
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:auto">
-        <div style="background:#0d1117;border-radius:6px;padding:7px 8px">
-          <div style="font-size:9px;color:#8b949e;margin-bottom:2px">Gasto</div>
-          <div style="font-size:13px;font-weight:700;color:#e6edf3">${spendS}</div>
+      <div style="font-size:11px;font-weight:600;color:#e6edf3;line-height:1.4;margin-bottom:2px">${name}</div>
+      ${camp ? `<div style="font-size:9px;color:#8b949e;margin-bottom:8px">${camp}</div>` : '<div style="margin-bottom:8px"></div>'}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:5px">
+        <div style="background:#0d1117;border-radius:5px;padding:6px 7px">
+          <div style="font-size:8px;color:#8b949e;margin-bottom:1px">Gasto</div>
+          <div style="font-size:12px;font-weight:700;color:#e6edf3">${spendS}</div>
         </div>
-        <div style="background:#0d1117;border-radius:6px;padding:7px 8px">
-          <div style="font-size:9px;color:#8b949e;margin-bottom:2px">CTR</div>
-          <div style="font-size:13px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</div>
+        <div style="background:#0d1117;border-radius:5px;padding:6px 7px">
+          <div style="font-size:8px;color:#8b949e;margin-bottom:1px">CTR</div>
+          <div style="font-size:12px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</div>
         </div>
-        <div style="background:#0d1117;border-radius:6px;padding:7px 8px">
-          <div style="font-size:9px;color:#8b949e;margin-bottom:2px">Cliques</div>
-          <div style="font-size:13px;font-weight:700;color:#e6edf3">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</div>
+        <div style="background:#0d1117;border-radius:5px;padding:6px 7px">
+          <div style="font-size:8px;color:#8b949e;margin-bottom:1px">Cliques</div>
+          <div style="font-size:12px;font-weight:700;color:#e6edf3">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</div>
         </div>
       </div>
+      ${leads > 0 || agendou > 0 ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">
+        <div style="background:rgba(145,70,255,0.08);border:1px solid rgba(145,70,255,0.15);border-radius:5px;padding:6px 7px">
+          <div style="font-size:8px;color:rgba(145,70,255,0.7);margin-bottom:1px">Leads</div>
+          <div style="font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads}</div>
+        </div>
+        <div style="background:rgba(0,245,160,0.06);border:1px solid rgba(0,245,160,0.15);border-radius:5px;padding:6px 7px">
+          <div style="font-size:8px;color:rgba(0,245,160,0.6);margin-bottom:1px">Agendou</div>
+          <div style="font-size:12px;font-weight:700;color:#3fb950">${agendou}</div>
+        </div>
+        <div style="background:rgba(0,245,160,0.1);border:1px solid rgba(0,245,160,0.2);border-radius:5px;padding:6px 7px">
+          <div style="font-size:8px;color:rgba(0,245,160,0.7);margin-bottom:1px">Fechou</div>
+          <div style="font-size:12px;font-weight:700;color:#3fb950">${fechou}</div>
+        </div>
+      </div>` : ''}
     </div>`;
   }).join('');
-  box.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${cards}</div>
+  box.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${cards}</div>
     <div style="font-size:9px;color:var(--dim);padding:10px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
 }
 function renderCriativosTable(ads, box, fromCache) { renderCriativosCards(ads, box, 'last_30d', 'spend'); } // legado
@@ -2101,15 +2124,22 @@ async function loadCreativos(sortBy) {
   const presetMap = { this_month: 'this_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
   try {
-    const r = await fetch(ACOES_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_creatives', date_preset: preset, sort_by: currentSortBy })
-    });
-    const d = await r.json();
+    const [rMeta, rLeads, rAgend, rFech] = await Promise.all([
+      fetch(ACOES_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_creatives', date_preset: preset, sort_by: currentSortBy }) }),
+      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY } }),
+      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null&agendou=eq.true`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY } }),
+      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null&fechou=eq.true`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY } })
+    ]);
+    const d = await rMeta.json();
     if (!d.success || !d.ads || d.ads.length === 0) { box.innerHTML = '<div class="empty">Sem dados de criativos para este período</div>'; return; }
+    // Construir mapa de leads/agendamentos/fechamentos por utm_content
+    const sbData = {};
+    const addTo = (rows, field) => (Array.isArray(rows)?rows:[]).forEach(r => { const k=(r.utm_content||'').trim(); if(k){ if(!sbData[k]) sbData[k]={}; sbData[k][field]=(sbData[k][field]||0)+1; } });
+    [await rLeads.json(), null].slice(0,1).forEach(r => addTo(r,'leads'));
+    addTo(await rAgend.json(), 'agendou');
+    addTo(await rFech.json(), 'fechou');
     try { localStorage.setItem('fm_criativos_cache_b', JSON.stringify({ads: d.ads, ts: Date.now()})); } catch(ec) {}
-    renderCriativosCards(d.ads, box, preset, sortBy);
+    renderCriativosCards(d.ads, box, preset, sortBy, sbData);
   } catch(e) {
     box.innerHTML = '<div class="empty" style="font-size:11px">Criativos: ' + e.message + '</div>';
   }
