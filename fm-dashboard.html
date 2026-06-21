@@ -1382,7 +1382,6 @@ async function onDrop(e) {
 // ═══ GRÁFICO ═══
 function drawBar(id, labels, vals, c1, c2) {
   const cv = document.getElementById(id); if(!cv) return;
-  // Cancela animação anterior para evitar múltiplos loops simultâneos
   if (cv._animId) { cancelAnimationFrame(cv._animId); cv._animId = null; }
   const parent = cv.parentElement;
   const W = parent ? parent.clientWidth || parent.offsetWidth : 0;
@@ -1391,14 +1390,15 @@ function drawBar(id, labels, vals, c1, c2) {
   const H = parent ? (parent.clientHeight || parent.offsetHeight || 190) : 190;
   cv.width = W*dpr; cv.height = H*dpr;
   cv.style.width = W+'px'; cv.style.height = H+'px';
+  cv.style.cursor = 'crosshair';
   ctx.scale(dpr,dpr);
   if (!vals.length) {
     ctx.fillStyle='rgba(239,239,241,0.15)'; ctx.font='12px Outfit';
     ctx.textAlign='center'; ctx.fillText('Sem dados',W/2,H/2); return;
   }
   const MAX = Math.max(...vals)+1, pL=16,pR=16,pT=10,pB=22,aW=W-pL-pR,aH=H-pT-pB;
-  const step=aW/vals.length, bW=Math.max(step*.6,3), r=3; let prog=0;
-  function roundedBar(ctx,x,y,w,h,radius){
+  const step=aW/vals.length, bW=Math.max(step*.6,3), r=3;
+  function roundedBar(x,y,w,h,radius){
     if(h<=0) return;
     if(h<radius*2) radius=h/2;
     ctx.beginPath();
@@ -1409,20 +1409,36 @@ function drawBar(id, labels, vals, c1, c2) {
     ctx.quadraticCurveTo(x,y,x+radius,y);
     ctx.closePath(); ctx.fill();
   }
-  (function frame(){
+  function renderBars(hIdx, progVal) {
     ctx.clearRect(0,0,W,H);
     for(let i=1;i<=3;i++){const gy=pT+aH-aH*i/MAX;ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;ctx.setLineDash([3,6]);ctx.beginPath();ctx.moveTo(pL,gy);ctx.lineTo(W-pR,gy);ctx.stroke();ctx.setLineDash([]);}
     vals.forEach((v,i)=>{
-      const x=pL+step*i+(step-bW)/2,fH=(v/MAX)*aH*Math.min(prog,1),y=pT+aH-fH;
-      const gr=ctx.createLinearGradient(x,y,x,pT+aH);gr.addColorStop(0,c1);gr.addColorStop(1,c2);
-      ctx.fillStyle=gr; roundedBar(ctx,x,y,bW,fH,r);
-      ctx.fillStyle='rgba(239,239,241,0.3)';ctx.font='9px "DM Sans"';ctx.textAlign='center';
+      const x=pL+step*i+(step-bW)/2, fH=(v/MAX)*aH*Math.min(progVal,1), y=pT+aH-fH;
+      const hot=hIdx===i;
+      const gr=ctx.createLinearGradient(x,y,x,pT+aH);
+      gr.addColorStop(0, hot?'rgba(190,110,255,0.98)':c1);
+      gr.addColorStop(1, hot?'rgba(145,70,255,0.25)':c2);
+      ctx.fillStyle=gr; roundedBar(x,y,bW,fH,r);
+      ctx.fillStyle=hot?'rgba(239,239,241,0.9)':'rgba(239,239,241,0.3)';
+      ctx.font='9px "DM Sans"';ctx.textAlign='center';
       if(i%2===0||vals.length<=15) ctx.fillText(labels[i],x+bW/2,H-4);
-      if(prog>=1&&v>0){ctx.fillStyle='rgba(239,239,241,0.7)';ctx.font='bold 9px "DM Mono"';ctx.fillText(v,x+bW/2,y-4);}
+      if(progVal>=1&&v>0){ctx.fillStyle=hot?'#fff':'rgba(239,239,241,0.7)';ctx.font=`bold ${hot?10:9}px "DM Mono"`;ctx.fillText(v,x+bW/2,y-4);}
     });
-    if(prog<1){prog+=.04; cv._animId=requestAnimationFrame(frame);}
-    else { cv._animId=null; }
-  })();
+  }
+  let prog=0;
+  (function frame(){ renderBars(-1,prog); if(prog<1){prog+=.04;cv._animId=requestAnimationFrame(frame);}else{cv._animId=null;} })();
+  let tip=document.getElementById('wk-tip');
+  if(!tip){tip=document.createElement('div');tip.id='wk-tip';tip.style.cssText='position:fixed;background:#1c2128;border:1px solid rgba(145,70,255,0.5);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:#e6edf3;pointer-events:none;display:none;z-index:9999;white-space:nowrap';document.body.appendChild(tip);}
+  cv._lastHover=-1;
+  cv.onmousemove=function(e){
+    const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left;
+    let found=-1;
+    for(let i=0;i<vals.length;i++){const x=pL+step*i+(step-bW)/2;if(mx>=x-6&&mx<=x+bW+6){found=i;break;}}
+    if(found!==cv._lastHover){cv._lastHover=found;renderBars(found,1);}
+    if(found>=0){tip.textContent=`${labels[found]}: ${vals[found]} lead${vals[found]!==1?'s':''}`;tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-34)+'px';}
+    else tip.style.display='none';
+  };
+  cv.onmouseleave=function(){cv._lastHover=-1;renderBars(-1,1);tip.style.display='none';};
 }
 
 // ═══ CHAT FALLBACK ═══
@@ -2064,64 +2080,57 @@ async function loadCampeoes() {
   }
 }
 
-// ═══ HELPER — renderiza cards de criativos (usado em loadCreativos + loadCampeoes cache) ═══
+// ═══ HELPER — renderiza criativos em lista compacta ═══
 function renderCriativosCards(ads, box, preset, sortBy, sbData) {
   if (!ads || !ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
-  const rankLabels = ['🥇 #1', '🥈 #2', '🥉 #3', '#4', '#5', '#6', '#7', '#8'];
-  const cards = ads.slice(0, 8).map((ad, i) => {
-    const imgUrl = ad.picture || ad.thumbnail_url;
-    const thumb = imgUrl
-      ? `<img src="${imgUrl}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:5px;margin-bottom:8px;display:block;max-height:90px" loading="lazy" onerror="this.style.display='none'">`
-      : `<div style="aspect-ratio:16/9;background:#0d1117;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(145,70,255,0.3)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m7 21 5-5 5 5"/></svg></div>`;
+  const medals = ['🥇','🥈','🥉','4º','5º','6º','7º','8º'];
+  const rows = ads.slice(0, 8).map((ad, i) => {
+    const imgUrl   = ad.picture || ad.thumbnail_url;
     const spend    = parseFloat(ad.spend || 0);
     const ctr      = parseFloat(ad.ctr || 0);
     const clicks   = parseInt(ad.clicks || 0);
     const adKey    = (ad.ad_name || ad.name || '').trim();
     const sbAd     = sbData && sbData[adKey] || {};
-    const leads    = sbAd.leads    || 0;
-    const agendou  = sbAd.agendou  || 0;
-    const fechou   = sbAd.fechou   || 0;
-    const name     = adKey.substring(0, 32) + (adKey.length > 32 ? '…' : '');
-    const camp     = (ad.campaign_name || '').substring(0, 26) + ((ad.campaign_name||'').length > 26 ? '…' : '');
+    const leads    = sbAd.leads   || 0;
+    const agendou  = sbAd.agendou || 0;
+    const fechou   = sbAd.fechou  || 0;
+    const name     = adKey.substring(0, 40) + (adKey.length > 40 ? '…' : '');
+    const camp     = (ad.campaign_name || '').substring(0, 32) + ((ad.campaign_name||'').length > 32 ? '…' : '');
     const ctrC     = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
     const spendS   = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
-    return `<div class="criativo-thumb-wrap" style="background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px;display:flex;flex-direction:column">
-      <div style="font-size:9px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">${rankLabels[i] || `#${i+1}`}</div>
-      ${thumb}
-      <div style="font-size:11px;font-weight:600;color:#e6edf3;line-height:1.4;margin-bottom:2px">${name}</div>
-      ${camp ? `<div style="font-size:9px;color:#8b949e;margin-bottom:8px">${camp}</div>` : '<div style="margin-bottom:8px"></div>'}
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:5px">
-        <div style="background:#0d1117;border-radius:5px;padding:6px 7px">
-          <div style="font-size:8px;color:#8b949e;margin-bottom:1px">Gasto</div>
-          <div style="font-size:12px;font-weight:700;color:#e6edf3">${spendS}</div>
-        </div>
-        <div style="background:#0d1117;border-radius:5px;padding:6px 7px">
-          <div style="font-size:8px;color:#8b949e;margin-bottom:1px">CTR</div>
-          <div style="font-size:12px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</div>
-        </div>
-        <div style="background:#0d1117;border-radius:5px;padding:6px 7px">
-          <div style="font-size:8px;color:#8b949e;margin-bottom:1px">Cliques</div>
-          <div style="font-size:12px;font-weight:700;color:#e6edf3">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</div>
-        </div>
-      </div>
-      ${leads > 0 || agendou > 0 ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">
-        <div style="background:rgba(145,70,255,0.08);border:1px solid rgba(145,70,255,0.15);border-radius:5px;padding:6px 7px">
-          <div style="font-size:8px;color:rgba(145,70,255,0.7);margin-bottom:1px">Leads</div>
-          <div style="font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads}</div>
-        </div>
-        <div style="background:rgba(0,245,160,0.06);border:1px solid rgba(0,245,160,0.15);border-radius:5px;padding:6px 7px">
-          <div style="font-size:8px;color:rgba(0,245,160,0.6);margin-bottom:1px">Agendou</div>
-          <div style="font-size:12px;font-weight:700;color:#3fb950">${agendou}</div>
-        </div>
-        <div style="background:rgba(0,245,160,0.1);border:1px solid rgba(0,245,160,0.2);border-radius:5px;padding:6px 7px">
-          <div style="font-size:8px;color:rgba(0,245,160,0.7);margin-bottom:1px">Fechou</div>
-          <div style="font-size:12px;font-weight:700;color:#3fb950">${fechou}</div>
-        </div>
-      </div>` : ''}
-    </div>`;
+    const thumb    = imgUrl
+      ? `<img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06)" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="width:44px;height:44px;background:#0d1117;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`;
+    const sbCols = (leads > 0 || agendou > 0)
+      ? `<td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads||'—'}</td>
+         <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${agendou||'—'}</td>
+         <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${fechou||'—'}</td>`
+      : `<td colspan="3" style="padding:10px 8px;text-align:center;font-family:var(--fM);font-size:10px;color:var(--dim)">—</td>`;
+    return `<tr class="criativo-thumb-wrap" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <td style="padding:10px 8px;text-align:center;font-size:15px;white-space:nowrap">${medals[i]||`${i+1}º`}</td>
+      <td style="padding:10px 8px"><div style="display:flex;align-items:center;gap:10px">${thumb}
+        <div><div style="font-size:12px;font-weight:600;color:#e6edf3;line-height:1.3">${name}</div>
+        <div style="font-size:10px;color:#8b949e;margin-top:1px">${camp}</div></div></div></td>
+      <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:#e6edf3">${spendS}</td>
+      <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</td>
+      <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;color:#8b949e">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</td>
+      ${sbCols}
+    </tr>`;
   }).join('');
-  box.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">${cards}</div>
-    <div style="font-size:9px;color:var(--dim);padding:10px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
+  box.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+    <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08)">
+      <th style="padding:8px;text-align:center;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">#</th>
+      <th style="padding:8px;text-align:left;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Criativo</th>
+      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Gasto</th>
+      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">CTR</th>
+      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Cliques</th>
+      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(145,70,255,0.7);letter-spacing:.1em;text-transform:uppercase">Leads</th>
+      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.6);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Agendou</th>
+      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.7);letter-spacing:.1em;text-transform:uppercase">Fechou</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>
+  <div style="font-size:9px;color:var(--dim);padding:8px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
 }
 function renderCriativosTable(ads, box, fromCache) { renderCriativosCards(ads, box, 'last_30d', 'spend'); } // legado
 
