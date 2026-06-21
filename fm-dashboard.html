@@ -266,6 +266,20 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 canvas{display:block;width:100%!important}
 .mb-frame{border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
 
+/* ── DATA HOVER ── */
+.f-row{border-radius:4px;cursor:default;transition:background .12s}
+.f-row:hover{background:rgba(145,70,255,0.08)}
+.utm-row{border-radius:4px;cursor:default;transition:background .12s}
+.utm-row:hover{background:rgba(145,70,255,0.08)}
+.criativo-thumb-wrap{cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .18s}
+.criativo-thumb-wrap:hover{border-color:rgba(145,70,255,0.55)!important;box-shadow:0 4px 20px rgba(145,70,255,0.18)!important;transform:translateY(-3px)}
+.meta-row{cursor:default;transition:background .12s;border-radius:4px}
+.meta-row:hover{background:rgba(145,70,255,0.07)}
+.cfg-row{transition:background .12s;cursor:default;border-radius:4px}
+.cfg-row:hover{background:rgba(145,70,255,0.06)}
+.panel-row{transition:background .12s;border-radius:4px}
+.panel-row:hover{background:rgba(145,70,255,0.06)}
+
 /* ── MOBILE ── */
 @media(min-width:769px){
   .mb-iframe{height:calc(100vh - 200px)!important;min-height:700px}
@@ -1926,7 +1940,7 @@ function renderMetaAdsGrid(spend, cpl, impressions, ctr, badge) {
       ? `<div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:6px;overflow:hidden">
            <div style="height:100%;width:0;border-radius:2px;background:${valColor};transition:width 1.3s cubic-bezier(.16,1,.3,1) .4s" data-w="${barPct}%"></div>
          </div>` : '';
-    return `<div style="padding:10px 0;border-bottom:1px solid var(--bd)">
+    return `<div class="meta-row" style="padding:10px 0;border-bottom:1px solid var(--bd)">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
         <span style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">${label}</span>
         <span style="font-family:var(--fD);font-size:18px;font-weight:700;color:${valColor}">${val}</span>
@@ -2057,7 +2071,7 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
   const cards = ads.slice(0, 8).map((ad, i) => {
     const imgUrl = ad.picture || ad.thumbnail_url;
     const thumb = imgUrl
-      ? `<img src="${imgUrl}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;margin-bottom:10px;display:block" loading="lazy" onerror="this.style.display='none'">`
+      ? `<img src="${imgUrl}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:5px;margin-bottom:8px;display:block;max-height:90px" loading="lazy" onerror="this.style.display='none'">`
       : `<div style="aspect-ratio:16/9;background:#0d1117;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(145,70,255,0.3)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m7 21 5-5 5 5"/></svg></div>`;
     const spend    = parseFloat(ad.spend || 0);
     const ctr      = parseFloat(ad.ctr || 0);
@@ -2106,7 +2120,7 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
       </div>` : ''}
     </div>`;
   }).join('');
-  box.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${cards}</div>
+  box.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">${cards}</div>
     <div style="font-size:9px;color:var(--dim);padding:10px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
 }
 function renderCriativosTable(ads, box, fromCache) { renderCriativosCards(ads, box, 'last_30d', 'spend'); } // legado
