@@ -960,6 +960,7 @@ let leadsFilter = 'todos';
 let leadsSearch = '';
 
 async function loadDashboard() {
+  const onDashboard = document.getElementById('s-dashboard')?.classList.contains('active');
   const now = new Date();
   const brt = new Date(now.getTime() - 3*60*60*1000);
   // Período selecionado pelo usuário
@@ -994,9 +995,9 @@ async function loadDashboard() {
   const kpiLeadsEl = document.querySelector('.kpi-lbl');
   if (kpiLeadsEl) kpiLeadsEl.textContent = `Leads (${pLabel})`;
 
-  animCount(document.getElementById('kpi-leads'), leadsMonth);
-  animCount(document.getElementById('kpi-agendou'), agendou);
-  animCount(document.getElementById('kpi-fechou'), fechou);
+  if (onDashboard) animCount(document.getElementById('kpi-leads'), leadsMonth);
+  if (onDashboard) animCount(document.getElementById('kpi-agendou'), agendou);
+  if (onDashboard) animCount(document.getElementById('kpi-fechou'), fechou);
   // kpi-ana foi substituído por kpi-cpl — sem animCount aqui, valor calculado depois
 
   // Deltas verdes — estilo LP
@@ -1044,7 +1045,7 @@ async function loadDashboard() {
   const bar2 = document.getElementById('kpi-bar-2');
   const bar3 = document.getElementById('kpi-bar-3');
   const bar4 = document.getElementById('kpi-bar-4');
-  setTimeout(() => {
+  if (onDashboard) setTimeout(() => {
     bar1.style.width = Math.min(100, leadsMonth / Math.max(leadsTotal,1) * 100 * 3) + '%';
     bar2.style.width = Math.min(100, agendou / Math.max(leadsTotal,1) * 100 * 5) + '%';
     bar3.style.width = Math.min(100, fechou / Math.max(agendou,1) * 100) + '%';
@@ -1070,6 +1071,7 @@ async function loadDashboard() {
   ]);
   const T = leadsTotal || 1;
   const funil = document.getElementById('funnel-container');
+  if (!onDashboard) return;
   funil.innerHTML = `
     <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((leadsTotal-resp)/T*100)}%</div></div>
@@ -1477,7 +1479,7 @@ function show(id) {
   }
 }
 document.querySelectorAll('nav a[data-sec]').forEach(a => {
-  a.addEventListener('click', e => { e.preventDefault(); show(a.dataset.sec); });
+  a.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
 });
 
 // ═══ CRM PROXY (API key nunca exposta no browser) ═══
