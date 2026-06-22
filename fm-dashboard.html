@@ -1056,6 +1056,8 @@ async function loadDashboard() {
   const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
   document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
 
+  if (!onDashboard) return;
+
   loadMetaAds();
   loadCreativos(currentSortBy);
 
@@ -1071,7 +1073,6 @@ async function loadDashboard() {
   ]);
   const T = leadsTotal || 1;
   const funil = document.getElementById('funnel-container');
-  if (!onDashboard) return;
   funil.innerHTML = `
     <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((leadsTotal-resp)/T*100)}%</div></div>
