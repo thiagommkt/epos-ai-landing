@@ -1057,7 +1057,7 @@ async function loadDashboard() {
   document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
 
   loadMetaAds();
-  loadCreativos('spend');
+  loadCreativos(currentSortBy);
 
   // Funil — filtrado pelo período
   const qFilter    = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}${endClause}` : 'qualificado=eq.true';
