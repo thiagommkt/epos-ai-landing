@@ -618,6 +618,12 @@ canvas{display:block;width:100%!important}
 <section class="section" id="s-crm">
   <div class="sec-head">
     <div><div class="sec-title">PIPELINE <span>CRM</span></div><div class="sec-sub" id="crm-count">Carregando...</div></div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <button class="crm-period-btn active" onclick="setCrmPeriod(this,'all')" style="padding:4px 10px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Tudo</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'30')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">30d</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'14')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">14d</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'7')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">7d</button>
+    </div>
   </div>
   <div class="rule"></div>
   <div class="kanban" id="kanban-board"><div class="loading"></div></div>
@@ -1268,8 +1274,29 @@ function getStage(l) {
   return 'novo';
 }
 
+let crmPeriodDays = null; // null = tudo
+
+function setCrmPeriod(btn, val) {
+  document.querySelectorAll('.crm-period-btn').forEach(b => {
+    b.style.background = 'transparent';
+    b.style.borderColor = 'var(--bd)';
+    b.style.color = 'var(--muted)';
+  });
+  btn.style.background = 'var(--pur-l)';
+  btn.style.borderColor = 'var(--bd-b)';
+  btn.style.color = 'var(--purple)';
+  crmPeriodDays = val === 'all' ? null : parseInt(val);
+  loadCRM();
+}
+
 async function loadCRM() {
-  const { data } = await sb(`${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&order=criado_em.desc&limit=200`);
+  document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
+  let query = `${TABLE}?select=nome,telefone,patologia,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&descartado=eq.false&order=criado_em.desc&limit=500`;
+  if (crmPeriodDays) {
+    const since = new Date(Date.now() - crmPeriodDays * 24 * 60 * 60 * 1000).toISOString();
+    query += `&criado_em=gte.${encodeURIComponent(since)}`;
+  }
+  const { data } = await sb(query);
   const leads = data || [];
   const stageMap = {};
   leads.forEach(l => {
@@ -1278,11 +1305,13 @@ async function loadCRM() {
     stageMap[s].push(l);
   });
 
-  document.getElementById('crm-count').textContent = `${leads.length} LEADS ATIVOS`;
+  const periodoLabel = crmPeriodDays ? `últimos ${crmPeriodDays}d` : 'histórico completo';
+  document.getElementById('crm-count').textContent = `${leads.length} leads · ${periodoLabel}`;
 
   const board = document.getElementById('kanban-board');
   board.innerHTML = STAGES.map(st => {
     const cards = (stageMap[st.key] || []);
+    const count = cards.length;
     const cardsHtml = cards.map(l => {
       const tel = (l.telefone||'').replace(/^55/,'');
       const telFmt = tel.length >= 10 ? `(${tel.slice(0,2)}) ${tel.slice(2,7)}-${tel.slice(7)}` : tel;
