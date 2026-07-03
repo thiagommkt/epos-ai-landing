@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>F&M IA — Acesso</title>
+<title>BYD IA — Acesso</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -145,19 +145,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
     </div>
     <div class="footer">
-      <span>Farias &amp; Moura · Sistema IA · EPOS Marketing</span>
+      <span>Lucas Josias BYD · Sistema IA · EPOS Marketing</span>
     </div>
   </div>
 </div>
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const SENHA = 'fmpainel2026';
-const DASHBOARD_URL = 'fm-dashboard.html';
-const AUTH_KEY = 'fm_auth_v2';
-const BIO_KEY = 'fm_bio_credential';
-const BIO_RP = { id: location.hostname || 'localhost', name: 'F&M IA' };
-const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Farias & Moura' };
+const SENHA = 'ljpainel2026';
+const DASHBOARD_URL = 'dashboard-lucas-josias.html';
+const AUTH_KEY = 'lj_auth_v2';
+const BIO_KEY = 'lj_bio_credential';
+const BIO_RP = { id: location.hostname || 'localhost', name: 'BYD IA' };
+const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Lucas Josias BYD' };
 
 // ─── UTILS ────────────────────────────────────────────────
 function hashSimples(s) {
@@ -226,7 +226,7 @@ function entrar() {
       showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
     } else {
       // Senha é fallback válido quando a biometria já está registrada (ex: Face ID falhou)
-      if (credId) sessionStorage.setItem('fm_bio_verified', '1');
+      if (credId) sessionStorage.setItem('lj_bio_verified', '1');
       setTimeout(() => location.href = DASHBOARD_URL, 400);
     }
   } else {
@@ -262,7 +262,7 @@ async function autenticarBio(silencioso = false) {
 
     if (assertion) {
       setAuth();
-      sessionStorage.setItem('fm_bio_verified', '1');
+      sessionStorage.setItem('lj_bio_verified', '1');
       showMsg('bio-msg', '✓ Identidade confirmada', 'ok');
       btn.classList.remove('scanning');
       setTimeout(() => location.href = DASHBOARD_URL, 500);
