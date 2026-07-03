@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório de Campanha · Lucas Josias BYD Bali · Jun–Jul 2026</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --n900: #030B18;
+  --n800: #071524;
+  --n700: #0D1E36;
+  --b500: #1E88E5;
+  --b400: #00A8E8;
+  --gold:  #F5A623;
+  --green: #00D68F;
+  --white: #FFFFFF;
+  --g300:  #D0DCE8;
+  --g400:  #B0C4D8;
+  --g600:  #607080;
+  --border: rgba(255,255,255,0.07);
+  --border-b: rgba(255,255,255,0.13);
+  --surf: rgba(255,255,255,0.03);
+  --r: 14px;
+  --r-sm: 8px;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--n900);
+  color: var(--white);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,168,232,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,168,232,0.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed; top: -20%; left: 50%;
+  transform: translateX(-50%);
+  width: 900px; height: 500px;
+  background: radial-gradient(ellipse, rgba(0,168,232,0.06) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 28px 64px;
+}
+
+/* HEADER */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--b500), var(--b400));
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 900; color: var(--white);
+  letter-spacing: -0.03em; flex-shrink: 0;
+}
+.logo-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.logo-name span { color: var(--b400); }
+.hd-right { text-align: right; }
+.hd-client { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+.hd-meta { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.pill {
+  display: inline-block; padding: 3px 10px; border-radius: 100px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.pill-b  { background: rgba(0,168,232,0.12);  color: var(--b400); border: 1px solid rgba(0,168,232,0.25); }
+.pill-g  { background: rgba(245,166,35,0.12); color: var(--gold); border: 1px solid rgba(245,166,35,0.25); }
+.pill-gr { background: rgba(0,214,143,0.12);  color: var(--green); border: 1px solid rgba(0,214,143,0.25); }
+
+/* SECTION LABEL */
+.sec {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--g600);
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.sec::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* KPI ROW */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 12px;
+}
+.kpi {
+  background: var(--n800); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 22px 20px;
+  position: relative; overflow: hidden;
+  transition: background 0.2s, border-color 0.2s;
+}
+.kpi:hover { background: var(--n700); border-color: var(--border-b); }
+.kpi::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: var(--r) var(--r) 0 0;
+}
+.kpi-g::after  { background: linear-gradient(90deg, var(--gold), #F0C040); }
+.kpi-b::after  { background: linear-gradient(90deg, var(--b500), var(--b400)); }
+.kpi-gr::after { background: linear-gradient(90deg, #00C077, var(--green)); }
+.kpi-w::after  { background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05)); }
+.kpi-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--g600); margin-bottom: 12px;
+}
+.kpi-num {
+  font-size: 38px; font-weight: 800; line-height: 1;
+  letter-spacing: -0.03em; margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.num-b  { color: var(--b400); }
+.num-g  { color: var(--gold); }
+.num-gr { color: var(--green); }
+.kpi-note { font-size: 11px; color: var(--g600); }
+.kpi-note.ok { color: var(--green); font-weight: 500; }
+
+/* BENCHMARK */
+.bm {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 18px;
+  background: rgba(0,214,143,0.04);
+  border: 1px solid rgba(0,214,143,0.18);
+  border-radius: var(--r); margin-bottom: 28px;
+}
+.bm-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: rgba(0,214,143,0.1); border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.bm-text { font-size: 12.5px; color: var(--g400); line-height: 1.55; }
+.bm-text strong { color: var(--green); font-weight: 700; }
+
+/* CARDS */
+.card {
+  background: var(--n800); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px;
+}
+.card-ttl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--g600);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+}
+.card-ttl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* GRIDS */
+.g2   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.g3-2 { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; margin-bottom: 10px; }
+.mb   { margin-bottom: 10px; }
+
+/* CANVAS */
+canvas { display: block; width: 100%; }
+
+/* FUNNEL */
+.funnel { display: flex; flex-direction: column; gap: 0; }
+.f-row  { display: flex; align-items: center; gap: 14px; }
+.f-lbl  { font-size: 11.5px; color: var(--g400); width: 190px; flex-shrink: 0; }
+.f-track {
+  flex: 1; height: 28px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px; overflow: hidden; position: relative;
+}
+.f-fill {
+  position: absolute; left: 0; top: 0; height: 100%; width: 0;
+  border-radius: 4px; transition: width 1s cubic-bezier(0.16,1,0.3,1);
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 10px;
+}
+.ff0 { background: linear-gradient(90deg, #1E88E5, #00A8E8); }
+.ff1 { background: linear-gradient(90deg, #1560BD, #1E88E5); }
+.ff2 { background: linear-gradient(90deg, #1060A0, #15A0C8); }
+.ff3 { background: linear-gradient(90deg, #008866, #00C080); }
+.ff4 { background: linear-gradient(90deg, #00A855, #00D68F); }
+.f-pct { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.85); white-space: nowrap; }
+.f-n   {
+  font-size: 15px; font-weight: 700; color: var(--g400);
+  width: 56px; text-align: right; flex-shrink: 0;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+}
+.f-gap {
+  display: flex; align-items: center;
+  height: 16px; padding-left: 204px; gap: 8px;
+}
+.f-vline { width: 1px; height: 100%; background: rgba(255,255,255,0.1); }
+.f-drop {
+  font-size: 9px; font-weight: 500; color: var(--g600);
+  padding: 1px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 100px;
+}
+
+/* INSIGHT CARDS */
+.ins-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+.ins {
+  background: var(--n800); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 22px 22px 20px;
+  position: relative; overflow: hidden;
+}
+.ins::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: var(--r) var(--r) 0 0;
+}
+.ins-b::before  { background: linear-gradient(90deg, var(--b500), var(--b400)); }
+.ins-g::before  { background: linear-gradient(90deg, var(--gold), #F0C040); }
+.ins-gr::before { background: linear-gradient(90deg, #00C077, var(--green)); }
+.ins-eye {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--g600); margin-bottom: 12px;
+}
+.ins-stat {
+  font-size: 42px; font-weight: 900; line-height: 1;
+  letter-spacing: -0.04em; margin-bottom: 8px;
+}
+.ins-stat.b  { color: var(--b400); }
+.ins-stat.g  { color: var(--gold); }
+.ins-stat.gr { color: var(--green); }
+.ins-copy { font-size: 12px; color: var(--g400); line-height: 1.6; }
+
+/* FOOTER */
+footer {
+  margin-top: 36px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ft-l { font-size: 13px; font-weight: 700; color: var(--g600); }
+.ft-l span { color: var(--b400); }
+.ft-r { font-size: 10.5px; color: var(--g600); }
+
+@media (max-width: 740px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .g2, .g3-2 { grid-template-columns: 1fr; }
+  .ins-grid { grid-template-columns: 1fr; }
+  .f-lbl { width: 110px; font-size: 10px; }
+  .f-gap { padding-left: 124px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">E</div>
+    <div class="logo-name">EPOS <span>Marketing</span></div>
+  </div>
+  <div class="hd-right">
+    <div class="hd-client">Lucas Josias · BYD Bali</div>
+    <div class="hd-meta">
+      <span class="pill pill-b">Campanha WhatsApp</span>
+      <span class="pill pill-g">23 Jun – 01 Jul 2026</span>
+      <span class="pill pill-gr">Ativa</span>
+    </div>
+  </div>
+</header>
+
+<div class="sec">Visão Geral · 9 dias de veiculação</div>
+<div class="kpi-row">
+  <div class="kpi kpi-g">
+    <div class="kpi-lbl">Investimento Total</div>
+    <div class="kpi-num num-g">R$160,15</div>
+    <div class="kpi-note">9 dias · R$17,79/dia</div>
+  </div>
+  <div class="kpi kpi-w">
+    <div class="kpi-lbl">Pessoas Alcançadas</div>
+    <div class="kpi-num">4.735</div>
+    <div class="kpi-note">frequência média 1,19×</div>
+  </div>
+  <div class="kpi kpi-b">
+    <div class="kpi-lbl">Conversas no WhatsApp</div>
+    <div class="kpi-num num-b">65</div>
+    <div class="kpi-note">CTR médio 2,87%</div>
+  </div>
+  <div class="kpi kpi-gr">
+    <div class="kpi-lbl">Custo por Conversa</div>
+    <div class="kpi-num num-gr">R$2,46</div>
+    <div class="kpi-note ok">↓ 6× abaixo do mercado</div>
+  </div>
+</div>
+
+<div class="bm">
+  <div class="bm-icon">📊</div>
+  <div class="bm-text">
+    O custo médio por lead no setor automotivo varia de <strong>R$15 a R$60</strong>.
+    Esta campanha gerou conversas a <strong>R$2,46</strong> —
+    performance <strong>6× a 24× acima da média do mercado</strong>.
+  </div>
+</div>
+
+<div class="card mb">
+  <div class="card-ttl">Evolução Diária · Conversas &amp; Gasto</div>
+  <canvas id="c-daily" height="230"></canvas>
+</div>
+
+<div class="g3-2">
+  <div class="card">
+    <div class="card-ttl">Performance por Modelo Anunciado</div>
+    <canvas id="c-adset" height="190"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-ttl">Por Plataforma</div>
+    <canvas id="c-platform" height="190"></canvas>
+  </div>
+</div>
+
+<div class="g2">
+  <div class="card">
+    <div class="card-ttl">Conversas por Faixa Etária</div>
+    <canvas id="c-age" height="210"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-ttl">Conversas por Gênero</div>
+    <canvas id="c-gender" height="210"></canvas>
+  </div>
+</div>
+
+<div class="card mb">
+  <div class="card-ttl">Funil de Conversas</div>
+  <div class="funnel" id="funnel"></div>
+</div>
+
+<div class="sec">Insights Principais</div>
+<div class="ins-grid">
+  <div class="ins ins-b">
+    <div class="ins-eye">Modelo destaque</div>
+    <div class="ins-stat b">75%</div>
+    <div class="ins-copy">das conversas vieram do Dolphin Mini, com custo de R$2,09 por lead — 3,6× mais eficiente que o Dolphin.</div>
+  </div>
+  <div class="ins ins-g">
+    <div class="ins-eye">Faixa etária de maior conversão</div>
+    <div class="ins-stat g">45–54</div>
+    <div class="ins-copy">anos: 35% das conversas com o menor custo por lead (R$1,97). Perfil com maior renda consolidada — ideal para o ticket do BYD.</div>
+  </div>
+  <div class="ins ins-gr">
+    <div class="ins-eye">Oportunidade de audiência</div>
+    <div class="ins-stat gr">4,6%</div>
+    <div class="ins-copy">de CTR entre o público feminino — 75% acima dos homens. Com apenas 12% das impressões, converte proporcionalmente melhor e a menor custo.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-l">EPOS <span>Marketing</span></div>
+  <div class="ft-r">Meta Ads Manager · Conta "Lucas Josias BYD Vendas" · 23 Jun – 01 Jul 2026</div>
+</footer>
+
+</div>
+<script>
+var SUI = 'system-ui, sans-serif';
+
+var C = {
+  blue:  '#00A8E8', blueD: '#1E88E5',
+  green: '#00D68F', gold: '#F5A623',
+  white: '#FFFFFF', g300: '#D0DCE8',
+  g400:  '#B0C4D8', g600: '#607080',
+  surf:  'rgba(255,255,255,0.03)',
+  grid:  'rgba(255,255,255,0.055)',
+};
+
+function rr(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function setup(id) {
+  var el  = document.getElementById(id);
+  var dpr = window.devicePixelRatio || 1;
+  var w   = el.offsetWidth  || el.parentElement.offsetWidth || 600;
+  var h   = el.height       || 200;
+  el.width  = w * dpr;
+  el.height = h * dpr;
+  var ctx = el.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx: ctx, w: w, h: h };
+}
+
+function drawDaily() {
+  var s = setup('c-daily');
+  var ctx = s.ctx, w = s.w, h = s.h;
+  var days   = ['23/06','24/06','25/06','26/06','27/06','28/06','29/06','30/06','01/07'];
+  var convos = [3,10,10,6,7,12,8,6,3];
+  var spend  = [6.40,19.47,25.61,19.04,18.22,22.70,20.12,19.72,8.87];
+  var maxC = Math.max.apply(null, convos);
+  var maxS = Math.max.apply(null, spend);
+  var pad  = { t:28, r:20, b:58, l:28 };
+  var cw   = w - pad.l - pad.r;
+  var ch   = h - pad.t - pad.b;
+  var n    = days.length;
+  var slW  = cw / n;
+  var bW   = slW * 0.42;
+  var ceil = 14;
+
+  // grid lines
+  ctx.lineWidth = 1;
+  [0,4,8,12].forEach(function(v) {
+    var y = pad.t + ch * (1 - v / ceil);
+    ctx.strokeStyle = C.grid;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cw, y); ctx.stroke();
+    ctx.fillStyle = C.g600;
+    ctx.font = '9px ' + SUI;
+    ctx.textAlign = 'right';
+    ctx.fillText(v, pad.l - 4, y + 3);
+  });
+
+  // spend line
+  ctx.strokeStyle = 'rgba(245,166,35,0.45)';
+  ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath();
+  spend.forEach(function(sp, i) {
+    var x = pad.l + i * slW + slW / 2;
+    var y = pad.t + ch - (sp / maxS) * ch * 0.78 - ch * 0.08;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // spend dots
+  spend.forEach(function(sp, i) {
+    var x = pad.l + i * slW + slW / 2;
+    var y = pad.t + ch - (sp / maxS) * ch * 0.78 - ch * 0.08;
+    ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = C.gold; ctx.fill();
+  });
+
+  // bars
+  convos.forEach(function(c, i) {
+    var cx = pad.l + i * slW + slW / 2;
+    var bx = cx - bW / 2;
+    var bh = (c / ceil) * ch;
+    var by = pad.t + ch - bh;
+    var isBest = c === maxC;
+
+    var gr = ctx.createLinearGradient(0, by, 0, pad.t + ch);
+    if (isBest) {
+      gr.addColorStop(0, 'rgba(0,168,232,0.95)');
+      gr.addColorStop(1, 'rgba(0,168,232,0.15)');
+    } else {
+      gr.addColorStop(0, 'rgba(0,168,232,0.55)');
+      gr.addColorStop(1, 'rgba(0,168,232,0.06)');
+    }
+    ctx.fillStyle = gr;
+    rr(ctx, bx, by, bW, bh, 3); ctx.fill();
+
+    if (isBest) {
+      ctx.strokeStyle = 'rgba(0,168,232,0.65)'; ctx.lineWidth = 1;
+      rr(ctx, bx, by, bW, bh, 3); ctx.stroke();
+    }
+
+    ctx.fillStyle = isBest ? C.white : C.g400;
+    ctx.font = (isBest ? '700' : '500') + ' 11px ' + SUI;
+    ctx.textAlign = 'center';
+    ctx.fillText(c, cx, by - 5);
+
+    ctx.fillStyle = isBest ? C.g300 : C.g600;
+    ctx.font = (isBest ? '600' : '400') + ' 9px ' + SUI;
+    ctx.fillText(days[i], cx, pad.t + ch + 15);
+
+    ctx.fillStyle = 'rgba(245,166,35,0.65)';
+    ctx.font = '9px ' + SUI;
+    ctx.fillText('R$' + spend[i].toFixed(0), cx, pad.t + ch + 28);
+
+    if (isBest) {
+      ctx.fillStyle = 'rgba(0,168,232,0.55)';
+      ctx.font = '700 8px ' + SUI;
+      ctx.fillText('★ MELHOR DIA', cx, pad.t + ch + 44);
+    }
+  });
+
+  // legend
+  var lx = w - 130, ly = 10;
+  var gl = ctx.createLinearGradient(lx, 0, lx+14, 0);
+  gl.addColorStop(0, C.blueD); gl.addColorStop(1, C.blue);
+  ctx.fillStyle = gl; ctx.fillRect(lx, ly+1, 14, 7);
+  ctx.fillStyle = C.g400; ctx.font = '9px ' + SUI; ctx.textAlign = 'left';
+  ctx.fillText('conversas', lx+18, ly+9);
+  ctx.strokeStyle = 'rgba(245,166,35,0.55)'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(lx, ly+23); ctx.lineTo(lx+14, ly+23); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = C.g400; ctx.fillText('gasto diário', lx+18, ly+27);
+}
+
+function drawAdset() {
+  var s = setup('c-adset');
+  var ctx = s.ctx, w = s.w, h = s.h;
+  var data = [
+    { name: 'Dolphin Mini', c: 49, cpc: 2.09 },
+    { name: 'Dolphin',      c:  3, cpc: 7.53 },
+    { name: 'Song Pro',     c:  1, cpc: 3.93 },
+  ];
+  var pad  = { t:8, r:16, b:8, l:110 };
+  var cw   = w - pad.l - pad.r;
+  var ch   = h - pad.t - pad.b;
+  var rowH = ch / 3;
+  var max  = data[0].c;
+
+  data.forEach(function(d, i) {
+    var y  = pad.t + i * rowH;
+    var bH = rowH * 0.34;
+    var by = y + rowH / 2 - bH / 2;
+    var bw = (d.c / max) * cw;
+
+    ctx.fillStyle = i === 0 ? C.white : C.g400;
+    ctx.font = (i === 0 ? '700 12px ' : '400 11px ') + SUI;
+    ctx.textAlign = 'right';
+    ctx.fillText(d.name, pad.l - 10, by + bH / 2 + 4);
+
+    ctx.fillStyle = C.surf;
+    rr(ctx, pad.l, by, cw, bH, 4); ctx.fill();
+
+    if (bw > 0) {
+      var g = ctx.createLinearGradient(pad.l, 0, pad.l + bw, 0);
+      if (i === 0) {
+        g.addColorStop(0, 'rgba(30,136,229,0.85)'); g.addColorStop(1, 'rgba(0,168,232,0.45)');
+      } else {
+        g.addColorStop(0, 'rgba(0,168,232,0.4)'); g.addColorStop(1, 'rgba(0,168,232,0.1)');
+      }
+      ctx.fillStyle = g; rr(ctx, pad.l, by, bw, bH, 4); ctx.fill();
+    }
+
+    var ax = pad.l + bw + 10;
+    ctx.fillStyle = i === 0 ? C.g300 : C.g600;
+    ctx.font = '10px ' + SUI; ctx.textAlign = 'left';
+    ctx.fillText(d.c + ' conv.', ax, by + bH / 2 - 3);
+    ctx.fillStyle = d.cpc <= 3 ? C.green : (d.cpc > 5 ? 'rgba(255,71,87,0.75)' : C.g600);
+    ctx.fillText('R$' + d.cpc.toFixed(2) + '/conv', ax, by + bH / 2 + 11);
+  });
+}
+
+function drawPlatform() {
+  var s = setup('c-platform');
+  var ctx = s.ctx, w = s.w, h = s.h;
+  var data = [
+    { name: 'Instagram', c: 53, cpc: 2.32, ctr: '2,72', color: 'rgba(0,168,232,0.72)' },
+    { name: 'Facebook',  c: 12, cpc: 3.09, ctr: '3,38', color: 'rgba(74,174,255,0.5)' },
+  ];
+  var pad  = { t:8, r:16, b:8, l:90 };
+  var cw   = w - pad.l - pad.r;
+  var ch   = h - pad.t - pad.b;
+  var rowH = ch / 2;
+  var max  = data[0].c;
+
+  data.forEach(function(d, i) {
+    var y  = pad.t + i * rowH;
+    var bH = rowH * 0.32;
+    var by = y + rowH / 2 - bH / 2;
+    var bw = (d.c / max) * cw;
+
+    ctx.fillStyle = i === 0 ? C.white : C.g400;
+    ctx.font = (i === 0 ? '700 12px ' : '400 11px ') + SUI;
+    ctx.textAlign = 'right';
+    ctx.fillText(d.name, pad.l - 10, by + bH / 2 + 4);
+
+    ctx.fillStyle = C.surf; rr(ctx, pad.l, by, cw, bH, 4); ctx.fill();
+    ctx.fillStyle = d.color; rr(ctx, pad.l, by, bw, bH, 4); ctx.fill();
+
+    var ax = pad.l + bw + 10;
+    ctx.fillStyle = C.g400; ctx.font = '10px ' + SUI; ctx.textAlign = 'left';
+    ctx.fillText(d.c + ' conv.', ax, by + bH / 2 - 3);
+    ctx.fillStyle = C.g600;
+    ctx.fillText('R$' + d.cpc + ' · CTR ' + d.ctr + '%', ax, by + bH / 2 + 11);
+  });
+}
+
+function drawAge() {
+  var s = setup('c-age');
+  var ctx = s.ctx, w = s.w, h = s.h;
+  var data = [
+    { l: '18–24', c:  1, cpc: 2.76 },
+    { l: '25–34', c: 12, cpc: 2.46 },
+    { l: '35–44', c: 18, cpc: 2.95 },
+    { l: '45–54', c: 23, cpc: 1.97 },
+    { l: '55–64', c:  7, cpc: 3.51 },
+    { l: '65+',   c:  4, cpc: 1.24 },
+  ];
+  var pad  = { t:26, r:8, b:52, l:8 };
+  var cw   = w - pad.l - pad.r;
+  var ch   = h - pad.t - pad.b;
+  var n    = data.length;
+  var slW  = cw / n;
+  var bW   = slW * 0.52;
+  var ceil = 26;
+  var best = Math.max.apply(null, data.map(function(d) { return d.c; }));
+
+  [0,8,16,24].forEach(function(v) {
+    var y = pad.t + ch * (1 - v / ceil);
+    ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cw, y); ctx.stroke();
+  });
+
+  data.forEach(function(d, i) {
+    var cx = pad.l + i * slW + slW / 2;
+    var bx = cx - bW / 2;
+    var bh = (d.c / ceil) * ch;
+    var by = pad.t + ch - bh;
+    var isB = d.c === best;
+
+    var g = ctx.createLinearGradient(0, by, 0, pad.t + ch);
+    if (isB) {
+      g.addColorStop(0, 'rgba(0,214,143,0.9)'); g.addColorStop(1, 'rgba(0,168,85,0.15)');
+    } else {
+      g.addColorStop(0, 'rgba(0,168,232,0.6)'); g.addColorStop(1, 'rgba(0,168,232,0.08)');
+    }
+    ctx.fillStyle = g; rr(ctx, bx, by, bW, bh, 3); ctx.fill();
+
+    ctx.fillStyle = isB ? C.white : C.g400;
+    ctx.font = (isB ? '700' : '500') + ' 11px ' + SUI;
+    ctx.textAlign = 'center';
+    ctx.fillText(d.c, cx, by - 5);
+
+    ctx.fillStyle = isB ? C.g300 : C.g600;
+    ctx.font = (isB ? '600' : '400') + ' 9px ' + SUI;
+    ctx.fillText(d.l, cx, pad.t + ch + 14);
+
+    ctx.fillStyle = d.cpc < 2.5 ? 'rgba(0,214,143,0.75)' : 'rgba(245,166,35,0.65)';
+    ctx.font = '8.5px ' + SUI;
+    ctx.fillText('R$' + d.cpc.toFixed(2), cx, pad.t + ch + 27);
+
+    if (isB) {
+      ctx.fillStyle = 'rgba(0,214,143,0.55)';
+      ctx.font = '700 8px ' + SUI;
+      ctx.fillText('★ MELHOR', cx, pad.t + ch + 42);
+    }
+  });
+
+  ctx.fillStyle = C.green; ctx.font = '700 8px ' + SUI; ctx.textAlign = 'right';
+  ctx.fillText('menor custo/conv', pad.l + cw, 16);
+}
+
+function drawGender() {
+  var s = setup('c-gender');
+  var ctx = s.ctx, w = s.w, h = s.h;
+  var data = [
+    { l: 'Masculino', pct: 82, c: 53, ctr: '2,65', cpc: 2.55, color: 'rgba(0,168,232,0.6)' },
+    { l: 'Feminino',  pct: 18, c: 12, ctr: '4,63', cpc: 2.05, color: 'rgba(0,214,143,0.55)', star: true },
+  ];
+  var pad  = { t:18, r:16, b:16, l:102 };
+  var cw   = w - pad.l - pad.r;
+  var ch   = h - pad.t - pad.b;
+  var rowH = ch / 2;
+
+  data.forEach(function(d, i) {
+    var y  = pad.t + i * rowH;
+    var bH = rowH * 0.26;
+    var by = y + rowH / 2 - bH / 2;
+    var bw = (d.pct / 100) * cw;
+
+    ctx.fillStyle = i === 1 ? C.green : C.white;
+    ctx.font = '700 12.5px ' + SUI; ctx.textAlign = 'right';
+    ctx.fillText(d.l, pad.l - 10, by - 5);
+
+    if (d.star) {
+      ctx.fillStyle = 'rgba(0,214,143,0.75)';
+      ctx.font = '600 9px ' + SUI;
+      ctx.fillText('CTR +75% ↑', pad.l - 10, by + 9);
+    }
+
+    ctx.fillStyle = C.surf; rr(ctx, pad.l, by, cw, bH, 4); ctx.fill();
+    ctx.fillStyle = d.color; rr(ctx, pad.l, by, bw, bH, 4); ctx.fill();
+
+    if (bw > 30) {
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = '700 10px ' + SUI; ctx.textAlign = 'left';
+      ctx.fillText(d.pct + '%', pad.l + 8, by + bH / 2 + 4);
+    }
+
+    ctx.fillStyle = C.g400; ctx.font = '10px ' + SUI; ctx.textAlign = 'left';
+    ctx.fillText(d.c + ' conv.', pad.l, by + bH + 15);
+    ctx.fillStyle = C.g600;
+    ctx.fillText('CTR ' + d.ctr + '% · R$' + d.cpc + '/conv', pad.l, by + bH + 28);
+  });
+}
+
+function buildFunnel() {
+  var stages = [
+    { l: 'Pessoas alcançadas',         n: 4735, vw: 100, cls: 'ff0', pct: null },
+    { l: 'Clicaram no anúncio',        n:  162, vw:  64, cls: 'ff1', pct: '3,4% do alcance' },
+    { l: 'Iniciaram conversa',         n:   65, vw:  44, cls: 'ff2', pct: '40,1% dos cliques' },
+    { l: 'Continuaram (2+ msg)',        n:   47, vw:  32, cls: 'ff3', pct: '72,3% continuaram' },
+    { l: 'Engajamento profundo (3+)',   n:   33, vw:  22, cls: 'ff4', pct: '70,2% avançaram' },
+  ];
+  var drops = [
+    '4.573 saíram sem clicar',
+    '97 clicaram mas não mensageram',
+    '18 encerraram a conversa',
+    '14 pararam após 2ª mensagem',
+  ];
+  var el = document.getElementById('funnel');
+  var html = '';
+  stages.forEach(function(st, i) {
+    html += '<div class="f-row">' +
+      '<div class="f-lbl">' + st.l + '</div>' +
+      '<div class="f-track"><div class="f-fill ' + st.cls + '" data-w="' + st.vw + '">' +
+        (st.pct ? '<span class="f-pct">' + st.pct + '</span>' : '') +
+      '</div></div>' +
+      '<div class="f-n">' + st.n.toLocaleString('pt-BR') + '</div>' +
+    '</div>';
+    if (i < stages.length - 1) {
+      html += '<div class="f-gap"><div class="f-vline"></div><div class="f-drop">' + drops[i] + '</div></div>';
+    }
+  });
+  el.innerHTML = html;
+  var bars = el.querySelectorAll('.f-fill');
+  bars.forEach(function(bar, i) {
+    setTimeout(function() { bar.style.width = bar.getAttribute('data-w') + '%'; }, 300 + i * 90);
+  });
+}
+
+function init() {
+  try { drawDaily(); }    catch(e) { console.error('daily', e); }
+  try { drawAdset(); }    catch(e) { console.error('adset', e); }
+  try { drawPlatform(); } catch(e) { console.error('platform', e); }
+  try { drawAge(); }      catch(e) { console.error('age', e); }
+  try { drawGender(); }   catch(e) { console.error('gender', e); }
+  buildFunnel();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
