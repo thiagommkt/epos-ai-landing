@@ -1083,7 +1083,7 @@ async function loadDashboard() {
   const T = leadsTotal || 1;
   const funil = document.getElementById('funnel-container');
   funil.innerHTML = `
-    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
+    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="${T>0?'100%':'0%'}"><span class="f-pct">${T>0?'100%':'0%'}</span></div></div><div class="f-n">${leadsTotal}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((leadsTotal-resp)/T*100)}%</div></div>
     <div class="f-row"><div class="f-lbl">c/ Bia</div><div class="f-track"><div class="f-fill f1-5" data-w="${Math.round(resp/T*100)}%"><span class="f-pct">${Math.round(resp/T*100)}%</span></div></div><div class="f-n">${resp}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((resp-q)/Math.max(resp,1)*100)}%</div></div>
