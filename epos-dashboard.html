@@ -719,8 +719,8 @@ canvas{display:block;width:100%!important}
   </div>
   <div class="rule"></div>
 
-  <div style="margin-bottom:12px;padding:10px 14px;background:rgba(255,94,91,.05);border:1px solid rgba(255,94,91,.2);border-radius:4px;font-family:var(--fM);font-size:11px;color:var(--warn);line-height:1.6">
-    ⚠️ <strong>Atenção:</strong> Estes dashboards Metabase estão configurados para a tabela <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">fm_leads</code> (Farias &amp; Moura). Para dados Epos corretos, duplique cada dashboard no Metabase apontando para a tabela <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">leads</code>.
+  <div style="margin-bottom:12px;padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:4px;font-family:var(--fM);font-size:11px;color:var(--muted);line-height:1.6">
+    ℹ️ Dashboards Metabase precisam ser configurados no Metabase apontando para a tabela <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">leads</code> — acesse o Metabase para duplicar e ajustar cada painel.
   </div>
 
   <!-- Seletor de período -->
@@ -1603,14 +1603,13 @@ const PROXY_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-dashboard-
 const PROXY_TOKEN = 'epos-dash-2026-x9k2';
 
 async function updateCRMStage(crm_person_id, newStage, telefone) {
-  const r = await fetch(PROXY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: PROXY_TOKEN, crm_person_id, statusFunil: newStage, telefone })
+  if (!telefone) return;
+  const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+    method: 'PATCH',
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({ crm_stage: newStage })
   });
-  const d = await r.json();
-  if (d.error) throw new Error(d.error);
-  return d;
+  if (!r.ok) throw new Error('Erro Supabase: ' + r.status);
 }
 
 // ═══ PERÍODO DO DASHBOARD ═══
@@ -1792,10 +1791,10 @@ async function enviarMensagem(telefone) {
   if (!mensagem) { toast('Digite uma mensagem antes de enviar', 'err'); return; }
   try {
     input.disabled = true;
-    const r = await fetch(PROXY_URL, {
+    const r = await fetch(ACOES_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: PROXY_TOKEN, acao: 'enviar_mensagem', telefone, mensagem })
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'enviar_mensagem', telefone, mensagem })
     });
     const d = await r.json();
     if (d.error) throw new Error(d.error);
@@ -2314,19 +2313,7 @@ const TIPO_META = {
 
 async function loadCampanhas() {
   const box = document.getElementById('campanhas-container');
-  if (box) box.innerHTML = '<div class="loading"></div>';
-  try {
-    // Supabase direto — RLS permite SELECT para anon
-    const r = await fetch(SB_URL + '/rest/v1/nutricao_templates?select=*&order=tipo.asc,step.asc', {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const templates = await r.json();
-    if (!Array.isArray(templates)) throw new Error('Resposta inesperada');
-    renderCampanhas(templates);
-  } catch(e) {
-    if (box) box.innerHTML = '<div class="empty">Erro ao carregar — ' + e.message + '</div>';
-  }
+  if (box) box.innerHTML = '<div class="empty" style="padding:32px 0;text-align:center;color:var(--muted);font-size:12px">⏳ Módulo de Campanhas em breve<br><span style="font-size:11px;opacity:.6">Nutrição de leads via WhatsApp — disponível na Fase 3</span></div>';
 }
 
 function renderCampanhas(templates) {
