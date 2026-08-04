@@ -423,6 +423,10 @@ canvas{display:block;width:100%!important}
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
       Campanhas
     </a>
+    <a data-sec="prospeccao" onclick="navTo('prospeccao')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l4 4" stroke="currentColor" stroke-width="1.5"/></svg>
+      Prospecção
+    </a>
     <div class="nav-section">Sistema</div>
     <a data-sec="status" onclick="navTo('status')">
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2"/></svg>
@@ -799,6 +803,44 @@ canvas{display:block;width:100%!important}
   </div>
 
   <div id="campanhas-container"><div class="loading"></div></div>
+</section>
+
+<!-- ══ PROSPECÇÃO SWaaS ══ -->
+<section class="section" id="s-prospeccao">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">PROSPECÇÃO <span>COLD OUTREACH</span></div>
+      <div class="sec-sub">DISPARO SWaaS · API OFICIAL WHATSAPP · RESPOSTAS AO VIVO</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="loadProspeccao()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↻ Atualizar</button>
+      <button id="btn-disparar-lote" onclick="dispararLote()" style="padding:6px 16px;background:var(--purple);border:1px solid var(--purple);color:#fff;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s">▶ Disparar Lote</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div style="background:rgba(145,70,255,.06);border:1px solid var(--bd);padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);line-height:1.6;font-family:var(--fB)">
+    <strong style="color:var(--text);font-family:var(--fD);font-size:11px;letter-spacing:.08em;text-transform:uppercase">Como funciona:</strong>
+    Leads reais captados via Google Maps recebem template WhatsApp aprovado. Quem responde "Faz total sentido" é qualificado pela Donna automaticamente. "Disparar Lote" aciona o próximo lote pendente na planilha — respeita o intervalo de 90–150s entre envios (regra de rate limiting).
+  </div>
+
+  <div class="kpi-row" id="prosp-kpi-row" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kpi"><div class="kpi-lbl">Contatos na base</div><div class="kpi-val" id="prosp-total">—</div><div class="kpi-note">leads captados</div></div>
+    <div class="kpi"><div class="kpi-lbl">Disparados</div><div class="kpi-val g" id="prosp-enviado">—</div><div class="kpi-note">templates enviados</div></div>
+    <div class="kpi"><div class="kpi-lbl">Taxa de resposta</div><div class="kpi-val n" id="prosp-taxa-resposta">—</div><div class="kpi-note" id="prosp-respondeu-note">—</div></div>
+    <div class="kpi"><div class="kpi-lbl">Taxa de interesse</div><div class="kpi-val g" id="prosp-taxa-interesse">—</div><div class="kpi-note" id="prosp-interessou-note">"faz total sentido"</div></div>
+    <div class="kpi"><div class="kpi-lbl">Opt-outs</div><div class="kpi-val" id="prosp-optout">—</div><div class="kpi-note">não incomodar mais</div></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="cfg-sec-title">Por Segmento</div>
+    <div id="prosp-segmentos"><div class="loading"></div></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="cfg-sec-title">Respostas Recentes</div>
+    <div id="prosp-recentes"><div class="loading"></div></div>
+  </div>
 </section>
 
 <!-- ══ STATUS ══ -->
@@ -1584,6 +1626,7 @@ function show(id) {
     if(id==='status') loadStatus();
     if(id==='campanhas') loadCampanhas();
     if(id==='analista') loadAnalista();
+    if(id==='prospeccao') loadProspeccao();
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -2279,6 +2322,8 @@ async function loadCreativos(sortBy) {
 
 // ═══ AÇÕES RÁPIDAS (A3) ═══
 const ACOES_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-dashboard-acoes';
+const SWAAS_METRICS_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-dashboard-swaas';
+const SWAAS_DISPARAR_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-dashboard-disparar-swaas';
 
 async function executarAcao(btn, action, loadingMsg) {
   btn.disabled = true;
@@ -2314,6 +2359,76 @@ const TIPO_META = {
 async function loadCampanhas() {
   const box = document.getElementById('campanhas-container');
   if (box) box.innerHTML = '<div class="empty" style="padding:32px 0;text-align:center;color:var(--muted);font-size:12px">⏳ Módulo de Campanhas em breve<br><span style="font-size:11px;opacity:.6">Nutrição de leads via WhatsApp — disponível na Fase 3</span></div>';
+}
+
+// ═══ PROSPECÇÃO SWaaS — COLD OUTREACH ═══
+const SEGMENTO_LABEL = { advocacia: 'Advocacia', odontologia: 'Odontologia', estetica: 'Estética', outros: 'Outros' };
+
+async function loadProspeccao() {
+  const segBox = document.getElementById('prosp-segmentos');
+  const recBox = document.getElementById('prosp-recentes');
+  if (segBox) segBox.innerHTML = '<div class="loading"></div>';
+  if (recBox) recBox.innerHTML = '<div class="loading"></div>';
+  try {
+    const r = await fetch(SWAAS_METRICS_URL);
+    const d = await r.json();
+
+    document.getElementById('prosp-total').textContent = d.total_contatos ?? '—';
+    document.getElementById('prosp-enviado').textContent = d.total_enviado ?? '—';
+    document.getElementById('prosp-taxa-resposta').textContent = (d.taxa_resposta ?? 0) + '%';
+    document.getElementById('prosp-respondeu-note').textContent = (d.total_respondeu ?? 0) + ' de ' + (d.total_enviado ?? 0) + ' responderam';
+    document.getElementById('prosp-taxa-interesse').textContent = (d.taxa_interesse ?? 0) + '%';
+    document.getElementById('prosp-interessou-note').textContent = (d.total_interessou ?? 0) + ' clicaram "faz total sentido"';
+    document.getElementById('prosp-optout').textContent = d.total_optout ?? '—';
+
+    const segs = d.por_segmento || {};
+    const segEntries = Object.entries(segs);
+    if (segBox) {
+      segBox.innerHTML = segEntries.length ? segEntries.map(([seg, s]) => {
+        const label = SEGMENTO_LABEL[seg] || seg;
+        const taxaResp = s.enviado > 0 ? ((s.respondeu / s.enviado) * 100).toFixed(1) : '0.0';
+        return '<div class="cfg-row"><div class="cfg-key">' + label + '</div><div class="cfg-val">' +
+          s.enviado + ' enviados · ' + s.respondeu + ' responderam (' + taxaResp + '%) · ' + s.interessou + ' interessados</div></div>';
+      }).join('') : '<div class="empty" style="padding:16px 0;text-align:center;color:var(--muted);font-size:12px">Sem dados ainda</div>';
+    }
+
+    const recentes = d.respostas_recentes || [];
+    if (recBox) {
+      recBox.innerHTML = recentes.length ? '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
+        '<thead><tr style="text-align:left;color:var(--muted);font-family:var(--fD);font-size:10px;letter-spacing:.06em;text-transform:uppercase">' +
+        '<th style="padding:6px 8px">Nome</th><th style="padding:6px 8px">Segmento</th><th style="padding:6px 8px">Resposta</th><th style="padding:6px 8px">Quando</th></tr></thead><tbody>' +
+        recentes.map(x => {
+          const data = x.data_resposta ? new Date(x.data_resposta).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
+          const respostaCurta = (x.resposta || '').length > 60 ? x.resposta.slice(0, 60) + '…' : (x.resposta || '');
+          return '<tr style="border-top:1px solid var(--bd)"><td style="padding:6px 8px;color:var(--text)">' + (x.nome || '—') + '</td>' +
+            '<td style="padding:6px 8px;color:var(--muted)">' + (SEGMENTO_LABEL[x.segmento] || x.segmento || '—') + '</td>' +
+            '<td style="padding:6px 8px;color:var(--muted)">' + respostaCurta + '</td>' +
+            '<td style="padding:6px 8px;color:var(--dim);font-family:var(--fM)">' + data + '</td></tr>';
+        }).join('') + '</tbody></table>' : '<div class="empty" style="padding:16px 0;text-align:center;color:var(--muted);font-size:12px">Nenhuma resposta ainda</div>';
+    }
+  } catch (e) {
+    if (segBox) segBox.innerHTML = '<div class="empty" style="padding:16px 0;text-align:center;color:var(--warn);font-size:12px">Erro ao carregar: ' + e.message + '</div>';
+    if (recBox) recBox.innerHTML = '';
+  }
+}
+
+async function dispararLote() {
+  if (!confirm('Disparar o próximo lote pendente da planilha de prospecção?\n\nO envio respeita o intervalo de 90–150s entre mensagens e pode levar bastante tempo para concluir.')) return;
+  const btn = document.getElementById('btn-disparar-lote');
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Iniciando…';
+  try {
+    const r = await fetch(SWAAS_DISPARAR_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const d = await r.json().catch(() => ({}));
+    toast('✅ Disparo iniciado — acompanhe as respostas nesta aba', 'ok');
+    btn.textContent = '✅ Disparo iniciado';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 5000);
+  } catch (e) {
+    toast('Erro ao iniciar disparo: ' + e.message, 'err');
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
 }
 
 function renderCampanhas(templates) {
