@@ -999,7 +999,7 @@ function fmtDate(iso) {
 }
 function canalBadge(l) {
   if (l.canal === 'chatwoot_auditoria') return '<span class="badge b-ct" style="background:rgba(145,70,255,.09);color:var(--purple);border-color:rgba(145,70,255,.2)">👤 Manual</span>';
-  if (l.canal === 'whatsapp_outreach') return '<span class="badge b-ct" style="background:rgba(255,165,0,.09);color:#FFA500;border-color:rgba(255,165,0,.3)">📤 Outreach</span>';
+  if (l.canal === 'cold_outreach_swaas' || l.canal === 'whatsapp_outreach') return '<span class="badge b-ct" style="background:rgba(255,165,0,.09);color:#FFA500;border-color:rgba(255,165,0,.3)">📤 Outreach</span>';
   if (l.dify_conversation_id || l.dify_ativo) return '<span class="badge b-ql" style="background:rgba(0,245,160,.09);color:var(--neon);border-color:rgba(0,245,160,.2)">🤖 Donna IA</span>';
   return '<span class="badge b-ct" style="background:rgba(74,174,255,.09);color:#4AAEFF;border-color:rgba(74,174,255,.2)">📱 WA Direto</span>';
 }
@@ -1173,7 +1173,7 @@ async function loadDashboard() {
   let nIA = 0, nManual = 0, nDireto = 0, nOutreach = 0;
   canalData.forEach(l => {
     if (l.canal === 'chatwoot_auditoria') nManual++;
-    else if (l.canal === 'whatsapp_outreach') nOutreach++;
+    else if (l.canal === 'cold_outreach_swaas' || l.canal === 'whatsapp_outreach') nOutreach++;
     else if (l.dify_conversation_id || l.dify_ativo) nIA++;
     else nDireto++;
   });
