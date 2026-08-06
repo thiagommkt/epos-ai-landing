@@ -574,17 +574,17 @@ canvas{display:block;width:100%!important}
   <div class="card" style="margin-top:0">
     <div class="card-ttl">Ações Rápidas</div>
     <div class="actions-grid">
-      <button class="action-btn" onclick="executarAcao(this,'reativar_parados','Reativando...')">
+      <button class="action-btn" onclick="confirmarAcao(this,'reativar_parados','Reativar Parados','Enviará mensagem para leads sem contato há 30+ dias.','Reativando...')">
         <div class="action-icon">🔄</div>
         <div class="action-lbl">Reativar Parados</div>
         <div class="action-sub">Leads sem contato há 30+ dias</div>
       </button>
-      <button class="action-btn" onclick="executarAcao(this,'lembrete_amanha','Enviando...')">
+      <button class="action-btn" onclick="confirmarAcao(this,'lembrete_amanha','Lembrete Amanhã','Enviará lembrete de consulta para todos os agendamentos de amanhã.','Enviando...')">
         <div class="action-icon">📅</div>
         <div class="action-lbl">Lembrete Amanhã</div>
         <div class="action-sub">Agendamentos de amanhã</div>
       </button>
-      <button class="action-btn" onclick="executarAcao(this,'qualificados_sem_agenda','Enviando...')">
+      <button class="action-btn" onclick="confirmarAcao(this,'qualificados_sem_agenda','Convidar Qualificados','Enviará convite de agendamento para leads qualificados sem consulta marcada.','Enviando...')">
         <div class="action-icon">🎯</div>
         <div class="action-lbl">Convidar Qualificados</div>
         <div class="action-sub">Qualificados sem agendamento</div>
@@ -2250,6 +2250,24 @@ async function loadCreativos(sortBy) {
 
 // ═══ AÇÕES RÁPIDAS (A3) ═══
 const ACOES_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-dashboard-acoes';
+
+function confirmarAcao(btn, action, titulo, descricao, loadingMsg) {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  modal.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:24px;max-width:380px;width:100%">
+      <div style="font-family:var(--fD);font-weight:700;font-size:15px;color:var(--text);margin-bottom:10px">⚠ ${titulo}</div>
+      <div style="font-family:var(--fM);font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:20px">${descricao}<br><span style="color:var(--warn)">Mensagens WhatsApp serão enviadas imediatamente.</span></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="confirm-cancel" style="padding:8px 18px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px">Cancelar</button>
+        <button id="confirm-ok" style="padding:8px 18px;background:var(--purple);border:none;color:#fff;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px">Confirmar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.querySelector('#confirm-cancel').onclick = () => modal.remove();
+  modal.querySelector('#confirm-ok').onclick = () => { modal.remove(); executarAcao(btn, action, loadingMsg); };
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+}
 
 async function executarAcao(btn, action, loadingMsg) {
   btn.disabled = true;
