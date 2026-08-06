@@ -152,19 +152,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const SENHA = 'fmpainel2026';
 const DASHBOARD_URL = 'fm-dashboard.html';
 const AUTH_KEY = 'fm_auth_v2';
 const BIO_KEY = 'fm_bio_credential';
+const AUTH_WEBHOOK = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-dashboard-auth';
+const PROXY_TOKEN_PAINEL = 'fm-dash-2026-x9k2';
 const BIO_RP = { id: location.hostname || 'localhost', name: 'F&M IA' };
 const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Farias & Moura' };
-
-// ─── UTILS ────────────────────────────────────────────────
-function hashSimples(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i);
-  return Math.abs(h).toString(16);
-}
 
 // Cookie sem limite — localStorage é apagado em alguns browsers mobile ao fechar
 function setCookie(name, value, days) {
@@ -178,15 +172,15 @@ function getCookie(name) {
   return match ? decodeURIComponent(match.pop()) : null;
 }
 
-function setAuth() {
-  const hash = hashSimples(SENHA + '_v2');
-  setCookie(AUTH_KEY, hash); // sem limite — usa padrão 100 anos
-  localStorage.setItem(AUTH_KEY, hash); // fallback
+function setAuth(sessionToken) {
+  setCookie(AUTH_KEY, sessionToken);
+  localStorage.setItem(AUTH_KEY, sessionToken);
 }
 
 function checkAuth() {
-  const hash = hashSimples(SENHA + '_v2');
-  return getCookie(AUTH_KEY) === hash || localStorage.getItem(AUTH_KEY) === hash;
+  const val = getCookie(AUTH_KEY) || localStorage.getItem(AUTH_KEY);
+  if (!val) return false;
+  try { const s = JSON.parse(atob(val)); return s && s.exp && s.exp > Date.now(); } catch { return false; }
 }
 
 function showMsg(id, text, type = '') {
@@ -215,27 +209,41 @@ if (credId && bioSupported) {
 }
 
 // ─── SENHA ────────────────────────────────────────────────
-function entrar() {
-  const v = document.getElementById('pwd-input').value;
-  if (hashSimples(v) === hashSimples(SENHA)) {
-    setAuth();
-    showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
-    // Mostrar opção de ativar biometria se suportado e não registrado
-    if (bioSupported && !credId) {
-      bioRegister.classList.add('show');
-      showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
+async function entrar() {
+  const pwd = document.getElementById('pwd-input').value;
+  if (!pwd) return;
+  const btn = document.querySelector('.btn-enter');
+  btn.textContent = 'Verificando...';
+  btn.disabled = true;
+  try {
+    const r = await fetch(AUTH_WEBHOOK, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action: 'login', password: pwd, token: PROXY_TOKEN_PAINEL})
+    });
+    const data = await r.json();
+    if (data.ok && data.session) {
+      setAuth(data.session);
+      showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
+      if (bioSupported && !credId) {
+        bioRegister.classList.add('show');
+        showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
+      } else {
+        if (credId) sessionStorage.setItem('fm_bio_verified', '1');
+        setTimeout(() => location.href = DASHBOARD_URL, 400);
+      }
     } else {
-      // Senha é fallback válido quando a biometria já está registrada (ex: Face ID falhou)
-      if (credId) sessionStorage.setItem('fm_bio_verified', '1');
-      setTimeout(() => location.href = DASHBOARD_URL, 400);
+      showMsg('pwd-msg', 'Senha incorreta', 'err');
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('pwd-input').focus();
+      document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
+      setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
     }
-  } else {
-    showMsg('pwd-msg', 'Senha incorreta', 'err');
-    document.getElementById('pwd-input').value = '';
-    document.getElementById('pwd-input').focus();
-    // Shaky animation
-    document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
-    setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
+  } catch (e) {
+    showMsg('pwd-msg', 'Erro de conexão — tente novamente', 'err');
+  } finally {
+    btn.textContent = 'Entrar →';
+    btn.disabled = false;
   }
 }
 
@@ -261,7 +269,11 @@ async function autenticarBio(silencioso = false) {
     });
 
     if (assertion) {
-      setAuth();
+      if (!checkAuth()) {
+        showMsg('bio-msg', 'Sessão expirada — use a senha abaixo', 'err');
+        btn.classList.remove('scanning');
+        return;
+      }
       sessionStorage.setItem('fm_bio_verified', '1');
       showMsg('bio-msg', '✓ Identidade confirmada', 'ok');
       btn.classList.remove('scanning');
