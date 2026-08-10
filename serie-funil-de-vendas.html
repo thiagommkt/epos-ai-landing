@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serie: A Evolucao do Funil de Vendas - 7 Episodios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #090909;
+    --surface:    #121212;
+    --surface-2:  #1a1a1a;
+    --surface-3:  #222222;
+    --border:     rgba(255,255,255,0.07);
+    --border-2:   rgba(255,255,255,0.12);
+    --accent:     #f59e0b;
+    --accent-dim: rgba(245,158,11,0.12);
+    --accent-glow:rgba(245,158,11,0.06);
+    --text-1:     #eeeeee;
+    --text-2:     #a0a0a0;
+    --text-3:     #5a5a5a;
+    --green:      #10b981;
+    --blue:       #3b82f6;
+    --radius-sm:  6px;
+    --radius-md:  12px;
+    --radius-lg:  18px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+
+  /* ─── NAV ───────────────────────────────────────────────── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(9,9,9,0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    height: 52px;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+    padding-right: 12px;
+    border-right: 1px solid var(--border-2);
+    margin-right: 6px;
+  }
+  .nav-pill {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 180ms ease;
+    cursor: pointer;
+  }
+  .nav-pill:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── HERO ───────────────────────────────────────────────── */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 24px 48px;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text-1);
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-2);
+    max-width: 580px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+  }
+  .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text-2);
+  }
+  .stat-chip strong { color: var(--text-1); font-weight: 600; }
+  .stat-icon { color: var(--accent); font-size: 15px; }
+
+  /* ─── OVERVIEW TABLE ─────────────────────────────────────── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 56px;
+  }
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .overview-table-wrap { overflow-x: auto; }
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .overview-table thead th {
+    background: var(--surface-2);
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .overview-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 120ms ease;
+    cursor: pointer;
+  }
+  .overview-table tbody tr:hover { background: var(--accent-glow); }
+  .overview-table tbody td { padding: 14px 16px; vertical-align: middle; }
+  .ep-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(245,158,11,0.25);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .ep-title-link {
+    color: var(--text-1);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: color 150ms;
+  }
+  .ep-title-link:hover { color: var(--accent); }
+  .duration-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: var(--surface-3);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .theme-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 4px;
+    font-size: 12px;
+    color: #60a5fa;
+  }
+
+  /* ─── DIVIDER ────────────────────────────────────────────── */
+  .divider {
+    max-width: 1100px;
+    margin: 0 auto 48px;
+    padding: 0 24px;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ─── EPISODE CARD ───────────────────────────────────────── */
+  .episode-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 64px;
+  }
+  .ep-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .ep-num {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(245,158,11,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .ep-meta {
+    flex: 1;
+    min-width: 0;
+  }
+  .ep-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .ep-series-tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .ep-duration {
+    padding: 3px 10px;
+    background: var(--surface-3);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .ep-meta h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--text-1);
+    margin-bottom: 10px;
+  }
+  .ep-description {
+    color: var(--text-2);
+    font-size: 14px;
+    max-width: 640px;
+  }
+
+  /* Script table */
+  .script-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .script-table-title {
+    padding: 14px 20px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .script-table-title span { color: var(--accent); }
+  .script-table-scroll { overflow-x: auto; }
+  .script-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    min-width: 720px;
+  }
+  .script-table thead th {
+    background: var(--surface-2);
+    padding: 11px 16px;
+    text-align: left;
+    font-family: 'Outfit', sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .script-table tbody tr { border-bottom: 1px solid var(--border); }
+  .script-table tbody tr:last-child { border-bottom: none; }
+  .script-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+  .script-table tbody td {
+    padding: 13px 16px;
+    vertical-align: top;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+  .td-time {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 12.5px;
+    font-family: 'Outfit', sans-serif;
+    width: 72px;
+  }
+  .td-locucao {
+    color: var(--text-1);
+    width: 38%;
+    min-width: 200px;
+    font-style: italic;
+  }
+  .td-visual { width: 27%; color: var(--text-2); }
+  .td-overlay {
+    width: 22%;
+    color: var(--text-3);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .cta-row td { background: rgba(245,158,11,0.04) !important; }
+  .cta-row .td-locucao { color: var(--accent); font-style: normal; font-weight: 500; }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .footer-inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .footer h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 10px;
+  }
+  .footer p {
+    color: var(--text-2);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .footer-cta {
+    display: inline-block;
+    padding: 12px 28px;
+    background: var(--accent);
+    color: #000;
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: opacity 150ms;
+  }
+  .footer-cta:hover { opacity: 0.88; }
+  .footer-meta {
+    margin-top: 28px;
+    color: var(--text-3);
+    font-size: 12px;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .hero { padding: 40px 16px 32px; }
+    .section, .episode-card, .divider { padding-left: 16px; padding-right: 16px; }
+    .ep-header { flex-direction: column; gap: 12px; }
+    .ep-num { width: 44px; height: 44px; font-size: 18px; }
+    .nav { padding: 0 16px; }
+    .hero-stats { gap: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+
+  /* ─── UTILITY ────────────────────────────────────────────── */
+  .mt-8 { margin-top: 32px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Navegacao dos episodios">
+  <div class="nav-inner">
+    <span class="nav-label">Serie</span>
+    <a class="nav-pill" href="#ep1">EP 01</a>
+    <a class="nav-pill" href="#ep2">EP 02</a>
+    <a class="nav-pill" href="#ep3">EP 03</a>
+    <a class="nav-pill" href="#ep4">EP 04</a>
+    <a class="nav-pill" href="#ep5">EP 05</a>
+    <a class="nav-pill" href="#ep6">EP 06</a>
+    <a class="nav-pill" href="#ep7">EP 07</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot" aria-hidden="true"></span>
+    Serie de Conteudo - Epos Marketing
+  </div>
+  <h1>A Evolucao do Funil de Vendas</h1>
+  <p class="hero-sub">
+    De 1898 ate o Marketing 5.0: como o funil mudou, o que sobrou, o que morreu,
+    e onde o WhatsApp se encaixa em tudo isso.
+  </p>
+  <div class="hero-stats">
+    <div class="stat-chip">
+      <span class="stat-icon" aria-hidden="true">&#9654;</span>
+      <span><strong>7 episodios</strong></span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icon" aria-hidden="true">&#9201;</span>
+      <span>Ate <strong>150 segundos</strong> por video</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icon" aria-hidden="true">&#128244;</span>
+      <span>Roteiro <strong>pronto para gravar</strong></span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icon" aria-hidden="true">&#127919;</span>
+      <span>CTA integrado em <strong>cada episodio</strong></span>
+    </div>
+  </div>
+</header>
+
+<!-- OVERVIEW -->
+<section class="section">
+  <div class="section-title">Visao Geral da Serie</div>
+  <div class="overview-table-wrap">
+    <table class="overview-table">
+      <thead>
+        <tr>
+          <th>Ep</th>
+          <th>Titulo</th>
+          <th>Duracao</th>
+          <th>Tema Central</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="location.href='#ep1'">
+          <td><span class="ep-badge">01</span></td>
+          <td><a class="ep-title-link" href="#ep1">O Funil que Existe Ha 100 Anos</a></td>
+          <td><span class="duration-badge">120s</span></td>
+          <td><span class="theme-tag">AIDA - 1898</span></td>
+        </tr>
+        <tr onclick="location.href='#ep2'">
+          <td><span class="ep-badge">02</span></td>
+          <td><a class="ep-title-link" href="#ep2">A Era em que Ganhar Cannes Bastava</a></td>
+          <td><span class="duration-badge">135s</span></td>
+          <td><span class="theme-tag">Branding - Anos 80-90</span></td>
+        </tr>
+        <tr onclick="location.href='#ep3'">
+          <td><span class="ep-badge">03</span></td>
+          <td><a class="ep-title-link" href="#ep3">Quando o Google Mudou Tudo</a></td>
+          <td><span class="duration-badge">140s</span></td>
+          <td><span class="theme-tag">AdWords - 2000</span></td>
+        </tr>
+        <tr onclick="location.href='#ep4'">
+          <td><span class="ep-badge">04</span></td>
+          <td><a class="ep-title-link" href="#ep4">Facebook Ads e o Fim da Inocencia</a></td>
+          <td><span class="duration-badge">145s</span></td>
+          <td><span class="theme-tag">Social Ads - 2007</span></td>
+        </tr>
+        <tr onclick="location.href='#ep5'">
+          <td><span class="ep-badge">05</span></td>
+          <td><a class="ep-title-link" href="#ep5">Marketing 5.0: IA, Velocidade e Personalizacao</a></td>
+          <td><span class="duration-badge">140s</span></td>
+          <td><span class="theme-tag">IA - Agora</span></td>
+        </tr>
+        <tr onclick="location.href='#ep6'">
+          <td><span class="ep-badge">06</span></td>
+          <td><a class="ep-title-link" href="#ep6">Marketing Nao e Departamento. E Fundacao.</a></td>
+          <td><span class="duration-badge">145s</span></td>
+          <td><span class="theme-tag">Funil Integrado</span></td>
+        </tr>
+        <tr onclick="location.href='#ep7'">
+          <td><span class="ep-badge">07</span></td>
+          <td><a class="ep-title-link" href="#ep7">O Elo que Fecha o Funil</a></td>
+          <td><span class="duration-badge">140s</span></td>
+          <td><span class="theme-tag">WhatsApp + CTA Epos</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ─── EP 01 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep1">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 1">01</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 01 de 07</span>
+        <span class="ep-duration">120 segundos</span>
+        <span class="theme-tag">AIDA - 1898</span>
+      </div>
+      <h2>O Funil que Existe Ha 100 Anos</h2>
+      <p class="ep-description">
+        Apresenta o conceito original do funil de vendas (AIDA, 1898) e mostra que
+        a logica nao mudou - so a velocidade e o canal.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 01</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">Antes do TikTok, antes do Instagram, antes do Google... o funil de vendas ja existia. Em 1898.</td>
+            <td class="td-visual">Fundo preto. Numeros do ano surgem com tipografia bold.</td>
+            <td class="td-overlay">"1898"</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 20s</td>
+            <td class="td-locucao">Um publicitario chamado Elias St. Elmo Lewis criou um modelo simples pra vender qualquer coisa. Ele chamou de AIDA.</td>
+            <td class="td-visual">Nome "Elias St. Elmo Lewis" aparece. Foto de epoca em sepia.</td>
+            <td class="td-overlay">"Elias St. Elmo Lewis, 1898"</td>
+          </tr>
+          <tr>
+            <td class="td-time">20 - 45s</td>
+            <td class="td-locucao">Atencao. Interesse. Desejo. Acao. Um funil. Quatro etapas. A ideia era simples: primeiro voce captura a atencao. Desperta o interesse. Cria o desejo. E entao convida pra acao.</td>
+            <td class="td-visual">Letras A - I - D - A surgem uma a uma. Funil animado com cada etapa se iluminando.</td>
+            <td class="td-overlay">"A → I → D → A"</td>
+          </tr>
+          <tr>
+            <td class="td-time">45 - 70s</td>
+            <td class="td-locucao">Isso funcionou nos jornais, no radio, na TV. Por decadas, marcas dominavam o funil com mensagens de massa. Uma propaganda certa, no lugar certo, pra pessoa certa.</td>
+            <td class="td-visual">Montagem rapida: jornal antigo, radio, televisao preto e branco. Tom vintage.</td>
+            <td class="td-overlay">"Marketing de Massa - Seculo XX"</td>
+          </tr>
+          <tr>
+            <td class="td-time">70 - 95s</td>
+            <td class="td-locucao">O consumidor nao tinha voz. Era passivo. Recebia a mensagem e comprava... ou nao. Sem rastreamento, sem dado, sem retargeting.</td>
+            <td class="td-visual">Pessoa em frente a TV em preto e branco. Corte para tela de TV com estatica.</td>
+            <td class="td-overlay">"Consumidor passivo. Sem dados."</td>
+          </tr>
+          <tr>
+            <td class="td-time">95 - 115s</td>
+            <td class="td-locucao">Esse modelo tem 126 anos. E ainda e a base de tudo que voce faz no marketing hoje. A diferenca e que agora o funil e digital, mensuravel, e acontece em segundos.</td>
+            <td class="td-visual">Funil moderno com dados, graficos e metricas em tempo real sobrepostos.</td>
+            <td class="td-overlay">"O mesmo funil. Velocidade diferente."</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">115 - 120s</td>
+            <td class="td-locucao">Nos proximos episodios: como esse funil evoluiu ate o Marketing 5.0 - e como uma ferramenta de WhatsApp automatiza cada etapa pra voce.</td>
+            <td class="td-visual">Tela rapida da ferramenta. Ícone WhatsApp pulsando levemente.</td>
+            <td class="td-overlay">"Automatize seu funil no WhatsApp - Epos"</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- ─── EP 02 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep2">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 2">02</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 02 de 07</span>
+        <span class="ep-duration">135 segundos</span>
+        <span class="theme-tag">Branding - Anos 80-90</span>
+      </div>
+      <h2>A Era em que Ganhar Cannes Bastava</h2>
+      <p class="ep-description">
+        A epoca do branding puro: campanhas memoraveis sem dados. ROI medido
+        por intuicao. O que sobrou dessa era - e o que morreu.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 02</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">Havia uma epoca em que a metrica de sucesso de uma campanha era ganhar um trofeu em Cannes.</td>
+            <td class="td-visual">Leao dourado de Cannes em slowmo. Luzes de palco.</td>
+            <td class="td-overlay">"Cannes Lions - Anos 80"</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 35s</td>
+            <td class="td-locucao">Nos anos 80 e 90, o marketing vivia a era do branding. A Coca-Cola nao precisava medir cliques. A Nike nao rastreava conversoes. Bastava criar uma campanha memoravel que entrasse na cultura.</td>
+            <td class="td-visual">Montagem de comerciais classicos: Coca-Cola, Nike Just Do It. Filmagem de epoca.</td>
+            <td class="td-overlay">"A Era da Marca - Branding Puro"</td>
+          </tr>
+          <tr>
+            <td class="td-time">35 - 65s</td>
+            <td class="td-locucao">O ROI era calculado de forma simples: vendas subiram? A campanha funcionou. Vendas cairam? Trocava a agencia. Nao havia painel de metricas, nao havia pixel, nao havia dado em tempo real.</td>
+            <td class="td-visual">Reuniao de executivos em sala dos anos 80. Graficos simples em papel.</td>
+            <td class="td-overlay">"ROI = Vendas subiram? Pronto."</td>
+          </tr>
+          <tr>
+            <td class="td-time">65 - 95s</td>
+            <td class="td-locucao">Grandes orcamentos. Semanas de producao. Campanhas que viravam cultura. Era o marketing do impacto emocional puro - sem remarketing, sem funil mensuravel, sem segmentacao cirurgica.</td>
+            <td class="td-visual">Making-of de um comercial de TV da epoca. Equipe de producao grande.</td>
+            <td class="td-overlay">"Impacto emocional. Sem metricas."</td>
+          </tr>
+          <tr>
+            <td class="td-time">95 - 120s</td>
+            <td class="td-locucao">Esse modelo ainda funciona? Pra quem tem verba infinita, sim. Red Bull ainda investe milhoes em branding puro. Mas pra maioria das empresas, o jogo mudou. Voce precisa de resultado, nao de trofeu.</td>
+            <td class="td-visual">Contraste: evento de branding grande vs pequena empresa olhando para dashboard.</td>
+            <td class="td-overlay">"Funciona pra quem tem verba infinita."</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">120 - 135s</td>
+            <td class="td-locucao">No proximo episodio: a chegada do Google em 2000 e o nascimento do marketing de performance. O dia em que o marketing virou ciencia. Se voce usa WhatsApp pra vender, essa historia e sua fundacao.</td>
+            <td class="td-visual">Logotipo Google antigo. Transicao para proximo episodio.</td>
+            <td class="td-overlay">"Proximo: O Google muda tudo"</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- ─── EP 03 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep3">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 3">03</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 03 de 07</span>
+        <span class="ep-duration">140 segundos</span>
+        <span class="theme-tag">AdWords - 2000</span>
+      </div>
+      <h2>Quando o Google Mudou Tudo</h2>
+      <p class="ep-description">
+        2000: AdWords lanca o pay-per-click e o marketing vira ciencia. Pela
+        primeira vez, mensurar ficou possivel - e obrigatorio.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 03</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">2000. O Google lanca o AdWords. E o marketing nunca mais foi o mesmo.</td>
+            <td class="td-visual">Logotipo Google retro. Ano "2000" em tipografia grande.</td>
+            <td class="td-overlay">"Google AdWords - 2000"</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 35s</td>
+            <td class="td-locucao">Pela primeira vez na historia, voce pagava apenas quando alguem clicava no seu anuncio. Nao quando via. Nao quando passava pela vitrine. So quando clicava. Pay-per-click. Revolucao.</td>
+            <td class="td-visual">Animacao de cursor clicando. Contador de cliques subindo.</td>
+            <td class="td-overlay">"Pay-per-click. Voce paga o resultado."</td>
+          </tr>
+          <tr>
+            <td class="td-time">35 - 65s</td>
+            <td class="td-locucao">De repente, mensurar ficou possivel. Cliques, visitas, conversoes. O funil ganhou dados reais. O marketing saiu do campo da intuicao pro campo da ciencia. CPC, CTR, CPA viraram vocabulario basico.</td>
+            <td class="td-visual">Dashboard do Google Ads. Metricas em tempo real. Graficos subindo.</td>
+            <td class="td-overlay">"Cliques. Conversoes. Dados reais."</td>
+          </tr>
+          <tr>
+            <td class="td-time">65 - 95s</td>
+            <td class="td-locucao">Isso criou uma nova geracao: os especialistas em trafego. Profissionais que viviam de otimizar campanha por CPC, melhorar CTR, reduzir CPA. O ROI deixou de ser surpresa e virou obrigacao.</td>
+            <td class="td-visual">Profissional de marketing jovem analisando dados num monitor.</td>
+            <td class="td-overlay">"Marketing de Performance nasce aqui."</td>
+          </tr>
+          <tr>
+            <td class="td-time">95 - 120s</td>
+            <td class="td-locucao">O problema? O Google mostrava anuncio pra quem ja estava procurando. Otimo pro fundo do funil. Mas o topo ficava descoberto. E as redes sociais vieram resolver exatamente isso.</td>
+            <td class="td-visual">Funil com destaque no fundo. Parte de cima desbotada.</td>
+            <td class="td-overlay">"Otimo pra quem ja busca. O topo do funil??"</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">120 - 140s</td>
+            <td class="td-locucao">Sua empresa ja tem presenca no Google? Se voce atende pelo WhatsApp, integrar trafego de busca com automacao de atendimento e o proximo nivel do funil. E o que mostramos na pratica.</td>
+            <td class="td-visual">Split screen: Google Ads + tela de conversa no WhatsApp.</td>
+            <td class="td-overlay">"Busca + WhatsApp = funil completo"</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- ─── EP 04 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep4">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 4">04</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 04 de 07</span>
+        <span class="ep-duration">145 segundos</span>
+        <span class="theme-tag">Social Ads - 2007</span>
+      </div>
+      <h2>Facebook Ads e o Fim da Inocencia</h2>
+      <p class="ep-description">
+        2007: segmentacao cirurgica chega. O alcance organico morre devagar.
+        O pixel nasce. E o consumidor aprende a ignorar banner.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 04</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">2007. O Facebook lanca sua plataforma de anuncios. E o mundo do marketing explode.</td>
+            <td class="td-visual">Logo Facebook azul retro. Notificacoes simuladas aparecendo.</td>
+            <td class="td-overlay">"Facebook Ads - 2007"</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 40s</td>
+            <td class="td-locucao">De repente voce podia segmentar por idade, cidade, interesse, estado civil, nivel de renda. O sonho de qualquer publicitario: falar com a pessoa certa, na hora certa, no lugar certo.</td>
+            <td class="td-visual">Painel de segmentacao do Ads Manager animado. Filtros sendo aplicados.</td>
+            <td class="td-overlay">"Segmentacao cirurgica. Pessoa certa."</td>
+          </tr>
+          <tr>
+            <td class="td-time">40 - 70s</td>
+            <td class="td-locucao">O alcance organico no comeco era generoso. Postava e as pessoas viam. Marcas construiram comunidades enormes de graca. Parecia bom demais pra ser verdade.</td>
+            <td class="td-visual">Grafico de alcance organico subindo. Posts com muitos likes.</td>
+            <td class="td-overlay">"Alcance organico: 20-30% dos seguidores"</td>
+          </tr>
+          <tr>
+            <td class="td-time">70 - 95s</td>
+            <td class="td-locucao">E era. Em 2012 o Facebook comecou a reduzir o alcance organico. Hoje uma postagem chega entre 1% e 5% dos seus seguidores. Pra ver todo mundo, voce paga.</td>
+            <td class="td-visual">Mesmo grafico despencando. Cor mudando pra vermelho.</td>
+            <td class="td-overlay">"Alcance organico hoje: 1-5%"</td>
+          </tr>
+          <tr>
+            <td class="td-time">95 - 120s</td>
+            <td class="td-locucao">Mas o grande legado do Facebook Ads foi o pixel. A capacidade de rastrear o comportamento do usuario, criar publicos personalizados, e fechar o loop do funil com remarketing. Isso mudou tudo.</td>
+            <td class="td-visual">Animacao de pixel rastreando navegacao. Loop de retargeting.</td>
+            <td class="td-overlay">"O pixel que tudo rastreia."</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">120 - 145s</td>
+            <td class="td-locucao">Hoje a Meta ainda domina o trafego social. Mas o consumidor ficou mais exigente: ele quer conversa, nao banner. Quer resposta rapida. E ai que o WhatsApp entra no funil pra fechar o que o anuncio abre.</td>
+            <td class="td-visual">Comparativo: banner ignorado vs mensagem de WhatsApp aberta.</td>
+            <td class="td-overlay">"O consumidor quer conversa. Nao banner."</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- ─── EP 05 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep5">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 5">05</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 05 de 07</span>
+        <span class="ep-duration">140 segundos</span>
+        <span class="theme-tag">IA - Agora</span>
+      </div>
+      <h2>Marketing 5.0: IA, Velocidade e Personalizacao</h2>
+      <p class="ep-description">
+        Philip Kotler define o Marketing 5.0. IA entra no funil. Velocidade
+        de resposta vira vantagem competitiva. Personalizacao em escala e possivel.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 05</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">Bem-vindo ao Marketing 5.0. A era onde a inteligencia artificial entrou de vez no funil.</td>
+            <td class="td-visual">Particulas de dados e redes neurais. Visual tecnologico.</td>
+            <td class="td-overlay">"Marketing 5.0 - Agora."</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 35s</td>
+            <td class="td-locucao">Philip Kotler definiu o Marketing 5.0 como o uso de tecnologia pra criar, comunicar, entregar e aumentar valor ao longo da jornada do cliente. Em bom portugues: IA a servico do funil.</td>
+            <td class="td-visual">Imagem de Kotler. Capa do livro Marketing 5.0. Texto sobreposto.</td>
+            <td class="td-overlay">"Philip Kotler - Marketing 5.0"</td>
+          </tr>
+          <tr>
+            <td class="td-time">35 - 65s</td>
+            <td class="td-locucao">O que isso significa na pratica? Personalizacao em escala. Uma IA que lembra o historico de cada cliente. Que responde em segundos. Que qualifica o lead antes do vendedor precisar falar.</td>
+            <td class="td-visual">Telas de chat com IA respondendo automaticamente. Multiplas conversas simultaneas.</td>
+            <td class="td-overlay">"Personalizacao em escala."</td>
+          </tr>
+          <tr>
+            <td class="td-time">65 - 95s</td>
+            <td class="td-locucao">Velocidade virou vantagem competitiva. Um estudo do Harvard Business Review mostrou: empresas que respondem um lead em menos de 1 hora tem 7 vezes mais chance de qualificar. Quem demora 24 horas perdeu.</td>
+            <td class="td-visual">Cronometro. Grafico de conversao por tempo de resposta.</td>
+            <td class="td-overlay">"Resposta em 1h = 7x mais conversao"</td>
+          </tr>
+          <tr>
+            <td class="td-time">95 - 120s</td>
+            <td class="td-locucao">A IA tambem aprendeu a prever. Qual lead vai comprar? Qual campanha vai funcionar? Os dados passaram a ser o ativo mais valioso de qualquer empresa que quer crescer.</td>
+            <td class="td-visual">Dashboard preditivo com scores de leads. IA classificando.</td>
+            <td class="td-overlay">"IA que preve, nao so reage."</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">120 - 140s</td>
+            <td class="td-locucao">A convergencia de tudo isso? IA mais canal de massa mais personalizacao igual a automacao de WhatsApp com inteligencia. Isso nao e futuro. Esta acontecendo agora. E as empresas que adotaram primeiro estao se distanciando.</td>
+            <td class="td-visual">Tela da ferramenta Epos. WhatsApp com IA respondendo.</td>
+            <td class="td-overlay">"IA + WhatsApp = funil do presente"</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- ─── EP 06 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep6">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 6">06</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 06 de 07</span>
+        <span class="ep-duration">145 segundos</span>
+        <span class="theme-tag">Funil Integrado</span>
+      </div>
+      <h2>Marketing Nao e Departamento. E Fundacao.</h2>
+      <p class="ep-description">
+        O marketing moderno nao termina no anuncio. Ele permeia vendas, operacional
+        e pos-venda. Quando esses silos nao se comunicam, o funil vaza.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 06</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">Tem uma mentira que muitas empresas ainda acreditam: que marketing e responsabilidade do departamento de marketing.</td>
+            <td class="td-visual">Organograma corporativo tradicional. Caixinhas separadas.</td>
+            <td class="td-overlay">"Marketing = um departamento?"</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 40s</td>
+            <td class="td-locucao">No funil moderno, o marketing nao termina quando o lead chega no vendedor. Ele influencia o atendimento, o pos-venda, a retencao, o boca a boca. Marketing e fundacao, nao teto.</td>
+            <td class="td-visual">Diagrama de influencia do marketing em todos os setores. Setas conectando tudo.</td>
+            <td class="td-overlay">"Marketing e fundacao."</td>
+          </tr>
+          <tr>
+            <td class="td-time">40 - 70s</td>
+            <td class="td-locucao">Kotler chama de Marketing Integrado. A empresa inteira pensa na experiencia do cliente. O vendedor precisa entender a promessa da campanha. O operacional precisa entregar o que o marketing prometeu.</td>
+            <td class="td-visual">Equipe unida. Reuniao cross-funcional. Times conversando.</td>
+            <td class="td-overlay">"A empresa inteira pensa no cliente."</td>
+          </tr>
+          <tr>
+            <td class="td-time">70 - 100s</td>
+            <td class="td-locucao">Quando marketing e vendas nao conversam, o que acontece? O lead chega quente pelo anuncio de "resposta em 5 minutos"... e o vendedor demora 3 horas. Promessa quebrada. Conversao perdida. Cliente perdido.</td>
+            <td class="td-visual">Funil com vazamento. Lead escorregando pelas rachaduras.</td>
+            <td class="td-overlay">"Promessa quebrada = conversao perdida."</td>
+          </tr>
+          <tr>
+            <td class="td-time">100 - 120s</td>
+            <td class="td-locucao">O funil moderno exige alinhamento: marketing atrai, a automacao qualifica, o vendedor fecha, o pos-venda reten. Cada etapa passa pra proxima sem atrito. Sem vazamento.</td>
+            <td class="td-visual">Funil fluindo sem interrupcao. Verde em cada etapa.</td>
+            <td class="td-overlay">"Sem atrito em cada etapa."</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">120 - 145s</td>
+            <td class="td-locucao">A automacao de WhatsApp e o elo que une o marketing ao vendedor. O lead chega pelo anuncio, a IA qualifica, e o vendedor recebe so quem esta pronto pra comprar. Isso e Marketing 5.0 na pratica real.</td>
+            <td class="td-visual">Fluxo automatizado completo. Anuncio, WhatsApp, vendedor, fechamento.</td>
+            <td class="td-overlay">"Marketing atrai. IA qualifica. Vendedor fecha."</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- ─── EP 07 ───────────────────────────────────────────────── -->
+<article class="episode-card" id="ep7">
+  <div class="ep-header">
+    <div class="ep-num" aria-label="Episodio 7">07</div>
+    <div class="ep-meta">
+      <div class="ep-meta-top">
+        <span class="ep-series-tag">Episodio 07 de 07</span>
+        <span class="ep-duration">140 segundos</span>
+        <span class="theme-tag">WhatsApp + CTA Epos</span>
+      </div>
+      <h2>O Elo que Fecha o Funil</h2>
+      <p class="ep-description">
+        Em 126 anos, um problema persiste: perder o lead no primeiro contato.
+        WhatsApp tem 98% de abertura. Automacao inteligente resolve o gargalo final.
+      </p>
+    </div>
+  </div>
+  <div class="script-table-wrap">
+    <div class="script-table-title">
+      Roteiro completo - <span>EP 07</span>
+    </div>
+    <div class="script-table-scroll">
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Tempo</th>
+            <th>Locucao (Voz)</th>
+            <th>Visual / B-roll</th>
+            <th>Overlay de Texto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-time">0 - 5s</td>
+            <td class="td-locucao">Voce fez tudo certo: criou a campanha, gerou o clique, o lead chegou. E ai?</td>
+            <td class="td-visual">Notificacao de lead chegando. Tela esperando resposta.</td>
+            <td class="td-overlay">"O lead chegou. E ai?"</td>
+          </tr>
+          <tr>
+            <td class="td-time">5 - 35s</td>
+            <td class="td-locucao">Em 126 anos de funil de vendas, de Elias Lewis ao Marketing 5.0, um problema persiste: a maioria das empresas perde o lead no momento mais critico - o primeiro contato.</td>
+            <td class="td-visual">Linha do tempo de 1898 a 2024. Cada era marcada.</td>
+            <td class="td-overlay">"126 anos. O mesmo problema."</td>
+          </tr>
+          <tr>
+            <td class="td-time">35 - 65s</td>
+            <td class="td-locucao">O WhatsApp hoje e o canal com maior taxa de abertura do mundo. 98% de abertura. Enquanto o email chega a 20%, o SMS a 30%, o WhatsApp chega a quase todos. Sempre.</td>
+            <td class="td-visual">Comparativo visual de canais. Barras de abertura. WhatsApp dominando.</td>
+            <td class="td-overlay">"WhatsApp: 98% de abertura."</td>
+          </tr>
+          <tr>
+            <td class="td-time">65 - 90s</td>
+            <td class="td-locucao">Mas enviar mensagem manualmente pra cada lead e impossivel em escala. E contratar uma equipe inteira tem custo. A solucao e a automacao inteligente: o atendimento acontece, voce nao precisa estar la.</td>
+            <td class="td-visual">Comparativo: equipe grande vs automacao enxuta. Grafico de custo.</td>
+            <td class="td-overlay">"Escala sem custo de equipe."</td>
+          </tr>
+          <tr>
+            <td class="td-time">90 - 115s</td>
+            <td class="td-locucao">Imagine: seu anuncio roda as 22h. O lead clica. Em segundos, recebe uma mensagem personalizada, e qualificado por uma IA, e no dia seguinte o vendedor acorda com a agenda cheia de leads quentes.</td>
+            <td class="td-visual">Sequencia em motion: anuncio rodando, lead clicando, resposta automatica chegando, vendedor vendo agenda cheia.</td>
+            <td class="td-overlay">"Vende enquanto voce dorme."</td>
+          </tr>
+          <tr class="cta-row">
+            <td class="td-time">115 - 140s</td>
+            <td class="td-locucao">Isso e o que construimos na Epos. Uma ferramenta que fecha o elo final do funil: da campanha ao atendimento automatizado no WhatsApp. Se voce quer ver como funciona na sua empresa, fala comigo agora. O link esta na bio.</td>
+            <td class="td-visual">Tela da Epos AI. Logo. Link claro na bio. CTA direto.</td>
+            <td class="td-overlay">"Epos AI - Feche seu funil no WhatsApp"</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</article>
+
+<hr class="divider">
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <h3>Pronto pra gravar a serie?</h3>
+    <p>
+      7 roteiros prontos. Ate 145 segundos cada. CTA integrado. Use diretamente
+      para gravar ou adapte conforme sua identidade visual.
+    </p>
+    <a class="footer-cta" href="https://wa.me/5511999999999" rel="noopener">
+      Falar sobre automacao no WhatsApp
+    </a>
+    <p class="footer-meta">
+      Epos Marketing &nbsp;&middot;&nbsp; Serie: A Evolucao do Funil de Vendas &nbsp;&middot;&nbsp; 7 episodios &nbsp;&middot;&nbsp; 2026
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
