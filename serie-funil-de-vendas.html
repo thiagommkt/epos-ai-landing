@@ -477,15 +477,25 @@
   /* ─── RESPONSIVE ─────────────────────────────────────────── */
   @media (max-width: 768px) {
     .hero-bg {
-      min-height: 500px;
-      background-position: center 40%;
+      /* imagem 16:9 aparece inteira no topo: 100% largura, altura proporcional */
       background-image:
-        linear-gradient(to top, rgba(9,9,9,1) 0%, rgba(9,9,9,0.7) 25%, transparent 50%),
-        linear-gradient(rgba(9,9,9,0.72), rgba(9,9,9,0.72)),
+        linear-gradient(to top, rgba(9,9,9,1) 0%, rgba(9,9,9,0.95) 10%, rgba(9,9,9,0.45) 32%, transparent 52%),
         url('assets/hero-funil-bg.png');
+      background-size: 100% auto;
+      background-position: center top;
+      background-color: var(--bg);
+      min-height: calc(56.25vw + 300px);
+      align-items: flex-end;
     }
-    .hero { padding: 64px 20px 56px; text-align: center; }
-    .hero h1 { font-size: clamp(36px, 10vw, 52px); letter-spacing: -0.03em; }
+    /* empurra conteúdo para baixo da imagem com fade overlap */
+    .hero {
+      padding-top: calc(56.25vw - 48px);
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 52px;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(32px, 9vw, 48px); letter-spacing: -0.03em; }
     .section, .episode-card, .divider { padding-left: 16px; padding-right: 16px; }
     .ep-header { flex-direction: column; gap: 12px; }
     .ep-num { width: 44px; height: 44px; font-size: 18px; }
