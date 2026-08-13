@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="IA que qualifica, conversa e agenda no WhatsApp — enquanto você foca em fechar.">
+  <title>Epos AI — IA para Serviços de Alto Ticket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#0A0A0A;--s1:#141414;--s2:#1C1C1C;--s3:#242424;
+  --bdr:rgba(255,255,255,0.07);
+  --pu:#9146FF;--pu-d:rgba(145,70,255,0.09);--pu-b:rgba(145,70,255,0.22);
+  --ne:#00F5A0;--ne-d:rgba(0,245,160,0.07);--ne-b:rgba(0,245,160,0.2);
+  --rd:#EF4444;
+  --t1:#FFFFFF;--t2:#A0A0A0;--t3:#555;
+  --r:14px;--r-sm:8px;--mx:1160px;
+}
+body{background:var(--bg);color:var(--t1);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
+.c{max-width:var(--mx);margin:0 auto;padding:0 24px}
+.hl{color:var(--pu);font-weight:700}
+.hl-ne{color:var(--ne);font-weight:700}
+.fade{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.fade.in{opacity:1;transform:translateY(0)}
+/* tags */
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.tag-pu{background:var(--pu);color:#fff}
+.tag-dk{background:var(--s2);color:var(--t2);border:1px solid var(--bdr)}
+.tag-ne{background:var(--ne-d);color:var(--ne);border:1px solid var(--ne-b)}
+.tag-sm{font-size:11px;padding:4px 10px}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;cursor:pointer;border:none;transition:opacity .15s,box-shadow .15s,transform .1s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-pu{background:var(--pu);color:#fff}
+.btn-pu:hover{opacity:.9;box-shadow:0 0 28px rgba(145,70,255,.35)}
+.btn-out{background:transparent;color:var(--t2);border:1.5px solid rgba(255,255,255,.16)}
+.btn-out:hover{border-color:rgba(255,255,255,.3);color:var(--t1)}
+.btn-lg{padding:15px 32px;font-size:16px}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:72px;display:flex;align-items:center;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.nav.scr{background:rgba(10,10,10,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom-color:var(--bdr)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;width:100%}
+.nav>.c{width:100%}
+.logo{font-size:19px;font-weight:800;letter-spacing:-.02em}
+.logo em{font-style:normal;color:var(--pu)}
+/* icons */
+.ic-rd{color:var(--rd);width:17px;height:17px;flex-shrink:0;margin-top:2px}
+.ic-pu{color:var(--pu);width:17px;height:17px;flex-shrink:0;margin-top:2px}
+.ic-ne{color:var(--ne);width:17px;height:17px;flex-shrink:0;margin-top:2px}
+.bdr-t{border-top:1px solid var(--bdr)}
+/* HERO */
+.hero{padding:130px 0 80px}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-h1{font-size:clamp(36px,4.8vw,64px);font-weight:900;line-height:1.04;letter-spacing:-.03em;margin:18px 0 18px}
+.hero-sub{font-size:17px;color:var(--t2);line-height:1.7;max-width:440px;margin-bottom:30px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:36px}
+.hero-pills{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pill{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r-sm);font-size:13px;font-weight:500;color:var(--t2)}
+.pill-ic{color:var(--pu);font-size:14px;flex-shrink:0}
+/* CHAT */
+.chat-card{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7)}
+.chat-hd{background:var(--s2);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr)}
+.chat-av{width:36px;height:36px;border-radius:50%;background:var(--pu);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.chat-nm{font-weight:600;font-size:14px}
+.chat-st{font-size:11px;color:var(--ne);margin-top:1px}
+.chat-bd{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.55}
+.msg-in{background:var(--s2);border-bottom-left-radius:3px;align-self:flex-start;color:var(--t2)}
+.msg-out{background:var(--pu-d);border:1px solid var(--pu-b);border-bottom-right-radius:3px;align-self:flex-end;color:var(--t2)}
+.msg-t{font-size:10px;color:var(--t3);margin-top:4px}
+.chip-ok{display:inline-flex;align-items:center;gap:6px;background:var(--ne-d);border:1px solid var(--ne-b);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ne);font-weight:600;align-self:flex-start}
+/* SEC */
+.sec{padding:96px 0}
+.sh{font-size:clamp(28px,3.8vw,52px);font-weight:800;line-height:1.1;letter-spacing:-.025em}
+.ss{font-size:17px;color:var(--t2);line-height:1.68;margin-top:12px}
+.cen{text-align:center}
+.cen .ss{margin:12px auto 0;max-width:580px}
+/* PROBLEMA */
+.prob-card{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:48px 48px 0;margin-top:52px;overflow:hidden}
+.prob-g{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:28px}
+.chk{list-style:none;display:flex;flex-direction:column;gap:12px}
+.chk li{display:flex;align-items:flex-start;gap:9px;font-size:15px;color:var(--t2);line-height:1.5}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);margin-top:44px;border-top:1px solid var(--bdr)}
+.sb{padding:28px 32px;border-right:1px solid var(--bdr)}
+.sb:last-child{border-right:none}
+.sv{font-size:40px;font-weight:900;line-height:1;letter-spacing:-.03em}
+.sv-pu{color:var(--pu)}.sv-ne{color:var(--ne)}
+.sl{font-size:13px;color:var(--t2);margin-top:5px;line-height:1.4}
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:44px}
+.sc{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:38px 32px;position:relative}
+.sc-n{font-size:11px;font-weight:700;color:var(--pu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.sc-h{font-size:19px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.sc-b{font-size:14px;color:var(--t2);line-height:1.6}
+.sc-arr{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:30px;height:30px;background:var(--s2);border:1px solid var(--bdr);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--pu);z-index:2;font-size:13px}
+/* 2COL FEATURE */
+.f2{display:grid;grid-template-columns:1fr 1fr;margin-top:44px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.f2c{padding:44px 48px}
+.f2c:first-child{border-right:1px solid var(--bdr)}
+.f2h{font-size:clamp(21px,2.6vw,30px);font-weight:800;line-height:1.2;margin-bottom:12px}
+.f2b{font-size:15px;color:var(--t2);line-height:1.72}
+/* SEM/COM */
+.cw{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:44px}
+.cc{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.cc-hd{padding:18px 26px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+.cc-items{padding:18px 26px;display:flex;flex-direction:column;gap:11px}
+.cc-item{display:flex;align-items:flex-start;gap:9px;font-size:14px;color:var(--t2);line-height:1.5}
+.cc.good{border-color:var(--pu-b);background:var(--pu-d)}
+.cc.good .cc-item{color:var(--t1)}
+/* CASE */
+.case-g{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:44px}
+.cn{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:32px 28px;text-align:center}
+.cn.hl-card{background:var(--pu-d);border-color:var(--pu-b)}
+.cn-big{font-size:clamp(34px,5vw,62px);font-weight:900;color:var(--pu);line-height:1;letter-spacing:-.03em;margin-bottom:6px}
+.cn-lbl{font-size:13px;color:var(--t2)}
+.cs{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:34px 30px;grid-column:span 2}
+.cs-h{font-size:18px;font-weight:700;margin-bottom:10px}
+.cs-b{font-size:15px;color:var(--t2);line-height:1.72}
+/* CRIATIVOS */
+.criativos-g{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+.cr-card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:30px 26px}
+.cr-ic{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.cr-ic-pu{background:var(--pu-d);border:1px solid var(--pu-b);color:var(--pu)}
+.cr-ic-ne{background:var(--ne-d);border:1px solid var(--ne-b);color:var(--ne)}
+.cr-h{font-size:19px;font-weight:700;margin-bottom:8px;line-height:1.2}
+.cr-b{font-size:14px;color:var(--t2);line-height:1.62}
+/* FUNIL */
+.funil-g{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:44px;border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.funil-left{padding:44px 48px;border-right:1px solid var(--bdr)}
+.funil-right{padding:44px 48px;display:flex;flex-direction:column;gap:20px}
+.funil-h{font-size:clamp(22px,2.8vw,32px);font-weight:800;line-height:1.18;margin-bottom:14px}
+.funil-b{font-size:15px;color:var(--t2);line-height:1.72;margin-bottom:18px}
+.etapa{display:flex;align-items:flex-start;gap:14px}
+.etapa-num{width:28px;height:28px;border-radius:50%;background:var(--pu-d);border:1px solid var(--pu-b);color:var(--pu);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.etapa-h{font-size:14px;font-weight:700;margin-bottom:3px}
+.etapa-b{font-size:13px;color:var(--t2);line-height:1.5}
+/* O QUE INCLUI */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:44px}
+.ic-card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:32px 28px}
+.ic-card.hl-card{background:var(--pu-d);border-color:var(--pu-b)}
+.ic-h{font-size:20px;font-weight:700;margin-bottom:18px}
+.ic-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ic-list li{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--t2);line-height:1.5}
+.ic-list li::before{content:'+';color:var(--pu);font-weight:800;font-size:15px;flex-shrink:0;margin-top:-1px}
+/* ICP */
+.icp-g{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;margin-top:44px}
+.icp-c{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:30px 26px;transition:border-color .2s}
+.icp-c:hover{border-color:var(--pu-b)}
+.icp-ic{width:38px;height:38px;border-radius:9px;background:var(--pu-d);border:1px solid var(--pu-b);display:flex;align-items:center;justify-content:center;color:var(--pu);margin-bottom:14px}
+.icp-h{font-size:18px;font-weight:700;margin-bottom:8px}
+.icp-b{font-size:14px;color:var(--t2);line-height:1.62}
+/* FORM */
+.form-sec{border-top:1px solid var(--bdr)}
+.fi-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
+.form-left{padding:80px 0}
+.form-h{font-size:clamp(28px,3.6vw,48px);font-weight:800;line-height:1.1;letter-spacing:-.025em;margin-bottom:12px}
+.form-sub{font-size:16px;color:var(--t2);line-height:1.65;margin-bottom:32px}
+.prom{list-style:none;display:flex;flex-direction:column;gap:10px}
+.prom li{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--t2)}
+.form-right{padding:80px 0}
+.form-box{background:var(--s1);border:1px solid var(--bdr);border-radius:20px;padding:36px}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:13px;font-weight:600;color:var(--t2);margin-bottom:5px}
+.fi,.fs,.ft{width:100%;padding:11px 14px;background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--r-sm);color:var(--t1);font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.fi:focus,.fs:focus,.ft:focus{border-color:rgba(145,70,255,.5)}
+.fi::placeholder,.ft::placeholder{color:var(--t3)}
+.fs{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.ft{resize:vertical;min-height:80px}
+.opt{color:var(--t3);font-weight:400}
+.btn-sub{width:100%;padding:14px;background:var(--pu);color:#fff;border:none;border-radius:999px;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:4px;transition:opacity .15s,box-shadow .15s}
+.btn-sub:hover{opacity:.9;box-shadow:0 0 28px rgba(145,70,255,.28)}
+/* footer */
+footer{border-top:1px solid var(--bdr);padding:32px 0}
+.foot-in{display:flex;align-items:center;justify-content:space-between}
+.foot-logo{font-size:17px;font-weight:800}
+.foot-logo em{font-style:normal;color:var(--pu)}
+.foot-copy{font-size:12px;color:var(--t3)}
+/* responsive */
+@media(max-width:860px){
+  .hero-grid,.fi-grid,.prob-g,.f2,.cw,.case-g,.ig,.icp-g,.criativos-g,.funil-g{grid-template-columns:1fr}
+  .chat-card{display:none}
+  .hero-pills{grid-template-columns:1fr}
+  .f2c:first-child,.funil-left{border-right:none;border-bottom:1px solid var(--bdr)}
+  .f2c,.funil-left,.funil-right{padding:32px 24px}
+  .cs{grid-column:1}
+  .stats-row{grid-template-columns:1fr}
+  .sb{border-right:none;border-bottom:1px solid var(--bdr)}
+  .sb:last-child{border-bottom:none}
+  .steps{grid-template-columns:1fr}
+  .sc-arr{display:none}
+  .prob-card{padding:32px 24px 0}
+  .form-left,.form-right{padding:48px 0}
+  .form-right{padding-top:0}
+  .foot-in{flex-direction:column;gap:10px;text-align:center}
+}
+  </style>
+  <!-- Meta Pixel -->
+  <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','130141280708842');fbq('track','PageView');</script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=130141280708842&ev=PageView&noscript=1"/></noscript>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="c">
+    <div class="nav-in">
+      <span class="logo">Epos<em>.</em>AI</span>
+      <a href="#formulario" class="btn btn-pu" style="padding:10px 22px;font-size:14px" onclick="fbq('trackCustom','CTAClick',{button_id:'nav-cta'})">Quero uma demonstração →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="c">
+    <div class="hero-grid">
+      <div>
+        <div class="fade"><span class="tag tag-pu">IA para Serviços de Alto Ticket</span></div>
+        <h1 class="hero-h1 fade">Pare de perder leads.<br>Responda em <span class="hl">30 segundos</span>,<br>24h por dia.</h1>
+        <p class="hero-sub fade">IA que qualifica, conversa e agenda no WhatsApp — enquanto você foca em fechar. Criativos que param o scroll. Funil desenhado para converter.</p>
+        <div class="hero-ctas fade">
+          <a href="#formulario" class="btn btn-pu btn-lg" onclick="fbq('trackCustom','CTAClick',{button_id:'hero-cta'})">Quero uma demonstração →</a>
+          <a href="#como-funciona" class="btn btn-out btn-lg" onclick="fbq('trackCustom','CTAClick',{button_id:'hero-secondary-cta'})">Ver como funciona</a>
+        </div>
+        <div class="hero-pills fade">
+          <div class="pill"><span class="pill-ic">✓</span> Resposta em menos de 30s</div>
+          <div class="pill"><span class="pill-ic">✓</span> Qualificação automática</div>
+          <div class="pill"><span class="pill-ic">✓</span> Agendamento automático</div>
+          <div class="pill"><span class="pill-ic">✓</span> WhatsApp como canal</div>
+          <div class="pill"><span class="pill-ic">✓</span> Rastreamento de cada lead</div>
+          <div class="pill"><span class="pill-ic">✓</span> Dashboard em tempo real</div>
+        </div>
+      </div>
+
+      <div class="fade">
+        <div class="chat-card">
+          <div class="chat-hd">
+            <div class="chat-av">D</div>
+            <div>
+              <div class="chat-nm">Donna — Assistente Epos AI</div>
+              <div class="chat-st">● Online agora</div>
+            </div>
+          </div>
+          <div class="chat-bd">
+            <div class="msg msg-in">
+              Olá! Vi o anúncio de vocês. Atendem advocacia previdenciária?
+              <div class="msg-t">agora</div>
+            </div>
+            <div class="msg msg-out">
+              Oi! Sou a <strong style="color:var(--t1)">Donna da Epos AI</strong>. Sim, trabalhamos com escritórios que querem transformar tráfego em contratos. Me conta mais — qual é o volume de leads que você recebe hoje?
+              <div class="msg-t">agora</div>
+            </div>
+            <div class="msg msg-in">
+              Invisto em anúncios mas perco muitos leads à noite e nos fins de semana.
+              <div class="msg-t">agora</div>
+            </div>
+            <div class="msg msg-out">
+              Esse é exatamente o problema que resolvemos. Qual o melhor horário para uma conversa rápida de 20 minutos?
+              <div class="msg-t">agora</div>
+            </div>
+            <div class="msg msg-in">Amanhã às 14h está ótimo.<div class="msg-t">agora</div></div>
+            <div class="chip-ok">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Reunião agendada — Amanhã 14h00
+            </div>
+            <div style="font-size:11px;color:var(--t3);padding-bottom:6px;margin-top:2px">Sem intervenção humana. A IA fez tudo isso. ↑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROBLEMA ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="fade"><span class="tag tag-dk">Por que negócios high ticket perdem leads</span></div>
+    <h2 class="sh fade" style="margin-top:14px">Você investe em atrair leads e perde<br>a maioria na <span class="hl">primeira mensagem</span></h2>
+    <div class="prob-card fade">
+      <div class="prob-g">
+        <div>
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:14px">O que acontece hoje</h3>
+          <ul class="chk">
+            <li>
+              <svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              Leads chegam à noite, fds e feriados — e ninguém responde
+            </li>
+            <li>
+              <svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              Mais de 5 minutos de espera reduz a chance de fechar em 80%
+            </li>
+            <li>
+              <svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              A equipe perde tempo com leads que nunca vão converter
+            </li>
+            <li>
+              <svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              Impossível saber quais campanhas geram contratos de verdade
+            </li>
+            <li>
+              <svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              O concorrente que responde primeiro fecha — mesmo sendo pior
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:18px;font-weight:700;margin-bottom:14px">Com o stack Epos AI</h3>
+          <ul class="chk">
+            <li>
+              <svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+              IA responde em menos de 30 segundos, 24h por dia, 7 dias
+            </li>
+            <li>
+              <svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+              Qualifica pelo perfil e agenda sem intervenção humana
+            </li>
+            <li>
+              <svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+              Sua equipe só fala com leads quentes e prontos para fechar
+            </li>
+            <li>
+              <svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+              Rastreamento completo de cada lead — do clique ao contrato
+            </li>
+            <li>
+              <svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+              Primeiro a responder. Sempre. Sem exceção.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="sb"><div class="sv sv-pu">&lt;30s</div><div class="sl">1ª resposta da IA, a qualquer hora do dia</div></div>
+        <div class="sb"><div class="sv sv-pu">52%</div><div class="sl">dos leads chegam fora do horário comercial</div></div>
+        <div class="sb"><div class="sv sv-ne">3x</div><div class="sl">mais contratos com atendimento imediato e qualificado</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CRIATIVOS ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">Criativos</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Anúncios que param o scroll<br>e fazem o lead <span class="hl">entrar em contato</span></h2>
+      <p class="ss fade">Não adianta ter a melhor IA se o anúncio não convence. Produzimos os criativos que alimentam o funil — do conceito à entrega.</p>
+    </div>
+    <div class="criativos-g">
+      <div class="cr-card fade">
+        <div class="cr-ic cr-ic-pu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        </div>
+        <h3 class="cr-h">Vídeo que prende em 3 segundos</h3>
+        <p class="cr-b">Roteiro, gravação orientada e edição com o gancho certo. Criativo feito para parar o scroll no primeiro frame — e gerar clique antes do lead perceber que viu um anúncio.</p>
+      </div>
+      <div class="cr-card fade" style="transition-delay:.08s">
+        <div class="cr-ic cr-ic-pu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <h3 class="cr-h">Imagem que comunica em 1 segundo</h3>
+        <p class="cr-b">Arte estática ou carrossel com hierarquia visual clara. Design que entrega a mensagem antes do olho terminar de passar pela tela — pensado para cada formato e posicionamento.</p>
+      </div>
+      <div class="cr-card fade" style="transition-delay:.16s">
+        <div class="cr-ic cr-ic-ne">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3 class="cr-h">Copy que fala com quem quer comprar</h3>
+        <p class="cr-b">Texto de anúncio escrito com metodologia de funil — headline que fisga, corpo que agita a dor e CTA que convida à ação. Testamos ângulos diferentes até encontrar o que converte mais.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COMO FUNCIONA ═══ -->
+<section class="sec bdr-t" id="como-funciona">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">O sistema por dentro</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Do anúncio à reunião,<br>tudo conectado</h2>
+      <p class="ss fade">Cada etapa integrada — do clique no anúncio à confirmação na agenda do especialista.</p>
+    </div>
+    <div class="steps">
+      <div class="sc fade">
+        <div class="sc-n">01 — Atração</div>
+        <h3 class="sc-h">O anúncio vai direto para o WhatsApp</h3>
+        <p class="sc-b">A pessoa vê o criativo, clica e cai direto numa conversa no WhatsApp da empresa — sem formulário, sem fricção, sem abandono no meio do caminho.</p>
+        <div class="sc-arr">→</div>
+      </div>
+      <div class="sc fade" style="transition-delay:.08s">
+        <div class="sc-n">02 — Qualificação</div>
+        <h3 class="sc-h">A IA qualifica e agenda automaticamente</h3>
+        <p class="sc-b">A Donna responde em segundos, faz as perguntas certas, entende o perfil do lead e decide se agenda ou descarta. Sua equipe só entra quando o lead já está pronto.</p>
+        <div class="sc-arr">→</div>
+      </div>
+      <div class="sc fade" style="transition-delay:.16s">
+        <div class="sc-n">03 — Conversão</div>
+        <h3 class="sc-h">Reunião confirmada, dado registrado</h3>
+        <p class="sc-b">A reunião vai para a agenda do especialista e cada conversão é registrada automaticamente — do primeiro clique até o fechamento. Você sabe exatamente onde cada real investido gerou resultado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FUNIL ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">Como trabalhamos</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Cada funil desenhado<br>para o seu <span class="hl">negócio e público</span></h2>
+    </div>
+    <div class="funil-g fade" style="margin-top:44px">
+      <div class="funil-left">
+        <h3 class="funil-h">Não usamos template. Desenhamos um funil do zero para cada cliente.</h3>
+        <p class="funil-b">O funil certo depende de quem é o seu cliente, em que momento ele está e qual é a barreira que impede a compra. Antes de criar qualquer anúncio ou configurar qualquer automação, mapeamos isso junto com você.</p>
+        <p class="funil-b">O resultado é um caminho específico — desde a primeira vez que a pessoa vê um anúncio até o momento em que ela assina o contrato. Cada etapa pensada para reduzir fricção e aumentar conversão.</p>
+        <a href="#formulario" class="btn btn-pu" style="margin-top:4px;display:inline-flex" onclick="fbq('trackCustom','CTAClick',{button_id:'funis-cta'})">Quero um funil para o meu negócio →</a>
+      </div>
+      <div class="funil-right">
+        <div class="etapa">
+          <div class="etapa-num">1</div>
+          <div>
+            <div class="etapa-h">Diagnóstico do público e da dor</div>
+            <div class="etapa-b">Mapeamos quem compra, por que compra e o que impede quem ainda não comprou. Essa etapa define o ângulo de tudo que vem depois.</div>
+          </div>
+        </div>
+        <div class="etapa">
+          <div class="etapa-num">2</div>
+          <div>
+            <div class="etapa-h">Estratégia de criativos e atração</div>
+            <div class="etapa-b">Criamos os formatos e ângulos certos para cada etapa do funil — topo de consciência, consideração e decisão de compra.</div>
+          </div>
+        </div>
+        <div class="etapa">
+          <div class="etapa-num">3</div>
+          <div>
+            <div class="etapa-h">Automação e qualificação no WhatsApp</div>
+            <div class="etapa-b">A IA entra no canal onde o lead já está e conduz a conversa até o agendamento — sem deixar ninguém sem resposta.</div>
+          </div>
+        </div>
+        <div class="etapa">
+          <div class="etapa-num">4</div>
+          <div>
+            <div class="etapa-h">Rastreamento de cada etapa</div>
+            <div class="etapa-b">Cada ação do lead é registrada. Você vê no dashboard o caminho de cada pessoa — do anúncio ao fechamento — e sabe onde investir mais.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURE 2COL ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">Por que funciona</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Velocidade e dados.<br>Ao mesmo tempo.</h2>
+    </div>
+    <div class="f2 fade" style="margin-top:44px">
+      <div class="f2c">
+        <div style="margin-bottom:16px"><span class="tag tag-pu tag-sm">Velocidade</span></div>
+        <h3 class="f2h">Você <span class="hl">não vai perder</span> nenhum lead por falta de resposta. A IA jamais dorme.</h3>
+        <p class="f2b">O maior motivo de perda de lead não é preço — é tempo de resposta. Quem responde primeiro cria a primeira impressão e estabelece o rapport. A Donna faz isso em segundos, no canal que o lead já usa todos os dias.</p>
+      </div>
+      <div class="f2c">
+        <div style="margin-bottom:16px"><span class="tag tag-dk tag-sm">Rastreamento</span></div>
+        <h3 class="f2h">Você finalmente sabe <span class="hl">o que gerou cada contrato</span> — não só quem clicou.</h3>
+        <p class="f2b">Rastreamos cada etapa da jornada do lead: qual anúncio trouxe, qual conversa qualificou, qual reunião aconteceu, qual contrato foi fechado. Sem achismo. Sem dado perdido. Você investe no que funciona — e para de investir no que não funciona.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SEM / COM ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">O problema</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Sem processo, seu WhatsApp vira<br>um <span class="hl">buraco negro</span> de leads</h2>
+    </div>
+    <div class="cw fade">
+      <div class="cc">
+        <div class="cc-hd" style="color:var(--rd)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+          Sem Epos AI
+        </div>
+        <div class="cc-items">
+          <div class="cc-item"><svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Leads aguardam resposta por horas ou dias</div>
+          <div class="cc-item"><svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Equipe perde tempo qualificando leads ruins</div>
+          <div class="cc-item"><svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Agendamentos perdidos no papel ou WhatsApp pessoal</div>
+          <div class="cc-item"><svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Impossível saber qual campanha gerou resultado real</div>
+          <div class="cc-item"><svg class="ic-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Criativo sem estratégia esgota o orçamento sem retorno</div>
+        </div>
+      </div>
+      <div class="cc good">
+        <div class="cc-hd" style="color:var(--pu);border-bottom-color:rgba(145,70,255,.12)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9146FF" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+          Com Epos AI
+        </div>
+        <div class="cc-items">
+          <div class="cc-item"><svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>IA responde em menos de 30 segundos, 24h, 7 dias</div>
+          <div class="cc-item"><svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>Apenas leads quentes chegam na sua equipe</div>
+          <div class="cc-item"><svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>Google Calendar atualizado automaticamente</div>
+          <div class="cc-item"><svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>Rastreamento completo do lead até o fechamento</div>
+          <div class="cc-item"><svg class="ic-pu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>Criativo, funil e IA trabalhando juntos no mesmo sistema</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CASE ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="fade"><span class="tag tag-pu">Case real</span></div>
+    <h2 class="sh fade" style="margin-top:14px">De 20 contratos no ano<br>para <span class="hl">8–12 por mês</span></h2>
+    <div class="case-g fade" style="margin-top:44px">
+      <div class="cn"><div class="cn-big">20/ano</div><div class="cn-lbl">contratos antes da implementação</div></div>
+      <div class="cn hl-card"><div class="cn-big" style="color:var(--ne)">8–12/mês</div><div class="cn-lbl" style="color:var(--pu)">contratos após 90 dias</div></div>
+      <div class="cs">
+        <div class="cs-h">Escritório de advocacia previdenciária — implementação em 30 dias</div>
+        <p class="cs-b">O escritório investia em anúncios, mas perdia a maior parte dos leads que chegavam fora do horário. A equipe não dava conta de responder e qualificar todo mundo — e não tinha como saber quais campanhas geravam contratos de verdade. Em 30 dias implementamos o funil completo: criativos testados, anúncios diretos para o WhatsApp, IA para qualificação e agendamento automático, e rastreamento de cada etapa da jornada do lead. Em 90 dias de operação, a agenda estava cheia — e as campanhas que mais convertiam tinham orçamento crescendo mês a mês.</p>
+        <a href="#formulario" class="btn btn-pu" style="margin-top:20px;display:inline-flex" onclick="fbq('trackCustom','CTAClick',{button_id:'case-cta'})">Quero resultado igual →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ O QUE INCLUI ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">O que você recebe</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Stack completo, do anúncio<br>à reunião de fechamento</h2>
+      <p class="ss fade">Criativo, funil, IA e dados num único sistema. Não vendemos peça separada — entregamos o processo completo.</p>
+    </div>
+    <div class="ig fade" style="margin-top:44px">
+      <div class="ic-card">
+        <div style="margin-bottom:14px"><span class="tag tag-pu tag-sm">IA Conversacional</span></div>
+        <h3 class="ic-h">Atendente virtual treinada no seu negócio</h3>
+        <ul class="ic-list">
+          <li>Resposta automática em menos de 30 segundos</li>
+          <li>Qualificação inteligente por perfil e intenção</li>
+          <li>Agendamento automático na agenda do especialista</li>
+          <li>Histórico persistente — sem repetir perguntas para o lead</li>
+          <li>Passagem para humano no momento certo</li>
+          <li>Silenciamento automático quando a equipe assumir</li>
+        </ul>
+      </div>
+      <div class="ic-card">
+        <div style="margin-bottom:14px"><span class="tag tag-dk tag-sm">Tráfego Pago</span></div>
+        <h3 class="ic-h">Anúncios gerenciados com estratégia de funil</h3>
+        <ul class="ic-list">
+          <li>Anúncios diretos para o WhatsApp e formulários de captação</li>
+          <li>Rastreamento completo de cada lead, do clique ao contrato</li>
+          <li>Dados que ensinam o algoritmo quem fecha — não quem clica</li>
+          <li>Criativos em vídeo, imagem e copy testados por ângulo</li>
+          <li>Acompanhamento semanal de performance</li>
+          <li>Escala das campanhas que mais convertem</li>
+        </ul>
+      </div>
+      <div class="ic-card">
+        <div style="margin-bottom:14px"><span class="tag tag-pu tag-sm">Infraestrutura</span></div>
+        <h3 class="ic-h">WhatsApp, agenda e dashboard prontos</h3>
+        <ul class="ic-list">
+          <li>Inbox unificada para toda a equipe — sem mensagem perdida</li>
+          <li>Histórico completo de cada conversa com cada lead</li>
+          <li>Dashboard em tempo real com todos os dados do funil</li>
+          <li>Nutrição e recontato automático para leads que não fecharam</li>
+          <li>Implementação completa em até 30 dias</li>
+          <li>Suporte e ajustes por 90 dias após a entrega</li>
+        </ul>
+      </div>
+      <div class="ic-card hl-card">
+        <div style="margin-bottom:14px"><span class="tag tag-pu tag-sm">Incluso em tudo</span></div>
+        <h3 class="ic-h">Garantia de que tudo funciona junto</h3>
+        <ul class="ic-list" style="gap:12px">
+          <li>Diagnóstico completo de público e funil antes de começar</li>
+          <li>Setup de toda a infraestrutura técnica do zero</li>
+          <li>IA treinada com o vocabulário e as situações do seu negócio</li>
+          <li>Integração WhatsApp + agenda + anúncios + dados</li>
+          <li>Documentação de todos os fluxos entregue para você</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PARA QUEM ═══ -->
+<section class="sec bdr-t">
+  <div class="c">
+    <div class="cen">
+      <div class="fade"><span class="tag tag-dk">Para quem é</span></div>
+      <h2 class="sh fade" style="margin-top:14px">Feito para negócios onde<br>cada lead vale <span class="hl">muito</span></h2>
+      <p class="ss fade">Funciona onde o cliente precisa de um processo consultivo antes de fechar — e onde perder um lead custa caro.</p>
+    </div>
+    <div class="icp-g">
+      <div class="icp-c fade">
+        <h3 class="icp-h">Advocacia</h3>
+        <p class="icp-b">Escritórios que dependem de captação de clientes. Cada novo contrato tem alto valor e margem — mas a maioria dos leads some por falta de atendimento rápido.</p>
+      </div>
+      <div class="icp-c fade" style="transition-delay:.08s">
+        <h3 class="icp-h">Clínicas Odontológicas</h3>
+        <p class="icp-b">Procedimentos de alto valor que precisam de uma primeira consulta antes de fechar. A perda de leads é quase toda por demora no atendimento inicial.</p>
+      </div>
+      <div class="icp-c fade" style="transition-delay:.16s">
+        <h3 class="icp-h">Clínicas de Estética</h3>
+        <p class="icp-b">Procedimentos de transformação com ticket elevado. O cliente precisa ser conduzido — da curiosidade no anúncio à consulta agendada — sem cair no meio do caminho.</p>
+      </div>
+    </div>
+    <div style="margin-top:36px;text-align:center">
+      <a href="#formulario" class="btn btn-pu btn-lg fade" onclick="fbq('trackCustom','CTAClick',{button_id:'icp-cta'})">Isso é para o meu negócio →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FORM ═══ -->
+<section class="form-sec" id="formulario">
+  <div class="c">
+    <div class="fi-grid">
+      <div class="form-left">
+        <div style="margin-bottom:18px"><span class="tag tag-pu">Fale com a gente</span></div>
+        <h2 class="form-h fade">Pronto para parar de perder leads?</h2>
+        <p class="form-sub fade">Preencha ao lado. Retornamos em até 24 horas com uma proposta pensada para o seu negócio, seu público e seu momento.</p>
+        <ul class="prom fade">
+          <li>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9146FF" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+            Implementação completa em até 30 dias
+          </li>
+          <li>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9146FF" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+            Suporte e ajustes por 90 dias após a entrega
+          </li>
+          <li>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9146FF" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+            Diagnóstico gratuito antes de qualquer proposta
+          </li>
+          <li>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9146FF" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+            Funil, criativos e IA específicos para o seu negócio
+          </li>
+        </ul>
+      </div>
+      <div class="form-right">
+        <div class="form-box fade">
+          <form id="epos-form">
+            <div class="fg">
+              <label class="fl" for="nome">Nome</label>
+              <input type="text" id="nome" name="nome" class="fi" placeholder="Seu nome completo">
+            </div>
+            <div class="fg">
+              <label class="fl" for="wpp">WhatsApp</label>
+              <input type="tel" id="wpp" name="wpp" class="fi" placeholder="(11) 99999-9999">
+            </div>
+            <div class="fg">
+              <label class="fl" for="seg">Segmento</label>
+              <select id="seg" name="seg" class="fs">
+                <option value="" disabled selected>Selecione seu segmento</option>
+                <option value="advocacia">Advocacia</option>
+                <option value="odonto">Clínica Odontológica</option>
+                <option value="estetica">Clínica de Estética</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl" for="msg">O que você está buscando? <span class="opt">(opcional)</span></label>
+              <textarea id="msg" name="msg" class="ft" placeholder="Me conte sobre seu negócio..."></textarea>
+            </div>
+            <div id="form-status" style="display:none;font-size:13px;text-align:center;margin-bottom:10px"></div>
+            <button type="submit" class="btn-sub" id="btn-sub" onclick="fbq('trackCustom','CTAClick',{button_id:'form-submit'})">Quero uma demonstração →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="c">
+    <div class="foot-in">
+      <span class="foot-logo">Epos<em>.</em>AI</span>
+      <span class="foot-copy">© 2026 Epos Marketing e Filmes IA</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+var nav=document.getElementById('nav');
+window.addEventListener('scroll',function(){nav.classList.toggle('scr',scrollY>40)},{passive:true});
+var obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');obs.unobserve(x.target)}})},{threshold:0.1});
+document.querySelectorAll('.fade').forEach(function(el){obs.observe(el)});
+setTimeout(function(){document.querySelectorAll('.hero .fade').forEach(function(el,i){setTimeout(function(){el.classList.add('in')},i*90)})},60);
+
+document.getElementById('epos-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  var btn=document.getElementById('btn-sub');
+  var status=document.getElementById('form-status');
+  btn.disabled=true;btn.textContent='Enviando...';
+  var payload={
+    nome:document.getElementById('nome').value,
+    whatsapp:document.getElementById('wpp').value,
+    segmento:document.getElementById('seg').value,
+    mensagem:document.getElementById('msg').value,
+    origem:'lp-epos-ai',
+    ts:new Date().toISOString()
+  };
+  fetch('https://n8n.eposmktfilmsia.com.br/webhook/epos-lp-lead',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){
+    status.style.display='block';
+    if(r.ok){
+      status.style.color='#00F5A0';
+      status.textContent='✓ Recebemos! Retornamos em até 24h.';
+      fbq('track','Lead');
+      document.getElementById('epos-form').reset();
+    } else {
+      status.style.color='#EF4444';
+      status.textContent='Algo deu errado. Tente novamente.';
+      btn.disabled=false;btn.textContent='Quero uma demonstração →';
+    }
+  })
+  .catch(function(){
+    status.style.display='block';status.style.color='#EF4444';
+    status.textContent='Erro de conexão. Tente novamente.';
+    btn.disabled=false;btn.textContent='Quero uma demonstração →';
+  });
+});
+</script>
+</body>
+</html>
