@@ -73,6 +73,12 @@ a{text-decoration:none;color:inherit}
 .msg-out{background:var(--or-d);border:1px solid var(--or-b);border-bottom-right-radius:3px;align-self:flex-end;color:var(--t2)}
 .msg-t{font-size:10px;color:var(--t3);margin-top:4px}
 .chip-ok{display:inline-flex;align-items:center;gap:6px;background:var(--gr-d);border:1px solid var(--gr-b);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--gr);font-weight:600;align-self:flex-start}
+/* TYPING */
+.typing-ind{display:flex;align-items:center;gap:4px;padding:10px 14px;background:var(--s2);border-radius:12px;border-bottom-left-radius:3px;align-self:flex-start;width:48px}
+.typing-ind span{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:dot-b 1.2s ease infinite}
+.typing-ind span:nth-child(2){animation-delay:.2s}
+.typing-ind span:nth-child(3){animation-delay:.4s}
+@keyframes dot-b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
 /* SEC */
 .sec{padding:96px 0}
 .sh{font-size:clamp(28px,3.8vw,52px);font-weight:800;line-height:1.1;letter-spacing:-.025em}
@@ -227,28 +233,30 @@ footer{border-top:1px solid var(--bdr);padding:32px 0}
             </div>
           </div>
           <div class="chat-bd">
-            <div class="msg msg-in">
+            <div class="msg msg-in ca1">
               Olá! Vi o anúncio de vocês. Atendem advocacia previdenciária?
               <div class="msg-t">agora</div>
             </div>
-            <div class="msg msg-out">
+            <div class="typing-ind ty1"><span></span><span></span><span></span></div>
+            <div class="msg msg-out ca2">
               Oi! Sou a <strong style="color:var(--t1)">Donna da Epos AI</strong>. Sim, trabalhamos com escritórios que querem transformar tráfego em contratos. Me conta mais — qual é o volume de leads que você recebe hoje?
               <div class="msg-t">agora</div>
             </div>
-            <div class="msg msg-in">
+            <div class="msg msg-in ca3">
               Invisto em anúncios mas perco muitos leads à noite e nos fins de semana.
               <div class="msg-t">agora</div>
             </div>
-            <div class="msg msg-out">
+            <div class="typing-ind ty2"><span></span><span></span><span></span></div>
+            <div class="msg msg-out ca4">
               Esse é exatamente o problema que resolvemos. Qual o melhor horário para uma conversa rápida de 20 minutos?
               <div class="msg-t">agora</div>
             </div>
-            <div class="msg msg-in">Amanhã às 14h está ótimo.<div class="msg-t">agora</div></div>
-            <div class="chip-ok">
+            <div class="msg msg-in ca5">Amanhã às 14h está ótimo.<div class="msg-t">agora</div></div>
+            <div class="chip-ok ca6">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               Reunião agendada — Amanhã 14h00
             </div>
-            <div style="font-size:11px;color:var(--t3);padding-bottom:6px;margin-top:2px">Sem intervenção humana. A IA fez tudo isso. ↑</div>
+            <div class="ca7" style="font-size:11px;color:var(--t3);padding-bottom:6px;margin-top:2px">Sem intervenção humana. A IA fez tudo isso. ↑</div>
           </div>
         </div>
       </div>
@@ -633,6 +641,41 @@ document.getElementById('epos-form').addEventListener('submit',function(e){
     btn.disabled=false;btn.textContent='Quero uma demonstração →';
   });
 });
+</script>
+<script>
+(function(){
+  var sels = ['.ca1','.ty1','.ca2','.ca3','.ty2','.ca4','.ca5','.ca6','.ca7'];
+  function hide(s){ var el=document.querySelector(s); if(el){el.style.opacity='0';el.style.transform='translateY(8px)';el.style.transition='none';} }
+  function show(s){ setTimeout(function(){ var el=document.querySelector(s); if(!el)return; el.style.transition='opacity .4s ease,transform .4s ease'; el.style.opacity='1'; el.style.transform='translateY(0)'; }, 0); }
+  function fade(s){ setTimeout(function(){ var el=document.querySelector(s); if(!el)return; el.style.transition='opacity .3s ease,transform .3s ease'; el.style.opacity='0'; el.style.transform='translateY(8px)'; }, 0); }
+
+  function startAnim(){
+    sels.forEach(hide);
+    var steps=[
+      ['.ca1', 400, 's'],
+      ['.ty1', 900, 's'],
+      ['.ty1',1650,'h'],['.ca2',1650,'s'],
+      ['.ca3',2550,'s'],
+      ['.ty2',3050,'s'],
+      ['.ty2',3800,'h'],['.ca4',3800,'s'],
+      ['.ca5',4700,'s'],
+      ['.ca6',5200,'s'],
+      ['.ca7',5600,'s']
+    ];
+    steps.forEach(function(st){
+      setTimeout(function(){
+        if(st[2]==='h') fade(st[0]); else show(st[0]);
+      }, st[1]);
+    });
+  }
+
+  var card = document.querySelector('.chat-card');
+  if(!card) return;
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(en){ if(en[0].isIntersecting){startAnim();io.disconnect();} },{threshold:0.25});
+    io.observe(card);
+  } else { startAnim(); }
+})();
 </script>
 </body>
 </html>
