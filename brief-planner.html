@@ -482,8 +482,6 @@
   <div class="meta">
     <span><strong>Agosto 2026</strong></span>
     <span>·</span>
-    <span>Stack: n8n · Dify AI · Evolution API · Supabase · Meta CAPI</span>
-    <span>·</span>
     <span>Canais ativos: WhatsApp + Meta Ads (CTWA + Lead Form + LP)</span>
   </div>
 </div>
@@ -504,12 +502,12 @@
       <div class="source-card">
         <div class="icon">📋</div>
         <div class="name">Lead Form</div>
-        <div class="detail">Formulário nativo Meta Ads. Polling n8n 5 min. Donna gera mensagem proativa via IA.</div>
+        <div class="detail">Formulário nativo Meta Ads. Verificação automática a cada 5 min. Donna gera mensagem proativa.</div>
       </div>
       <div class="source-card">
         <div class="icon">🌐</div>
         <div class="name">Landing Page</div>
-        <div class="detail">Form na LP lp.eposmktfilmsia.com.br. Token de segurança. Pixel Lead + CAPI.</div>
+        <div class="detail">Form na LP lp.eposmktfilmsia.com.br. Rastreamento e atribuição de conversão ativos.</div>
       </div>
       <div class="source-card">
         <div class="icon">💬</div>
@@ -556,7 +554,7 @@
             <span class="badge badge-capi">CAPI Lead (qualificado)</span>
             <span class="badge badge-ai">Score IA</span>
           </div>
-          <div class="funnel-desc">O Analista (GPT rodando diariamente) avalia cada conversa, atribui score 1-10 e categoriza motivo de perda caso não avance. Score salvo no CRM automaticamente.</div>
+          <div class="funnel-desc">O Analista avalia cada conversa diariamente, atribui score 1-10 e categoriza motivo de perda caso não avance. Score salvo no CRM automaticamente.</div>
         </div>
       </div>
 
@@ -614,7 +612,7 @@
             Perdido / Parado
             <span class="badge badge-auto">Remarketing automático</span>
           </div>
-          <div class="funnel-desc">Lead parou de responder. Sistema dispara sequência de remarketing: dia seguinte + lead parado há X dias. Rate limit de 60s entre mensagens (regra obrigatória — violação causou bloqueio do número em jul/2026).</div>
+          <div class="funnel-desc">Lead parou de responder. Sistema dispara sequência de remarketing: dia seguinte + lead parado há X dias. Intervalo de segurança entre mensagens para preservar o número.</div>
         </div>
       </div>
 
@@ -636,22 +634,15 @@
       <div class="ia-block">
         <div class="ia-icon green">📊</div>
         <div>
-          <h3>O Analista — Auditoria de conversas</h3>
-          <p>GPT-4o-mini roda diariamente, lê cada conversa no Chatwoot, atribui score 1-10, categoriza o motivo de perda ("sem engajamento", "objeção preço", "desqualificado", etc.). Dados salvos no CRM. Funcionalidade inexistente em qualquer ferramenta concorrente pesquisada.</p>
+          <h3>O Analista — Auditoria e Detecção de Conversão</h3>
+          <p>IA audita cada conversa diariamente, atribui score 1-10 e categoriza motivo de perda ("sem engajamento", "objeção preço", "desqualificado", etc.). Ao mesmo tempo, opera 3 camadas de detecção de fechamento: palavras-chave em tempo real na caixa de entrada, varredura da conversa ativa e varredura noturna completa. Quando detecta sinal de conversão → lead entra em "Pendente de Aprovação" no dashboard. Gestor confirma → evento de compra dispara com valor para o algoritmo do Meta. Dados salvos no CRM. Funcionalidade inexistente em qualquer ferramenta concorrente pesquisada.</p>
         </div>
       </div>
       <div class="ia-block">
         <div class="ia-icon blue">🔄</div>
         <div>
           <h3>Donna ML — Retroalimentação semanal</h3>
-          <p>Toda segunda-feira às 8h, workflow analisa 100+ conversas da semana anterior, identifica o top motivo de perda e envia relatório via WhatsApp com sugestões concretas de melhoria de prompt. Testado em produção: 104 leads analisados, top motivo "sem engajamento" (29x na semana de 06-12/ago).</p>
-        </div>
-      </div>
-      <div class="ia-block">
-        <div class="ia-icon amber">🔍</div>
-        <div>
-          <h3>Tintim — Detecção de conversão</h3>
-          <p>3 camadas de detecção de fechamento: (1) WhatsApp real-time via análise de palavras-chave, (2) Chatwoot real-time, (3) varredura noturna completa. Quando detecta sinal → entra em "Pendente de Aprovação" no dashboard. Gestor confirma → CAPI Purchase dispara com valor.</p>
+          <p>Toda segunda-feira às 8h, sistema analisa 100+ conversas da semana anterior, identifica o top motivo de perda e envia relatório com sugestões concretas de melhoria. Testado em produção: 104 leads analisados, top motivo "sem engajamento" (29x na semana de 06-12/ago).</p>
         </div>
       </div>
     </div>
@@ -675,25 +666,25 @@
           <tr>
             <td>Nome + WhatsApp</td>
             <td>WhatsApp / LP / Lead Form</td>
-            <td>Supabase + CRM</td>
+            <td>Base de dados + CRM</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Criativo de origem (utm_content)</td>
             <td>ctwaRef (CTWA) + ad_id (Lead Form)</td>
-            <td>Supabase + Dashboard Top Criativos</td>
+            <td>Dashboard de Criativos</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Campanha (utm_campaign)</td>
             <td>CTWA ref + Meta webhook</td>
-            <td>Supabase + Donna (contexto)</td>
+            <td>Base de dados + IA de atendimento</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Canal de entrada</td>
             <td>Sistema identifica: ctwa / meta_lead_form / lp / whatsapp</td>
-            <td>Supabase + Donna (adapta abordagem)</td>
+            <td>Base de dados + IA de atendimento</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
@@ -710,25 +701,25 @@
           </tr>
           <tr>
             <td>Score IA da conversa (1-10)</td>
-            <td>O Analista (GPT diário)</td>
-            <td>Supabase + Dashboard</td>
+            <td>O Analista (IA)</td>
+            <td>Base de dados + Dashboard</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Motivo de perda categorizado</td>
-            <td>O Analista (GPT diário)</td>
-            <td>Supabase + Dashboard + Donna ML</td>
+            <td>O Analista (IA)</td>
+            <td>Base de dados + Dashboard + retroalimentação</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Etapa do funil em tempo real</td>
-            <td>Tintim + O Analista + ações manuais</td>
-            <td>Supabase + TwentyCRM + Labels Chatwoot</td>
+            <td>O Analista + ações manuais</td>
+            <td>CRM + caixa de entrada</td>
             <td><span class="check">✓</span></td>
           </tr>
           <tr>
             <td>Gasto Meta Ads por período</td>
-            <td>Meta Ads API</td>
+            <td>Meta Ads</td>
             <td>Dashboard (valor total)</td>
             <td><span class="check">✓</span></td>
           </tr>
@@ -746,14 +737,14 @@
           </tr>
           <tr>
             <td>Gravação de sessão / heatmap</td>
-            <td>Microsoft Clarity</td>
-            <td>Painel Clarity</td>
+            <td>Ferramenta de análise de sessão</td>
+            <td>Painel de gravações</td>
             <td><span class="cross">✗ planejado</span></td>
           </tr>
           <tr>
             <td>Google Ads attribution</td>
-            <td>UTM capture (sistema pronto)</td>
-            <td>Supabase</td>
+            <td>Captura automática de UTM</td>
+            <td>Base de dados</td>
             <td><span class="partial">⚠ aguarda Google Ads ativo</span></td>
           </tr>
         </tbody>
@@ -791,14 +782,14 @@
         <div class="gap-dot dot-amber"></div>
         <div>
           <strong>Sem tracking de sessão nas LPs</strong>
-          <span>Pixel Meta e GA4 instalados. Clarity (gravação de sessão/heatmap) e eventos de scroll/tempo na página ainda não implementados. Não sabemos até onde as pessoas rolam, onde clicam, nem quanto tempo ficam antes de converter.</span>
+          <span>Rastreamento instalado. Gravação de sessão, heatmap e eventos de scroll/tempo na página ainda não implementados. Não sabemos até onde as pessoas rolam, onde clicam, nem quanto tempo ficam antes de converter.</span>
         </div>
       </div>
       <div class="gap-item">
         <div class="gap-dot dot-amber"></div>
         <div>
           <strong>Google Ads, TikTok e LinkedIn não rastreados</strong>
-          <span>Sistema preparado para capturar UTMs do Google Ads — falta só ativar campanhas. TikTok Pixel e LinkedIn Insight Tag não planejados ainda.</span>
+          <span>Sistema preparado para capturar UTMs do Google Ads — falta só ativar campanhas. TikTok e LinkedIn ainda não rastreados.</span>
         </div>
       </div>
       <div class="gap-item">
@@ -834,7 +825,7 @@
           <strong>Remarketing interno:</strong> Leads que pararam de responder entram em re-engajamento automático via WhatsApp. Faz sentido também criar audiência custom no Meta com esses leads e fazer remarketing paralelo por anúncio?
         </li>
         <li>
-          <strong>A LP converte — mas onde perde?</strong> Sem Clarity e eventos de scroll instalados, não sabemos onde o usuário abandona a LP. O que você olharia primeiro para otimizar taxa de conversão?
+          <strong>A LP converte — mas onde perde?</strong> Sem gravação de sessão e eventos de scroll instalados, não sabemos onde o usuário abandona a LP. O que você olharia primeiro para otimizar taxa de conversão?
         </li>
       </ol>
     </div>
