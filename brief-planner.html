@@ -367,6 +367,94 @@
 
   .questions li strong { color: var(--text); }
 
+  /* form */
+  .form-section {
+    margin-top: 56px;
+    padding-top: 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .form-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.01em;
+    margin-bottom: 8px;
+  }
+
+  .form-section .form-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 560px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .feedback-form input,
+  .feedback-form textarea {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color .2s;
+    width: 100%;
+  }
+
+  .feedback-form input::placeholder,
+  .feedback-form textarea::placeholder { color: var(--muted); }
+
+  .feedback-form input:focus,
+  .feedback-form textarea:focus { border-color: var(--accent); }
+
+  .feedback-form textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+  }
+
+  .btn-submit {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 13px 24px;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+    align-self: flex-start;
+  }
+
+  .btn-submit:hover { opacity: .85; }
+  .btn-submit:active { transform: scale(.98); }
+  .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+  .form-msg {
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    display: none;
+  }
+
+  .form-msg.ok  { background: #00f5a018; border: 1px solid #00f5a044; color: var(--green); display: block; }
+  .form-msg.err { background: #ef444418; border: 1px solid #ef444444; color: var(--red);   display: block; }
+
   /* divider */
   .divider {
     height: 1px;
@@ -754,7 +842,81 @@
 
 </div>
 
+<div class="wrap">
+  <div class="form-section">
+    <div class="section-label">Contribua com o projeto</div>
+    <h2>Deixa sua sugestão</h2>
+    <p class="form-sub">Viu algo que poderíamos melhorar, adicionar ou explorar? Manda aqui — chega direto no WhatsApp.</p>
+
+    <form class="feedback-form" id="ffForm" novalidate>
+      <div class="form-row">
+        <input type="text"  id="ffNome"     placeholder="Seu nome"              required autocomplete="name">
+        <input type="tel"   id="ffTelefone" placeholder="WhatsApp (com DDD)"   required autocomplete="tel">
+      </div>
+      <textarea id="ffSugestao" placeholder="Sua sugestão, ideia ou insight..." required></textarea>
+      <div class="form-msg" id="ffMsg"></div>
+      <button type="submit" class="btn-submit" id="ffBtn">Enviar sugestão</button>
+    </form>
+  </div>
+</div>
+
 <div class="divider"></div>
 <div class="footer">
   Epos Marketing · Sistema WhatsApp AI · Agosto 2026 · Confidencial
 </div>
+
+<script>
+(function(){
+  var form = document.getElementById('ffForm');
+  var msg  = document.getElementById('ffMsg');
+  var btn  = document.getElementById('ffBtn');
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var nome     = document.getElementById('ffNome').value.trim();
+    var telefone = document.getElementById('ffTelefone').value.trim();
+    var sugestao = document.getElementById('ffSugestao').value.trim();
+
+    msg.className = 'form-msg';
+    msg.textContent = '';
+
+    if (!nome || !telefone || !sugestao) {
+      msg.className = 'form-msg err';
+      msg.textContent = 'Preencha todos os campos antes de enviar.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    try {
+      var res = await fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-brief-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: nome,
+          telefone: telefone,
+          sugestao: sugestao,
+          _token: 'ep0s_brief_k3x7n9p2',
+          origem: 'brief-planner',
+          ts: new Date().toISOString()
+        })
+      });
+      var data = await res.json();
+      if (data.status === 'ok') {
+        msg.className = 'form-msg ok';
+        msg.textContent = 'Sugestão enviada! Chegou no WhatsApp agora.';
+        form.reset();
+      } else {
+        throw new Error(data.motivo || 'erro');
+      }
+    } catch(err) {
+      msg.className = 'form-msg err';
+      msg.textContent = 'Erro ao enviar. Tenta novamente em instantes.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Enviar sugestão';
+    }
+  });
+})();
+</script>
