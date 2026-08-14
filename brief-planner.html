@@ -1,0 +1,760 @@
+
+<title>Sistema Epos AI — Brief para Planner</title>
+<style>
+  @import url('data:text/css,');
+
+  :root {
+    --bg: #0b0d11;
+    --bg2: #13161c;
+    --bg3: #1a1e27;
+    --border: #ffffff12;
+    --text: #e8eaf0;
+    --muted: #7a8096;
+    --accent: #9146ff;
+    --green: #00f5a0;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0 0 80px;
+  }
+
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 0 32px;
+    text-align: center;
+  }
+
+  .header .tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .header .sub {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .header .meta {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header .meta span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .header .meta strong { color: var(--text); }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .section {
+    margin-top: 48px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: -.01em;
+  }
+
+  .section p {
+    color: var(--muted);
+    margin-bottom: 16px;
+    max-width: 680px;
+  }
+
+  /* funnel */
+  .funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 24px;
+  }
+
+  .funnel-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    position: relative;
+  }
+
+  .funnel-step::before {
+    content: '';
+    position: absolute;
+    left: 35px;
+    bottom: -10px;
+    width: 2px;
+    height: 10px;
+    background: var(--border);
+  }
+
+  .funnel-step:last-child::before { display: none; }
+
+  .funnel-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .funnel-body { flex: 1; }
+
+  .funnel-stage {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .funnel-stage .badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: .04em;
+  }
+
+  .badge-capi { background: #9146ff22; color: var(--accent); border: 1px solid #9146ff44; }
+  .badge-ai   { background: #00f5a022; color: var(--green);  border: 1px solid #00f5a044; }
+  .badge-human{ background: #f59e0b22; color: var(--amber);  border: 1px solid #f59e0b44; }
+  .badge-auto { background: #3b82f622; color: var(--blue);   border: 1px solid #3b82f644; }
+
+  .funnel-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* sources */
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .source-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .source-card .icon { font-size: 20px; margin-bottom: 8px; }
+  .source-card .name { font-weight: 700; font-size: 14px; color: #fff; }
+  .source-card .detail { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* data points */
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .data-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .data-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .data-card .value { font-size: 20px; font-weight: 800; color: #fff; margin-top: 4px; }
+  .data-card .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ia blocks */
+  .ia-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .ia-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .ia-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .ia-icon.purple { background: #9146ff22; }
+  .ia-icon.green  { background: #00f5a022; }
+  .ia-icon.blue   { background: #3b82f622; }
+  .ia-icon.amber  { background: #f59e0b22; }
+
+  .ia-block h3 { font-size: 14px; font-weight: 700; color: #fff; }
+  .ia-block p  { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* gaps */
+  .gap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .gap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .gap-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .dot-red    { background: var(--red); }
+  .dot-amber  { background: var(--amber); }
+  .dot-green  { background: var(--green); }
+
+  .gap-item strong { font-size: 14px; color: #fff; font-weight: 600; }
+  .gap-item span   { font-size: 13px; color: var(--muted); display: block; margin-top: 2px; }
+
+  /* tracking */
+  .track-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 13px;
+  }
+
+  .track-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .track-table td {
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  .track-table td:first-child { color: var(--text); font-weight: 500; }
+  .track-table tr:last-child td { border-bottom: none; }
+
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: #ff4466; font-weight: 700; }
+  .partial { color: var(--amber); font-weight: 700; }
+
+  /* question box */
+  .questions {
+    background: var(--bg2);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 28px 28px;
+    margin-top: 28px;
+  }
+
+  .questions h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .questions ol {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 20px;
+  }
+
+  .questions li {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .questions li strong { color: var(--text); }
+
+  /* divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0 0;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    .sources-grid, .data-grid { grid-template-columns: 1fr 1fr; }
+    .ia-block { flex-direction: column; gap: 8px; }
+  }
+</style>
+
+<div class="header">
+  <div class="tag">Confidencial — Uso Interno</div>
+  <h1>Sistema <span>Epos AI</span><br>Brief Técnico para Planner</h1>
+  <p class="sub">Visão completa do funil de automação, IA de atendimento e rastreamento — para análise e geração de insights.</p>
+  <div class="meta">
+    <span><strong>Agosto 2026</strong></span>
+    <span>·</span>
+    <span>Stack: n8n · Dify AI · Evolution API · Supabase · Meta CAPI</span>
+    <span>·</span>
+    <span>Canais ativos: WhatsApp + Meta Ads (CTWA + Lead Form + LP)</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- COMO O LEAD CHEGA -->
+  <div class="section">
+    <div class="section-label">Entradas do funil</div>
+    <h2>De onde vêm os leads</h2>
+    <p>Quatro fontes ativas hoje — todas convergem para o mesmo fluxo de IA.</p>
+    <div class="sources-grid">
+      <div class="source-card">
+        <div class="icon">📲</div>
+        <div class="name">CTWA</div>
+        <div class="detail">Click-to-WhatsApp direto do anúncio Meta. Captura ctwa_clid + criativo de origem.</div>
+      </div>
+      <div class="source-card">
+        <div class="icon">📋</div>
+        <div class="name">Lead Form</div>
+        <div class="detail">Formulário nativo Meta Ads. Polling n8n 5 min. Donna gera mensagem proativa via IA.</div>
+      </div>
+      <div class="source-card">
+        <div class="icon">🌐</div>
+        <div class="name">Landing Page</div>
+        <div class="detail">Form na LP lp.eposmktfilmsia.com.br. Token de segurança. Pixel Lead + CAPI.</div>
+      </div>
+      <div class="source-card">
+        <div class="icon">💬</div>
+        <div class="name">WhatsApp Direto</div>
+        <div class="detail">Lead que chega sem anúncio. Detectado como "orgânico", mesma IA atende.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUNIL -->
+  <div class="section">
+    <div class="section-label">Funil de vendas automatizado</div>
+    <h2>As 8 etapas — o que acontece em cada uma</h2>
+    <div class="funnel">
+
+      <div class="funnel-step">
+        <div class="funnel-num">1</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Contato
+            <span class="badge badge-capi">CAPI Lead</span>
+            <span class="badge badge-ai">IA ativa</span>
+          </div>
+          <div class="funnel-desc">Lead entra. Sistema detecta se é novo ou existente. Donna inicia conversa personalizada com contexto do anúncio (qual criativo, qual serviço, qual campanha). CAPI dispara evento <strong>Lead</strong> para o Meta — algoritmo começa a aprender o perfil.</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">2</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Em conversa
+            <span class="badge badge-ai">IA + RAG</span>
+          </div>
+          <div class="funnel-desc">Donna usa base de conhecimento indexada (RAG — 9 documentos sobre serviços, objeções, processo). Quebra objeções com respostas baseadas nos docs, não templates genéricos. Debounce: agrupa mensagens antes de responder.</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">3</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Qualificado
+            <span class="badge badge-capi">CAPI Lead (qualificado)</span>
+            <span class="badge badge-ai">Score IA</span>
+          </div>
+          <div class="funnel-desc">O Analista (GPT rodando diariamente) avalia cada conversa, atribui score 1-10 e categoriza motivo de perda caso não avance. Score salvo no CRM automaticamente.</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">4</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Agendou
+            <span class="badge badge-capi">CAPI Schedule</span>
+            <span class="badge badge-auto">Google Calendar</span>
+          </div>
+          <div class="funnel-desc">Donna verifica a agenda do especialista em tempo real, oferece horários, confirma via WhatsApp. Cria evento no Google Calendar automaticamente. CAPI dispara <strong>Schedule</strong> — o Meta aprende o perfil de quem agenda, não só de quem abre o chat.</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">5</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Compareceu
+            <span class="badge badge-capi">CAPI ConsultaRealizada</span>
+            <span class="badge badge-auto">Lembrete 24h</span>
+          </div>
+          <div class="funnel-desc">Sistema envia lembrete automático 24h antes. Após consulta, CAPI dispara evento customizado <strong>ConsultaRealizada</strong>. Meta otimiza para leads que de fato aparecem — diferencial raro em qualquer ferramenta.</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">6</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Fechou
+            <span class="badge badge-capi">CAPI Purchase</span>
+            <span class="badge badge-human">Aprovação manual</span>
+          </div>
+          <div class="funnel-desc">Sistema detecta sinais de fechamento nas mensagens (palavras-chave: "assinei", "topei", "vou contratar" etc.) — 3 camadas de detecção. Aparece no dashboard como "Pendente de Aprovação". Gestor confirma → CAPI Purchase dispara. Sem falso positivo no funil.</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">7</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Desqualificado
+            <span class="badge badge-auto">Nutrição D+7/D+30</span>
+          </div>
+          <div class="funnel-desc">Lead não se encaixa no perfil ideal. Entra em fluxo de nutrição de longo prazo automaticamente (D+7 e D+30).</div>
+        </div>
+      </div>
+
+      <div class="funnel-step">
+        <div class="funnel-num">8</div>
+        <div class="funnel-body">
+          <div class="funnel-stage">
+            Perdido / Parado
+            <span class="badge badge-auto">Remarketing automático</span>
+          </div>
+          <div class="funnel-desc">Lead parou de responder. Sistema dispara sequência de remarketing: dia seguinte + lead parado há X dias. Rate limit de 60s entre mensagens (regra obrigatória — violação causou bloqueio do número em jul/2026).</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- IA -->
+  <div class="section">
+    <div class="section-label">Inteligência artificial</div>
+    <h2>O que a IA faz — além do atendimento</h2>
+    <div class="ia-blocks">
+      <div class="ia-block">
+        <div class="ia-icon purple">🧠</div>
+        <div>
+          <h3>Donna — Atendente com RAG</h3>
+          <p>IA conversacional com base de conhecimento indexada (9 documentos: serviços, objeções, cases, qualificação, funil). Recebe contexto do anúncio de origem. Decide qual abordagem usar com base na origem do lead (CTWA, Lead Form, orgânico). Não usa templates — gera respostas contextualizadas.</p>
+        </div>
+      </div>
+      <div class="ia-block">
+        <div class="ia-icon green">📊</div>
+        <div>
+          <h3>O Analista — Auditoria de conversas</h3>
+          <p>GPT-4o-mini roda diariamente, lê cada conversa no Chatwoot, atribui score 1-10, categoriza o motivo de perda ("sem engajamento", "objeção preço", "desqualificado", etc.). Dados salvos no CRM. Funcionalidade inexistente em qualquer ferramenta concorrente pesquisada.</p>
+        </div>
+      </div>
+      <div class="ia-block">
+        <div class="ia-icon blue">🔄</div>
+        <div>
+          <h3>Donna ML — Retroalimentação semanal</h3>
+          <p>Toda segunda-feira às 8h, workflow analisa 100+ conversas da semana anterior, identifica o top motivo de perda e envia relatório via WhatsApp com sugestões concretas de melhoria de prompt. Testado em produção: 104 leads analisados, top motivo "sem engajamento" (29x na semana de 06-12/ago).</p>
+        </div>
+      </div>
+      <div class="ia-block">
+        <div class="ia-icon amber">🔍</div>
+        <div>
+          <h3>Tintim — Detecção de conversão</h3>
+          <p>3 camadas de detecção de fechamento: (1) WhatsApp real-time via análise de palavras-chave, (2) Chatwoot real-time, (3) varredura noturna completa. Quando detecta sinal → entra em "Pendente de Aprovação" no dashboard. Gestor confirma → CAPI Purchase dispara com valor.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKING -->
+  <div class="section">
+    <div class="section-label">Rastreamento e atribuição</div>
+    <h2>O que capturamos de cada lead</h2>
+    <div class="overflow-x: auto">
+      <table class="track-table">
+        <thead>
+          <tr>
+            <th>Dado capturado</th>
+            <th>Fonte</th>
+            <th>Onde vai</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Nome + WhatsApp</td>
+            <td>WhatsApp / LP / Lead Form</td>
+            <td>Supabase + CRM</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Criativo de origem (utm_content)</td>
+            <td>ctwaRef (CTWA) + ad_id (Lead Form)</td>
+            <td>Supabase + Dashboard Top Criativos</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Campanha (utm_campaign)</td>
+            <td>CTWA ref + Meta webhook</td>
+            <td>Supabase + Donna (contexto)</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Canal de entrada</td>
+            <td>Sistema identifica: ctwa / meta_lead_form / lp / whatsapp</td>
+            <td>Supabase + Donna (adapta abordagem)</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Serviço de interesse</td>
+            <td>Ref do anúncio CTWA ou Lead Form</td>
+            <td>Donna usa no primeiro contato</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>fbclid / ctwa_clid</td>
+            <td>URL do anúncio</td>
+            <td>CAPI (melhora EMQ)</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Score IA da conversa (1-10)</td>
+            <td>O Analista (GPT diário)</td>
+            <td>Supabase + Dashboard</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Motivo de perda categorizado</td>
+            <td>O Analista (GPT diário)</td>
+            <td>Supabase + Dashboard + Donna ML</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Etapa do funil em tempo real</td>
+            <td>Tintim + O Analista + ações manuais</td>
+            <td>Supabase + TwentyCRM + Labels Chatwoot</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Gasto Meta Ads por período</td>
+            <td>Meta Ads API</td>
+            <td>Dashboard (valor total)</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Custo por lead / por agendamento / por fechamento</td>
+            <td>Gasto ÷ conversões</td>
+            <td>Dashboard</td>
+            <td><span class="cross">✗ em construção</span></td>
+          </tr>
+          <tr>
+            <td>Scroll depth + tempo na página</td>
+            <td>LP JS → Meta custom events</td>
+            <td>Meta Ads (sinal de engajamento)</td>
+            <td><span class="cross">✗ planejado</span></td>
+          </tr>
+          <tr>
+            <td>Gravação de sessão / heatmap</td>
+            <td>Microsoft Clarity</td>
+            <td>Painel Clarity</td>
+            <td><span class="cross">✗ planejado</span></td>
+          </tr>
+          <tr>
+            <td>Google Ads attribution</td>
+            <td>UTM capture (sistema pronto)</td>
+            <td>Supabase</td>
+            <td><span class="partial">⚠ aguarda Google Ads ativo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- O QUE FALTA -->
+  <div class="section">
+    <div class="section-label">Gaps ativos</div>
+    <h2>O que ainda não temos</h2>
+    <div class="gap-list">
+      <div class="gap-item">
+        <div class="gap-dot dot-red"></div>
+        <div>
+          <strong>Multi-canal — só WhatsApp hoje</strong>
+          <span>Não atendemos via Instagram DM, Telegram ou email de forma automática. Leads que chegam por outros canais caem fora do funil. Planejado: Instagram DM (set/26), API Oficial WhatsApp integrada (out/26).</span>
+        </div>
+      </div>
+      <div class="gap-item">
+        <div class="gap-dot dot-red"></div>
+        <div>
+          <strong>Custo real por etapa do funil não está no dashboard</strong>
+          <span>Sabemos quanto gastamos no Meta. Sabemos quantos leads chegaram em cada etapa. Mas o cruzamento (CPL, CPA agendamento, CPA fechamento) ainda não está calculado e visível. Isso limita a tomada de decisão de verba.</span>
+        </div>
+      </div>
+      <div class="gap-item">
+        <div class="gap-dot dot-amber"></div>
+        <div>
+          <strong>Funil 8 etapas não está visual no dashboard</strong>
+          <span>Os dados existem no banco. O visual do funil ainda mostra 5 etapas booleanas — não mostra a taxa de conversão entre etapas (contato → em conversa → qualificado → agendou → fechou).</span>
+        </div>
+      </div>
+      <div class="gap-item">
+        <div class="gap-dot dot-amber"></div>
+        <div>
+          <strong>Sem tracking de sessão nas LPs</strong>
+          <span>Pixel Meta e GA4 instalados. Clarity (gravação de sessão/heatmap) e eventos de scroll/tempo na página ainda não implementados. Não sabemos até onde as pessoas rolam, onde clicam, nem quanto tempo ficam antes de converter.</span>
+        </div>
+      </div>
+      <div class="gap-item">
+        <div class="gap-dot dot-amber"></div>
+        <div>
+          <strong>Google Ads, TikTok e LinkedIn não rastreados</strong>
+          <span>Sistema preparado para capturar UTMs do Google Ads — falta só ativar campanhas. TikTok Pixel e LinkedIn Insight Tag não planejados ainda.</span>
+        </div>
+      </div>
+      <div class="gap-item">
+        <div class="gap-dot dot-amber"></div>
+        <div>
+          <strong>Sem proposta ou contrato automatizado</strong>
+          <span>Quando lead fecha, o processo de envio de proposta/contrato ainda é manual. Oportunidade de automação: O Analista detecta qualificado → WhatsApp com link de proposta personalizada.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERGUNTAS -->
+  <div class="section">
+    <div class="section-label">Para você refletir</div>
+    <h2>Perguntas que gostaríamos de responder</h2>
+    <div class="questions">
+      <h3>Com a sua visão de funil e tráfego — onde você enxerga oportunidade?</h3>
+      <ol>
+        <li>
+          <strong>Criativo vs. etapa:</strong> Hoje sabemos qual criativo gerou mais leads. Mas qual criativo gera leads que <em>chegam até o agendamento</em>? Essa informação mudaria a verba — como você atacaria isso com o que temos?
+        </li>
+        <li>
+          <strong>Lead Form vs. CTWA:</strong> Os dois chegam à mesma Donna, mas têm intenções diferentes. Lead Form = mais frio, CTWA = mais quente. O funil deveria ser diferente para cada um?
+        </li>
+        <li>
+          <strong>Topo vs. qualificação:</strong> O algoritmo do Meta recebe CAPI Lead quando o lead é qualificado (não quando entra). Isso força o Meta a buscar perfis que realmente qualificam — não só que clicam. Você já trabalhou com essa lógica? Como otimizaria o público?
+        </li>
+        <li>
+          <strong>Motivos de perda:</strong> O sistema categoriza motivo de perda semana a semana (ex: "sem engajamento" foi o top em agosto). Como você usaria esse dado para ajustar criativos e copy dos anúncios?
+        </li>
+        <li>
+          <strong>Remarketing interno:</strong> Leads que pararam de responder entram em re-engajamento automático via WhatsApp. Faz sentido também criar audiência custom no Meta com esses leads e fazer remarketing paralelo por anúncio?
+        </li>
+        <li>
+          <strong>A LP converte — mas onde perde?</strong> Sem Clarity e eventos de scroll instalados, não sabemos onde o usuário abandona a LP. O que você olharia primeiro para otimizar taxa de conversão?
+        </li>
+      </ol>
+    </div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+<div class="footer">
+  Epos Marketing · Sistema WhatsApp AI · Agosto 2026 · Confidencial
+</div>
