@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Epos AI — Parceria White-Label</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08080A;
+  --bg-1: #111115;
+  --bg-2: #18181f;
+  --border: rgba(255,255,255,0.07);
+  --border-2: rgba(255,255,255,0.12);
+  --text: #F0F0F2;
+  --text-2: #888899;
+  --text-3: #46465a;
+  --purple: #9146FF;
+  --purple-a10: rgba(145,70,255,0.1);
+  --purple-a20: rgba(145,70,255,0.2);
+  --purple-a35: rgba(145,70,255,0.35);
+  --green: #00F5A0;
+  --green-a10: rgba(0,245,160,0.07);
+  --green-a20: rgba(0,245,160,0.18);
+  --red: #FF5F57;
+  --f-d: 'Plus Jakarta Sans', sans-serif;
+  --f-b: 'Inter', sans-serif;
+  --f-m: 'DM Mono', monospace;
+  --mw: 1060px;
+  --r: 12px;
+  --r-s: 6px;
+  --r-l: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-b);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  padding: 0 40px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(8,8,10,0.75);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: var(--f-d); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.nav-logo em { color: var(--purple); font-style: normal; }
+.nav-tag { display: flex; align-items: center; gap: 7px; font-family: var(--f-m); font-size: 11px; color: var(--text-3); }
+.nav-live { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: livepulse 2.5s infinite; }
+@keyframes livepulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+
+.wrap { max-width: var(--mw); margin: 0 auto; padding: 0 40px; }
+section { padding: 110px 0; }
+.section-sep { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+.label { display: inline-block; font-family: var(--f-m); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple); margin-bottom: 22px; }
+h1, h2, h3 { font-family: var(--f-d); font-weight: 700; }
+h1 { font-size: clamp(48px, 6.5vw, 84px); line-height: 1.0; letter-spacing: -0.04em; font-weight: 800; }
+h2 { font-size: clamp(30px, 3.8vw, 50px); line-height: 1.06; letter-spacing: -0.035em; font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.sub { font-size: 17px; color: var(--text-2); line-height: 1.75; max-width: 520px; }
+.mono { font-family: var(--f-m); }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-d); font-size: 13px; font-weight: 700; padding: 13px 24px; border-radius: var(--r-s); text-decoration: none; cursor: pointer; border: none; transition: opacity 0.15s, transform 0.15s; letter-spacing: 0.02em; }
+.btn:hover { transform: translateY(-1px); }
+.btn-p { background: var(--purple); color: #fff; }
+.btn-p:hover { background: #a361ff; }
+.btn-g { background: transparent; color: var(--text-2); border: 1px solid var(--border-2); }
+.btn-g:hover { color: var(--text); }
+
+/* HERO */
+#hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 120px 0 80px;
+  position: relative; overflow: hidden;
+}
+.orb { position: absolute; border-radius: 50%; pointer-events: none; }
+.orb-1 { width: 800px; height: 800px; top: -200px; left: -200px; background: radial-gradient(circle, rgba(145,70,255,0.22) 0%, rgba(145,70,255,0.08) 40%, transparent 70%); filter: blur(100px); }
+.orb-2 { width: 500px; height: 500px; bottom: -100px; right: -50px; background: radial-gradient(circle, rgba(0,245,160,0.08) 0%, transparent 65%); filter: blur(80px); }
+.hero-inner { position: relative; z-index: 1; text-align: center; }
+.hero-inner h1 { max-width: 820px; margin-left: auto; margin-right: auto; }
+.hero-inner .hero-sub { margin-left: auto; margin-right: auto; }
+.hero-inner .hero-pill { display: inline-flex; }
+.hero-inner .hero-actions { justify-content: center; }
+.hero-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-2); border-radius: 100px; padding: 5px 14px 5px 8px; margin-bottom: 36px; background: rgba(255,255,255,0.03); font-family: var(--f-m); font-size: 11px; color: var(--text-2); }
+.hero-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); box-shadow: 0 0 8px var(--purple); animation: livepulse 2s infinite; }
+#headline { margin-bottom: 28px; filter: drop-shadow(0 0 80px rgba(145,70,255,0.15)); }
+.scroll-cue { position: absolute; bottom: 36px; left: 40px; display: flex; align-items: center; gap: 10px; font-family: var(--f-m); font-size: 11px; color: var(--text-3); }
+.scroll-cue-line { width: 32px; height: 1px; background: var(--text-3); }
+.word { display: inline-block; overflow: hidden; margin-right: 0.2em; vertical-align: bottom; }
+.wi { display: inline-block; }
+.hero-sub { font-size: 18px; color: var(--text-2); line-height: 1.75; max-width: 540px; margin-bottom: 44px; }
+.hero-sub strong { color: var(--text); font-weight: 500; }
+.hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* COMO FUNCIONA */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.step {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px 22px;
+  position: relative; opacity: 0; transform: translateY(18px);
+}
+.step-n {
+  font-family: var(--f-m); font-size: 11px; color: var(--purple);
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 14px;
+}
+.step h4 { font-family: var(--f-d); font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.step p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+.step-arrow {
+  position: absolute; right: -22px; top: 50%; transform: translateY(-50%);
+  color: var(--text-3); font-size: 18px; z-index: 2;
+}
+
+/* WL CARDS */
+.wl-cards { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+.wlcard {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
+  overflow: hidden; opacity: 0; transform: translateY(14px);
+}
+.wlcard.featured { border-color: var(--purple-a20); }
+.wlcard-name {
+  font-family: var(--f-d); font-size: 15px; font-weight: 700;
+  padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wlcard-name span { font-family: var(--f-m); font-size: 10px; color: var(--purple); font-weight: 400; letter-spacing: .08em; text-transform: uppercase; }
+.wl-block { padding: 18px 22px; border-bottom: 1px solid var(--border); }
+.wl-block:last-child { border-bottom: none; }
+.wl-block-lbl { font-family: var(--f-m); font-size: 10px; color: var(--purple); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+.wl-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; }
+.wl-row:last-child { border-bottom: none; }
+.wl-row-lbl { color: var(--text-2); font-size: 12px; }
+.wl-row-val { font-family: var(--f-m); font-size: 13px; color: var(--text-2); }
+.wl-row-val.accent { color: var(--text); }
+.wl-row-val.profit { color: var(--green); font-weight: 500; font-size: 15px; }
+.wl-row.total { margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--border-2); border-bottom: none; }
+.wl-row.total .wl-row-lbl { color: var(--text-2); font-size: 13px; font-weight: 500; }
+
+/* O QUE INCLUI */
+.tfeats { list-style: none; display: flex; flex-direction: column; gap: 9px; padding: 18px 22px; }
+.tf { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--text-2); }
+.tfck { color: var(--green); flex-shrink: 0; margin-top: 1px; }
+
+/* PROJECTION */
+.proj-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.pjcard {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px 24px; opacity: 0; transform: translateY(14px);
+}
+.pjcard.hl { border-color: var(--green); background: var(--green-a10); }
+.pjlbl { font-family: var(--f-m); font-size: 10px; color: var(--text-2); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+.pjval { font-family: var(--f-d); font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; margin-bottom: 4px; }
+.pjval.green { color: var(--green); }
+.pjsub { font-size: 13px; color: var(--text-2); }
+
+/* PROOF strip */
+.proof-strip {
+  background: var(--bg-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 50px 0;
+}
+.proof-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); }
+.pitem { background: var(--bg-1); padding: 40px 32px; }
+.pnum { font-family: var(--f-d); font-size: clamp(42px, 5vw, 64px); font-weight: 800; line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em; }
+.plbl { font-family: var(--f-m); font-size: 11px; color: var(--text-2); letter-spacing: .07em; text-transform: uppercase; }
+
+/* EXPAND NOTE */
+.expand-note {
+  background: var(--bg-1); border: 1px solid var(--purple-a20);
+  border-radius: var(--r); padding: 28px 32px;
+  display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+}
+.expand-note p { font-size: 15px; color: var(--text-2); line-height: 1.7; }
+.expand-note strong { color: var(--text); }
+
+/* CTA */
+#cta { text-align: center; }
+.cta-in { max-width: 540px; margin: 0 auto; }
+.cta-in h2 { margin-bottom: 16px; }
+.cta-lead { font-size: 17px; color: var(--text-2); line-height: 1.75; margin-bottom: 36px; }
+.terms { font-size: 16px; color: var(--text-2); margin-bottom: 32px; padding: 18px; border: 1px solid var(--border-2); border-radius: var(--r); background: var(--bg-1); font-style: italic; }
+.terms em { color: var(--text); font-style: normal; }
+.cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+footer { border-top: 1px solid var(--border); padding: 32px 0; }
+.foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+.fbrand { font-family: var(--f-d); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+.fbrand em { color: var(--purple); font-style: normal; }
+.fmeta { font-family: var(--f-m); font-size: 11px; color: var(--text-3); }
+
+.rv { opacity: 0; transform: translateY(22px); }
+
+.hi-p { color: var(--purple); font-style: normal; }
+.hi-g { color: var(--green); font-style: normal; }
+
+.cta-strip { padding: 52px 0; background: linear-gradient(135deg, rgba(145,70,255,0.08) 0%, rgba(0,245,160,0.04) 100%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.cta-strip .wrap { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+.cta-strip-copy { font-family: var(--f-d); font-size: 20px; font-weight: 700; letter-spacing: -0.025em; color: var(--text); max-width: 560px; }
+.cta-strip-copy span { color: var(--purple); }
+.cta-anchor { padding: 60px 0; text-align: center; border-top: 1px solid var(--border); }
+.cta-anchor-copy { font-size: 15px; color: var(--text-2); margin-bottom: 20px; }
+.cta-anchor-copy strong { color: var(--text); }
+.cta-conv { padding: 72px 0; background: var(--bg-1); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; }
+.cta-conv-head { font-family: var(--f-d); font-size: clamp(22px, 3vw, 32px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 10px; }
+.cta-conv-sub { font-size: 15px; color: var(--text-2); margin-bottom: 28px; }
+.cta-conv-sub strong { color: var(--green); }
+
+/* O ANALISTA EXCLUSIVO */
+#analista-ex { position: relative; overflow: hidden; }
+.analista-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: url('assets/pitch-analista.jpg') center/cover no-repeat; opacity: 0.06; filter: saturate(0.5); }
+#analista-ex .wrap { position: relative; z-index: 1; }
+.analista-lay { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+.analista-copy h2 { margin-bottom: 20px; }
+.analista-copy p { color: var(--text-2); font-size: 16px; line-height: 1.75; margin-bottom: 20px; }
+.excl-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--purple-a10); border: 1px solid var(--purple-a20); padding: 7px 14px; border-radius: 100px; font-family: var(--f-m); font-size: 11px; color: var(--purple); }
+.bdot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); animation: livepulse 2s infinite; }
+/* CHAT */
+.chat { background: var(--bg-1); border: 1px solid var(--border-2); border-radius: var(--r-l); overflow: hidden; box-shadow: 0 48px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(145,70,255,0.04), inset 0 1px 0 rgba(255,255,255,0.04); }
+.chat-top { background: var(--bg-2); padding: 13px 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+.cdots { display: flex; gap: 5px; }
+.cd { width: 10px; height: 10px; border-radius: 50%; }
+.cd:nth-child(1){background:#FF5F57} .cd:nth-child(2){background:#FFBD2E} .cd:nth-child(3){background:#28CA41}
+.chat-ttl { font-family: var(--f-m); font-size: 11px; color: var(--text-3); margin-left: 5px; }
+.chat-bd { padding: 18px; min-height: 390px; display: flex; flex-direction: column; gap: 10px; }
+.msg { display: flex; flex-direction: column; max-width: 82%; opacity: 0; }
+.msg.c { align-self: flex-start; }
+.msg.a { align-self: flex-end; }
+.msg.s { align-self: stretch; max-width: 100%; }
+.who { font-family: var(--f-m); font-size: 10px; color: var(--text-3); margin-bottom: 3px; }
+.msg.a .who { text-align: right; }
+.bub { padding: 9px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.msg.c .bub { background: var(--bg-2); border: 1px solid var(--border-2); border-radius: 12px 12px 12px 4px; }
+.msg.a .bub { background: var(--purple-a10); border: 1px solid var(--purple-a20); border-radius: 12px 12px 4px 12px; }
+.msg.s .bub { background: var(--green-a10); border: 1px solid var(--green-a20); color: var(--green); font-family: var(--f-m); font-size: 12px; border-radius: 8px; padding: 13px 16px; }
+.ts { font-family: var(--f-m); font-size: 10px; color: var(--text-3); margin-top: 3px; }
+.msg.a .ts { text-align: right; }
+.typing-ind { background: var(--bg-2); border: 1px solid var(--border-2); padding: 9px 13px; border-radius: 12px 12px 12px 4px; display: flex; gap: 4px; align-items: center; align-self: flex-start; opacity: 0; }
+.td { width: 5px; height: 5px; border-radius: 50%; background: var(--text-3); animation: tb 1.2s infinite; }
+.td:nth-child(2){animation-delay:.2s} .td:nth-child(3){animation-delay:.4s}
+@keyframes tb { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+/* ORB-3 */
+.orb-3 { width: 400px; height: 400px; top: 40%; right: -100px; background: radial-gradient(circle, rgba(0,245,160,0.06) 0%, transparent 70%); filter: blur(80px); }
+
+/* SPLIT — Sem vs Com (mesmo estilo pitch principal) */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; }
+.split-col { background: var(--bg); padding: 48px 40px; }
+.split-col.b { background: var(--bg-1); }
+.split-head { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.dot.g { background: var(--green); box-shadow: 0 0 8px var(--green-a20); }
+.split-tag { font-family: var(--f-m); font-size: 11px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; }
+.slist { list-style: none; }
+.sitem { display: flex; align-items: flex-start; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border); font-size: 15px; color: var(--text-2); }
+.sitem:last-child { border-bottom: none; }
+.sitem.ok { color: var(--text); }
+.sicon { flex-shrink: 0; margin-top: 3px; }
+
+/* FEATURES GRID */
+.feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 44px; }
+.feat-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r); padding: 28px 24px; opacity: 0; transform: translateY(14px); }
+.feat-card:hover { border-color: var(--border-2); }
+.feat-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--purple-a10); border: 1px solid var(--purple-a20); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; color: var(--purple); }
+.feat-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.02em; }
+.feat-card p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+
+/* BEFORE / AFTER */
+.ba-wrap { display: grid; grid-template-columns: 1fr 44px 1fr; align-items: center; gap: 0; margin-top: 44px; }
+.ba-card { background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r); padding: 28px 28px; }
+.ba-card.after { border-color: var(--green-a20); background: var(--green-a10); }
+.ba-head { font-family: var(--f-m); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px; color: var(--text-3); }
+.ba-card.after .ba-head { color: var(--green); }
+.ba-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.ba-item { font-size: 14px; color: var(--text-2); padding-left: 18px; position: relative; line-height: 1.5; }
+.ba-item::before { content: '—'; position: absolute; left: 0; color: var(--text-3); }
+.ba-card.after .ba-item { color: var(--text); }
+.ba-card.after .ba-item::before { content: '✓'; color: var(--green); font-weight: 700; }
+.ba-card.after .ba-item strong { color: var(--green); }
+.ba-arrow { text-align: center; font-size: 22px; color: var(--text-3); }
+
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  .wrap { padding: 0 20px; }
+  section { padding: 80px 0; }
+  .steps, .proj-cards, .feat-grid { grid-template-columns: repeat(2,1fr); }
+  .proof-row, .wl-cards { grid-template-columns: repeat(2,1fr); }
+  .split { grid-template-columns: 1fr; }
+  .ba-wrap { grid-template-columns: 1fr; }
+  .ba-arrow { transform: rotate(90deg); padding: 8px 0; }
+  .analista-lay { grid-template-columns: 1fr; }
+  .expand-note { grid-template-columns: 1fr; }
+  .step-arrow { display: none; }
+  h1 { font-size: 42px; }
+  .orb-1 { width: 500px; height: 500px; top: -100px; left: -150px; }
+}
+@media (max-width: 560px) {
+  .steps, .wl-cards, .proj-cards, .proof-row, .feat-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">EPOS <em>AI</em></div>
+  <div class="nav-tag">
+    <div class="nav-live"></div>
+    Parceria White-Label · 2026
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="wrap hero-inner">
+    <div class="hero-pill">
+      <span class="hero-pill-dot"></span>
+      Sistema em produção · cliente ativo · resultado comprovado
+    </div>
+
+    <h1 id="headline">
+      Venda um sistema de IA com sua marca. Nós operamos.
+    </h1>
+
+    <p class="hero-sub" id="hSub">
+      Você fecha o cliente, recebe a margem e passa o trabalho pra frente.
+      <strong>Epos instala, configura e opera</strong> — o cliente fica satisfeito com a sua marca no topo.
+    </p>
+
+    <div class="hero-actions" id="hAct">
+      <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+        Quero ser parceiro
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#wl" class="btn btn-g">Ver margens</a>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span class="scroll-cue-line"></span>
+    <span class="mono" style="font-size:11px">scroll</span>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- PROVA SOCIAL -->
+<div class="proof-strip">
+  <div class="wrap">
+    <div class="proof-row">
+      <div class="pitem">
+        <div class="pnum" data-target="633" data-sfx="">0</div>
+        <div class="plbl">leads processados</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum" data-target="127" data-sfx="">0</div>
+        <div class="plbl">agendamentos gerados</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum" data-target="66" data-sfx="">0</div>
+        <div class="plbl">fechamentos confirmados</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum" data-target="48" data-sfx="%">0</div>
+        <div class="plbl">taxa de qualificação</div>
+      </div>
+    </div>
+    <p style="font-family:var(--f-m);font-size:12px;color:var(--text-2);padding-top:16px">
+      Farias &amp; Moura — escritório de advocacia previdenciária. Dados reais, em produção.
+    </p>
+  </div>
+</div>
+
+<!-- CTA 1 — após prova social -->
+<div class="cta-strip rv">
+  <div class="wrap">
+    <p class="cta-strip-copy">633 leads. 66 fechamentos. <span>Dados reais de um cliente ativo.</span> Quer levar isso para os seus clientes?</p>
+    <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+      Quero ser parceiro
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- O CENÁRIO QUE TODA AGÊNCIA CONHECE -->
+<section id="features">
+  <div class="wrap">
+    <div class="label rv">O cenário que toda agência de marketing conhece</div>
+    <h2 style="max-width:580px;margin-bottom:44px" class="rv">A diferença entre <em class="hi-p">oferecer IA</em> e depender de terceiros para entregar</h2>
+    <div class="split rv">
+      <div class="split-col">
+        <div class="split-head">
+          <div class="dot"></div>
+          <span class="split-tag">Sem a parceria</span>
+        </div>
+        <ul class="slist">
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Cliente quer IA no WhatsApp — você não tem produto pra entregar
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Terceiriza para fornecedor caro que some após o setup
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Meses de configuração manual, margem consumida pela operação
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Sem stack técnica própria, cada cliente é um projeto do zero
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Não escala — mais clientes = mais horas da equipe comprometidas
+          </li>
+        </ul>
+      </div>
+      <div class="split-col b">
+        <div class="split-head">
+          <div class="dot g"></div>
+          <span class="split-tag">Com a parceria Epos</span>
+        </div>
+        <ul class="slist">
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Você fecha com proposta pronta, case real e produto testado em produção
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Epos configura, opera e mantém — você só coloca sua marca
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Sistema no ar em até 24h via FORJA™. Margem no setup + MRR mensal.
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Stack completo gerenciado por nós — você entrega resultado, não infraestrutura
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Cada cliente novo = mesma margem, mesmo processo. Escala sem aumentar equipe.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- O ANALISTA EXCLUSIVO -->
+<section id="analista-ex">
+  <div class="analista-bg"></div>
+  <div class="wrap">
+    <div class="analista-lay">
+      <div class="analista-copy rv">
+        <div class="label">Exclusivo · Nenhum concorrente tem</div>
+        <h2 style="margin-bottom:18px">O <em class="hi-p">Analista</em></h2>
+        <p>Após 3 minutos de silêncio em uma conversa, O Analista lê toda a troca, detecta o que travou o lead (objeção, urgência, hesitação) e instrui a IA a agir com a mensagem certa.</p>
+        <p>Não é uma regra fixa. É análise de contexto individual, em tempo real, aplicada a cada conversa. É o que você vende — e nenhum concorrente entrega.</p>
+        <div class="excl-badge">
+          <span class="bdot"></span>
+          Nenhum sistema BR opera isso hoje
+        </div>
+      </div>
+
+      <div class="chat rv">
+        <div class="chat-top">
+          <div class="cdots"><div class="cd"></div><div class="cd"></div><div class="cd"></div></div>
+          <span class="chat-ttl">Conversa ativa · lead qualificado</span>
+        </div>
+        <div class="chat-bd" id="chatBd">
+          <div class="msg c" id="m1"><div class="who">Lead</div><div class="bub">Oi, vi vocês no Instagram. Queria saber mais sobre o serviço.</div><div class="ts">14:22</div></div>
+          <div class="typing-ind" id="ty1"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+          <div class="msg a" id="m2"><div class="who">IA</div><div class="bub">Olá! Fico feliz que nos encontrou. Para te ajudar melhor, qual é a sua área de atuação?</div><div class="ts">14:22</div></div>
+          <div class="msg c" id="m3"><div class="who">Lead</div><div class="bub">Sou advogado trabalhista, tenho escritório próprio há 4 anos.</div><div class="ts">14:23</div></div>
+          <div class="msg a" id="m4"><div class="who">IA</div><div class="bub">Perfeito. Com quais clientes você trabalha mais? CLT demitido ou autônomo com passivo?</div><div class="ts">14:23</div></div>
+          <div class="msg s" id="m5"><div class="bub">⚡ O ANALISTA · 3 min sem resposta detectados<br>Perfil: advogado solo · alta qualificação. Objeção provável: tempo.<br>→ Instrução enviada: abordar facilidade de adoção.</div></div>
+          <div class="typing-ind" id="ty2"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+          <div class="msg a" id="m6"><div class="who">IA</div><div class="bub">Sei que a agenda de quem tem escritório próprio é pesada. Em 3 minutos posso te mostrar como isso funciona na prática, sem reunião longa.</div><div class="ts">14:26</div></div>
+          <div class="msg c" id="m7"><div class="who">Lead</div><div class="bub">Sim, me conta mais! 👍</div><div class="ts">14:27</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- COMO FUNCIONA -->
+<section id="como">
+  <div class="wrap">
+    <div class="label rv">Modelo de parceria</div>
+    <h2 style="margin-bottom:12px" class="rv">Como funciona <em class="hi-p">na prática</em></h2>
+    <p class="sub rv" style="margin-bottom:44px">Quatro passos. Você só precisa executar o primeiro.</p>
+    <div class="steps" id="stepsEl">
+      <div class="step" id="s0">
+        <div class="step-n">01 · Você</div>
+        <h4>Fecha o cliente</h4>
+        <p>Apresenta o sistema com sua marca, negocia e assina o contrato. A proposta, o preço e a relação são seus.</p>
+        <span class="step-arrow">→</span>
+      </div>
+      <div class="step" id="s1">
+        <div class="step-n">02 · Epos</div>
+        <h4>Instala e configura</h4>
+        <p>Em até 24h o sistema está no ar via FORJA™. IA treinada, integrações ativas, dashboard funcionando.</p>
+        <span class="step-arrow">→</span>
+      </div>
+      <div class="step" id="s2">
+        <div class="step-n">03 · Epos</div>
+        <h4>Opera e mantém</h4>
+        <p>Infraestrutura, atualizações, suporte técnico. O cliente interage com o sistema — você não precisa tocar.</p>
+        <span class="step-arrow">→</span>
+      </div>
+      <div class="step" id="s3">
+        <div class="step-n">04 · Você</div>
+        <h4>Recebe a margem</h4>
+        <p>Todo mês, para cada cliente ativo. Margem previsível, recorrente, sem custo operacional adicional.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA 2 — após como funciona -->
+<div class="cta-anchor rv">
+  <div class="wrap">
+    <p class="cta-anchor-copy"><strong>Você fecha. Nós instalamos em 24h e operamos.</strong> Sua marca, sua margem, sem custo técnico.</p>
+    <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+      Falar com Thiago
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- POR QUE FUNCIONA -->
+<section id="porque">
+  <div class="wrap">
+    <div class="label rv">Prova real</div>
+    <h2 style="margin-bottom:12px" class="rv">Um cliente ativo. <em class="hi-g">Resultado real.</em></h2>
+    <p class="sub rv" style="margin-bottom:44px">Farias &amp; Moura Advocacia — previdenciária, Brasília. Ativo desde fevereiro de 2026.</p>
+    <div class="ba-wrap rv">
+      <div class="ba-card before">
+        <div class="ba-head">Antes do sistema</div>
+        <ul class="ba-list">
+          <li class="ba-item">Triagem de WhatsApp manual, sem escala</li>
+          <li class="ba-item">Leads sem resposta fora do horário comercial</li>
+          <li class="ba-item">Até 25 contratos por ano — time inteiro</li>
+          <li class="ba-item">Sem visibilidade: qual anúncio trouxe o cliente?</li>
+        </ul>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-card after">
+        <div class="ba-head">Com o sistema Epos</div>
+        <ul class="ba-list">
+          <li class="ba-item">Qualificação automática 24/7 via IA</li>
+          <li class="ba-item">Nenhum lead sem resposta — 633 atendidos</li>
+          <li class="ba-item"><strong>8–12 contratos por mês</strong> — mesmo time, sem contratar</li>
+          <li class="ba-item">Dashboard com funil completo e atribuição por campanha</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- WL PRICING -->
+<section id="wl">
+  <div class="wrap">
+    <div class="label rv">Tabela de parceria</div>
+    <h2 style="margin-bottom:12px" class="rv">Margens por <em class="hi-g">plano</em></h2>
+    <p class="sub rv" style="margin-bottom:44px">Você compra no atacado, revende com sua marca no preço que preferir. Abaixo estão os valores de referência.</p>
+
+    <div class="wl-cards" id="wlEl">
+
+      <!-- START WL -->
+      <div class="wlcard">
+        <div class="wlcard-name">Start <span>até 200 leads/mês · 20% off</span></div>
+
+        <div class="tfeats">
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>IA conversacional 24/7 via WhatsApp</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Qualificação automática + agendamento</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>O Analista (detecção de silêncio)</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Saiba qual campanha trouxe cada fechamento</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Dashboard de performance</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Check-in mensal de 1h com o cliente</li>
+        </div>
+
+        <div class="wl-block">
+          <div class="wl-block-lbl">Mensalidade</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você paga à Epos</span>
+            <span class="wl-row-val">R$ 716/mês</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 895+/mês</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Sua margem por cliente</span>
+            <span class="wl-row-val profit">R$ 179+/mês</span>
+          </div>
+        </div>
+        <div class="wl-block">
+          <div class="wl-block-lbl">Setup · pagamento único</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você paga à Epos</span>
+            <span class="wl-row-val">R$ 1.600</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 2.000</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Margem no setup</span>
+            <span class="wl-row-val profit">R$ 400</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRO WL -->
+      <div class="wlcard featured">
+        <div class="wlcard-name">Pro <span>até 500 leads/mês · 25% off</span></div>
+
+        <div class="tfeats">
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Tudo do Start</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Múltiplos agentes especializados</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Base de conhecimento com docs do cliente</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Google Calendar avançado</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Relatórios mensais gerenciados</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Reunião mensal estratégica de 1h</li>
+        </div>
+
+        <div class="wl-block">
+          <div class="wl-block-lbl">Mensalidade</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você paga à Epos</span>
+            <span class="wl-row-val">R$ 1.471/mês</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 1.961+/mês</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Sua margem por cliente</span>
+            <span class="wl-row-val profit">R$ 490+/mês</span>
+          </div>
+        </div>
+        <div class="wl-block">
+          <div class="wl-block-lbl">Setup · pagamento único</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você paga à Epos</span>
+            <span class="wl-row-val">R$ 1.875</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Você cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 2.500</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Margem no setup</span>
+            <span class="wl-row-val profit">R$ 625</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NOTA EXPANSÃO -->
+    <div class="expand-note rv" style="margin-top:20px">
+      <p><strong>Precisa de mais do que o Pro oferece?</strong> O plano Pro suporta expansão personalizada — volume maior de leads, múltiplos agentes, integrações adicionais. Disponível sob medida com investimento adicional. Fale com a gente antes de fechar o cliente.</p>
+      <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank" style="white-space:nowrap">
+        Consultar
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA 3 — após pricing WL -->
+<div class="cta-conv rv">
+  <div class="wrap">
+    <p class="cta-conv-head">10 clientes ativos. <strong class="hi-g">R$ 45.265/ano.</strong> Sem equipe técnica.</p>
+    <p class="cta-conv-sub">Você vende. Epos entrega e opera. Margem previsível todo mês.</p>
+    <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+      Começar agora
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<hr class="section-sep">
+
+<!-- PROJEÇÃO -->
+<section id="proj">
+  <div class="wrap">
+    <div class="label rv">Projeção de carteira</div>
+    <h2 style="margin-bottom:12px" class="rv">O que uma carteira de 10 clientes <em class="hi-g">gera</em></h2>
+    <p class="sub rv" style="margin-bottom:44px">Conservador. Considerando mix de Start e Pro.</p>
+    <div class="proj-cards" id="projEl">
+      <div class="pjcard" id="pj0">
+        <div class="pjlbl">MRR (10 clientes)</div>
+        <div class="pjval">R$ 3.345</div>
+        <div class="pjsub">Margem mensal recorrente</div>
+      </div>
+      <div class="pjcard" id="pj1">
+        <div class="pjlbl">Setup (10 clientes)</div>
+        <div class="pjval">R$ 5.125</div>
+        <div class="pjsub">Lucro nos setups acumulados</div>
+      </div>
+      <div class="pjcard hl" id="pj2">
+        <div class="pjlbl">Total Ano 1</div>
+        <div class="pjval green">R$ 45.265+</div>
+        <div class="pjsub">Margem anual conservadora</div>
+      </div>
+    </div>
+    <p style="font-family:var(--f-m);font-size:12px;color:var(--text-2);margin-top:16px">
+      * Cálculo: 6 clientes Start (R$179/mês) + 4 clientes Pro (R$490/mês) = R$3.345 MRR. Setup médio R$512.50 × 10 = R$5.125. Total ano: (R$3.345 × 12) + R$5.125 = R$45.265.
+    </p>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- CTA FINAL -->
+<section id="cta">
+  <div class="wrap">
+    <div class="cta-in">
+      <div class="label">O próximo passo</div>
+      <h2>Pronto para começar?</h2>
+      <p class="cta-lead rv">Sistema em produção, resultado comprovado. Você traz o cliente — nós fazemos o resto funcionar.</p>
+      <div class="terms rv">
+        <em>"Epos opera. Você lucra. O cliente cresce."</em>
+      </div>
+      <div class="cta-btns rv">
+        <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+          Falar com Thiago
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="mailto:thiago@epos.com.br" class="btn btn-g">Enviar e-mail</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div class="fbrand">EPOS <em>AI</em> SYSTEM</div>
+    <div class="fmeta">Documento confidencial · Thiago Montandon · 2026</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+const mm = gsap.matchMedia();
+mm.add({
+  motion: "(prefers-reduced-motion: no-preference)",
+  still: "(prefers-reduced-motion: reduce)"
+}, ctx => {
+  const { motion } = ctx.conditions;
+  const D = motion ? 1 : 0;
+  const SD = motion ? 0.65 : 0;
+
+  /* HERO */
+  const hl = document.getElementById('headline');
+  const raw = hl.innerText.trim();
+  hl.innerHTML = '';
+  raw.split(' ').forEach((w, i, arr) => {
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.innerHTML = `<span class="wi">${w}</span>`;
+    hl.appendChild(span);
+    if (i < arr.length - 1) hl.appendChild(document.createTextNode(' '));
+  });
+  if (motion) {
+    gsap.from('.wi', { y: '108%', opacity: 0, duration: 1.0, stagger: 0.048, delay: 0.2, ease: 'power3.out' });
+    gsap.from('#hSub', { y: 18, autoAlpha: 0, duration: 0.85, delay: 1.0, ease: 'power2.out' });
+    gsap.from('#hAct', { y: 14, autoAlpha: 0, duration: 0.7, delay: 1.25, ease: 'power2.out' });
+  } else {
+    gsap.set(['.wi','#hSub','#hAct'], { opacity: 1, y: 0 });
+  }
+
+  /* REVEALS */
+  gsap.utils.toArray('.rv').forEach(el => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.7, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* SECTION PARAGRAPH STAGGER */
+  if (motion) {
+    ['#como','#wl','#proj','#cta'].forEach(sel => {
+      const sec = document.querySelector(sel);
+      if (!sec) return;
+      sec.querySelectorAll('p').forEach(p => {
+        if (p.closest('.rv')) return;
+        gsap.from(p, {
+          y: 16, opacity: 0, duration: 0.65, ease: 'power2.out',
+          scrollTrigger: { trigger: p, start: 'top 90%', toggleActions: 'play none none none' }
+        });
+      });
+    });
+
+    /* STEPS STAGGER */
+    ['s0','s1','s2','s3'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      gsap.to(el, {
+        opacity: 1, y: 0, duration: SD || 0.55, ease: 'power2.out', delay: i * 0.08,
+        scrollTrigger: { trigger: '#stepsEl', start: 'top 82%', toggleActions: 'play none none none' }
+      });
+    });
+  }
+
+  /* COUNTERS */
+  document.querySelectorAll('.pnum[data-target]').forEach(el => {
+    const target = +el.dataset.target;
+    const sfx = el.dataset.sfx || '';
+    ScrollTrigger.create({
+      trigger: el, start: 'top 82%', once: true,
+      onEnter: () => {
+        if (!motion) { el.textContent = target + sfx; return; }
+        gsap.to({ v: 0 }, {
+          v: target, duration: 1.9, ease: 'power2.out',
+          onUpdate() { el.textContent = Math.round(this.targets()[0].v) + sfx; }
+        });
+      }
+    });
+  });
+
+  /* ORB PARALLAX */
+  if (motion) {
+    gsap.to('.orb-1', { y: -80, ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 }
+    });
+    gsap.to('.orb-3', { y: 60, x: -30, ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 3 }
+    });
+  }
+
+  /* WL CARDS */
+  gsap.utils.toArray('#wlEl .wlcard').forEach((el, i) => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.55, ease: 'power2.out', delay: i * 0.12,
+      scrollTrigger: { trigger: '#wlEl', start: 'top 84%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* PROJ CARDS */
+  ['pj0','pj1','pj2'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.55, ease: 'power2.out', delay: i * 0.12,
+      scrollTrigger: { trigger: '#projEl', start: 'top 80%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* O ANALISTA LOOP */
+  function chatLoop() {
+    const all = ['m1','ty1','m2','m3','m4','m5','ty2','m6','m7'];
+    all.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) gsap.set(el, { opacity: 0, y: 8 });
+    });
+    const tl = gsap.timeline({ onComplete: () => setTimeout(chatLoop, 2800) });
+    const at = (t, id, isTyping) => {
+      if (isTyping) {
+        tl.to('#'+id, { opacity: 1, duration: 0.25 }, t)
+          .to('#'+id, { opacity: 0, duration: 0.2 }, t + 0.75);
+      } else {
+        tl.to('#'+id, { opacity: 1, y: 0, duration: SD || 0.38, ease: 'power2.out' }, t);
+      }
+    };
+    at(0,   'm1');
+    at(0.9, 'ty1', true);
+    at(1.7, 'm2');
+    at(3.2, 'm3');
+    at(4.0, 'm4');
+    at(5.7, 'm5');
+    at(7.1, 'ty2', true);
+    at(8.1, 'm6');
+    at(9.9, 'm7');
+    return tl;
+  }
+  ScrollTrigger.create({
+    trigger: '#analista-ex', start: 'top 70%', once: true,
+    onEnter: chatLoop
+  });
+
+  /* FEAT CARDS */
+  ['fc0','fc1','fc2','fc3','fc4','fc5'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.5, ease: 'power2.out', delay: i * 0.07,
+      scrollTrigger: { trigger: '#featEl', start: 'top 84%', toggleActions: 'play none none none' }
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Epos AI System — Pitch de Investimento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg: #08080A;
+  --bg-1: #111115;
+  --bg-2: #18181f;
+  --border: rgba(255,255,255,0.07);
+  --border-2: rgba(255,255,255,0.12);
+  --text: #F0F0F2;
+  --text-2: #888899;
+  --text-3: #46465a;
+  --purple: #9146FF;
+  --purple-a10: rgba(145,70,255,0.1);
+  --purple-a20: rgba(145,70,255,0.2);
+  --purple-a35: rgba(145,70,255,0.35);
+  --green: #00F5A0;
+  --green-a10: rgba(0,245,160,0.07);
+  --green-a20: rgba(0,245,160,0.18);
+  --red: #FF5F57;
+  --f-d: 'Plus Jakarta Sans', sans-serif;
+  --f-b: 'Inter', sans-serif;
+  --f-m: 'DM Mono', monospace;
+  --mw: 1060px;
+  --r: 12px;
+  --r-s: 6px;
+  --r-l: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-b);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY (Raycast signature) ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  padding: 0 40px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(8,8,10,0.75);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--f-d); font-size: 13px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.nav-logo em { color: var(--purple); font-style: normal; }
+.nav-tag {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--f-m); font-size: 11px; color: var(--text-3);
+}
+.nav-live {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  box-shadow: 0 0 6px var(--green); animation: livepulse 2.5s infinite;
+}
+@keyframes livepulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+
+/* ── LAYOUT ── */
+.wrap { max-width: var(--mw); margin: 0 auto; padding: 0 40px; }
+section { padding: 110px 0; }
+.section-sep { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ── TYPE ── */
+.label {
+  display: inline-block; font-family: var(--f-m); font-size: 11px;
+  font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--purple); margin-bottom: 22px;
+}
+h1, h2, h3 { font-family: var(--f-d); font-weight: 700; }
+h1 {
+  font-size: clamp(48px, 6.5vw, 84px);
+  line-height: 1.0; letter-spacing: -0.04em; font-weight: 800;
+}
+h2 {
+  font-size: clamp(30px, 3.8vw, 50px);
+  line-height: 1.06; letter-spacing: -0.035em; font-weight: 700;
+}
+h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.sub { font-size: 17px; color: var(--text-2); line-height: 1.75; max-width: 500px; }
+.mono { font-family: var(--f-m); }
+
+/* ── BTNS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--f-d); font-size: 13px; font-weight: 700;
+  padding: 13px 24px; border-radius: var(--r-s);
+  text-decoration: none; cursor: pointer; border: none;
+  transition: opacity 0.15s, transform 0.15s; letter-spacing: 0.02em;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-p { background: var(--purple); color: #fff; }
+.btn-p:hover { background: #a361ff; }
+.btn-g {
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--border-2);
+}
+.btn-g:hover { color: var(--text); }
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 120px 0 80px;
+  position: relative; overflow: hidden;
+}
+
+.hero-inner { text-align: center; }
+.hero-inner h1 { max-width: 820px; margin-left: auto; margin-right: auto; }
+.hero-inner .hero-sub { margin-left: auto; margin-right: auto; }
+.hero-inner .hero-pill { display: inline-flex; }
+.hero-inner .hero-actions { justify-content: center; }
+
+/* THE ORB — Raycast signature */
+.orb {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+.orb-1 {
+  width: 800px; height: 800px;
+  top: -200px; left: -200px;
+  background: radial-gradient(circle, rgba(145,70,255,0.22) 0%, rgba(145,70,255,0.08) 40%, transparent 70%);
+  filter: blur(100px);
+}
+.orb-2 {
+  width: 500px; height: 500px;
+  bottom: -100px; right: -50px;
+  background: radial-gradient(circle, rgba(0,245,160,0.08) 0%, transparent 65%);
+  filter: blur(80px);
+}
+.orb-3 {
+  width: 300px; height: 300px;
+  top: 40%; left: 55%;
+  background: radial-gradient(circle, rgba(145,70,255,0.12) 0%, transparent 70%);
+  filter: blur(60px);
+}
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border-2); border-radius: 100px;
+  padding: 5px 14px 5px 8px; margin-bottom: 36px;
+  background: rgba(255,255,255,0.03);
+  font-family: var(--f-m); font-size: 11px; color: var(--text-2);
+}
+.hero-pill-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--purple); box-shadow: 0 0 8px var(--purple);
+  animation: livepulse 2s infinite;
+}
+
+#headline {
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 80px rgba(145,70,255,0.15));
+}
+.word { display: inline-block; overflow: hidden; margin-right: 0.2em; vertical-align: bottom; }
+.wi { display: inline-block; }
+
+.hero-sub {
+  font-size: 18px; color: var(--text-2); line-height: 1.75;
+  max-width: 520px; margin-bottom: 44px;
+}
+.hero-sub strong { color: var(--text); font-weight: 500; }
+
+.hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.scroll-cue {
+  position: absolute; bottom: 36px; left: 40px;
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--f-m); font-size: 11px; color: var(--text-3);
+}
+.scroll-cue-line { width: 32px; height: 1px; background: var(--text-3); }
+
+/* ── PROBLEM / SOLUTION ── */
+.split {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--border);
+  border-radius: var(--r); border: 1px solid var(--border); overflow: hidden;
+}
+.split-col { background: var(--bg); padding: 48px 40px; }
+.split-col.b { background: var(--bg-1); }
+.split-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 28px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.dot.g { background: var(--green); box-shadow: 0 0 8px var(--green-a20); }
+.split-tag { font-family: var(--f-m); font-size: 11px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; }
+.slist { list-style: none; }
+.sitem {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+  font-size: 15px; color: var(--text-2);
+}
+.sitem:last-child { border-bottom: none; }
+.sitem.ok { color: var(--text); }
+.sicon { flex-shrink: 0; margin-top: 3px; }
+
+/* ── PROOF ── */
+#proof {
+  background: var(--bg-1);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+#proof::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: url('assets/pitch-dashboard.jpg') center/cover no-repeat;
+  opacity: 0.07;
+  filter: saturate(0.6);
+}
+#proof .wrap { position: relative; z-index: 1; }
+.proof-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--border);
+}
+.pitem { background: var(--bg-1); padding: 48px 32px 40px; }
+.pnum {
+  font-family: var(--f-d); font-size: clamp(48px, 6vw, 72px); font-weight: 800;
+  line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em;
+}
+.plbl { font-family: var(--f-m); font-size: 11px; color: var(--text-2); letter-spacing: .07em; text-transform: uppercase; }
+.proof-caption {
+  padding: 18px 0 0;
+  font-family: var(--f-m); font-size: 12px; color: var(--text-2);
+  grid-column: 1 / -1;
+}
+
+/* ── ANALISTA ── */
+#analista { position: relative; overflow: hidden; }
+.analista-bg {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: url('assets/pitch-analista.jpg') center/cover no-repeat;
+  opacity: 0.06;
+  filter: saturate(0.5);
+}
+#analista .wrap { position: relative; z-index: 1; }
+.analista-lay { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+.analista-copy h2 { margin-bottom: 20px; }
+.analista-copy p { color: var(--text-2); font-size: 16px; line-height: 1.75; margin-bottom: 20px; }
+.excl-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--purple-a10); border: 1px solid var(--purple-a20);
+  padding: 7px 14px; border-radius: 100px;
+  font-family: var(--f-m); font-size: 11px; color: var(--purple);
+}
+.bdot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); animation: livepulse 2s infinite; }
+
+/* CHAT */
+.chat {
+  background: var(--bg-1); border: 1px solid var(--border-2);
+  border-radius: var(--r-l); overflow: hidden;
+  box-shadow: 0 48px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(145,70,255,0.04),
+              inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.chat-top {
+  background: var(--bg-2); padding: 13px 18px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.cdots { display: flex; gap: 5px; }
+.cd { width: 10px; height: 10px; border-radius: 50%; }
+.cd:nth-child(1){background:#FF5F57} .cd:nth-child(2){background:#FFBD2E} .cd:nth-child(3){background:#28CA41}
+.chat-ttl { font-family: var(--f-m); font-size: 11px; color: var(--text-3); margin-left: 5px; }
+
+.chat-bd {
+  padding: 18px; min-height: 390px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.msg { display: flex; flex-direction: column; max-width: 82%; opacity: 0; }
+.msg.c { align-self: flex-start; }
+.msg.a { align-self: flex-end; }
+.msg.s { align-self: stretch; max-width: 100%; }
+.who { font-family: var(--f-m); font-size: 10px; color: var(--text-3); margin-bottom: 3px; }
+.msg.a .who { text-align: right; }
+.bub { padding: 9px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.msg.c .bub { background: var(--bg-2); border: 1px solid var(--border-2); border-radius: 12px 12px 12px 4px; }
+.msg.a .bub {
+  background: var(--purple-a10); border: 1px solid var(--purple-a20);
+  border-radius: 12px 12px 4px 12px;
+}
+.msg.s .bub {
+  background: var(--green-a10); border: 1px solid var(--green-a20);
+  color: var(--green); font-family: var(--f-m); font-size: 12px; border-radius: 8px; padding: 13px 16px;
+}
+.ts { font-family: var(--f-m); font-size: 10px; color: var(--text-3); margin-top: 3px; }
+.msg.a .ts { text-align: right; }
+.typing-ind {
+  background: var(--bg-2); border: 1px solid var(--border-2);
+  padding: 9px 13px; border-radius: 12px 12px 12px 4px;
+  display: flex; gap: 4px; align-items: center; align-self: flex-start; opacity: 0;
+}
+.td { width: 5px; height: 5px; border-radius: 50%; background: var(--text-3); animation: tb 1.2s infinite; }
+.td:nth-child(2){animation-delay:.2s} .td:nth-child(3){animation-delay:.4s}
+@keyframes tb { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+/* ── COMPETITORS ── */
+.comp-lay { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.ctable { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.crow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 22px; border-bottom: 1px solid var(--border);
+  opacity: 0; transform: translateX(-14px);
+}
+.crow:last-child { border-bottom: none; }
+.cn { font-size: 14px; color: var(--text-2); }
+.cp { font-family: var(--f-m); font-size: 13px; color: var(--red); }
+.ctotal {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 22px;
+  background: rgba(255,95,87,0.04); border-top: 1px solid rgba(255,95,87,0.12);
+}
+.ctl { font-family: var(--f-d); font-size: 14px; font-weight: 700; }
+.ctv { font-family: var(--f-m); font-size: 20px; color: var(--red); }
+
+.comp-right { display: flex; flex-direction: column; gap: 18px; }
+.cvs {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--f-m); font-size: 11px; color: var(--text-3);
+}
+.cvs-line { flex: 1; height: 1px; background: var(--border); }
+
+.epos-box {
+  background: var(--bg-1); border: 1px solid var(--border-2);
+  border-radius: var(--r); padding: 28px 26px; position: relative; overflow: hidden;
+}
+.epos-box::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 20% 50%, rgba(0,245,160,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.ep-lbl { font-family: var(--f-m); font-size: 11px; color: var(--green); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+.ep-price { font-family: var(--f-d); font-size: 52px; font-weight: 800; color: var(--green); line-height: 1; letter-spacing: -0.02em; }
+.ep-mo { font-family: var(--f-m); font-size: 13px; color: var(--text-2); }
+.ep-setup { font-family: var(--f-m); font-size: 12px; color: var(--text-3); margin: 8px 0 16px; }
+.ep-save {
+  padding: 10px 14px; background: var(--green-a10); border-radius: var(--r-s);
+  font-size: 14px; color: var(--text-2);
+}
+.ep-save strong { color: var(--green); }
+.cnote { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+
+/* ── TIERS ── */
+.tiers-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+.tier {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 32px 26px; position: relative;
+  opacity: 0; transform: translateY(18px);
+}
+.tier.ft { border-color: var(--purple-a20); }
+.tier.ft::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(145,70,255,0.06) 0%, transparent 60%);
+  border-radius: inherit; pointer-events: none;
+}
+.tier.ag { border-color: rgba(0,245,160,0.15); }
+.tier.ag::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0,245,160,0.04) 0%, transparent 60%);
+  border-radius: inherit; pointer-events: none;
+}
+.tbadge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: var(--purple); color: #fff; padding: 3px 14px; border-radius: 100px;
+  font-family: var(--f-m); font-size: 10px; font-weight: 500;
+  letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+}
+.tbadge.green { background: var(--green); color: #000; }
+.tname { font-family: var(--f-d); font-size: 22px; font-weight: 800; margin-bottom: 3px; letter-spacing: -0.03em; }
+.tleads { font-family: var(--f-m); font-size: 11px; color: var(--text-2); margin-bottom: 24px; }
+.tprice { font-family: var(--f-d); font-size: 38px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.tper { font-family: var(--f-m); font-size: 12px; color: var(--text-3); }
+.tsetup {
+  font-family: var(--f-m); font-size: 12px; color: var(--text-3);
+  margin: 8px 0 22px; padding-bottom: 22px; border-bottom: 1px solid var(--border);
+}
+.tfeats { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.tf { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--text-2); }
+.tfck { color: var(--green); flex-shrink: 0; margin-top: 1px; }
+.tdis {
+  margin-top: 22px; padding: 11px 13px;
+  background: var(--green-a10); border: 1px solid rgba(0,245,160,0.08); border-radius: var(--r-s);
+}
+.tdis-tag { font-family: var(--f-m); font-size: 10px; color: var(--green); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2px; }
+.tdis-d { font-size: 13px; color: var(--text-2); }
+
+/* ── TIER CLIENT LABEL ── */
+.tclient-lbl {
+  font-family: var(--f-m); font-size: 10px; color: var(--text-3);
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 3px;
+}
+
+/* ── TIER DIVIDER ── */
+.tier-divider {
+  display: flex; align-items: center; gap: 16px;
+  margin: 36px 0 28px;
+  font-family: var(--f-m); font-size: 11px; color: var(--text-3);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.tier-divider-line { flex: 1; height: 1px; background: var(--border); }
+
+/* ── WL CARDS ── */
+.wl-cards { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+.wlcard {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r);
+  overflow: hidden; opacity: 0; transform: translateY(14px);
+}
+.wlcard-name {
+  font-family: var(--f-d); font-size: 14px; font-weight: 700;
+  padding: 16px 20px 12px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wlcard-name span { font-family: var(--f-m); font-size: 10px; color: var(--purple); font-weight: 400; letter-spacing: .08em; text-transform: uppercase; }
+.wl-block { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.wl-block:last-child { border-bottom: none; }
+.wl-block-lbl { font-family: var(--f-m); font-size: 10px; color: var(--purple); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+.wl-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px;
+}
+.wl-row:last-child { border-bottom: none; }
+.wl-row-lbl { color: var(--text-3); font-size: 12px; }
+.wl-row-val { font-family: var(--f-m); font-size: 13px; color: var(--text-2); }
+.wl-row-val.accent { color: var(--text); }
+.wl-row-val.profit { color: var(--green); font-weight: 500; }
+.wl-row.total {
+  margin-top: 6px; padding-top: 10px;
+  border-top: 1px solid var(--border-2); border-bottom: none;
+}
+.wl-row.total .wl-row-lbl { color: var(--text-2); font-size: 13px; font-weight: 500; }
+.wl-row.total .wl-row-val { font-size: 15px; }
+.wl-note {
+  margin-top: 20px; padding: 16px 18px;
+  background: var(--purple-a10); border: 1px solid var(--purple-a20);
+  border-radius: var(--r-s); font-size: 13px; color: var(--text-2); line-height: 1.65;
+}
+.wl-note strong { color: var(--text); }
+
+/* ── POTENTIAL ── */
+.pot { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.potc {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r); padding: 32px;
+}
+.potc h3 { margin-bottom: 24px; }
+.prow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 13px 0; border-bottom: 1px solid var(--border); font-size: 15px;
+}
+.prow:last-child { border-bottom: none; }
+.pl { color: var(--text-2); }
+.pv { font-family: var(--f-m); font-size: 15px; }
+.pv.hl { color: var(--text); }
+.pv.big { font-size: 22px; color: var(--green); }
+
+/* ── TECH ── */
+.tech { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.techbtn {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 26px; background: var(--bg-1); border: none; cursor: pointer;
+  color: var(--text); font-family: var(--f-d); font-size: 16px; font-weight: 700;
+  transition: background 0.2s; letter-spacing: -0.01em;
+}
+.techbtn:hover { background: var(--bg-2); }
+.ticon { color: var(--text-3); transition: transform 0.3s; }
+.techbtn.open .ticon { transform: rotate(180deg); }
+.techbody { height: 0; overflow: hidden; }
+.techinner {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+  padding: 0 26px 26px; background: var(--bg-1);
+}
+.titem {
+  padding: 18px; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-s);
+}
+.tlbl { font-family: var(--f-m); font-size: 10px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+.tval { font-size: 14px; color: var(--text); }
+
+/* ── VALUATION ── */
+.val-hd { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 28px; }
+.vstat {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r); padding: 30px;
+}
+.vslbl { font-family: var(--f-m); font-size: 11px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+.vsval { font-family: var(--f-d); font-size: 46px; font-weight: 800; color: var(--green); line-height: 1; letter-spacing: -0.02em; }
+.vssub { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+
+.mult {
+  display: grid; grid-template-columns: 1fr 1px 1fr;
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 28px;
+}
+.mi { padding: 30px 34px; }
+.msep { background: var(--border); }
+.mlbl { font-family: var(--f-m); font-size: 11px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+.mval { font-family: var(--f-d); font-size: 28px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 5px; }
+.mval.hi { color: var(--green); }
+.mdesc { font-size: 14px; color: var(--text-2); }
+
+/* CAP */
+.cap {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r); padding: 32px;
+}
+.cap h3 { margin-bottom: 26px; }
+.capbar-w { height: 9px; background: var(--bg-2); border-radius: 100px; overflow: hidden; margin-bottom: 26px; }
+.capbar {
+  height: 100%; width: 0; border-radius: 100px;
+  background: linear-gradient(90deg, var(--purple) 0%, rgba(145,70,255,0.4) 65%, transparent 65%);
+  transition: width 1.6s cubic-bezier(0.4,0,0.2,1);
+}
+.capleg { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+.clrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
+.cll { display: flex; align-items: center; gap: 9px; }
+.cldot { width: 7px; height: 7px; border-radius: 50%; }
+.cllbl { color: var(--text-2); }
+.clv { font-family: var(--f-m); font-size: 14px; }
+.capnote {
+  padding: 14px 16px; background: var(--purple-a10); border: 1px solid var(--purple-a20);
+  border-radius: var(--r-s); font-size: 13px; color: var(--text-2); line-height: 1.65;
+}
+
+/* ── INVEST ── */
+#invest { text-align: center; }
+.inv-in { max-width: 600px; margin: 0 auto; }
+.inv-in h2 { margin-bottom: 18px; }
+.inv-lead { font-size: 18px; color: var(--text-2); line-height: 1.75; margin-bottom: 40px; }
+.inv-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 36px; text-align: left; }
+.icard {
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--r); padding: 28px;
+}
+.iclbl {
+  font-family: var(--f-m); font-size: 10px; color: var(--text-3);
+  letter-spacing: .14em; text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 7px;
+}
+.iclbl::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.icard.a .iclbl::before { background: var(--purple); }
+.icard.b .iclbl::before { background: var(--green); }
+.icard h4 { font-family: var(--f-d); font-size: 18px; font-weight: 700; margin-bottom: 9px; letter-spacing: -0.01em; }
+.icard p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+
+.terms {
+  font-size: 17px; color: var(--text-2); margin-bottom: 34px;
+  padding: 20px; border: 1px solid var(--border-2); border-radius: var(--r);
+  background: var(--bg-1); font-style: italic;
+}
+.terms em { color: var(--text); font-style: normal; }
+
+.inv-cta { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--border); padding: 32px 0; }
+.foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+.fbrand { font-family: var(--f-d); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+.fbrand em { color: var(--purple); font-style: normal; }
+.fmeta { font-family: var(--f-m); font-size: 11px; color: var(--text-3); }
+
+/* ── REVEAL ── */
+.rv { opacity: 0; transform: translateY(22px); }
+
+/* ── TEXT HIGHLIGHTS ── */
+.hi-p { color: var(--purple); font-style: normal; }
+.hi-g { color: var(--green); font-style: normal; }
+
+/* ── MID-PAGE CTA STRIP ── */
+.cta-strip {
+  padding: 52px 0;
+  background: linear-gradient(135deg, rgba(145,70,255,0.08) 0%, rgba(0,245,160,0.04) 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.cta-strip .wrap { display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+.cta-strip-copy { font-family: var(--f-d); font-size: 20px; font-weight: 700; letter-spacing: -0.025em; color: var(--text); max-width: 560px; }
+.cta-strip-copy span { color: var(--purple); }
+.cta-anchor {
+  padding: 60px 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.cta-anchor-copy { font-size: 15px; color: var(--text-2); margin-bottom: 20px; }
+.cta-anchor-copy strong { color: var(--text); }
+.cta-conv {
+  padding: 72px 0;
+  background: var(--bg-1);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.cta-conv-head { font-family: var(--f-d); font-size: clamp(22px, 3vw, 32px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 10px; }
+.cta-conv-sub { font-size: 15px; color: var(--text-2); margin-bottom: 28px; }
+.cta-conv-sub strong { color: var(--green); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  .wrap { padding: 0 20px; }
+  section { padding: 80px 0; }
+  .analista-lay, .comp-lay, .pot, .val-hd, .inv-cards { grid-template-columns: 1fr; }
+  .split, .mult { grid-template-columns: 1fr; }
+  .msep { display: none; }
+  .proof-row, .tiers-2, .wl-cards { grid-template-columns: repeat(2,1fr); }
+  .techinner { grid-template-columns: 1fr 1fr; }
+  .scroll-cue { display: none; }
+  h1 { font-size: 48px; }
+  .orb-1 { width: 500px; height: 500px; top: -100px; left: -150px; }
+}
+@media (max-width: 560px) {
+  .tiers-2, .wl-cards, .proof-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">EPOS <em>AI</em></div>
+  <div class="nav-tag">
+    <div class="nav-live"></div>
+    Sistema em produção · 2026
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="wrap hero-inner">
+    <div class="hero-pill">
+      <span class="hero-pill-dot"></span>
+      Cliente ativo · Resultados reais · Sistema operando agora
+    </div>
+
+    <h1 id="headline">
+      O sistema que qualifica, agenda e converte. Enquanto você dorme.
+    </h1>
+
+    <p class="hero-sub" id="hSub">
+      Infraestrutura de inteligência operacional para negócios.
+      <strong>SWaaS:</strong> nós operamos, acompanhamos e evoluímos. O cliente recebe resultado.
+    </p>
+
+    <div class="hero-actions" id="hAct">
+      <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+        Vamos conversar
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#proof" class="btn btn-g">Ver resultados</a>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span class="scroll-cue-line"></span>
+    <span class="mono" style="font-size:11px">scroll</span>
+  </div>
+</section>
+
+<!-- PROBLEMA / SOLUÇÃO -->
+<section id="prob">
+  <div class="wrap">
+    <div class="label rv">O cenário que todo prestador de serviço conhece</div>
+    <h2 style="max-width:560px;margin-bottom:44px" class="rv">A diferença entre <em class="hi-p">escalar</em> e continuar no mesmo lugar</h2>
+    <div class="split rv">
+      <div class="split-col">
+        <div class="split-head">
+          <div class="dot"></div>
+          <span class="split-tag">Sem o sistema</span>
+        </div>
+        <ul class="slist">
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Leads chegam pelo WhatsApp e somem sem resposta
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Follow-up manual que depende de memória ou planilha
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Nenhuma visibilidade de qual canal realmente converte
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            5+ ferramentas desconectadas, custo alto, operação complexa
+          </li>
+          <li class="sitem">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            Especialista preso em triagem, não em fechar negócio
+          </li>
+        </ul>
+      </div>
+      <div class="split-col b">
+        <div class="split-head">
+          <div class="dot g"></div>
+          <span class="split-tag">Com o sistema</span>
+        </div>
+        <ul class="slist">
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            IA qualifica e agenda 24h por dia, 7 dias por semana
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            O Analista detecta oportunidades travadas em tempo real
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Saiba qual campanha trouxe cada fechamento. Sem chutes.
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            1 sistema integrado: nós operamos, cliente recebe resultado
+          </li>
+          <li class="sitem ok">
+            <span class="sicon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Online em até 24h via FORJA™. Setup automático.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- PROOF -->
+<section id="proof">
+  <div class="wrap">
+    <div class="proof-row">
+      <div class="pitem">
+        <div class="pnum" data-target="633" data-sfx="">0</div>
+        <div class="plbl">leads capturados</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum" data-target="127" data-sfx="">0</div>
+        <div class="plbl">agendamentos gerados</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum" data-target="66" data-sfx="">0</div>
+        <div class="plbl">fechamentos confirmados</div>
+      </div>
+      <div class="pitem">
+        <div class="pnum" data-target="48" data-sfx="%">0</div>
+        <div class="plbl">taxa de qualificação</div>
+      </div>
+    </div>
+    <div class="proof-caption wrap">
+      Farias &amp; Moura, escritório de advocacia previdenciária. Dados reais, em produção.
+    </div>
+  </div>
+</section>
+
+<!-- CTA 1 — após prova social -->
+<div class="cta-strip rv">
+  <div class="wrap">
+    <p class="cta-strip-copy">633 leads capturados. 127 agendamentos. 66 fechamentos. <span>Dados reais.</span> Quer ver como seria no seu negócio?</p>
+    <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+      Quero conversar
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- O ANALISTA -->
+<section id="analista">
+  <div class="analista-bg"></div>
+  <div class="wrap">
+    <div class="analista-lay">
+      <div class="analista-copy rv">
+        <div class="label">Exclusivo · Nenhum concorrente tem</div>
+        <h2 style="margin-bottom:18px">O <em class="hi-p">Analista</em></h2>
+        <p>Após 3 minutos de silêncio em uma conversa, O Analista lê toda a troca, detecta o que travou o lead (objeção, urgência, hesitação) e instrui a IA a agir com a mensagem certa.</p>
+        <p>Não é uma regra fixa. É análise de contexto individual, em tempo real, aplicada a cada conversa.</p>
+        <div class="excl-badge">
+          <span class="bdot"></span>
+          Nenhum sistema BR opera isso hoje
+        </div>
+      </div>
+
+      <div class="chat rv">
+        <div class="chat-top">
+          <div class="cdots"><div class="cd"></div><div class="cd"></div><div class="cd"></div></div>
+          <span class="chat-ttl">Conversa ativa · lead qualificado</span>
+        </div>
+        <div class="chat-bd" id="chatBd">
+          <div class="msg c" id="m1"><div class="who">Lead</div><div class="bub">Oi, vi vocês no Instagram. Queria saber mais sobre o serviço.</div><div class="ts">14:22</div></div>
+          <div class="typing-ind" id="ty1"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+          <div class="msg a" id="m2"><div class="who">IA</div><div class="bub">Olá! Fico feliz que nos encontrou. Para te ajudar melhor, qual é a sua área de atuação?</div><div class="ts">14:22</div></div>
+          <div class="msg c" id="m3"><div class="who">Lead</div><div class="bub">Sou advogado trabalhista, tenho escritório próprio há 4 anos.</div><div class="ts">14:23</div></div>
+          <div class="msg a" id="m4"><div class="who">IA</div><div class="bub">Perfeito. Com quais clientes você trabalha mais? CLT demitido ou autônomo com passivo?</div><div class="ts">14:23</div></div>
+          <div class="msg s" id="m5"><div class="bub">⚡ O ANALISTA · 3 min sem resposta detectados<br>Perfil: advogado solo · alta qualificação. Objeção provável: tempo.<br>→ Instrução enviada: abordar facilidade de adoção.</div></div>
+          <div class="typing-ind" id="ty2"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+          <div class="msg a" id="m6"><div class="who">IA</div><div class="bub">Sei que a agenda de quem tem escritório próprio é pesada. Em 3 minutos posso te mostrar como isso funciona na prática, sem reunião longa.</div><div class="ts">14:26</div></div>
+          <div class="msg c" id="m7"><div class="who">Lead</div><div class="bub">Sim, me conta mais! 👍</div><div class="ts">14:27</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA 2 — após O Analista -->
+<div class="cta-anchor rv">
+  <div class="wrap">
+    <p class="cta-anchor-copy"><strong>Nenhum sistema no Brasil opera isso hoje.</strong> O Analista está ativo em produção agora.</p>
+    <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+      Falar com a equipe
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<hr class="section-sep">
+
+<!-- CONCORRENTES -->
+<section id="comp">
+  <div class="wrap">
+    <div class="label rv">Custo real de montar sozinho</div>
+    <h2 style="max-width:500px;margin-bottom:44px" class="rv">O que você pagaria vs. <em class="hi-g">o que é</em></h2>
+    <div class="comp-lay">
+      <div>
+        <div class="ctable">
+          <div class="crow" id="r0"><span class="cn">CRM + pipeline · Kommo Pro (3 usuários)</span><span class="cp">R$ 591/mês</span></div>
+          <div class="crow" id="r1"><span class="cn">Chatbot WhatsApp · ManyChat Pro</span><span class="cp">R$ 215/mês</span></div>
+          <div class="crow" id="r2"><span class="cn">Rastreamento de funil · Tintim Escala</span><span class="cp">R$ 297/mês</span></div>
+          <div class="crow" id="r3"><span class="cn">Agendamento inteligente · Calendly Teams</span><span class="cp">R$ 150/mês</span></div>
+          <div class="crow" id="r4"><span class="cn">Automação de fluxos · Make.com</span><span class="cp">R$ 100/mês</span></div>
+        </div>
+        <div class="ctotal">
+          <span class="ctl">Total mensal</span>
+          <span class="ctv">R$ 1.353+/mês</span>
+        </div>
+      </div>
+      <div class="comp-right">
+        <div class="cvs"><span class="cvs-line"></span><span class="mono" style="font-size:11px">vs. Epos AI Start</span><span class="cvs-line"></span></div>
+        <div class="epos-box rv">
+          <div class="ep-lbl">Epos AI · Start</div>
+          <div class="ep-price">R$ 895</div>
+          <div class="ep-mo">/mês + setup único R$ 2.000</div>
+          <div class="ep-setup">Você abastece a IA diretamente, como tráfego pago.</div>
+          <div class="ep-save">Economia de até <strong>R$ 458/mês</strong>. Com O Analista, rastreamento avançado e operação gerenciada que as 5 ferramentas separadas nunca vão te dar.</div>
+        </div>
+        <p class="cnote rv">Ferramentas separadas não se integram. O Analista não existe em nenhuma delas. E você ainda precisaria de alguém para operar e conectar tudo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA 3 — após comparação de concorrentes -->
+<div class="cta-conv rv">
+  <div class="wrap">
+    <p class="cta-conv-head">Tudo isso por <strong class="hi-g">R$ 895/mês.</strong> Gerenciado pela Epos.</p>
+    <p class="cta-conv-sub">Sem contratar equipe, sem montar stack, sem reunião de setup. <strong>Cliente ativo no dia 1.</strong></p>
+    <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+      Começar agora
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</div>
+
+<hr class="section-sep">
+
+<!-- PLANOS -->
+<section id="plans">
+  <div class="wrap">
+    <div class="label rv">Modelo de receita</div>
+    <h2 style="margin-bottom:12px" class="rv">Planos e <em class="hi-p">mensalidade</em></h2>
+    <p class="sub rv" style="margin-bottom:44px">MRR recorrente + setup único. VPS isolada por cliente em contratos anuais. Custo fixo previsível.</p>
+
+    <!-- SISTEMA DE IA -->
+    <div class="tiers-2" id="tiersTop">
+      <!-- START -->
+      <div class="tier" id="t0">
+        <div class="tname">Start</div>
+        <div class="tleads">até 200 leads/mês</div>
+        <div class="tclient-lbl">Cliente paga</div>
+        <div class="tprice">R$ 895<span class="tper">/mês</span></div>
+        <div class="tsetup">Setup cobrado do cliente: R$ 2.000 · Via FORJA™</div>
+        <ul class="tfeats">
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>IA conversacional 24/7 via WhatsApp</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Qualificação automática + agendamento</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>O Analista (detecção de silêncio)</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Saiba qual campanha trouxe cada fechamento. Sem chutes.</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Dashboard de performance</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Check-in mensal de 1h: alinhamento de IA + análise</li>
+        </ul>
+        <div class="tdis"><div class="tdis-tag">Bônus assinante</div><div class="tdis-d">15% off em serviços extras da agência</div></div>
+      </div>
+      <!-- PRO -->
+      <div class="tier ft" id="t1">
+        <div class="tbadge">Mais vendido</div>
+        <div class="tname">Pro</div>
+        <div class="tleads">até 500 leads/mês</div>
+        <div class="tclient-lbl">Cliente paga</div>
+        <div class="tprice">R$ 1.961<span class="tper">/mês</span></div>
+        <div class="tsetup">Setup cobrado do cliente: R$ 2.500 · Via FORJA™</div>
+        <ul class="tfeats">
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Tudo do Start</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Múltiplos agentes especializados</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Base de conhecimento personalizada com docs do cliente</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Google Calendar avançado</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Relatórios mensais gerenciados</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Reunião mensal estratégica de 1h: performance + ajustes</li>
+        </ul>
+        <div class="tdis"><div class="tdis-tag">Bônus assinante</div><div class="tdis-d">25% off em serviços extras da agência</div></div>
+      </div>
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="tier-divider rv">
+      <span class="tier-divider-line"></span>
+      <span>Expanda com serviços da agência</span>
+      <span class="tier-divider-line"></span>
+    </div>
+
+    <!-- PLANOS COM SERVIÇOS -->
+    <div class="tiers-2" id="tiersBot">
+      <!-- SCALE -->
+      <div class="tier ag" id="t2">
+        <div class="tbadge green">Crescimento gerenciado</div>
+        <div class="tname">Scale</div>
+        <div class="tleads">sistema completo + gestão de tráfego</div>
+        <div class="tclient-lbl">Cliente paga</div>
+        <div class="tprice">R$ 3.800<span class="tper">/mês</span></div>
+        <div class="tsetup">Setup cobrado do cliente: R$ 3.000 · Via FORJA™</div>
+        <ul class="tfeats">
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Tudo do Pro</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Gestão de tráfego pago (Meta Ads)</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Múltiplos canais de aquisição</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>SLA de resposta 24h</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>2 reuniões mensais: estratégia + operação</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Acesso antecipado a novos módulos</li>
+        </ul>
+      </div>
+      <!-- FULL STACK -->
+      <div class="tier ag" id="t3">
+        <div class="tbadge green">Parceria total</div>
+        <div class="tname">Full Stack</div>
+        <div class="tleads">crescimento completo gerenciado</div>
+        <div class="tclient-lbl">Cliente paga</div>
+        <div class="tprice">R$ 7.000<span class="tper">/mês</span></div>
+        <div class="tsetup">Setup e proposta: sob medida · Via FORJA™</div>
+        <ul class="tfeats">
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Tudo do Scale</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Elaboração de posicionamento e branding</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Produção audiovisual e peças gráficas</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Estratégia digital integrada</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>Estrategista dedicado com acesso direto</li>
+          <li class="tf"><span class="tfck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>2 reuniões mensais + suporte prioritário</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- WHITE-LABEL -->
+<section id="wl">
+  <div class="wrap">
+    <div class="label rv">Para agências e revendedores</div>
+    <h2 style="margin-bottom:12px" class="rv">Modelo <em class="hi-g">White-Label</em></h2>
+    <p class="sub rv" style="margin-bottom:44px">Parceiro compra o sistema no atacado, revende com sua marca. Epos opera. Parceiro lucra em cima de cada cliente ativo.</p>
+
+    <div class="wl-cards" id="wlEl">
+
+      <!-- START WL -->
+      <div class="wlcard">
+        <div class="wlcard-name">Start <span>até 200 leads/mês · 20% off</span></div>
+        <div class="wl-block">
+          <div class="wl-block-lbl">Mensalidade</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro paga à Epos</span>
+            <span class="wl-row-val">R$ 716/mês</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 895+/mês</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Lucro mensal por cliente</span>
+            <span class="wl-row-val profit">R$ 179+</span>
+          </div>
+        </div>
+        <div class="wl-block">
+          <div class="wl-block-lbl">Setup · pagamento único</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro paga à Epos</span>
+            <span class="wl-row-val">R$ 1.600</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 2.000</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Lucro no setup</span>
+            <span class="wl-row-val profit">R$ 400</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRO WL -->
+      <div class="wlcard">
+        <div class="wlcard-name">Pro <span>até 500 leads/mês · 25% off</span></div>
+        <div class="wl-block">
+          <div class="wl-block-lbl">Mensalidade</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro paga à Epos</span>
+            <span class="wl-row-val">R$ 1.471/mês</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 1.961+/mês</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Lucro mensal por cliente</span>
+            <span class="wl-row-val profit">R$ 490+</span>
+          </div>
+        </div>
+        <div class="wl-block">
+          <div class="wl-block-lbl">Setup · pagamento único</div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro paga à Epos</span>
+            <span class="wl-row-val">R$ 1.875</span>
+          </div>
+          <div class="wl-row">
+            <span class="wl-row-lbl">Parceiro cobra do cliente</span>
+            <span class="wl-row-val accent">R$ 2.500</span>
+          </div>
+          <div class="wl-row total">
+            <span class="wl-row-lbl">Lucro no setup</span>
+            <span class="wl-row-val profit">R$ 625</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="wl-note rv">
+      <strong>Precisa de mais?</strong> O plano Pro suporta expansão personalizada: volume maior de leads, múltiplos agentes, integrações adicionais. Disponível sob medida com investimento adicional. Fale com a gente.
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- POTENCIAL -->
+<section id="pot">
+  <div class="wrap">
+    <div class="label rv">Projeção conservadora</div>
+    <h2 style="margin-bottom:44px" class="rv">Potencial de receita em 12 meses</h2>
+    <div class="pot">
+      <div class="potc rv">
+        <h3>Meta 90 dias</h3>
+        <div class="prow"><span class="pl">Clientes ativos</span><span class="pv hl">10</span></div>
+        <div class="prow"><span class="pl">Setup acumulado</span><span class="pv hl">R$ 20.000</span></div>
+        <div class="prow"><span class="pl">MRR projetado</span><span class="pv hl">R$ 8.950+</span></div>
+        <div class="prow"><span class="pl">Total Ano 1</span><span class="pv big">R$ 127.400+</span></div>
+      </div>
+      <div class="potc rv">
+        <h3>Meta 12 meses</h3>
+        <div class="prow"><span class="pl">Clientes ativos</span><span class="pv hl">30</span></div>
+        <div class="prow"><span class="pl">MRR projetado</span><span class="pv hl">R$ 26.850+</span></div>
+        <div class="prow"><span class="pl">ARR run-rate</span><span class="pv hl">R$ 322.200+</span></div>
+        <div class="prow"><span class="pl">Margem líquida estimada</span><span class="pv big">~75%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- TECH -->
+<section id="tech">
+  <div class="wrap">
+    <div class="label rv">Por dentro do sistema</div>
+    <h2 style="margin-bottom:10px" class="rv">A estrutura que os maiores usam</h2>
+    <p class="sub rv" style="margin-bottom:28px">Cada módulo foi construído com base nos padrões de funil, qualificação e rastreamento que escalam negócios em 8 e 9 dígitos. Não reinventamos a roda. Aplicamos o que funciona em escala, no seu cliente, do dia 1.</p>
+    <div class="tech rv">
+      <button class="techbtn" id="techBtn" onclick="toggleTech()">
+        <span>Ver detalhes da infraestrutura</span>
+        <svg class="ticon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="techbody" id="techBd">
+        <div class="techinner">
+          <div class="titem"><div class="tlbl">Infraestrutura</div><div class="tval">Construída sobre padrões de conversão dos maiores players do mercado digital</div></div>
+          <div class="titem"><div class="tlbl">IA conversacional</div><div class="tval">Agentes com base de conhecimento, histórico e instruções por cliente</div></div>
+          <div class="titem"><div class="tlbl">Canal de entrada</div><div class="tval">WhatsApp + CTWA + Lead Ads → pipeline unificado</div></div>
+          <div class="titem"><div class="tlbl">Banco de dados</div><div class="tval">PostgreSQL cloud isolado por cliente, auditoria completa</div></div>
+          <div class="titem"><div class="tlbl">Isolamento</div><div class="tval">VPS dedicada por cliente · contratos anuais · uptime 99.9%</div></div>
+          <div class="titem"><div class="tlbl">Rastreamento avançado</div><div class="tval">Integração direta Meta: saiba qual campanha fecha, não qual clica</div></div>
+          <div class="titem"><div class="tlbl">FORJA™ · Onboarding</div><div class="tval">Auto-ativação em 24h · antes: 4–8h de setup manual</div></div>
+          <div class="titem"><div class="tlbl">Caixa de entrada</div><div class="tval">Omnicanal com handoff humano ↔ IA inteligente</div></div>
+          <div class="titem"><div class="tlbl">Custo IA (cliente)</div><div class="tval">Cliente abastece direto · como tráfego pago · mín. R$ 100/mês</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- VALUATION -->
+<section id="val">
+  <div class="wrap">
+    <div class="label rv">Por que vale o que projetamos</div>
+    <h2 style="margin-bottom:44px" class="rv">Valuation e estrutura</h2>
+
+    <div class="val-hd rv">
+      <div class="vstat">
+        <div class="vslbl">MRR alvo · 90 dias</div>
+        <div class="vsval">R$ 36K+</div>
+        <div class="vssub">ARR equivalente: R$ 432.000+</div>
+      </div>
+      <div class="vstat">
+        <div class="vslbl">Valuation projetado · múltiplo AI-native</div>
+        <div class="vsval">R$ 6,5M+</div>
+        <div class="vssub">15× ARR · padrão para plataformas onde IA é o core product</div>
+      </div>
+    </div>
+
+    <div class="mult rv">
+      <div class="mi">
+        <div class="mlbl">SaaS tradicional</div>
+        <div class="mval">4,5–9×</div>
+        <div class="mdesc">EV/Receita anual · ferramentas genéricas sem diferenciação</div>
+      </div>
+      <div class="msep"></div>
+      <div class="mi">
+        <div class="mlbl">Plataforma AI-native</div>
+        <div class="mval hi">15–30×</div>
+        <div class="mdesc">EV/Receita anual · IA é o core, não um add-on · Epos se encaixa aqui</div>
+      </div>
+    </div>
+
+    <div class="cap rv">
+      <h3>Estrutura de capital</h3>
+      <div class="capbar-w" style="margin-top:24px">
+        <div class="capbar" id="capBar"></div>
+      </div>
+      <div class="capleg">
+        <div class="clrow">
+          <div class="cll"><div class="cldot" style="background:var(--purple)"></div><span class="cllbl">Fundador</span></div>
+          <span class="clv">Maioria controladora</span>
+        </div>
+        <div class="clrow">
+          <div class="cll"><div class="cldot" style="background:var(--green)"></div><span class="cllbl">Investidor âncora</span></div>
+          <span class="clv">Participação significativa</span>
+        </div>
+        <div class="clrow">
+          <div class="cll"><div class="cldot" style="background:var(--text-3)"></div><span class="cllbl">Pool futuro (time + rodadas)</span></div>
+          <span class="clv">Reservado</span>
+        </div>
+      </div>
+      <div class="capnote">Os percentuais exatos dependem do que cada parceiro traz: capital, relacionamentos, operação. O fundador retém maioria absoluta em todas as rodadas projetadas. Investidor âncora tem preferência em rodadas futuras.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-sep">
+
+<!-- INVESTIMENTO -->
+<section id="invest">
+  <div class="wrap">
+    <div class="inv-in">
+      <div class="label">O convite</div>
+      <h2>Construa isso conosco.</h2>
+      <p class="inv-lead">Produto em produção, cliente ativo, resultados reais. Estamos na janela onde as melhores oportunidades entram.</p>
+
+      <div class="inv-cards rv">
+        <div class="icard a">
+          <div class="iclbl">Opção A</div>
+          <h4>Sócio investidor</h4>
+          <p>Capital entra para accelerar: FORJA™ automatizado, portal do parceiro, expansão de carteira. Equity proporcional ao que você traz. Mínimo: R$ 100.000.</p>
+        </div>
+        <div class="icard b">
+          <div class="iclbl">Opção B</div>
+          <h4>Parceiro White-Label</h4>
+          <p>Venda Epos para seus clientes com sua marca e sua margem. Operação gerenciada por nós. Você fecha, nós entregamos e operamos.</p>
+        </div>
+      </div>
+
+      <div class="terms rv">
+        <em>"Os termos dependem do que cada um traz para a mesa. Vamos conversar."</em>
+      </div>
+
+      <div class="inv-cta rv">
+        <a href="https://wa.me/5511999999999" class="btn btn-p" target="_blank">
+          Iniciar conversa no WhatsApp
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="mailto:thiago@epos.com.br" class="btn btn-g">Enviar e-mail</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot">
+    <div class="fbrand">EPOS <em>AI</em> SYSTEM</div>
+    <div class="fmeta">Documento confidencial · Thiago Montandon · 2026</div>
+  </div>
+</footer>
+
+<!-- GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+const mm = gsap.matchMedia();
+mm.add({
+  motion: "(prefers-reduced-motion: no-preference)",
+  still: "(prefers-reduced-motion: reduce)"
+}, ctx => {
+  const { motion } = ctx.conditions;
+  const D = motion ? 1 : 0;
+  const SD = motion ? 0.65 : 0;
+
+  /* ── HERO WORD-BY-WORD ── */
+  const hl = document.getElementById('headline');
+  const raw = hl.innerText.trim();
+  hl.innerHTML = '';
+  raw.split(' ').forEach((w, i, arr) => {
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.innerHTML = `<span class="wi">${w}</span>`;
+    hl.appendChild(span);
+    if (i < arr.length - 1) hl.appendChild(document.createTextNode(' '));
+  });
+
+  if (motion) {
+    gsap.from('.wi', { y: '108%', opacity: 0, duration: 1.0, stagger: 0.048, delay: 0.2, ease: 'power3.out' });
+    gsap.from('#hSub',  { y: 18, autoAlpha: 0, duration: 0.85, delay: 1.0, ease: 'power2.out' });
+    gsap.from('#hAct',  { y: 14, autoAlpha: 0, duration: 0.7,  delay: 1.25, ease: 'power2.out' });
+  } else {
+    gsap.set(['.wi','#hSub','#hAct'], { opacity: 1, y: 0 });
+  }
+
+  /* ── GENERIC REVEALS ── */
+  gsap.utils.toArray('.rv').forEach(el => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.7, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* ── SECTION PARAGRAPH STAGGER ── */
+  if (motion) {
+    ['#prob','#analista','#comp','#tech','#val','#invest'].forEach(sel => {
+      const sec = document.querySelector(sel);
+      if (!sec) return;
+      const paras = sec.querySelectorAll('p:not(.cta-strip-copy):not(.cta-anchor-copy)');
+      paras.forEach(p => {
+        if (p.closest('.rv')) return; // already handled by generic reveal
+        gsap.from(p, {
+          y: 16, opacity: 0, duration: 0.65, ease: 'power2.out',
+          scrollTrigger: { trigger: p, start: 'top 90%', toggleActions: 'play none none none' }
+        });
+      });
+    });
+  }
+
+  /* ── FEATURE LIST STAGGER (pricing tiers) ── */
+  ['t0','t1','t2','t3'].forEach(id => {
+    const tier = document.getElementById(id);
+    if (!tier) return;
+    const items = tier.querySelectorAll('.tf');
+    if (!items.length) return;
+    gsap.from(items, {
+      x: -14, opacity: 0, duration: SD || 0.42, stagger: 0.06, ease: 'power2.out',
+      scrollTrigger: { trigger: tier, start: 'top 82%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* ── PROOF COUNTERS ── */
+  document.querySelectorAll('.pnum[data-target]').forEach(el => {
+    const target = +el.dataset.target;
+    const sfx = el.dataset.sfx || '';
+    ScrollTrigger.create({
+      trigger: el, start: 'top 82%', once: true,
+      onEnter: () => {
+        if (!motion) { el.textContent = target + sfx; return; }
+        gsap.to({ v: 0 }, {
+          v: target, duration: 1.9, ease: 'power2.out',
+          onUpdate() { el.textContent = Math.round(this.targets()[0].v) + sfx; }
+        });
+      }
+    });
+  });
+
+  /* ── COMPETITOR ROWS ── */
+  for (let i = 0; i <= 4; i++) {
+    const el = document.getElementById('r' + i);
+    if (!el) continue;
+    gsap.to(el, {
+      opacity: 1, x: 0, duration: SD || 0.48, ease: 'power2.out',
+      delay: i * 0.055,
+      scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' }
+    });
+  }
+
+  /* ── TIER CARDS (top) ── */
+  ['t0','t1'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.6, ease: 'power2.out', delay: i * 0.1,
+      scrollTrigger: { trigger: '#tiersTop', start: 'top 80%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* ── TIER CARDS (bottom) ── */
+  ['t2','t3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.6, ease: 'power2.out', delay: i * 0.1,
+      scrollTrigger: { trigger: '#tiersBot', start: 'top 80%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* ── WL CARDS ── */
+  gsap.utils.toArray('#wlEl .wlcard').forEach((el, i) => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: SD || 0.55, ease: 'power2.out', delay: i * 0.1,
+      scrollTrigger: { trigger: '#wlEl', start: 'top 84%', toggleActions: 'play none none none' }
+    });
+  });
+
+  /* ── CAP BAR ── */
+  ScrollTrigger.create({
+    trigger: '.cap', start: 'top 76%', once: true,
+    onEnter: () => setTimeout(() => {
+      document.getElementById('capBar').style.width = '72%';
+    }, motion ? 250 : 0)
+  });
+
+  /* ── ORB PARALLAX (subtle Raycast feel) ── */
+  if (motion) {
+    gsap.to('.orb-1', { y: -80, ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 2 }
+    });
+    gsap.to('.orb-3', { y: 60, x: -30, ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 3 }
+    });
+  }
+
+  /* ── O ANALISTA LOOP ── */
+  function chatLoop() {
+    const all = ['m1','ty1','m2','m3','m4','m5','ty2','m6','m7'];
+    all.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) gsap.set(el, { opacity: 0, y: 8 });
+    });
+
+    const tl = gsap.timeline({ onComplete: () => setTimeout(chatLoop, 2800) });
+    const at = (t, id, isTyping) => {
+      if (isTyping) {
+        tl.to('#'+id, { opacity: 1, duration: 0.25 }, t)
+          .to('#'+id, { opacity: 0, duration: 0.2 }, t + 0.75);
+      } else {
+        tl.to('#'+id, { opacity: 1, y: 0, duration: SD || 0.38, ease: 'power2.out' }, t);
+      }
+    };
+
+    at(0,    'm1');
+    at(0.9,  'ty1', true);
+    at(1.7,  'm2');
+    at(3.2,  'm3');
+    at(4.0,  'm4');
+    at(5.7,  'm5');
+    at(7.1,  'ty2', true);
+    at(8.1,  'm6');
+    at(9.9,  'm7');
+
+    return tl;
+  }
+
+  ScrollTrigger.create({
+    trigger: '#analista', start: 'top 70%', once: true,
+    onEnter: chatLoop
+  });
+});
+
+/* ── TECH TOGGLE ── */
+function toggleTech() {
+  const btn = document.getElementById('techBtn');
+  const body = document.getElementById('techBd');
+  const inner = body.querySelector('.techinner');
+  const isOpen = btn.classList.contains('open');
+
+  if (isOpen) {
+    gsap.to(body, { height: 0, duration: 0.35, ease: 'power2.inOut' });
+    btn.classList.remove('open');
+  } else {
+    const targetH = (inner?.scrollHeight || 300) + 26;
+    gsap.fromTo(body, { height: 0 }, { height: targetH, duration: 0.4, ease: 'power2.out' });
+    btn.classList.add('open');
+  }
+}
+</script>
+</body>
+</html>
