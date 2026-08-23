@@ -952,7 +952,7 @@ function fmtDate(iso) {
 function canalBadge(l) {
   if (l.canal === 'chatwoot_auditoria') return '<span class="badge b-ct" style="background:rgba(145,70,255,.09);color:var(--purple);border-color:rgba(145,70,255,.2)">👤 Manual</span>';
   if (l.canal === 'cold_outreach_swaas') return '<span class="badge b-ct" style="background:rgba(255,165,0,.09);color:#FFA500;border-color:rgba(255,165,0,.3)">📤 Outreach</span>';
-  if (l.dify_conversation_id || l.dify_ativo || l.typebot_concluido) return '<span class="badge b-ql" style="background:rgba(0,245,160,.09);color:var(--neon);border-color:rgba(0,245,160,.2)">🤖 Ana IA</span>';
+  if (l.dify_conversation_id || l.dify_ativo) return '<span class="badge b-ql" style="background:rgba(0,245,160,.09);color:var(--neon);border-color:rgba(0,245,160,.2)">🤖 Ana IA</span>';
   return '<span class="badge b-ct" style="background:rgba(74,174,255,.09);color:#4AAEFF;border-color:rgba(74,174,255,.2)">📱 WA Direto</span>';
 }
 function statusBadge(l) {
@@ -1110,30 +1110,33 @@ async function loadDashboard() {
   loadMetaAds();
   loadCreativos(currentSortBy);
 
-  // Funil — filtrado pelo período
-  const qFilter    = periodoISO ? `qualificado=eq.true&criado_em=gte.${mesISO}${endClause}` : 'qualificado=eq.true';
-  const respFilter = periodoISO ? `dify_conversation_id=not.is.null&canal=eq.whatsapp&criado_em=gte.${mesISO}${endClause}` : 'dify_conversation_id=not.is.null&canal=eq.whatsapp';
-  const [q, resp, ag, comp, fech] = await Promise.all([
-    sbCount(qFilter),
-    sbCount(respFilter),
-    sbCount(agFilter),
-    sbCount(cmpFilter),
-    sbCount(fchFilter)
-  ]);
+  // Funil 8 etapas — baseado em crm_stage
+  const stageClause = periodoISO ? `&criado_em=gte.${mesISO}${endClause}` : '';
+  const { data: stageRows } = await sb(`${TABLE}?select=crm_stage${stageClause}&descartado=eq.false`);
+  const sC = {};
+  (stageRows || []).forEach(l => { const s = l.crm_stage || 'novo'; sC[s] = (sC[s]||0)+1; });
+  const MAIN = ['novo','em_conversa','qualificado','agendou','compareceu','fechou'];
+  const aob = k => MAIN.slice(MAIN.indexOf(k)).reduce((acc,st) => acc+(sC[st]||0), 0);
+  const fEC = aob('em_conversa'), fQL = aob('qualificado'), fAG = aob('agendou'),
+        fCO = aob('compareceu'), fFE = sC['fechou']||0,
+        fSA = (sC['desqualificado']||0)+(sC['perdido']||0);
   const T = leadsTotal || 1;
+  const pct = n => Math.round(n/T*100);
+  const drop = (a,b) => a>0 ? Math.round((a-b)/a*100) : 0;
   const funil = document.getElementById('funnel-container');
   funil.innerHTML = `
-    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="${leadsTotal>0?'100%':'0%'}"><span class="f-pct">${leadsTotal>0?'100%':'0%'}</span></div></div><div class="f-n">${leadsTotal}</div></div>
-    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((leadsTotal-resp)/T*100)}%</div></div>
-    <div class="f-row"><div class="f-lbl">c/ Ana</div><div class="f-track"><div class="f-fill f1-5" data-w="${Math.round(resp/T*100)}%"><span class="f-pct">${Math.round(resp/T*100)}%</span></div></div><div class="f-n">${resp}</div></div>
-    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((resp-q)/Math.max(resp,1)*100)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Qualificado</div><div class="f-track"><div class="f-fill f2" data-w="${Math.round(q/T*100)}%"><span class="f-pct">${Math.round(q/T*100)}%</span></div></div><div class="f-n">${q}</div></div>
-    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((q-ag)/Math.max(q,1)*100)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Agendou</div><div class="f-track"><div class="f-fill f3" data-w="${Math.round(ag/T*100)}%"><span class="f-pct">${Math.round(ag/T*100)}%</span></div></div><div class="f-n">${ag}</div></div>
-    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((ag-comp)/Math.max(ag,1)*100)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Compareceu</div><div class="f-track"><div class="f-fill f4" data-w="${Math.round(comp/T*100)}%"><span class="f-pct">${Math.round(comp/T*100)}%</span></div></div><div class="f-n">${comp}</div></div>
-    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${Math.round((comp-fech)/Math.max(comp,1)*100)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Fechou</div><div class="f-track"><div class="f-fill f5" data-w="${Math.round(fech/T*100)}%"><span class="f-pct">${Math.round(fech/T*100)}%</span></div></div><div class="f-n">${fech}</div></div>
+    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(leadsTotal,fEC)}%</div></div>
+    <div class="f-row"><div class="f-lbl">Em Conversa</div><div class="f-track"><div class="f-fill f1-5" data-w="${pct(fEC)}%"><span class="f-pct">${pct(fEC)}%</span></div></div><div class="f-n">${fEC}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fEC,fQL)}%</div></div>
+    <div class="f-row"><div class="f-lbl">Qualificado</div><div class="f-track"><div class="f-fill f2" data-w="${pct(fQL)}%"><span class="f-pct">${pct(fQL)}%</span></div></div><div class="f-n">${fQL}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fQL,fAG)}%</div></div>
+    <div class="f-row"><div class="f-lbl">Agendou</div><div class="f-track"><div class="f-fill f3" data-w="${pct(fAG)}%"><span class="f-pct">${pct(fAG)}%</span></div></div><div class="f-n">${fAG}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fAG,fCO)}%</div></div>
+    <div class="f-row"><div class="f-lbl">Compareceu</div><div class="f-track"><div class="f-fill f4" data-w="${pct(fCO)}%"><span class="f-pct">${pct(fCO)}%</span></div></div><div class="f-n">${fCO}</div></div>
+    <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fCO,fFE)}%</div></div>
+    <div class="f-row"><div class="f-lbl">Fechou</div><div class="f-track"><div class="f-fill f5" data-w="${pct(fFE)}%"><span class="f-pct">${pct(fFE)}%</span></div></div><div class="f-n">${fFE}</div></div>
+    ${fSA>0?`<div class="f-gap" style="opacity:.45"><div class="f-gline"></div></div><div class="f-row" style="opacity:.75"><div class="f-lbl" style="color:var(--warn)">Sa&#237;ram</div><div class="f-track"><div class="f-fill" style="background:var(--warn)" data-w="${pct(fSA)}%"><span class="f-pct">${pct(fSA)}%</span></div></div><div class="f-n" style="color:var(--warn)">${fSA}</div></div>`:''}
   `;
   setTimeout(() => {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
@@ -1601,14 +1604,28 @@ function getDBEndFilter() {
   return null;
 }
 
-function setDBPeriod(btn, period, label) {
+const DB_TO_AN_PERIOD = { this_month:'this_month', last_month:'last_month', last_30:'30', last_60:'60', last_90:'90', last_7:'7', all:'all' };
 
+function setDBPeriod(btn, period, label) {
+  window._currentPeriod = period;
   dbPeriod = period;
   document.querySelectorAll('.db-period').forEach(b => {
     b.style.background='transparent'; b.style.borderColor='var(--bd)'; b.style.color='var(--muted)';
   });
   btn.style.background='var(--pur-l)'; btn.style.borderColor='var(--bd-b)'; btn.style.color='var(--purple)';
   document.getElementById('db-period-label').textContent='· '+label;
+  // Sincroniza O Analista silenciosamente (sem loadAnalista — carrega ao navegar)
+  const anEq = DB_TO_AN_PERIOD[period];
+  if (anEq !== undefined) {
+    anPeriodVal = anEq;
+    document.querySelectorAll('.an-period').forEach(b => {
+      const on = b.getAttribute('onclick') || '';
+      const active = on.includes(`'${anEq}'`);
+      b.style.background = active ? 'var(--pur-l)' : 'transparent';
+      b.style.borderColor = active ? 'var(--bd-b)' : 'var(--bd)';
+      b.style.color = active ? 'var(--purple)' : 'var(--muted)';
+    });
+  }
   loadDashboard();
   loadCreativos(currentSortBy);
 }
