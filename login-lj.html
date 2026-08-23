@@ -128,7 +128,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="divider" style="margin-top:8px"><span>ou use a senha</span></div>
       </div>
 
-      <!-- Senha -->
+      <!-- Email + Senha -->
+      <div class="field">
+        <input id="email-input" type="email" placeholder="E-mail de acesso"
+          onkeydown="if(event.key==='Enter')document.getElementById('pwd-input').focus()"
+          autocomplete="email">
+      </div>
       <div class="field">
         <input id="pwd-input" type="password" placeholder="Senha de acesso"
           onkeydown="if(event.key==='Enter')entrar()"
@@ -150,10 +155,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
+<script src="/assets/supabase-js-2.112.3.min.js"></script>
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
 const DASHBOARD_URL = 'dashboard-lucas-josias.html';
-const ADMIN_EMAIL = 'thiagommkt@gmail.com';
 const BIO_KEY = 'lj_bio_credential';
 const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
@@ -161,24 +166,9 @@ const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
 const BIO_RP = { id: location.hostname || 'localhost', name: 'BYD IA' };
 const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'lj_user', displayName: 'Lucas Josias BYD' };
 
-async function sbSignIn(password) {
-  const resp = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
-    method: 'POST',
-    headers: { 'apikey': SB_ANON, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: ADMIN_EMAIL, password })
-  });
-  const data = await resp.json();
-  if (!resp.ok || !data.access_token) throw new Error(data.error_description || data.msg || 'auth_failed');
-  const sess = {
-    access_token: data.access_token,
-    refresh_token: data.refresh_token,
-    expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
-    token_type: 'bearer',
-    user: data.user
-  };
-  localStorage.setItem(SB_SESS_KEY, JSON.stringify(sess));
-  return sess;
-}
+const sb = supabase.createClient(SB_URL, SB_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+});
 
 // Cookie utils (mantidos para BIO_KEY)
 function setCookie(name, value, days) {
@@ -228,30 +218,30 @@ if (credId && bioSupported) {
 
 // ─── SENHA ────────────────────────────────────────────────
 async function entrar() {
+  const email = document.getElementById('email-input').value.trim();
   const pwd = document.getElementById('pwd-input').value;
-  if (!pwd) return;
+  if (!email || !pwd) return;
   const btn = document.querySelector('.btn-enter');
   btn.textContent = 'Verificando...';
   btn.disabled = true;
   try {
-    const sess = await sbSignIn(pwd);
-    if (sess) {
-      showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
-      if (bioSupported && !credId) {
-        bioRegister.classList.add('show');
-        showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
-      } else {
-        if (credId) sessionStorage.setItem('lj_bio_verified', '1');
-        setTimeout(() => location.href = DASHBOARD_URL, 400);
-      }
+    const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+    if (error) throw error;
+    showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
+    if (bioSupported && !credId) {
+      bioRegister.classList.add('show');
+      showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
+    } else {
+      if (credId) sessionStorage.setItem('lj_bio_verified', '1');
+      setTimeout(() => location.href = DASHBOARD_URL, 400);
     }
   } catch (e) {
-    const msg = (e.message && (e.message.includes('auth_failed') || e.message.toLowerCase().includes('invalid')))
-      ? 'Senha incorreta'
+    const msg = (e.message && (e.message.includes('Invalid login') || e.message.toLowerCase().includes('invalid')))
+      ? 'E-mail ou senha incorretos'
       : 'Erro de conexão — tente novamente';
     showMsg('pwd-msg', msg, 'err');
     document.getElementById('pwd-input').value = '';
-    document.getElementById('pwd-input').focus();
+    document.getElementById('email-input').focus();
   } finally {
     btn.textContent = 'Entrar →';
     btn.disabled = false;
@@ -342,7 +332,7 @@ async function registrarBio() {
 
 // ─── FOCUS ────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  if (!credId) document.getElementById('pwd-input')?.focus();
+  if (!credId) document.getElementById('email-input')?.focus();
 });
 
 // Ícone de biometria adaptivo
