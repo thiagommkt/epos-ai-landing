@@ -897,8 +897,7 @@ canvas{display:block;width:100%!important}
   const BIO_KEY = 'fm_bio_credential';
   function sessionValida(val) {
     if (!val) return false;
-    if (val === '41931cd5') return true; // hash legado — aceito durante período de migração
-    try { const s = JSON.parse(atob(val)); return s && s.exp && s.exp > Date.now(); } catch { return false; }
+try { const s = JSON.parse(atob(val)); return s && s.exp && s.exp > Date.now(); } catch { return false; }
   }
   const autenticado = sessionValida(getCookie(AUTH_KEY)) || sessionValida(localStorage.getItem(AUTH_KEY));
   if (!autenticado) {
