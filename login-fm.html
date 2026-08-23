@@ -150,7 +150,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
 const DASHBOARD_URL = 'fm-dashboard.html';
@@ -158,11 +157,28 @@ const ADMIN_EMAIL = 'thiagommkt@gmail.com';
 const BIO_KEY = 'fm_bio_credential';
 const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
 const BIO_RP = { id: location.hostname || 'localhost', name: 'F&M IA' };
 const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Farias & Moura' };
 
-const supabase = window.supabase.createClient(SB_URL, SB_ANON);
-const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
+async function sbSignIn(password) {
+  const resp = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { 'apikey': SB_ANON, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: ADMIN_EMAIL, password })
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data.access_token) throw new Error(data.error_description || data.msg || 'auth_failed');
+  const sess = {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
+    token_type: 'bearer',
+    user: data.user
+  };
+  localStorage.setItem(SB_SESS_KEY, JSON.stringify(sess));
+  return sess;
+}
 
 // Cookie utils (mantidos para BIO_KEY)
 function setCookie(name, value, days) {
@@ -218,14 +234,8 @@ async function entrar() {
   btn.textContent = 'Verificando...';
   btn.disabled = true;
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: pwd });
-    if (error || !data.session) {
-      showMsg('pwd-msg', 'Senha incorreta', 'err');
-      document.getElementById('pwd-input').value = '';
-      document.getElementById('pwd-input').focus();
-      document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
-      setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
-    } else {
+    const sess = await sbSignIn(pwd);
+    if (sess) {
       showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
       if (bioSupported && !credId) {
         bioRegister.classList.add('show');
@@ -236,7 +246,12 @@ async function entrar() {
       }
     }
   } catch (e) {
-    showMsg('pwd-msg', 'Erro de conexão — tente novamente', 'err');
+    const msg = (e.message && (e.message.includes('auth_failed') || e.message.toLowerCase().includes('invalid')))
+      ? 'Senha incorreta'
+      : 'Erro de conexão — tente novamente';
+    showMsg('pwd-msg', msg, 'err');
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
   } finally {
     btn.textContent = 'Entrar →';
     btn.disabled = false;
