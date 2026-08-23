@@ -150,26 +150,24 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const SENHA = 'ljpainel2026';
 const DASHBOARD_URL = 'dashboard-lucas-josias.html';
-const AUTH_KEY = 'lj_auth_v2';
+const ADMIN_EMAIL = 'thiagommkt@gmail.com';
 const BIO_KEY = 'lj_bio_credential';
+const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
 const BIO_RP = { id: location.hostname || 'localhost', name: 'BYD IA' };
-const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Lucas Josias BYD' };
+const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'lj_user', displayName: 'Lucas Josias BYD' };
 
-// ─── UTILS ────────────────────────────────────────────────
-function hashSimples(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i);
-  return Math.abs(h).toString(16);
-}
+const supabase = window.supabase.createClient(SB_URL, SB_ANON);
+const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
 
-// Cookie sem limite — localStorage é apagado em alguns browsers mobile ao fechar
+// Cookie utils (mantidos para BIO_KEY)
 function setCookie(name, value, days) {
   const d = new Date();
-  d.setTime(d.getTime() + (days || 36500) * 24 * 60 * 60 * 1000); // padrão 100 anos
+  d.setTime(d.getTime() + (days || 36500) * 24 * 60 * 60 * 1000);
   document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
 }
 
@@ -178,15 +176,13 @@ function getCookie(name) {
   return match ? decodeURIComponent(match.pop()) : null;
 }
 
-function setAuth() {
-  const hash = hashSimples(SENHA + '_v2');
-  setCookie(AUTH_KEY, hash); // sem limite — usa padrão 100 anos
-  localStorage.setItem(AUTH_KEY, hash); // fallback
-}
-
+// checkAuth lê sessão Supabase do localStorage (síncrono)
 function checkAuth() {
-  const hash = hashSimples(SENHA + '_v2');
-  return getCookie(AUTH_KEY) === hash || localStorage.getItem(AUTH_KEY) === hash;
+  try {
+    const stored = localStorage.getItem(SB_SESS_KEY);
+    const sess = stored ? JSON.parse(stored) : null;
+    return !!(sess && sess.access_token && (sess.expires_at || 0) * 1000 > Date.now());
+  } catch { return false; }
 }
 
 function showMsg(id, text, type = '') {
@@ -215,27 +211,35 @@ if (credId && bioSupported) {
 }
 
 // ─── SENHA ────────────────────────────────────────────────
-function entrar() {
-  const v = document.getElementById('pwd-input').value;
-  if (hashSimples(v) === hashSimples(SENHA)) {
-    setAuth();
-    showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
-    // Mostrar opção de ativar biometria se suportado e não registrado
-    if (bioSupported && !credId) {
-      bioRegister.classList.add('show');
-      showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
+async function entrar() {
+  const pwd = document.getElementById('pwd-input').value;
+  if (!pwd) return;
+  const btn = document.querySelector('.btn-enter');
+  btn.textContent = 'Verificando...';
+  btn.disabled = true;
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: pwd });
+    if (error || !data.session) {
+      showMsg('pwd-msg', 'Senha incorreta', 'err');
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('pwd-input').focus();
+      document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
+      setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
     } else {
-      // Senha é fallback válido quando a biometria já está registrada (ex: Face ID falhou)
-      if (credId) sessionStorage.setItem('lj_bio_verified', '1');
-      setTimeout(() => location.href = DASHBOARD_URL, 400);
+      showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
+      if (bioSupported && !credId) {
+        bioRegister.classList.add('show');
+        showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
+      } else {
+        if (credId) sessionStorage.setItem('lj_bio_verified', '1');
+        setTimeout(() => location.href = DASHBOARD_URL, 400);
+      }
     }
-  } else {
-    showMsg('pwd-msg', 'Senha incorreta', 'err');
-    document.getElementById('pwd-input').value = '';
-    document.getElementById('pwd-input').focus();
-    // Shaky animation
-    document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
-    setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
+  } catch (e) {
+    showMsg('pwd-msg', 'Erro de conexão — tente novamente', 'err');
+  } finally {
+    btn.textContent = 'Entrar →';
+    btn.disabled = false;
   }
 }
 
@@ -261,7 +265,11 @@ async function autenticarBio(silencioso = false) {
     });
 
     if (assertion) {
-      setAuth();
+      if (!checkAuth()) {
+        showMsg('bio-msg', 'Sessão expirada — use a senha abaixo', 'err');
+        btn.classList.remove('scanning');
+        return;
+      }
       sessionStorage.setItem('lj_bio_verified', '1');
       showMsg('bio-msg', '✓ Identidade confirmada', 'ok');
       btn.classList.remove('scanning');

@@ -150,20 +150,24 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
 const DASHBOARD_URL = 'epos-dashboard.html';
-const AUTH_KEY = 'epos_auth_v1';
+const ADMIN_EMAIL = 'thiagommkt@gmail.com';
 const BIO_KEY = 'epos_bio_credential';
-const AUTH_WEBHOOK = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-dashboard-auth';
-const PROXY_TOKEN_PAINEL = 'fm-dash-2026-x9k2';
+const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
 const BIO_RP = { id: location.hostname || 'localhost', name: 'Epos IA' };
 const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'epos_user', displayName: 'Epos Marketing' };
 
-// Cookie sem limite — localStorage é apagado em alguns browsers mobile ao fechar
+const supabase = window.supabase.createClient(SB_URL, SB_ANON);
+const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
+
+// Cookie utils (mantidos para BIO_KEY)
 function setCookie(name, value, days) {
   const d = new Date();
-  d.setTime(d.getTime() + (days || 36500) * 24 * 60 * 60 * 1000); // padrão 100 anos
+  d.setTime(d.getTime() + (days || 36500) * 24 * 60 * 60 * 1000);
   document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
 }
 
@@ -172,15 +176,13 @@ function getCookie(name) {
   return match ? decodeURIComponent(match.pop()) : null;
 }
 
-function setAuth(sessionToken) {
-  setCookie(AUTH_KEY, sessionToken);
-  localStorage.setItem(AUTH_KEY, sessionToken);
-}
-
+// checkAuth lê sessão Supabase do localStorage (síncrono)
 function checkAuth() {
-  const val = getCookie(AUTH_KEY) || localStorage.getItem(AUTH_KEY);
-  if (!val) return false;
-  try { const s = JSON.parse(atob(val)); return s && s.exp && s.exp > Date.now(); } catch { return false; }
+  try {
+    const stored = localStorage.getItem(SB_SESS_KEY);
+    const sess = stored ? JSON.parse(stored) : null;
+    return !!(sess && sess.access_token && (sess.expires_at || 0) * 1000 > Date.now());
+  } catch { return false; }
 }
 
 function showMsg(id, text, type = '') {
@@ -216,14 +218,14 @@ async function entrar() {
   btn.textContent = 'Verificando...';
   btn.disabled = true;
   try {
-    const r = await fetch(AUTH_WEBHOOK, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({action: 'login', password: pwd, token: PROXY_TOKEN_PAINEL, dashboard: 'epos'})
-    });
-    const data = await r.json();
-    if (data.ok && data.session) {
-      setAuth(data.session);
+    const { data, error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: pwd });
+    if (error || !data.session) {
+      showMsg('pwd-msg', 'Senha incorreta', 'err');
+      document.getElementById('pwd-input').value = '';
+      document.getElementById('pwd-input').focus();
+      document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
+      setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
+    } else {
       showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
       if (bioSupported && !credId) {
         bioRegister.classList.add('show');
@@ -232,12 +234,6 @@ async function entrar() {
         if (credId) sessionStorage.setItem('epos_bio_verified', '1');
         setTimeout(() => location.href = DASHBOARD_URL, 400);
       }
-    } else {
-      showMsg('pwd-msg', 'Senha incorreta', 'err');
-      document.getElementById('pwd-input').value = '';
-      document.getElementById('pwd-input').focus();
-      document.getElementById('pwd-input').style.borderColor = 'var(--warn)';
-      setTimeout(() => document.getElementById('pwd-input').style.borderColor = '', 1000);
     }
   } catch (e) {
     showMsg('pwd-msg', 'Erro de conexão — tente novamente', 'err');

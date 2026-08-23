@@ -892,23 +892,21 @@ canvas{display:block;width:100%!important}
 <script>
 // ═══ AUTENTICAÇÃO ═══
 (function() {
-  function getCookie(n) { const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return m?decodeURIComponent(m.pop()):null; }
-  const AUTH_KEY = 'fm_auth_v2';
-  const BIO_KEY = 'fm_bio_credential';
-  function sessionValida(val) {
-    if (!val) return false;
-try { const s = JSON.parse(atob(val)); return s && s.exp && s.exp > Date.now(); } catch { return false; }
-  }
-  const autenticado = sessionValida(getCookie(AUTH_KEY)) || sessionValida(localStorage.getItem(AUTH_KEY));
-  if (!autenticado) {
+  const storedSess = localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token');
+  let sess = null;
+  try { sess = storedSess ? JSON.parse(storedSess) : null; } catch {}
+  if (!sess || !sess.access_token || (sess.expires_at || 0) * 1000 < Date.now()) {
     location.replace('login-fm.html');
     throw new Error('auth_required');
   }
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const bioSupported = isMobile && window.PublicKeyCredential !== undefined;
-  const bioRegistrada = bioSupported && !!(getCookie(BIO_KEY) || localStorage.getItem(BIO_KEY));
-  const bioVerificadaNestaSessao = sessionStorage.getItem('fm_bio_verified') === '1';
-  if (bioRegistrada && !bioVerificadaNestaSessao) {
+  window._ACCESS_TOKEN = sess.access_token;
+  function getCk(n) { const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return m?decodeURIComponent(m.pop()):null; }
+  const BIO_KEY = 'fm_bio_credential';
+  const isMob = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const bioSupp = isMob && window.PublicKeyCredential !== undefined;
+  const bioReg = bioSupp && !!(getCk(BIO_KEY) || localStorage.getItem(BIO_KEY));
+  const bioVerif = sessionStorage.getItem('fm_bio_verified') === '1';
+  if (bioReg && !bioVerif) {
     location.replace('login-fm.html');
     throw new Error('bio_required');
   }
@@ -921,7 +919,7 @@ const TABLE = 'fm_leads';
 
 async function sb(path) {
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Prefer': 'count=exact' }
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Prefer': 'count=exact' }
   });
   const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0');
   const data = await r.json();
@@ -930,7 +928,7 @@ async function sb(path) {
 
 async function sbCount(filter) {
   const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?${filter}&select=id&limit=0`, {
-    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Prefer': 'count=exact' }
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Prefer': 'count=exact' }
   });
   return parseInt(r.headers.get('content-range')?.split('/')[1] || '0');
 }
@@ -1450,7 +1448,7 @@ async function onDrop(e) {
     if (tel) {
       await fetch(`${SB_URL}/rest/v1/fm_leads?telefone=eq.${encodeURIComponent(tel)}`, {
         method: 'PATCH',
-        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ crm_stage: toStage })
       });
     }
@@ -1830,7 +1828,7 @@ async function saveQualification(telefone) {
       method: 'PATCH',
       headers: {
         'apikey': SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`,
+        'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
       },
@@ -1874,7 +1872,7 @@ async function toggleBot(telefone, currentlyDisabled) {
 
     await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
       method: 'PATCH',
-      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(patch)
     });
 
