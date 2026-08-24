@@ -2178,52 +2178,53 @@ async function loadCampeoes() {
 function renderCriativosCards(ads, box, preset, sortBy, sbData) {
   if (!ads || !ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
   const medals = ['🥇','🥈','🥉','4º','5º','6º','7º','8º'];
-  const rows = ads.slice(0, 8).map((ad, i) => {
-    const imgUrl   = ad.picture || ad.thumbnail_url;
-    const spend    = parseFloat(ad.spend || 0);
-    const ctr      = parseFloat(ad.ctr || 0);
-    const clicks   = parseInt(ad.clicks || 0);
-    const adKey    = (ad.ad_name || ad.name || '').trim();
-    const sbAd     = sbData && sbData[adKey] || {};
-    const leads    = sbAd.leads   || 0;
-    const agendou  = sbAd.agendou || 0;
-    const fechou   = sbAd.fechou  || 0;
-    const name     = adKey.substring(0, 40) + (adKey.length > 40 ? '…' : '');
-    const camp     = (ad.campaign_name || '').substring(0, 32) + ((ad.campaign_name||'').length > 32 ? '…' : '');
-    const ctrC     = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
-    const spendS   = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
-    const thumb    = imgUrl
-      ? `<img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06)" loading="lazy" onerror="this.style.display='none'">`
+  const items = ads.slice(0, 8).map((ad, i) => {
+    const imgUrl  = ad.picture || ad.thumbnail_url;
+    const spend   = parseFloat(ad.spend || 0);
+    const ctr     = parseFloat(ad.ctr || 0);
+    const adKey   = (ad.ad_name || ad.name || '').trim();
+    const sbAd    = sbData && sbData[adKey] || {};
+    const leads   = sbAd.leads   || 0;
+    const agendou = sbAd.agendou || 0;
+    const fechou  = sbAd.fechou  || 0;
+    const name    = adKey.substring(0, 45) + (adKey.length > 45 ? '…' : '');
+    const camp    = (ad.campaign_name || '').substring(0, 40) + ((ad.campaign_name||'').length > 40 ? '…' : '');
+    const ctrC    = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
+    const spendS  = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
+    const thumb   = imgUrl
+      ? `<div style="position:relative;width:44px;height:44px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)"><div style="width:100%;height:100%;background:#0d1117;display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div><img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;position:absolute;top:0;left:0" loading="lazy" onerror="this.style.opacity=0"></div>`
       : `<div style="width:44px;height:44px;background:#0d1117;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`;
-    const sbCols = (leads > 0 || agendou > 0)
-      ? `<td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads||'—'}</td>
-         <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${agendou||'—'}</td>
-         <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${fechou||'—'}</td>`
-      : `<td colspan="3" style="padding:10px 8px;text-align:center;font-family:var(--fM);font-size:10px;color:var(--dim)">—</td>`;
-    return `<tr class="criativo-thumb-wrap" style="border-bottom:1px solid rgba(255,255,255,0.04)">
-      <td style="padding:10px 8px;text-align:center;font-size:15px;white-space:nowrap">${medals[i]||`${i+1}º`}</td>
-      <td style="padding:10px 8px"><div style="display:flex;align-items:center;gap:10px">${thumb}
-        <div><div style="font-size:12px;font-weight:600;color:#e6edf3;line-height:1.3">${name}</div>
-        <div style="font-size:10px;color:#8b949e;margin-top:1px">${camp}</div></div></div></td>
-      <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:#e6edf3">${spendS}</td>
-      <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</td>
-      <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;color:#8b949e">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</td>
-      ${sbCols}
-    </tr>`;
+    return { spend, ctr, thumb, name, camp, ctrC, spendS, leads, agendou, fechou, medal: medals[i]||`${i+1}º` };
+  });
+  const maxVal = sortBy === 'ctr'
+    ? Math.max(...items.map(x => x.ctr), 0.001)
+    : Math.max(...items.map(x => x.spend), 0.001);
+  const rows = items.map(it => {
+    const barW = Math.round((sortBy === 'ctr' ? it.ctr : it.spend) / maxVal * 100);
+    const extras = [
+      it.leads   > 0 ? `<span style="color:rgba(145,70,255,0.9);font-weight:700">${it.leads} lead${it.leads>1?'s':''}</span>` : null,
+      it.agendou > 0 ? `<span style="color:#3fb950;font-weight:700">${it.agendou} agendou</span>` : null,
+      it.fechou  > 0 ? `<span style="color:var(--neon);font-weight:700">${it.fechou} fechou</span>` : null,
+    ].filter(Boolean).join('<span style="color:var(--dim)"> · </span>');
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div style="font-size:14px;flex-shrink:0;width:22px;text-align:center;margin-top:2px">${it.medal}</div>
+      ${it.thumb}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:#e6edf3;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</div>
+        <div style="font-size:10px;color:#8b949e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.camp}</div>
+        <div style="margin:6px 0 4px;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${barW}%;background:var(--purple);border-radius:2px"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--fM);font-size:11px;letter-spacing:.02em">
+          <span style="color:var(--warn);font-weight:700">${it.spendS}</span>
+          <span style="color:var(--dim)">·</span>
+          <span style="color:${it.ctrC};font-weight:700">${it.ctr > 0 ? it.ctr.toFixed(1)+'% CTR' : '—'}</span>
+          ${extras ? `<span style="color:var(--dim)">·</span>${extras}` : ''}
+        </div>
+      </div>
+    </div>`;
   }).join('');
-  box.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
-    <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08)">
-      <th style="padding:8px;text-align:center;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">#</th>
-      <th style="padding:8px;text-align:left;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Criativo</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Gasto</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">CTR</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Cliques</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(145,70,255,0.7);letter-spacing:.1em;text-transform:uppercase">Leads</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.6);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Agendou</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.7);letter-spacing:.1em;text-transform:uppercase">Fechou</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>
+  box.innerHTML = `<div>${rows}</div>
   <div style="font-size:9px;color:var(--dim);padding:8px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
 }
 function renderCriativosTable(ads, box, fromCache) { renderCriativosCards(ads, box, 'last_30d', 'spend'); } // legado

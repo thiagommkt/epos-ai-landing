@@ -2522,14 +2522,15 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
     const sbAd    = sbData && sbData[adKey] || {};
     const leads   = sbAd.leads   || 0;
     const agendou = sbAd.agendou || 0;
+    const fechou  = sbAd.fechou  || 0;
     const name    = adKey.substring(0, 45) + (adKey.length > 45 ? '…' : '');
     const camp    = (ad.campaign_name || '').substring(0, 40) + ((ad.campaign_name||'').length > 40 ? '…' : '');
     const ctrC    = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
     const spendS  = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
     const thumb   = imgUrl
-      ? `<img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06)" loading="lazy" onerror="this.style.display='none'">`
+      ? `<div style="position:relative;width:44px;height:44px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)"><div style="width:100%;height:100%;background:#0d1117;display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div><img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;position:absolute;top:0;left:0" loading="lazy" onerror="this.style.opacity=0"></div>`
       : `<div style="width:44px;height:44px;background:#0d1117;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`;
-    return { spend, ctr, thumb, name, camp, ctrC, spendS, leads, agendou, medal: medals[i]||`${i+1}º` };
+    return { spend, ctr, thumb, name, camp, ctrC, spendS, leads, agendou, fechou, medal: medals[i]||`${i+1}º` };
   });
   const maxVal = sortBy === 'ctr'
     ? Math.max(...items.map(x => x.ctr), 0.001)
@@ -2539,6 +2540,7 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
     const extras = [
       it.leads   > 0 ? `<span style="color:rgba(145,70,255,0.9);font-weight:700">${it.leads} lead${it.leads>1?'s':''}</span>` : null,
       it.agendou > 0 ? `<span style="color:#3fb950;font-weight:700">${it.agendou} agendou</span>` : null,
+      it.fechou  > 0 ? `<span style="color:var(--neon);font-weight:700">${it.fechou} fechou</span>` : null,
     ].filter(Boolean).join('<span style="color:var(--dim)"> · </span>');
     return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
       <div style="font-size:14px;flex-shrink:0;width:22px;text-align:center;margin-top:2px">${it.medal}</div>
