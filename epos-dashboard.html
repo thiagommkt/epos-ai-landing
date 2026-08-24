@@ -360,8 +360,19 @@ canvas{display:block;width:100%!important}
 .period-row-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;display:flex;align-items:center;gap:8px;margin-bottom:18px;padding-bottom:4px}
 .period-row-wrap::-webkit-scrollbar{display:none}
 .period-sel-mob{display:none;width:100%;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd-b);color:var(--text);font-family:var(--fM);font-size:12px;letter-spacing:.05em;cursor:pointer;border-radius:3px;margin-bottom:14px;-webkit-appearance:none;appearance:none}
+.prd-drop{position:relative;display:inline-block;margin-bottom:18px}
+.prd-trigger{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--bg2);border:1px solid var(--bd-b);color:var(--text);font-family:var(--fM);font-size:11px;letter-spacing:.05em;cursor:pointer;border-radius:4px;white-space:nowrap;transition:border-color .15s}
+.prd-trigger:hover{border-color:var(--purple)!important}
+.prd-trigger svg{transition:transform .15s;flex-shrink:0}
+.prd-trigger.open svg{transform:rotate(180deg)}
+.prd-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;background:var(--bg2);border:1px solid var(--bd-b);border-radius:4px;overflow:hidden;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.prd-menu.open{display:block}
+.prd-opt{padding:8px 14px;cursor:pointer;font-family:var(--fM);font-size:11px;color:var(--muted);letter-spacing:.04em;transition:background .1s;white-space:nowrap}
+.prd-opt:hover{background:rgba(145,70,255,.08);color:var(--text)}
+.prd-opt.active{background:var(--pur-l);color:var(--purple)}
 @media(max-width:768px){
   .period-row-wrap{display:none!important}
+  .prd-drop{display:none!important}
   .period-sel-mob{display:block!important}
   /* Top Criativos: hide secondary columns, keep # + Criativo + Gasto + CTR */
   .crt-col-sec{display:none!important}
@@ -470,6 +481,7 @@ canvas{display:block;width:100%!important}
 
   <!-- Seletor de período do Dashboard -->
   <select class="period-sel-mob" id="db-period-sel" onchange="setDBPeriodSel(this)">
+    <option value="this_week">Esta semana</option>
     <option value="this_month">Este mês</option>
     <option value="last_month">Mês passado</option>
     <option value="last_30" selected>Últimos 30 dias</option>
@@ -479,17 +491,22 @@ canvas{display:block;width:100%!important}
     <option value="last_7">Últimos 7 dias</option>
     <option value="all">Todo o histórico</option>
   </select>
-  <div class="period-row-wrap">
-    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
-    <button class="db-period" onclick="setDBPeriod(this,'this_month','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este mês</button>
-    <button class="db-period" onclick="setDBPeriod(this,'last_month','Mês passado')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Mês passado</button>
-    <button class="db-period active" onclick="setDBPeriod(this,'last_30','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">30 dias</button>
-    <button class="db-period" onclick="setDBPeriod(this,'last_60','Últimos 60 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">60 dias</button>
-    <button class="db-period" onclick="setDBPeriod(this,'last_90','Últimos 90 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">90 dias</button>
-    <button class="db-period" onclick="setDBPeriod(this,'last_14','Últimos 14 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">14 dias</button>
-    <button class="db-period" onclick="setDBPeriod(this,'last_7','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">7 dias</button>
-    <button class="db-period" onclick="setDBPeriod(this,'all','Todo o histórico')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Tudo</button>
-    <span id="db-period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);flex-shrink:0">· Este mês</span>
+  <div class="prd-drop">
+    <button class="prd-trigger" id="db-prd-trigger" onclick="togglePrdMenu('db-prd-trigger','db-prd-menu')">
+      <span id="db-period-label">30 dias</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="prd-menu" id="db-prd-menu">
+      <div class="prd-opt" onclick="dbPrdPick('this_week','Esta semana')">Esta semana</div>
+      <div class="prd-opt" onclick="dbPrdPick('this_month','Este mês')">Este mês</div>
+      <div class="prd-opt" onclick="dbPrdPick('last_month','Mês passado')">Mês passado</div>
+      <div class="prd-opt active" onclick="dbPrdPick('last_30','30 dias')">30 dias</div>
+      <div class="prd-opt" onclick="dbPrdPick('last_60','60 dias')">60 dias</div>
+      <div class="prd-opt" onclick="dbPrdPick('last_90','90 dias')">90 dias</div>
+      <div class="prd-opt" onclick="dbPrdPick('last_14','14 dias')">14 dias</div>
+      <div class="prd-opt" onclick="dbPrdPick('last_7','7 dias')">7 dias</div>
+      <div class="prd-opt" onclick="dbPrdPick('all','Todo o histórico')">Tudo</div>
+    </div>
   </div>
 
   <!-- ── FRAME BROWSER (estilo LP) ── -->
@@ -666,13 +683,19 @@ canvas{display:block;width:100%!important}
       <option value="14">14d</option>
       <option value="7">7d</option>
     </select>
-    <div class="period-row-wrap" style="gap:6px">
-      <button class="crm-period-btn active" onclick="setCrmPeriod(this,'all')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Tudo</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'month')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Este m&ecirc;s</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'60')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">60d</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'30')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">30d</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'14')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">14d</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'7')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">7d</button>
+    <div class="prd-drop">
+      <button class="prd-trigger" id="crm-prd-trigger" onclick="togglePrdMenu('crm-prd-trigger','crm-prd-menu')">
+        <span id="crm-period-label">Tudo</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="prd-menu" id="crm-prd-menu">
+        <div class="prd-opt active" onclick="crmPrdPick('all','Tudo')">Tudo</div>
+        <div class="prd-opt" onclick="crmPrdPick('month','Este mês')">Este mês</div>
+        <div class="prd-opt" onclick="crmPrdPick('60','60 dias')">60 dias</div>
+        <div class="prd-opt" onclick="crmPrdPick('30','30 dias')">30 dias</div>
+        <div class="prd-opt" onclick="crmPrdPick('14','14 dias')">14 dias</div>
+        <div class="prd-opt" onclick="crmPrdPick('7','7 dias')">7 dias</div>
+      </div>
     </div>
   </div>
   <div class="rule"></div>
@@ -768,15 +791,19 @@ canvas{display:block;width:100%!important}
     <option value="thisyear">Este ano</option>
     <option value="">Todos os dados</option>
   </select>
-  <div class="period-row-wrap" style="margin-bottom:16px">
-    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-right:4px;flex-shrink:0">Período:</span>
-    <button class="period-btn active" onclick="setPeriod(this,'past7days','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">7 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'past30days','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">30 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'thismonth','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este mês</button>
-    <button class="period-btn" onclick="setPeriod(this,'past90days','Últimos 90 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">90 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'thisyear','Este ano')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este ano</button>
-    <button class="period-btn" onclick="setPeriod(this,'','Todos os dados')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Tudo</button>
-    <span id="period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);margin-left:8px;letter-spacing:.06em;flex-shrink:0">· Últimos 7 dias</span>
+  <div class="prd-drop" style="margin-bottom:16px">
+    <button class="prd-trigger" id="an-prd-trigger" onclick="togglePrdMenu('an-prd-trigger','an-prd-menu')">
+      <span id="period-label">7 dias</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="prd-menu" id="an-prd-menu">
+      <div class="prd-opt active" onclick="anPrdPick('past7days','7 dias')">7 dias</div>
+      <div class="prd-opt" onclick="anPrdPick('past30days','30 dias')">30 dias</div>
+      <div class="prd-opt" onclick="anPrdPick('thismonth','Este mês')">Este mês</div>
+      <div class="prd-opt" onclick="anPrdPick('past90days','90 dias')">90 dias</div>
+      <div class="prd-opt" onclick="anPrdPick('thisyear','Este ano')">Este ano</div>
+      <div class="prd-opt" onclick="anPrdPick('','Todos os dados')">Tudo</div>
+    </div>
   </div>
 
   <!-- Tabs análises -->
@@ -940,16 +967,22 @@ canvas{display:block;width:100%!important}
     <option value="7">Últimos 7 dias</option>
     <option value="15">Últimos 15 dias</option>
   </select>
-  <div class="period-row-wrap" style="margin-bottom:14px">
-    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
-    <button class="an-period active" onclick="setAnPeriod(this,'all')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">Tudo</button>
-    <button class="an-period" onclick="setAnPeriod(this,'this_month')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">Este mês</button>
-    <button class="an-period" onclick="setAnPeriod(this,'last_month')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">Mês passado</button>
-    <button class="an-period" onclick="setAnPeriod(this,'30')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">30 dias</button>
-    <button class="an-period" onclick="setAnPeriod(this,'60')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">60 dias</button>
-    <button class="an-period" onclick="setAnPeriod(this,'90')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">90 dias</button>
-    <button class="an-period" onclick="setAnPeriod(this,'7')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">7 dias</button>
-    <button class="an-period" onclick="setAnPeriod(this,'15')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">15 dias</button>
+  <div class="prd-drop" style="margin-bottom:14px">
+    <button class="prd-trigger" id="anal-prd-trigger" onclick="togglePrdMenu('anal-prd-trigger','anal-prd-menu')">
+      <span id="anal-period-label">Tudo</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="prd-menu" id="anal-prd-menu">
+      <div class="prd-opt active" onclick="analPrdPick('all','Tudo')">Tudo</div>
+      <div class="prd-opt" onclick="analPrdPick('this_week','Esta semana')">Esta semana</div>
+      <div class="prd-opt" onclick="analPrdPick('this_month','Este mês')">Este mês</div>
+      <div class="prd-opt" onclick="analPrdPick('last_month','Mês passado')">Mês passado</div>
+      <div class="prd-opt" onclick="analPrdPick('30','30 dias')">30 dias</div>
+      <div class="prd-opt" onclick="analPrdPick('60','60 dias')">60 dias</div>
+      <div class="prd-opt" onclick="analPrdPick('90','90 dias')">90 dias</div>
+      <div class="prd-opt" onclick="analPrdPick('7','7 dias')">7 dias</div>
+      <div class="prd-opt" onclick="analPrdPick('15','15 dias')">15 dias</div>
+    </div>
   </div>
 
   <div class="kpi-row" style="margin-bottom:14px">
@@ -1111,7 +1144,7 @@ async function loadDashboard() {
   ]);
 
   // Label dinâmico do período
-  const periodoLabels = { this_month:'este mês', last_month:'mês passado', last_30:'30d', last_60:'60d', last_90:'90d', last_14:'14d', last_7:'7d', all:'histórico' };
+  const periodoLabels = { this_week:'esta semana', this_month:'este mês', last_month:'mês passado', last_30:'30d', last_60:'60d', last_90:'90d', last_14:'14d', last_7:'7d', all:'histórico' };
   const pLabel = periodoLabels[dbPeriod] || '30d';
   const kpiLeadsEl = document.querySelector('.kpi-lbl');
   if (kpiLeadsEl) kpiLeadsEl.textContent = `Leads (${pLabel})`;
@@ -1729,6 +1762,13 @@ let dbPeriod = 'last_30';
 function getDBDateFilter() {
   const brt = new Date(Date.now() - 3*60*60*1000);
   const daysMap = { last_7: 7, last_14: 14, last_30: 30, last_60: 60, last_90: 90 };
+  if (dbPeriod === 'this_week') {
+    const brt = new Date(Date.now() - 3*60*60*1000);
+    const dow = brt.getUTCDay(); // 0=Dom
+    const daysFromMon = dow === 0 ? 6 : dow - 1;
+    const mon = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - daysFromMon) + 3*60*60*1000);
+    return encodeURIComponent(mon.toISOString());
+  }
   if (daysMap[dbPeriod]) return encodeURIComponent(new Date(Date.now() - daysMap[dbPeriod]*24*60*60*1000).toISOString());
   if (dbPeriod === 'this_month') {
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000);
@@ -1750,7 +1790,7 @@ function getDBEndFilter() {
   return null;
 }
 
-const DB_TO_AN_PERIOD = { this_month:'this_month', last_month:'last_month', last_30:'30', last_60:'60', last_90:'90', last_7:'7', all:'all' };
+const DB_TO_AN_PERIOD = { this_week:'7', this_month:'this_month', last_month:'last_month', last_30:'30', last_60:'60', last_90:'90', last_7:'7', all:'all' };
 
 function setDBPeriod(btn, period, label) {
   window._currentPeriod = period;
@@ -1778,7 +1818,7 @@ function setDBPeriod(btn, period, label) {
 
 // ═══ MOBILE SELECT HELPERS ═══
 function setDBPeriodSel(sel) {
-  const labelMap = {this_month:'Este mês',last_month:'Mês passado',last_30:'Últimos 30 dias',last_60:'Últimos 60 dias',last_90:'Últimos 90 dias',last_14:'Últimos 14 dias',last_7:'Últimos 7 dias',all:'Todo o histórico'};
+  const labelMap = {this_week:'Esta semana',this_month:'Este mês',last_month:'Mês passado',last_30:'Últimos 30 dias',last_60:'Últimos 60 dias',last_90:'Últimos 90 dias',last_14:'Últimos 14 dias',last_7:'Últimos 7 dias',all:'Todo o histórico'};
   const fakeBtn = {style:{},getAttribute:()=>''};
   setDBPeriod(fakeBtn, sel.value, labelMap[sel.value]||sel.value);
 }
@@ -1795,6 +1835,58 @@ function setCrmPeriodSel(sel) {
   const fakeBtn = {style:{},classList:{add:()=>{},remove:()=>{}}};
   setCrmPeriod(fakeBtn, sel.value);
 }
+
+// ═══ DROPDOWN PERÍODO ═══
+function togglePrdMenu(triggerId, menuId) {
+  const menu = document.getElementById(menuId);
+  const trigger = document.getElementById(triggerId);
+  const isOpen = menu.classList.contains('open');
+  closeAllPrdMenus();
+  if (!isOpen) { menu.classList.add('open'); trigger.classList.add('open'); }
+}
+function closeAllPrdMenus() {
+  document.querySelectorAll('.prd-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.prd-trigger').forEach(t => t.classList.remove('open'));
+}
+function dbPrdPick(period, label) {
+  const opt = event.currentTarget;
+  closeAllPrdMenus();
+  document.querySelectorAll('#db-prd-menu .prd-opt').forEach(o => o.classList.remove('active'));
+  opt.classList.add('active');
+  const fakeBtn = {style:{}, getAttribute:()=>''};
+  setDBPeriod(fakeBtn, period, label);
+  const el = document.getElementById('db-period-label'); if (el) el.textContent = label;
+}
+function anPrdPick(period, label) {
+  const opt = event.currentTarget;
+  closeAllPrdMenus();
+  document.querySelectorAll('#an-prd-menu .prd-opt').forEach(o => o.classList.remove('active'));
+  opt.classList.add('active');
+  const fakeBtn = {style:{}, classList:{add:()=>{},remove:()=>{}}};
+  setPeriod(fakeBtn, period, label);
+  const el = document.getElementById('period-label'); if (el) el.textContent = label;
+}
+function analPrdPick(period, label) {
+  const opt = event.currentTarget;
+  closeAllPrdMenus();
+  document.querySelectorAll('#anal-prd-menu .prd-opt').forEach(o => o.classList.remove('active'));
+  opt.classList.add('active');
+  const fakeBtn = {style:{}, getAttribute:()=>''};
+  setAnPeriod(fakeBtn, period);
+  const el = document.getElementById('anal-period-label'); if (el) el.textContent = label;
+}
+function crmPrdPick(period, label) {
+  const opt = event.currentTarget;
+  closeAllPrdMenus();
+  document.querySelectorAll('#crm-prd-menu .prd-opt').forEach(o => o.classList.remove('active'));
+  opt.classList.add('active');
+  const fakeBtn = {style:{}, classList:{add:()=>{},remove:()=>{}}};
+  setCrmPeriod(fakeBtn, period);
+  const el = document.getElementById('crm-period-label'); if (el) el.textContent = label;
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.prd-drop')) closeAllPrdMenus();
+});
 
 // ═══ PAINEL DE LEAD ═══
 function openLeadPanel(lead) {
@@ -2163,9 +2255,9 @@ async function loadMetaAds() {
   const box = document.getElementById('meta-ads-content');
   if (!box) return;
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_month: 'last_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
+  const presetMap = { this_week: 'last_7d', this_month: 'this_month', last_month: 'last_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
-  const labelMap = { this_month: 'este mês', last_month: 'mês passado', last_90: 'últimos 90 dias', last_60: 'últimos 60 dias', last_30: 'últimos 30 dias', last_14: 'últimos 14 dias', last_7: 'últimos 7 dias', all: 'todo o histórico' };
+  const labelMap = { this_week: 'esta semana', this_month: 'este mês', last_month: 'mês passado', last_90: 'últimos 90 dias', last_60: 'últimos 60 dias', last_30: 'últimos 30 dias', last_14: 'últimos 14 dias', last_7: 'últimos 7 dias', all: 'todo o histórico' };
   const periodLabel = document.getElementById('meta-period-label');
   if (periodLabel) periodLabel.textContent = labelMap[dbPeriod] || 'últimos 30 dias';
   try {
@@ -2243,7 +2335,7 @@ async function loadCampeoes() {
   const box = document.getElementById('campeoes-content');
   if (!box) return;
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
+  const presetMap = { this_week: 'last_7d', this_month: 'this_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
   try {
     // 1. Buscar dados de anúncios na Meta API
@@ -2402,7 +2494,7 @@ async function loadCreativos(sortBy) {
   document.getElementById('sort-ctr').style.borderColor = sortBy === 'ctr' ? 'var(--bd-b)' : 'var(--bd)';
   const box = document.getElementById('criativos-content');
   box.innerHTML = '<div class="loading"></div>';
-  const presetMap = { this_month: 'this_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
+  const presetMap = { this_week: 'last_7d', this_month: 'this_month', last_90: 'last_90d', last_60: 'last_60d', last_30: 'last_30d', last_14: 'last_14d', last_7: 'last_7d', all: 'maximum' };
   const preset = presetMap[dbPeriod] || 'last_30d';
   try {
     const [rMeta, rLeads, rAgend, rFech] = await Promise.all([
