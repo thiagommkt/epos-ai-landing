@@ -2727,7 +2727,8 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
       if (fmtd === '—') return null;
       const color = c.colDyn ? c.col(rawVal) : c.col;
       const lbl = COL_SHORT[c.id] || c.label;
-      return `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:2px 6px"><span style="font-size:9px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:500">${lbl}</span><span style="color:${color};font-weight:700;font-size:11px">${fmtd}</span></span>`;
+      const fmtdDisplay = fmtd.replace(/^(\d[\d.,]*)(\s+\S.*)$/, '$1');
+      return `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:4px;padding:2px 6px"><span style="font-size:9px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:500">${lbl}</span><span style="color:${color};font-weight:700;font-size:11px">${fmtdDisplay}</span></span>`;
     }).filter(Boolean);
     const colsHtml = colSpans.join('');
     return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
