@@ -359,7 +359,7 @@ canvas{display:block;width:100%!important}
 /* ── MOBILE UX: period selectors ── */
 .period-row-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;display:flex;align-items:center;gap:8px;margin-bottom:18px;padding-bottom:4px}
 .period-row-wrap::-webkit-scrollbar{display:none}
-.period-sel-mob{display:none;width:100%;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd-b);color:var(--text);font-family:var(--fM);font-size:12px;letter-spacing:.05em;cursor:pointer;border-radius:3px;margin-bottom:14px;-webkit-appearance:none;appearance:none}
+.period-sel-mob{display:none;width:100%;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd-b);color:var(--text);font-family:var(--fM);font-size:12px;letter-spacing:.05em;cursor:pointer;border-radius:3px;margin-bottom:14px}
 .prd-drop{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;align-self:flex-start;width:auto}
 .prd-btn-wrap{position:relative;display:inline-block}
 .prd-lbl{font-family:var(--fM);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;flex-shrink:0}
@@ -375,10 +375,12 @@ canvas{display:block;width:100%!important}
 .prd-opt:hover{background:rgba(145,70,255,.08);color:var(--text)}
 .prd-opt.active{background:var(--pur-l);color:var(--purple);font-weight:600}
 .prd-opt.active::after{content:'✓';font-size:10px;opacity:.9}
-@media(max-width:768px){
+@media(max-width:520px){
   .period-row-wrap{display:none!important}
   .prd-drop{display:none!important}
   .period-sel-mob{display:block!important}
+}
+@media(max-width:768px){
   /* Top Criativos: hide secondary columns, keep # + Criativo + Gasto + CTR */
   .crt-col-sec{display:none!important}
   /* card-ttl with sort buttons: stack on mobile */
