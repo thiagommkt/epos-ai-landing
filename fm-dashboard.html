@@ -2231,7 +2231,7 @@ async function loadCampeoes() {
 }
 
 // ═══ SELETOR DE COLUNAS ═══
-const COL_SHORT = {spend:'Gasto',impressions:'Impressões',reach:'Alcance',freq:'Freq.',clicks:'Cliques',unique_clicks:'Únicos',ctr:'CTR',cpc:'CPC',ctwa:'Conv. WA',onsite_lead:'Lead Form',offsite_lead:'Leads Pixel',roas:'ROAS',roi:'ROI',purchase_value:'Receita',video_3s:'Views 3s',video_p25:'25%',video_p50:'50%',video_p75:'75%',video_p100:'100%',video_thruplay:'Thruplay',utmLeads:'Leads',agendou:'Agend.',fechou:'Fechou'};
+const COL_SHORT = {spend:'Gasto',impressions:'Impressões',reach:'Alcance',freq:'Frequência',clicks:'Cliques',unique_clicks:'Únicos',ctr:'CTR',cpc:'CPC',ctwa:'Conv. WhatsApp',onsite_lead:'Lead Form',offsite_lead:'Leads Pixel',roas:'ROAS',roi:'ROI',purchase_value:'Receita',video_3s:'Views 3s',video_p25:'Views 25%',video_p50:'Views 50%',video_p75:'Views 75%',video_p100:'Views 100%',video_thruplay:'Thruplay',utmLeads:'Leads',agendou:'Agendou',fechou:'Fechou'};
 const COLUNAS_DEF = [
   {id:'spend',        label:'Investimento',           cat:'Entrega',     fmt:v=>v>0?`R$${parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})}`:'—', col:'var(--warn)'},
   {id:'impressions',  label:'Impressões',             cat:'Entrega',     fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
