@@ -436,6 +436,7 @@ canvas{display:block;width:100%!important}
   <div class="sb-footer">
     <div class="sb-c-name">Epos Marketing</div>
     <div class="sb-live"><div class="live-dot"></div>LIVE · Sistema ativo</div>
+    <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .15s" onmouseover="this.style.borderColor='var(--dim)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
   </div>
 </aside>
 <main>
@@ -1254,7 +1255,7 @@ async function loadDashboard() {
 async function loadPendentes() {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?select=id,nome,telefone,criado_em&fechou_pendente=eq.true&descartado=eq.false&order=criado_em.desc`, {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
     });
     const data = await r.json();
     const lista = Array.isArray(data) ? data : [];
@@ -1667,7 +1668,7 @@ async function updateCRMStage(crm_person_id, newStage, telefone) {
   if (!telefone) return;
   const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
     method: 'PATCH',
-    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
     body: JSON.stringify({ crm_stage: newStage })
   });
   if (!r.ok) throw new Error('Erro Supabase: ' + r.status);
@@ -1894,7 +1895,7 @@ async function marcarCompareceu(telefone) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
       method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
       body: JSON.stringify({ compareceu: true })
     });
     if (!r.ok) throw new Error('Erro ' + r.status);
@@ -2197,7 +2198,7 @@ async function loadCampeoes() {
 
     // 2. Buscar contagem de leads por utm_content no Supabase
     const rLeads = await fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
     });
     const leadRows = await rLeads.json();
     const leadsByAd = {};
@@ -2338,9 +2339,9 @@ async function loadCreativos(sortBy) {
   try {
     const [rMeta, rLeads, rAgend, rFech] = await Promise.all([
       fetch(ACOES_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token: PROXY_TOKEN, action: 'meta_ads_creatives', date_preset: preset, sort_by: currentSortBy }) }),
-      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY } }),
-      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null&agendou=eq.true`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY } }),
-      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null&fechou=eq.true`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+SB_KEY } })
+      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY) } }),
+      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null&agendou=eq.true`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY) } }),
+      fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null&fechou=eq.true`, { headers:{ apikey: SB_KEY, Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY) } })
     ]);
     const d = await rMeta.json();
     if (!d.success || !d.ads || d.ads.length === 0) { box.innerHTML = '<div class="empty">Sem dados de criativos para este período</div>'; return; }
@@ -2561,7 +2562,7 @@ async function loadStatus() {
   let bancoDetail = 'offline';
   try {
     const sbCheck = await fetch(SB_URL + '/rest/v1/leads?select=id&limit=1', {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
     });
     bancoOk = sbCheck.ok;
     bancoDetail = sbCheck.ok ? 'online' : 'erro ' + sbCheck.status;
@@ -2789,7 +2790,7 @@ function renderRoboStatus(ativo) {
 async function loadRoboStatus() {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.principal&select=robo_ativo&limit=1`, {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
     });
     const data = await r.json();
     const ativo = Array.isArray(data) && data[0] ? data[0].robo_ativo : true;
@@ -2813,7 +2814,7 @@ async function toggleRobo() {
   try {
     const resp = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.principal`, {
       method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
       body: JSON.stringify({ robo_ativo: novo, atualizado_em: new Date().toISOString() })
     });
     if (!resp.ok) { throw new Error(`HTTP ${resp.status} — verifique permissões do Supabase`); }
@@ -2855,6 +2856,15 @@ window.addEventListener('resize', () => {
     // Redraw chart on resize
   }
 });
+
+async function doLogout() {
+  try {
+    const client = window.supabase.createClient(SB_URL, SB_KEY, { auth: { autoRefreshToken: false, detectSessionInUrl: false } });
+    await client.auth.signOut({ scope: 'local' });
+  } catch(e) {}
+  localStorage.removeItem('sb-phszzzwqkujmmfregtsj-auth-token');
+  location.replace('login-epos.html');
+}
 </script>
 </body>
 </html>
