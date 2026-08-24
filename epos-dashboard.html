@@ -356,6 +356,18 @@ canvas{display:block;width:100%!important}
   .meta-ads-grid{grid-template-columns:1fr 1fr!important}
   .meta-ads-grid > div > div:last-child{font-size:22px!important}
 }
+/* ── MOBILE UX: period selectors ── */
+.period-row-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;display:flex;align-items:center;gap:8px;margin-bottom:18px;padding-bottom:4px}
+.period-row-wrap::-webkit-scrollbar{display:none}
+.period-sel-mob{display:none;width:100%;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd-b);color:var(--text);font-family:var(--fM);font-size:12px;letter-spacing:.05em;cursor:pointer;border-radius:3px;margin-bottom:14px;-webkit-appearance:none;appearance:none}
+@media(max-width:768px){
+  .period-row-wrap{display:none!important}
+  .period-sel-mob{display:block!important}
+  /* Top Criativos: hide secondary columns, keep # + Criativo + Gasto + CTR */
+  .crt-col-sec{display:none!important}
+  /* card-ttl with sort buttons: stack on mobile */
+  .crt-card-ttl{flex-direction:column;align-items:flex-start!important}
+}
 </style>
 </head>
 <body>
@@ -457,7 +469,17 @@ canvas{display:block;width:100%!important}
   <div class="rule"></div>
 
   <!-- Seletor de período do Dashboard -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:4px">
+  <select class="period-sel-mob" id="db-period-sel" onchange="setDBPeriodSel(this)">
+    <option value="this_month">Este mês</option>
+    <option value="last_month">Mês passado</option>
+    <option value="last_30" selected>Últimos 30 dias</option>
+    <option value="last_60">Últimos 60 dias</option>
+    <option value="last_90">Últimos 90 dias</option>
+    <option value="last_14">Últimos 14 dias</option>
+    <option value="last_7">Últimos 7 dias</option>
+    <option value="all">Todo o histórico</option>
+  </select>
+  <div class="period-row-wrap">
     <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
     <button class="db-period" onclick="setDBPeriod(this,'this_month','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este mês</button>
     <button class="db-period" onclick="setDBPeriod(this,'last_month','Mês passado')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Mês passado</button>
@@ -636,13 +658,21 @@ canvas{display:block;width:100%!important}
 <section class="section" id="s-crm">
   <div class="sec-head">
     <div><div class="sec-title">PIPELINE <span>CRM</span></div><div class="sec-sub" id="crm-count">Carregando...</div></div>
-    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-      <button class="crm-period-btn active" onclick="setCrmPeriod(this,'all')" style="padding:4px 10px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Tudo</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'month')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Este m&ecirc;s</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'60')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">60d</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'30')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">30d</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'14')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">14d</button>
-      <button class="crm-period-btn" onclick="setCrmPeriod(this,'7')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">7d</button>
+    <select class="period-sel-mob" id="crm-period-sel" onchange="setCrmPeriodSel(this)">
+      <option value="all" selected>Tudo</option>
+      <option value="month">Este mês</option>
+      <option value="60">60d</option>
+      <option value="30">30d</option>
+      <option value="14">14d</option>
+      <option value="7">7d</option>
+    </select>
+    <div class="period-row-wrap" style="gap:6px">
+      <button class="crm-period-btn active" onclick="setCrmPeriod(this,'all')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Tudo</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'month')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Este m&ecirc;s</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'60')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">60d</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'30')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">30d</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'14')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">14d</button>
+      <button class="crm-period-btn" onclick="setCrmPeriod(this,'7')" style="flex-shrink:0;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">7d</button>
     </div>
   </div>
   <div class="rule"></div>
@@ -730,15 +760,23 @@ canvas{display:block;width:100%!important}
   </div>
 
   <!-- Seletor de período -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:4px">
-    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-right:4px">Período:</span>
-    <button class="period-btn active" onclick="setPeriod(this,'past7days','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">7 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'past30days','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">30 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'thismonth','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Este mês</button>
-    <button class="period-btn" onclick="setPeriod(this,'past90days','Últimos 90 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">90 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'thisyear','Este ano')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Este ano</button>
-    <button class="period-btn" onclick="setPeriod(this,'','Todos os dados')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Tudo</button>
-    <span id="period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);margin-left:8px;letter-spacing:.06em">· Últimos 7 dias</span>
+  <select class="period-sel-mob" id="an-period-sel" onchange="setPeriodSel(this)">
+    <option value="past7days" selected>Últimos 7 dias</option>
+    <option value="past30days">Últimos 30 dias</option>
+    <option value="thismonth">Este mês</option>
+    <option value="past90days">Últimos 90 dias</option>
+    <option value="thisyear">Este ano</option>
+    <option value="">Todos os dados</option>
+  </select>
+  <div class="period-row-wrap" style="margin-bottom:16px">
+    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-right:4px;flex-shrink:0">Período:</span>
+    <button class="period-btn active" onclick="setPeriod(this,'past7days','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">7 dias</button>
+    <button class="period-btn" onclick="setPeriod(this,'past30days','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">30 dias</button>
+    <button class="period-btn" onclick="setPeriod(this,'thismonth','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este mês</button>
+    <button class="period-btn" onclick="setPeriod(this,'past90days','Últimos 90 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">90 dias</button>
+    <button class="period-btn" onclick="setPeriod(this,'thisyear','Este ano')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Este ano</button>
+    <button class="period-btn" onclick="setPeriod(this,'','Todos os dados')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s;flex-shrink:0">Tudo</button>
+    <span id="period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);margin-left:8px;letter-spacing:.06em;flex-shrink:0">· Últimos 7 dias</span>
   </div>
 
   <!-- Tabs análises -->
@@ -892,7 +930,17 @@ canvas{display:block;width:100%!important}
   <div class="rule"></div>
 
   <!-- Seletor de período -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:4px">
+  <select class="period-sel-mob" id="analista-period-sel" onchange="setAnPeriodSel(this)">
+    <option value="all" selected>Todo o histórico</option>
+    <option value="this_month">Este mês</option>
+    <option value="last_month">Mês passado</option>
+    <option value="30">Últimos 30 dias</option>
+    <option value="60">Últimos 60 dias</option>
+    <option value="90">Últimos 90 dias</option>
+    <option value="7">Últimos 7 dias</option>
+    <option value="15">Últimos 15 dias</option>
+  </select>
+  <div class="period-row-wrap" style="margin-bottom:14px">
     <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
     <button class="an-period active" onclick="setAnPeriod(this,'all')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">Tudo</button>
     <button class="an-period" onclick="setAnPeriod(this,'this_month')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;flex-shrink:0">Este mês</button>
@@ -1728,6 +1776,26 @@ function setDBPeriod(btn, period, label) {
   loadCreativos(currentSortBy);
 }
 
+// ═══ MOBILE SELECT HELPERS ═══
+function setDBPeriodSel(sel) {
+  const labelMap = {this_month:'Este mês',last_month:'Mês passado',last_30:'Últimos 30 dias',last_60:'Últimos 60 dias',last_90:'Últimos 90 dias',last_14:'Últimos 14 dias',last_7:'Últimos 7 dias',all:'Todo o histórico'};
+  const fakeBtn = {style:{},getAttribute:()=>''};
+  setDBPeriod(fakeBtn, sel.value, labelMap[sel.value]||sel.value);
+}
+function setPeriodSel(sel) {
+  const labelMap = {past7days:'Últimos 7 dias',past30days:'Últimos 30 dias',thismonth:'Este mês',past90days:'Últimos 90 dias',thisyear:'Este ano','':'Todos os dados'};
+  const fakeBtn = {style:{},classList:{add:()=>{},remove:()=>{}}};
+  setPeriod(fakeBtn, sel.value, labelMap[sel.value]||sel.value);
+}
+function setAnPeriodSel(sel) {
+  const fakeBtn = {style:{},getAttribute:()=>''};
+  setAnPeriod(fakeBtn, sel.value);
+}
+function setCrmPeriodSel(sel) {
+  const fakeBtn = {style:{},classList:{add:()=>{},remove:()=>{}}};
+  setCrmPeriod(fakeBtn, sel.value);
+}
+
 // ═══ PAINEL DE LEAD ═══
 function openLeadPanel(lead) {
   const tel = (lead.telefone||'').replace(/^55/,'');
@@ -2290,11 +2358,6 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
     const thumb    = imgUrl
       ? `<img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06)" loading="lazy" onerror="this.style.display='none'">`
       : `<div style="width:44px;height:44px;background:#0d1117;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`;
-    const sbCols = (leads > 0 || agendou > 0)
-      ? `<td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads||'—'}</td>
-         <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${agendou||'—'}</td>
-         <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${fechou||'—'}</td>`
-      : `<td colspan="3" style="padding:10px 8px;text-align:center;font-family:var(--fM);font-size:10px;color:var(--dim)">—</td>`;
     return `<tr class="criativo-thumb-wrap" style="border-bottom:1px solid rgba(255,255,255,0.04)">
       <td style="padding:10px 8px;text-align:center;font-size:15px;white-space:nowrap">${medals[i]||`${i+1}º`}</td>
       <td style="padding:10px 8px"><div style="display:flex;align-items:center;gap:10px">${thumb}
@@ -2302,8 +2365,12 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
         <div style="font-size:10px;color:#8b949e;margin-top:1px">${camp}</div></div></div></td>
       <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:#e6edf3">${spendS}</td>
       <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</td>
-      <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;color:#8b949e">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</td>
-      ${sbCols}
+      <td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;color:#8b949e">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</td>
+      ${(leads > 0 || agendou > 0)
+        ? `<td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads||'—'}</td>
+           <td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${agendou||'—'}</td>
+           <td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${fechou||'—'}</td>`
+        : `<td colspan="3" class="crt-col-sec" style="padding:10px 8px;text-align:center;font-family:var(--fM);font-size:10px;color:var(--dim)">—</td>`}
     </tr>`;
   }).join('');
   box.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
@@ -2312,10 +2379,10 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
       <th style="padding:8px;text-align:left;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Criativo</th>
       <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Gasto</th>
       <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">CTR</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Cliques</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(145,70,255,0.7);letter-spacing:.1em;text-transform:uppercase">Leads</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.6);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Agendou</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.7);letter-spacing:.1em;text-transform:uppercase">Fechou</th>
+      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Cliques</th>
+      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(145,70,255,0.7);letter-spacing:.1em;text-transform:uppercase">Leads</th>
+      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.6);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Agendou</th>
+      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.7);letter-spacing:.1em;text-transform:uppercase">Fechou</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>
