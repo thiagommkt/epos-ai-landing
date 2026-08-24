@@ -88,6 +88,23 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .card{background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:18px;transition:border-color .2s,box-shadow .2s;border-radius:10px}
 .card:hover{border-color:rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .card-ttl{font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.col-btn{padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer;transition:all .15s}
+.col-btn:hover,.col-btn.active{background:var(--pur-l);border-color:var(--bd-b);color:var(--purple)}
+.col-panel-wrap{position:relative}
+.col-panel{display:none;position:absolute;right:0;top:calc(100% + 6px);width:300px;background:#161b22;border:1px solid var(--bd);box-shadow:0 8px 32px rgba(0,0,0,.7);z-index:300;padding:12px}
+.col-panel.open{display:block}
+.col-cat-hdr{font-family:var(--fM);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:10px 0 5px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.col-cat-hdr:first-child{margin-top:0}
+.col-check-row{display:flex;align-items:center;gap:7px;padding:2px 0;cursor:pointer;user-select:none}
+.col-check-row input[type=checkbox]{accent-color:var(--purple);cursor:pointer;flex-shrink:0}
+.col-check-row span{font-size:11px;color:var(--muted);cursor:pointer}
+.col-check-row:hover span{color:var(--text)}
+.col-presets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}
+.col-preset-chip{padding:3px 8px;border:1px solid var(--bd);font-family:var(--fM);font-size:9px;letter-spacing:.04em;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s}
+.col-preset-chip:hover,.col-preset-chip.active{background:var(--pur-l);border-color:var(--bd-b);color:var(--purple)}
+.col-panel-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px;border-top:1px solid var(--bd);padding-top:10px}
+.col-save-btn{font-size:9px;color:var(--purple);cursor:pointer;font-family:var(--fM);letter-spacing:.04em;background:none;border:none;padding:0}
+.col-apply-btn{padding:5px 14px;background:var(--purple);border:none;color:#fff;font-family:var(--fM);font-size:10px;letter-spacing:.04em;cursor:pointer}
 
 /* ── FUNNEL ── */
 .funnel{display:flex;flex-direction:column;gap:6px}
@@ -401,6 +418,28 @@ canvas{display:block;width:100%!important}
   </div>
 </div>
 
+<!-- Modal confirmação de contrato com valor -->
+<div class="lead-panel-overlay" id="contrato-overlay" onclick="fecharModalContrato()">
+  <div class="lead-panel" style="max-width:420px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title">Confirmar Contrato</div>
+      <button class="panel-close" onclick="fecharModalContrato()">✕</button>
+    </div>
+    <div class="panel-body" style="padding:20px 24px 24px">
+      <div id="contrato-nome-display" style="font-family:var(--fD);font-size:14px;font-weight:600;color:var(--text);margin-bottom:18px"></div>
+      <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Valor do contrato (R$)</label>
+      <input id="contrato-valor-input" type="number" min="0" step="0.01" placeholder="Ex: 5000.00"
+        style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:14px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5">Usado para calcular ROAS e ROI por anúncio. Pode deixar em branco — dados de conversão ainda serão enviados ao Meta CAPI.</div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onclick="fecharModalContrato()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">Cancelar</button>
+        <button onclick="executarConfirmacaoContrato()" style="flex:2;padding:10px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='rgba(0,245,160,.18)'" onmouseout="this.style.background='rgba(0,245,160,.08)'">✅ Confirmar contrato</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 <div class="mobile-header">
   <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -615,9 +654,25 @@ canvas{display:block;width:100%!important}
   <div class="card" style="margin-top:0">
     <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       Top Criativos — Desempenho por Anúncio
-      <div style="display:flex;gap:6px">
+      <div style="display:flex;gap:6px;align-items:center">
         <button id="sort-spend" onclick="loadCreativos('spend')" style="padding:4px 10px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Maior Gasto</button>
         <button id="sort-ctr" onclick="loadCreativos('ctr')" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Maior CTR</button>
+        <div class="col-panel-wrap">
+          <button class="col-btn" id="col-toggle-btn" onclick="toggleColPanel()">Colunas ▾</button>
+          <div class="col-panel" id="col-panel">
+            <div class="col-cat-hdr" style="margin-top:0">Presets</div>
+            <div class="col-presets" id="col-presets-builtin"></div>
+            <div id="col-user-presets-section" style="display:none">
+              <div class="col-cat-hdr">Meus Presets</div>
+              <div class="col-presets" id="col-presets-user"></div>
+            </div>
+            <div id="col-checkboxes"></div>
+            <div class="col-panel-footer">
+              <button class="col-save-btn" onclick="salvarPresetCols()">+ Salvar como preset</button>
+              <button class="col-apply-btn" onclick="aplicarColunas()">Aplicar</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="criativos-content"><div class="loading"></div></div>
@@ -1097,6 +1152,7 @@ async function sb(path) {
     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Prefer': 'count=exact' }
   });
   const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0');
+  if (!r.ok) return { data: [], count: 0 };
   const data = await r.json();
   return { data, count };
 }
@@ -1410,15 +1466,36 @@ async function loadPendentes() {
   } catch(e) {}
 }
 
-async function confirmarContrato(telefone, nome) {
-  if (!confirm('Confirmar contrato de ' + (nome || telefone) + '?\n\nIsso irá:\n• Marcar como contrato fechado\n• Disparar evento Purchase no Meta CAPI')) return;
+var _contratoTelefone = '';
+var _contratoNome = '';
+
+function confirmarContrato(telefone, nome) {
+  _contratoTelefone = telefone;
+  _contratoNome = nome;
+  document.getElementById('contrato-nome-display').textContent = nome || telefone;
+  document.getElementById('contrato-valor-input').value = '';
+  document.getElementById('contrato-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { try { document.getElementById('contrato-valor-input').focus(); } catch(e){} }, 150);
+}
+
+function fecharModalContrato() {
+  document.getElementById('contrato-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+async function executarConfirmacaoContrato() {
+  const telefone = _contratoTelefone;
+  const nome = _contratoNome;
+  const valorRaw = parseFloat(document.getElementById('contrato-valor-input').value) || 0;
+  fecharModalContrato();
   try {
     const r = await fetch(ACOES_URL, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: PROXY_TOKEN, action: 'confirmar_contrato', telefone })
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'confirmar_contrato', telefone, valor_estimado: valorRaw })
     });
     const d = await r.json();
-    if (d.success) { closeLeadPanel(); loadPendentes(); loadDashboard(); if (initialized && initialized.dados) loadLeads(); toast('Contrato confirmado · CAPI Purchase disparado', 'ok'); }
+    if (d.success) { closeLeadPanel(); loadPendentes(); loadDashboard(); if (initialized && initialized.dados) loadLeads(); toast('Contrato confirmado · CAPI Purchase disparado' + (valorRaw > 0 ? ' · R$' + valorRaw.toLocaleString('pt-BR') : ''), 'ok'); }
     else alert('Erro: ' + (d.error || 'Falha ao confirmar'));
   } catch(e) { alert('Erro de rede: ' + e.message); }
 }
@@ -2442,7 +2519,7 @@ async function loadCampeoes() {
     const rLeads = await fetch(`${SB_URL}/rest/v1/${TABLE}?select=utm_content&utm_content=not.is.null`, {
       headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
     });
-    const leadRows = await rLeads.json();
+    const leadRows = rLeads.ok ? await rLeads.json() : [];
     const leadsByAd = {};
     (Array.isArray(leadRows) ? leadRows : []).forEach(r => {
       const k = (r.utm_content || '').trim();
@@ -2510,41 +2587,147 @@ async function loadCampeoes() {
   }
 }
 
+// ═══ SELETOR DE COLUNAS ═══
+const COLUNAS_DEF = [
+  {id:'spend',        label:'Investimento',           cat:'Entrega',     fmt:v=>v>0?`R$${parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})}`:'—', col:'var(--warn)'},
+  {id:'impressions',  label:'Impressões',             cat:'Entrega',     fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'reach',        label:'Alcance',                cat:'Entrega',     fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'frequency',    label:'Frequência',             cat:'Entrega',     fmt:v=>v>0?parseFloat(v).toFixed(2)+'x':'—',                 col:'var(--muted)'},
+  {id:'cpm',          label:'CPM',                    cat:'Entrega',     fmt:v=>v>0?`R$${parseFloat(v).toFixed(2)}`:'—',              col:'var(--muted)'},
+  {id:'clicks',       label:'Cliques totais',         cat:'Cliques',     fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'unique_clicks',label:'Cliques únicos',         cat:'Cliques',     fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'ctr',          label:'CTR',                    cat:'Cliques',     fmt:v=>v>0?parseFloat(v).toFixed(2)+'%':'—',                 col:v=>parseFloat(v)>2?'#3fb950':parseFloat(v)>1?'rgba(145,70,255,.9)':'#8b949e', colDyn:true},
+  {id:'cpc',          label:'CPC',                    cat:'Cliques',     fmt:v=>v>0?`R$${parseFloat(v).toFixed(2)}`:'—',              col:'var(--muted)'},
+  {id:'ctwa',         label:'Conv. WhatsApp (CTWA)',  cat:'Conversão',   fmt:v=>v>0?`${v} conv. iniciada${v>1?'s':''}`:'—',          col:'rgba(145,70,255,.9)'},
+  {id:'lead_form',    label:'Leads (Lead Form)',       cat:'Conversão',   fmt:v=>v>0?`${v} lead${v>1?'s':''} form`:'—',              col:'#58a6ff'},
+  {id:'offsite_lead', label:'Leads (Pixel/Offsite)',   cat:'Conversão',   fmt:v=>v>0?`${v} lead${v>1?'s':''} offsite`:'—',           col:'#58a6ff'},
+  {id:'roas',         label:'ROAS',                   cat:'Conversão',   fmt:v=>v>0?`${parseFloat(v).toFixed(2)}×`:'—',         col:'#3fb950'},
+  {id:'roi',          label:'ROI (%)',                cat:'Conversão',   fmt:v=>v!=null&&v!==''?`${v}%`:'—',                         col:v=>v>=0?'#3fb950':'#f85149', colDyn:true},
+  {id:'purchase_value',label:'Receita (CAPI)',        cat:'Conversão',   fmt:v=>v>0?`R$${parseFloat(v).toLocaleString('pt-BR',{maximumFractionDigits:0})}`:'—', col:'#3fb950'},
+  {id:'video_3s',     label:'Views 3s',               cat:'Vídeo',       fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'video_plays',  label:'Reproduções',            cat:'Vídeo',       fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'video_p25',    label:'Views 25%',              cat:'Vídeo',       fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'video_p75',    label:'Views 75%',              cat:'Vídeo',       fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'video_p100',   label:'Views 100%',             cat:'Vídeo',       fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'video_thruplay',label:'ThruPlay',              cat:'Vídeo',       fmt:v=>v>0?parseInt(v).toLocaleString('pt-BR'):'—',          col:'var(--muted)'},
+  {id:'utmLeads',     label:'Leads confirmados (UTM)',cat:'First-party', fmt:v=>v>0?`${v} lead${v>1?'s':''} confirmado${v>1?'s':''}`:'—', col:'#58a6ff'},
+  {id:'agendou',      label:'Agendamentos',           cat:'First-party', fmt:v=>v>0?`${v} agendou`:'—',                               col:'#3fb950'},
+  {id:'fechou',       label:'Fechamentos',            cat:'First-party', fmt:v=>v>0?`${v} fechou`:'—',                                col:'var(--neon)'},
+];
+const COL_BUILTIN_PRESETS = [
+  {id:'desempenho', label:'Desempenho', cols:['spend','impressions','clicks','ctr','cpc','reach','frequency']},
+  {id:'video',      label:'Vídeo',      cols:['spend','impressions','video_3s','video_p75','video_p100','video_thruplay']},
+  {id:'conversao',  label:'Conversão',  cols:['spend','ctwa','lead_form','offsite_lead','roas','roi','purchase_value']},
+  {id:'funil',      label:'Funil',      cols:['spend','clicks','ctwa','lead_form','utmLeads','agendou','fechou']},
+];
+const COL_DEFAULT = ['spend','ctr','ctwa','lead_form','video_3s','utmLeads','agendou','fechou'];
+const COL_STORAGE_KEY = 'criativos_cols';
+const COL_USER_PRESETS_KEY = 'criativos_user_presets';
+
+function getSelectedCols() {
+  try { const s = localStorage.getItem(COL_STORAGE_KEY); return s ? JSON.parse(s) : COL_DEFAULT; } catch(e) { return COL_DEFAULT; }
+}
+function setSelectedCols(cols) { try { localStorage.setItem(COL_STORAGE_KEY, JSON.stringify(cols)); } catch(e) {} }
+function getUserPresets() { try { return JSON.parse(localStorage.getItem(COL_USER_PRESETS_KEY) || '[]'); } catch(e) { return []; } }
+function saveUserPresets(p) { try { localStorage.setItem(COL_USER_PRESETS_KEY, JSON.stringify(p)); } catch(e) {} }
+
+function renderColPanel() {
+  const sel = getSelectedCols();
+  const bEl = document.getElementById('col-presets-builtin');
+  if (bEl) bEl.innerHTML = COL_BUILTIN_PRESETS.map(p =>
+    `<button class="col-preset-chip" onclick="applyColPreset(${JSON.stringify(p.cols)})">${p.label}</button>`
+  ).join('');
+  const ups = getUserPresets();
+  const uSec = document.getElementById('col-user-presets-section');
+  const uEl = document.getElementById('col-presets-user');
+  if (uSec && uEl) {
+    uSec.style.display = ups.length ? '' : 'none';
+    uEl.innerHTML = ups.map((p,i) =>
+      `<button class="col-preset-chip" onclick="applyColPreset(${JSON.stringify(p.cols)})">${p.label} <span onclick="event.stopPropagation();deleteColPreset(${i})" style="opacity:.5;margin-left:2px">✕</span></button>`
+    ).join('');
+  }
+  const cats = [...new Set(COLUNAS_DEF.map(c => c.cat))];
+  const cbEl = document.getElementById('col-checkboxes');
+  if (cbEl) cbEl.innerHTML = cats.map(cat => {
+    const cols = COLUNAS_DEF.filter(c => c.cat === cat);
+    return `<div class="col-cat-hdr">${cat}</div>` +
+      cols.map(c => `<label class="col-check-row"><input type="checkbox" data-col="${c.id}" ${sel.includes(c.id)?'checked':''}><span>${c.label}</span></label>`).join('');
+  }).join('');
+}
+
+function toggleColPanel() {
+  const panel = document.getElementById('col-panel');
+  const btn = document.getElementById('col-toggle-btn');
+  const isOpen = panel.classList.toggle('open');
+  if (btn) btn.classList.toggle('active', isOpen);
+  if (isOpen) { renderColPanel(); setTimeout(() => document.addEventListener('click', _colOutside, {once:true}), 30); }
+}
+function _colOutside(e) {
+  const wrap = document.querySelector('.col-panel-wrap');
+  if (wrap && wrap.contains(e.target)) { document.addEventListener('click', _colOutside, {once:true}); return; }
+  const panel = document.getElementById('col-panel');
+  if (panel) panel.classList.remove('open');
+  const btn = document.getElementById('col-toggle-btn');
+  if (btn) btn.classList.remove('active');
+}
+function applyColPreset(cols) {
+  setSelectedCols(cols);
+  renderColPanel();
+  _refreshCreativos();
+}
+function aplicarColunas() {
+  const checked = [...document.querySelectorAll('#col-checkboxes input[type=checkbox]:checked')].map(cb => cb.dataset.col);
+  if (!checked.length) { alert('Selecione ao menos uma coluna.'); return; }
+  setSelectedCols(checked);
+  document.getElementById('col-panel').classList.remove('open');
+  document.getElementById('col-toggle-btn').classList.remove('active');
+  _refreshCreativos();
+}
+function salvarPresetCols() {
+  const checked = [...document.querySelectorAll('#col-checkboxes input[type=checkbox]:checked')].map(cb => cb.dataset.col);
+  if (!checked.length) { alert('Selecione ao menos uma coluna.'); return; }
+  const name = prompt('Nome do preset:'); if (!name) return;
+  const ups = getUserPresets(); ups.push({label:name, cols:checked}); saveUserPresets(ups); renderColPanel();
+}
+function deleteColPreset(i) { const ups = getUserPresets(); ups.splice(i,1); saveUserPresets(ups); renderColPanel(); }
+function _refreshCreativos() {
+  if (window._lastCreativosData) {
+    const {ads, preset, sortBy, sbData} = window._lastCreativosData;
+    renderCriativosCards(ads, document.getElementById('criativos-content'), preset, sortBy, sbData);
+  }
+}
+
 // ═══ HELPER — renderiza criativos em lista compacta ═══
 function renderCriativosCards(ads, box, preset, sortBy, sbData) {
+  window._lastCreativosData = {ads, preset, sortBy, sbData};
   if (!ads || !ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
   const medals = ['🥇','🥈','🥉','4º','5º','6º','7º','8º'];
+  const selCols = getSelectedCols().map(id => COLUNAS_DEF.find(c => c.id === id)).filter(Boolean);
   const items = ads.slice(0, 8).map((ad, i) => {
-    const imgUrl  = ad.picture || ad.thumbnail_url;
-    const spend   = parseFloat(ad.spend || 0);
-    const ctr     = parseFloat(ad.ctr || 0);
-    const adKey   = (ad.ad_name || ad.name || '').trim();
-    const adId    = String(ad.ad_id || ad.id || '');
-    const sbAd      = sbData && (sbData[adId] || sbData[adKey]) || {};
-    const metaLeads = ad.meta_leads || 0;
-    const utmLeads  = sbAd.leads   || 0;
-    const agendou   = sbAd.agendou || 0;
-    const fechou    = sbAd.fechou  || 0;
-    const name    = adKey.substring(0, 45) + (adKey.length > 45 ? '…' : '');
-    const camp    = (ad.campaign_name || '').substring(0, 40) + ((ad.campaign_name||'').length > 40 ? '…' : '');
-    const ctrC    = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
-    const spendS  = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
-    const thumb   = imgUrl
+    const imgUrl = ad.picture || ad.thumbnail_url;
+    const spend = parseFloat(ad.spend || 0);
+    const ctr = parseFloat(ad.ctr || 0);
+    const adKey = (ad.ad_name || ad.name || '').trim();
+    const adId = String(ad.ad_id || ad.id || '');
+    const sbAd = sbData && (sbData[adId] || sbData[adKey]) || {};
+    const name = adKey.substring(0, 45) + (adKey.length > 45 ? '…' : '');
+    const camp = (ad.campaign_name || '').substring(0, 40) + ((ad.campaign_name||'').length > 40 ? '…' : '');
+    const thumb = imgUrl
       ? `<div style="position:relative;width:44px;height:44px;flex-shrink:0;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)"><div style="width:100%;height:100%;background:#0d1117;display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div><img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;position:absolute;top:0;left:0" loading="lazy" onerror="this.style.opacity=0"></div>`
       : `<div style="width:44px;height:44px;background:#0d1117;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`;
-    return { spend, ctr, thumb, name, camp, ctrC, spendS, metaLeads, utmLeads, agendou, fechou, medal: medals[i]||`${i+1}º` };
+    return {ad, spend, ctr, sbAd, name, camp, thumb, barBase: sortBy==='ctr'?ctr:spend, medal: medals[i]||`${i+1}º`};
   });
-  const maxVal = sortBy === 'ctr'
-    ? Math.max(...items.map(x => x.ctr), 0.001)
-    : Math.max(...items.map(x => x.spend), 0.001);
+  const maxVal = Math.max(...items.map(x => x.barBase), 0.001);
   const rows = items.map(it => {
-    const barW = Math.round((sortBy === 'ctr' ? it.ctr : it.spend) / maxVal * 100);
-    const extras = [
-      it.metaLeads > 0 ? `<span style="color:rgba(145,70,255,0.9);font-weight:700">${it.metaLeads} conv</span>` : null,
-      it.utmLeads  > 0 ? `<span style="color:#58a6ff;font-weight:700">${it.utmLeads} lead UTM</span>` : null,
-      it.agendou   > 0 ? `<span style="color:#3fb950;font-weight:700">${it.agendou} agendou</span>` : null,
-      it.fechou    > 0 ? `<span style="color:var(--neon);font-weight:700">${it.fechou} fechou</span>` : null,
-    ].filter(Boolean).join('<span style="color:var(--dim)"> · </span>');
+    const barW = Math.round(it.barBase / maxVal * 100);
+    const colSpans = selCols.map(c => {
+      const rawVal = c.id==='utmLeads'?it.sbAd.leads||0 : c.id==='agendou'?it.sbAd.agendou||0 : c.id==='fechou'?it.sbAd.fechou||0 : it.ad[c.id];
+      const fmtd = c.fmt(rawVal);
+      if (fmtd === '—') return null;
+      const color = c.colDyn ? c.col(rawVal) : c.col;
+      return `<span style="color:${color};font-weight:700">${fmtd}</span>`;
+    }).filter(Boolean);
+    const colsHtml = colSpans.join('<span style="color:var(--dim)"> · </span>');
     return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
       <div style="font-size:14px;flex-shrink:0;width:22px;text-align:center;margin-top:2px">${it.medal}</div>
       ${it.thumb}
@@ -2555,16 +2738,13 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
           <div style="height:100%;width:${barW}%;background:var(--purple);border-radius:2px"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--fM);font-size:11px;letter-spacing:.02em">
-          <span style="color:var(--warn);font-weight:700">${it.spendS}</span>
-          <span style="color:var(--dim)">·</span>
-          <span style="color:${it.ctrC};font-weight:700">${it.ctr > 0 ? it.ctr.toFixed(1)+'% CTR' : '—'}</span>
-          ${extras ? `<span style="color:var(--dim)">·</span>${extras}` : ''}
+          ${colsHtml||'<span style="color:var(--dim);font-size:10px">—</span>'}
         </div>
       </div>
     </div>`;
   }).join('');
   box.innerHTML = `<div>${rows}</div>
-  <div style="font-size:9px;color:var(--dim);padding:8px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
+  <div style="font-size:9px;color:var(--dim);padding:8px 0 0;text-align:right">ordenado por ${sortBy==='ctr'?'CTR':'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
 }
 function renderCriativosTable(ads, box, fromCache) { renderCriativosCards(ads, box, 'last_30d', 'spend'); } // legado
 
@@ -2594,9 +2774,10 @@ async function loadCreativos(sortBy) {
     // Construir mapa de leads/agendamentos/fechamentos por utm_content
     const sbData = {};
     const addTo = (rows, field) => (Array.isArray(rows)?rows:[]).forEach(r => { const k=(r.utm_content||'').trim(); if(k){ if(!sbData[k]) sbData[k]={}; sbData[k][field]=(sbData[k][field]||0)+1; } });
-    [await rLeads.json(), null].slice(0,1).forEach(r => addTo(r,'leads'));
-    addTo(await rAgend.json(), 'agendou');
-    addTo(await rFech.json(), 'fechou');
+    const safeJson = r => r.ok ? r.json() : Promise.resolve([]);
+    [await safeJson(rLeads), null].slice(0,1).forEach(r => addTo(r,'leads'));
+    addTo(await safeJson(rAgend), 'agendou');
+    addTo(await safeJson(rFech), 'fechou');
     try { localStorage.setItem('epos_criativos_cache_b', JSON.stringify({ads: d.ads, ts: Date.now()})); } catch(ec) {}
     renderCriativosCards(d.ads, box, preset, sortBy, sbData);
   } catch(e) {
