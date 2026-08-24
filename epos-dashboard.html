@@ -653,6 +653,26 @@ canvas{display:block;width:100%!important}
     <button onclick="exportCSV()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--neon)';this.style.color='var(--neon)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↓ Exportar CSV</button>
   </div>
   <div class="rule"></div>
+  <div class="prd-drop" style="margin-bottom:14px">
+    <span class="prd-lbl">Período</span>
+    <div class="prd-btn-wrap">
+      <button class="prd-trigger" id="leads-prd-trigger" onclick="togglePrdMenu('leads-prd-trigger','leads-prd-menu')">
+        <svg class="prd-ico" width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span id="leads-period-label">30 dias</span>
+        <svg class="prd-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="prd-menu" id="leads-prd-menu">
+        <div class="prd-opt" onclick="leadsPrdPick('this_week','Esta semana')">Esta semana</div>
+        <div class="prd-opt" onclick="leadsPrdPick('this_month','Este mês')">Este mês</div>
+        <div class="prd-opt" onclick="leadsPrdPick('last_month','Mês passado')">Mês passado</div>
+        <div class="prd-opt active" onclick="leadsPrdPick('last_30','30 dias')">30 dias</div>
+        <div class="prd-opt" onclick="leadsPrdPick('last_60','60 dias')">60 dias</div>
+        <div class="prd-opt" onclick="leadsPrdPick('last_90','90 dias')">90 dias</div>
+        <div class="prd-opt" onclick="leadsPrdPick('last_7','7 dias')">7 dias</div>
+        <div class="prd-opt" onclick="leadsPrdPick('all','Todo o histórico')">Tudo</div>
+      </div>
+    </div>
+  </div>
   <div style="margin-bottom:10px">
     <input type="text" id="leads-search" placeholder="🔍  Buscar por nome ou telefone..." oninput="searchLeads(this.value)"
       style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px;outline:none;transition:border-color .2s"
@@ -1415,10 +1435,48 @@ async function rejeitarContrato(telefone) {
 }
 
 // ═══ LEADS TABLE ═══
+let leadsPeriod = 'last_30';
+function getLeadsDateFilter(period) {
+  if (!period || period === 'all') return null;
+  const now = new Date();
+  if (period === 'this_week') {
+    const brt = new Date(Date.now() - 3*60*60*1000);
+    const dow = brt.getUTCDay(); const dfm = dow === 0 ? 6 : dow - 1;
+    return { gte: new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() - dfm) + 3*60*60*1000).toISOString() };
+  }
+  if (period === 'this_month') {
+    const d = new Date(now.getFullYear(), now.getMonth(), 1); return { gte: d.toISOString() };
+  }
+  if (period === 'last_month') {
+    return { gte: new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString(), lt: new Date(now.getFullYear(), now.getMonth(), 1).toISOString() };
+  }
+  const daysMap = { last_7:7, last_14:14, last_30:30, last_60:60, last_90:90 };
+  if (daysMap[period]) {
+    const d = new Date(); d.setDate(d.getDate() - daysMap[period]); d.setHours(0,0,0,0);
+    return { gte: d.toISOString() };
+  }
+  return null;
+}
+function leadsPrdPick(period, label) {
+  const opt = event.currentTarget;
+  closeAllPrdMenus();
+  document.querySelectorAll('#leads-prd-menu .prd-opt').forEach(o => o.classList.remove('active'));
+  opt.classList.add('active');
+  leadsPeriod = period;
+  const el = document.getElementById('leads-period-label'); if (el) el.textContent = label;
+  loadLeads();
+}
 async function loadLeads() {
-  const { data, count } = await sb(`${TABLE}?select=*&order=criado_em.desc&limit=100`);
+  let url = `${TABLE}?select=*&order=criado_em.desc`;
+  const df = getLeadsDateFilter(leadsPeriod);
+  if (df) {
+    url += `&criado_em=gte.${encodeURIComponent(df.gte)}`;
+    if (df.lt) url += `&criado_em=lt.${encodeURIComponent(df.lt)}`;
+  }
+  url += `&limit=300`;
+  const { data } = await sb(url);
   allLeads = data || [];
-  document.getElementById('dados-count').textContent = `${count || allLeads.length} REGISTROS`;
+  document.getElementById('dados-count').textContent = `${allLeads.length} REGISTROS`;
   renderLeads();
 }
 
@@ -2456,51 +2514,51 @@ async function loadCampeoes() {
 function renderCriativosCards(ads, box, preset, sortBy, sbData) {
   if (!ads || !ads.length) { box.innerHTML = '<div class="empty">Sem dados de criativos disponíveis</div>'; return; }
   const medals = ['🥇','🥈','🥉','4º','5º','6º','7º','8º'];
-  const rows = ads.slice(0, 8).map((ad, i) => {
-    const imgUrl   = ad.picture || ad.thumbnail_url;
-    const spend    = parseFloat(ad.spend || 0);
-    const ctr      = parseFloat(ad.ctr || 0);
-    const clicks   = parseInt(ad.clicks || 0);
-    const adKey    = (ad.ad_name || ad.name || '').trim();
-    const sbAd     = sbData && sbData[adKey] || {};
-    const leads    = sbAd.leads   || 0;
-    const agendou  = sbAd.agendou || 0;
-    const fechou   = sbAd.fechou  || 0;
-    const name     = adKey.substring(0, 40) + (adKey.length > 40 ? '…' : '');
-    const camp     = (ad.campaign_name || '').substring(0, 32) + ((ad.campaign_name||'').length > 32 ? '…' : '');
-    const ctrC     = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
-    const spendS   = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
-    const thumb    = imgUrl
+  const items = ads.slice(0, 8).map((ad, i) => {
+    const imgUrl  = ad.picture || ad.thumbnail_url;
+    const spend   = parseFloat(ad.spend || 0);
+    const ctr     = parseFloat(ad.ctr || 0);
+    const adKey   = (ad.ad_name || ad.name || '').trim();
+    const sbAd    = sbData && sbData[adKey] || {};
+    const leads   = sbAd.leads   || 0;
+    const agendou = sbAd.agendou || 0;
+    const name    = adKey.substring(0, 45) + (adKey.length > 45 ? '…' : '');
+    const camp    = (ad.campaign_name || '').substring(0, 40) + ((ad.campaign_name||'').length > 40 ? '…' : '');
+    const ctrC    = ctr > 2 ? '#3fb950' : ctr > 1 ? 'rgba(145,70,255,0.9)' : '#8b949e';
+    const spendS  = spend > 0 ? `R$${spend.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
+    const thumb   = imgUrl
       ? `<img src="${imgUrl}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06)" loading="lazy" onerror="this.style.display='none'">`
       : `<div style="width:44px;height:44px;background:#0d1117;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div>`;
-    return `<tr class="criativo-thumb-wrap" style="border-bottom:1px solid rgba(255,255,255,0.04)">
-      <td style="padding:10px 8px;text-align:center;font-size:15px;white-space:nowrap">${medals[i]||`${i+1}º`}</td>
-      <td style="padding:10px 8px"><div style="display:flex;align-items:center;gap:10px">${thumb}
-        <div><div style="font-size:12px;font-weight:600;color:#e6edf3;line-height:1.3">${name}</div>
-        <div style="font-size:10px;color:#8b949e;margin-top:1px">${camp}</div></div></div></td>
-      <td style="padding:10px 8px;text-align:right;font-family:var(--fD);font-size:13px;font-weight:700;color:#e6edf3">${spendS}</td>
-      <td style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:${ctrC}">${ctr > 0 ? ctr.toFixed(1)+'%' : '—'}</td>
-      <td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;color:#8b949e">${clicks > 0 ? clicks.toLocaleString('pt-BR') : '—'}</td>
-      ${(leads > 0 || agendou > 0)
-        ? `<td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:rgba(145,70,255,0.9)">${leads||'—'}</td>
-           <td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${agendou||'—'}</td>
-           <td class="crt-col-sec" style="padding:10px 8px;text-align:right;font-family:var(--fM);font-size:12px;font-weight:700;color:#3fb950">${fechou||'—'}</td>`
-        : `<td colspan="3" class="crt-col-sec" style="padding:10px 8px;text-align:center;font-family:var(--fM);font-size:10px;color:var(--dim)">—</td>`}
-    </tr>`;
+    return { spend, ctr, thumb, name, camp, ctrC, spendS, leads, agendou, medal: medals[i]||`${i+1}º` };
+  });
+  const maxVal = sortBy === 'ctr'
+    ? Math.max(...items.map(x => x.ctr), 0.001)
+    : Math.max(...items.map(x => x.spend), 0.001);
+  const rows = items.map(it => {
+    const barW = Math.round((sortBy === 'ctr' ? it.ctr : it.spend) / maxVal * 100);
+    const extras = [
+      it.leads   > 0 ? `<span style="color:rgba(145,70,255,0.9);font-weight:700">${it.leads} lead${it.leads>1?'s':''}</span>` : null,
+      it.agendou > 0 ? `<span style="color:#3fb950;font-weight:700">${it.agendou} agendou</span>` : null,
+    ].filter(Boolean).join('<span style="color:var(--dim)"> · </span>');
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div style="font-size:14px;flex-shrink:0;width:22px;text-align:center;margin-top:2px">${it.medal}</div>
+      ${it.thumb}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:#e6edf3;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</div>
+        <div style="font-size:10px;color:#8b949e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.camp}</div>
+        <div style="margin:6px 0 4px;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${barW}%;background:var(--purple);border-radius:2px"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--fM);font-size:11px;letter-spacing:.02em">
+          <span style="color:var(--warn);font-weight:700">${it.spendS}</span>
+          <span style="color:var(--dim)">·</span>
+          <span style="color:${it.ctrC};font-weight:700">${it.ctr > 0 ? it.ctr.toFixed(1)+'% CTR' : '—'}</span>
+          ${extras ? `<span style="color:var(--dim)">·</span>${extras}` : ''}
+        </div>
+      </div>
+    </div>`;
   }).join('');
-  box.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
-    <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08)">
-      <th style="padding:8px;text-align:center;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">#</th>
-      <th style="padding:8px;text-align:left;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Criativo</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Gasto</th>
-      <th style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">CTR</th>
-      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:#8b949e;letter-spacing:.1em;text-transform:uppercase">Cliques</th>
-      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(145,70,255,0.7);letter-spacing:.1em;text-transform:uppercase">Leads</th>
-      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.6);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Agendou</th>
-      <th class="crt-col-sec" style="padding:8px;text-align:right;font-family:var(--fM);font-size:9px;color:rgba(0,245,160,0.7);letter-spacing:.1em;text-transform:uppercase">Fechou</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>
+  box.innerHTML = `<div>${rows}</div>
   <div style="font-size:9px;color:var(--dim);padding:8px 0 0;text-align:right">ordenado por ${sortBy === 'ctr' ? 'CTR' : 'Gasto'} · ${(preset||'').replace(/_/g,' ')}</div>`;
 }
 function renderCriativosTable(ads, box, fromCache) { renderCriativosCards(ads, box, 'last_30d', 'spend'); } // legado
