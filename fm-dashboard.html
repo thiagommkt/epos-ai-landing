@@ -2183,7 +2183,8 @@ function renderCriativosCards(ads, box, preset, sortBy, sbData) {
     const spend   = parseFloat(ad.spend || 0);
     const ctr     = parseFloat(ad.ctr || 0);
     const adKey   = (ad.ad_name || ad.name || '').trim();
-    const sbAd    = sbData && sbData[adKey] || {};
+    const adId    = String(ad.ad_id || ad.id || '');
+    const sbAd    = sbData && (sbData[adId] || sbData[adKey]) || {};
     const leads   = sbAd.leads   || 0;
     const agendou = sbAd.agendou || 0;
     const fechou  = sbAd.fechou  || 0;
