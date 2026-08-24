@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Links UTM — WhatsApp</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --card: #151515;
+    --border: #262626;
+    --gold: #d4af37;
+    --gold-soft: #f0d878;
+    --text: #f2f2f2;
+    --muted: #9a9a9a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 32px 16px 80px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 40px; }
+  header h1 {
+    font-size: 22px;
+    margin: 0 0 6px;
+    color: var(--gold-soft);
+    letter-spacing: 0.02em;
+  }
+  header p { color: var(--muted); font-size: 13px; margin: 0; }
+  .section-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .row-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .row-url {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: ui-monospace, Consolas, monospace;
+    word-break: break-all;
+    margin-top: 3px;
+  }
+  .row-left { flex: 1; min-width: 0; }
+  button.copy {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-soft);
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+  button.copy:hover { background: var(--gold); color: #0a0a0a; }
+  button.copy.copied { background: var(--gold); color: #0a0a0a; }
+  .hint {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 44px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Links de rastreamento — WhatsApp</h1>
+    <p>Clique em "copiar" e cole onde for divulgar. Cada link já dispara o pixel certo e identifica a origem.</p>
+  </header>
+
+  <div class="section-title">Epos</div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Instagram — Bio</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=instagram&m=bio&c=organico&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Instagram — Stories (orgânico)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=instagram&m=stories&c=organico&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Instagram — Feed (post orgânico)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=instagram&m=feed&c=organico&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Facebook — Página (post orgânico)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=facebook&m=pagina&c=organico&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Landing Page — botão WhatsApp</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=lp&m=site&c=cta_hero&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Anúncio Meta pago — LP → WhatsApp</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=meta&m=cpc&c=NOME_CAMPANHA&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Google (futuro)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=google&m=cpc&c=CAMPANHA&t=Quero+saber+mais+sobre+o+sistema+EPOS+AI</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="section-title">FM (Farias &amp; Moura)</div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Instagram — Bio (FM)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=instagram&m=bio&c=organico&px=fm&t=Quero+saber+mais+sobre+a+FM+Advocacia</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Instagram — Stories (FM)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=instagram&m=stories&c=organico&px=fm&t=Quero+saber+mais+sobre+a+FM+Advocacia</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Landing Page (FM) — botão WhatsApp</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=lp&m=site&c=cta_hero&px=fm&t=Quero+saber+mais+sobre+a+FM+Advocacia</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Anúncio Meta pago (FM)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=meta&m=cpc&c=CAMPANHA_FM&px=fm&t=Quero+saber+mais+sobre+a+FM+Advocacia</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <p class="hint">Campanhas pagas: troque NOME_CAMPANHA / CAMPANHA_FM pelo nome real antes de usar.</p>
+</div>
+
+<script>
+document.querySelectorAll('.row').forEach(function(row){
+  var btn = row.querySelector('button.copy');
+  var urlEl = row.querySelector('[data-url]');
+  btn.addEventListener('click', function(){
+    var text = urlEl.textContent.trim();
+    function done(){
+      var original = 'copiar';
+      btn.textContent = 'copiado!';
+      btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  });
+});
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  cb();
+}
+</script>
+</body>
+</html>
