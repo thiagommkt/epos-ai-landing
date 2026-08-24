@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redirecionando...</title>
+<style>
+  body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0a;font-family:sans-serif;color:#fff;}
+  .wrap{text-align:center;}
+  .icon{font-size:48px;margin-bottom:16px;}
+  p{color:#aaa;font-size:14px;}
+</style>
+<!-- Meta Pixel Base (Epos) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=130141280708842&ev=PageView&noscript=1"/></noscript>
+</head>
+<body>
+<div class="wrap">
+  <div class="icon">💬</div>
+  <p>Abrindo WhatsApp...</p>
+</div>
+<script>
+(function(){
+  var p = new URLSearchParams(location.search);
+
+  // UTM / fonte
+  var src      = p.get('src') || p.get('utm_source') || '';
+  var medium   = p.get('utm_medium') || p.get('m') || '';
+  var campaign = p.get('utm_campaign') || p.get('c') || '';
+  var content  = p.get('utm_content') || p.get('ct') || '';
+
+  // Pixel: px=epos (default) | px=fm
+  var px = p.get('px') || 'epos';
+  var pixels = { epos: '130141280708842', fm: '2047813996163251' };
+  var pixelId = pixels[px] || pixels.epos;
+
+  // Número e texto
+  var number = p.get('n') || '5561985545598';
+  var text   = p.get('t') || 'Quero saber mais sobre o sistema EPOS AI';
+
+  // Inicializa pixel correto
+  fbq('init', pixelId);
+  fbq('track', 'PageView');
+  fbq('track', 'Contact', {
+    content_name: src || 'direto',
+    content_category: medium || '',
+    content_ids: [campaign || 'na']
+  });
+
+  // Log para n8n (best-effort, não bloqueia o redirect)
+  try {
+    var payload = JSON.stringify({
+      action: 'wa_click',
+      src: src, medium: medium, campaign: campaign, content: content,
+      px: px, referrer: document.referrer,
+      ts: Date.now()
+    });
+    // Webhook dedicado WA tracking — adicionar URL quando criar o workflow n8n
+    var webhookUrl = 'https://n8n.eposmktfilmsia.com.br/webhook/wa-click-track';
+    navigator.sendBeacon(webhookUrl, new Blob([payload], {type:'application/json'}));
+  } catch(e) {}
+
+  // Monta link WA e redireciona
+  var waUrl = 'https://wa.me/' + number + '?text=' + encodeURIComponent(text);
+  setTimeout(function(){ location.href = waUrl; }, 400);
+})();
+</script>
+</body>
+</html>
