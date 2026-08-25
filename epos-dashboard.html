@@ -650,6 +650,12 @@ canvas{display:block;width:100%!important}
     </div>
   </div>
 
+  <!-- ── CLIQUES WHATSAPP RASTREADOS (links.html) ── -->
+  <div class="card" style="margin-top:0">
+    <div class="card-ttl">Cliques WhatsApp Rastreados <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— últimos 30 dias, por fonte (links.html)</span></div>
+    <div class="utm-list" id="wa-clicks-list"><div class="loading"></div></div>
+  </div>
+
   <!-- ── TOP CRIATIVOS (A5b) ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -1211,6 +1217,36 @@ function animCount(el, to) {
 let allLeads = [];
 let leadsFilter = 'todos';
 let leadsSearch = '';
+
+async function loadWaClicks() {
+  const el = document.getElementById('wa-clicks-list');
+  if (!el) return;
+  try {
+    const trintaDiasISO = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+    const { data } = await sb(`wa_clicks?select=src,medium,campaign,created_at&created_at=gte.${trintaDiasISO}&order=created_at.desc`);
+    const rows = Array.isArray(data) ? data : [];
+    if (rows.length === 0) {
+      el.innerHTML = `<div style="font-family:var(--fM);font-size:11px;color:var(--dim);padding:12px 0">Nenhum clique registrado ainda nos últimos 30 dias.</div>`;
+      return;
+    }
+    const bySrc = {};
+    rows.forEach(r => {
+      const k = (r.src || 'desconhecido').trim() || 'desconhecido';
+      bySrc[k] = (bySrc[k] || 0) + 1;
+    });
+    const total = rows.length;
+    const cores = ['var(--neon)', 'var(--purple)', '#4AAEFF', '#FFA500', 'var(--warn)', 'var(--dim)'];
+    const sortedSrc = Object.entries(bySrc).sort((a,b) => b[1]-a[1]);
+    const rowsHtml = sortedSrc.map(([src,n], i) => {
+      const pct = Math.round(n/total*100);
+      const cor = cores[i % cores.length];
+      return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor}">${src}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${cor}22"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
+    }).join('');
+    el.innerHTML = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Total: ${total} cliques</div>${rowsHtml}`;
+  } catch (e) {
+    el.innerHTML = `<div style="font-family:var(--fM);font-size:11px;color:var(--dim);padding:12px 0">Erro ao carregar cliques.</div>`;
+  }
+}
 
 async function loadDashboard() {
   const onDashboard = document.getElementById('s-dashboard')?.classList.contains('active');
@@ -3262,6 +3298,7 @@ async function toggleRobo() {
 // ═══ INIT + AUTO-REFRESH + SUPABASE REALTIME ═══
 loadDashboard();
 loadRoboStatus();
+loadWaClicks();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
 
 // Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
