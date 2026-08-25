@@ -80,6 +80,51 @@
     text-align: center;
     margin-top: 44px;
   }
+  .gen {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 8px;
+  }
+  .gen-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    margin: 0 0 16px;
+  }
+  .gen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .gen-field { display: flex; flex-direction: column; gap: 4px; }
+  .gen-field.full { grid-column: 1 / -1; }
+  .gen-field label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .gen-field select, .gen-field input {
+    background: #0e0e0e;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 9px 10px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .gen-field select:focus, .gen-field input:focus { outline: none; border-color: var(--gold); }
+  .gen-output {
+    margin-top: 14px;
+    background: #0e0e0e;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .gen-output div { font-size: 11px; font-family: ui-monospace, Consolas, monospace; color: var(--gold-soft); word-break: break-all; }
 </style>
 </head>
 <body>
@@ -89,7 +134,92 @@
     <p>Clique em "copiar" e cole onde for divulgar. Cada link já dispara o pixel certo e identifica a origem.</p>
   </header>
 
-  <div class="section-title">Epos</div>
+  <div class="gen">
+    <div class="gen-title">Criar link personalizado</div>
+    <div class="gen-grid">
+      <div class="gen-field">
+        <label>Fonte (de onde vem)</label>
+        <select id="genSrc">
+          <option value="instagram">instagram</option>
+          <option value="facebook">facebook</option>
+          <option value="whatsapp">whatsapp</option>
+          <option value="linkedin">linkedin</option>
+          <option value="direto">direto (DM, conversa manual)</option>
+          <option value="meta">meta (anúncio pago)</option>
+          <option value="google">google</option>
+          <option value="outro">outro (digitar)</option>
+        </select>
+        <input id="genSrcCustom" placeholder="fonte customizada" style="display:none;margin-top:4px;">
+      </div>
+      <div class="gen-field">
+        <label>Mídia (onde exatamente)</label>
+        <input id="genMedia" placeholder="bio, stories, feed, cpc, site...">
+      </div>
+      <div class="gen-field">
+        <label>Campanha / serviço</label>
+        <input id="genCampaign" placeholder="ex: servico_branding, promo_agosto">
+      </div>
+      <div class="gen-field">
+        <label>Pixel</label>
+        <select id="genPixel">
+          <option value="epos">Epos</option>
+          <option value="fm">FM (Farias &amp; Moura)</option>
+        </select>
+      </div>
+      <div class="gen-field full">
+        <label>Mensagem pré-preenchida no WhatsApp</label>
+        <input id="genText" placeholder="Quero saber mais sobre..." value="Quero saber mais sobre a Epos">
+      </div>
+    </div>
+    <div class="gen-output">
+      <div id="genUrl">https://lp.eposmktfilmsia.com.br/wa?...</div>
+      <button class="copy" id="genCopyBtn">copiar</button>
+    </div>
+  </div>
+
+  <div class="section-title">Por Serviço</div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Sistema de Atendimento WhatsApp (SWaaS Kairos Method)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=direto&m=manual&c=servico_whatsapp&t=Quero+saber+mais+sobre+o+sistema+de+atendimento+via+WhatsApp+da+Epos</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Produção de Conteúdo (fotos e vídeos)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=direto&m=manual&c=servico_conteudo&t=Quero+saber+mais+sobre+produ%C3%A7%C3%A3o+de+fotos+e+v%C3%ADdeos+da+Epos</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Gestão de Tráfego Pago (Meta Ads / Google Ads)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=direto&m=manual&c=servico_trafego&t=Quero+saber+mais+sobre+gest%C3%A3o+de+an%C3%BAncios+da+Epos</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Branding e Identidade Visual</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=direto&m=manual&c=servico_branding&t=Quero+saber+mais+sobre+branding+e+identidade+visual+da+Epos</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="row-left">
+      <div class="row-label">Estratégia de Marketing (diagnóstico, ICP, jornada)</div>
+      <div class="row-url" data-url>https://lp.eposmktfilmsia.com.br/wa?src=direto&m=manual&c=servico_estrategia&t=Quero+saber+mais+sobre+estrat%C3%A9gia+de+marketing+da+Epos</div>
+    </div>
+    <button class="copy">copiar</button>
+  </div>
+
+  <div class="section-title">Epos — Por Canal</div>
 
   <div class="row">
     <div class="row-left">
@@ -185,24 +315,19 @@
 </div>
 
 <script>
-document.querySelectorAll('.row').forEach(function(row){
-  var btn = row.querySelector('button.copy');
-  var urlEl = row.querySelector('[data-url]');
-  btn.addEventListener('click', function(){
-    var text = urlEl.textContent.trim();
-    function done(){
-      var original = 'copiar';
-      btn.textContent = 'copiado!';
-      btn.classList.add('copied');
-      setTimeout(function(){ btn.textContent = original; btn.classList.remove('copied'); }, 1500);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
-    } else {
-      fallbackCopy(text, done);
-    }
-  });
-});
+function copyText(text, btn){
+  function done(){
+    var original = 'copiar';
+    btn.textContent = 'copiado!';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else {
+    fallbackCopy(text, done);
+  }
+}
 function fallbackCopy(text, cb){
   var ta = document.createElement('textarea');
   ta.value = text;
@@ -215,6 +340,47 @@ function fallbackCopy(text, cb){
   document.body.removeChild(ta);
   cb();
 }
+
+document.querySelectorAll('.row').forEach(function(row){
+  var btn = row.querySelector('button.copy');
+  var urlEl = row.querySelector('[data-url]');
+  btn.addEventListener('click', function(){ copyText(urlEl.textContent.trim(), btn); });
+});
+
+// Gerador de link personalizado
+var genSrc = document.getElementById('genSrc');
+var genSrcCustom = document.getElementById('genSrcCustom');
+var genMedia = document.getElementById('genMedia');
+var genCampaign = document.getElementById('genCampaign');
+var genPixel = document.getElementById('genPixel');
+var genText = document.getElementById('genText');
+var genUrl = document.getElementById('genUrl');
+var genCopyBtn = document.getElementById('genCopyBtn');
+
+function buildGenUrl(){
+  var src = genSrc.value === 'outro' ? (genSrcCustom.value.trim() || 'outro') : genSrc.value;
+  var params = new URLSearchParams();
+  params.set('src', src);
+  if (genMedia.value.trim()) params.set('m', genMedia.value.trim());
+  if (genCampaign.value.trim()) params.set('c', genCampaign.value.trim());
+  if (genPixel.value !== 'epos') params.set('px', genPixel.value);
+  params.set('t', genText.value.trim() || 'Quero saber mais sobre a Epos');
+  var url = 'https://lp.eposmktfilmsia.com.br/wa?' + params.toString();
+  genUrl.textContent = url;
+  return url;
+}
+
+genSrc.addEventListener('change', function(){
+  genSrcCustom.style.display = genSrc.value === 'outro' ? 'block' : 'none';
+  buildGenUrl();
+});
+[genSrcCustom, genMedia, genCampaign, genPixel, genText].forEach(function(el){
+  el.addEventListener('input', buildGenUrl);
+  el.addEventListener('change', buildGenUrl);
+});
+genCopyBtn.addEventListener('click', function(){ copyText(buildGenUrl(), genCopyBtn); });
+
+buildGenUrl();
 </script>
 </body>
 </html>
