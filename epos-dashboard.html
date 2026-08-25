@@ -1222,19 +1222,20 @@ async function loadWaClicks() {
   const el = document.getElementById('wa-clicks-list');
   if (!el) return;
   try {
-    const trintaDiasISO = new Date(Date.now() - 30*24*60*60*1000).toISOString();
-    const { data } = await sb(`wa_clicks?select=src,medium,campaign,created_at&created_at=gte.${trintaDiasISO}&order=created_at.desc`);
-    const rows = Array.isArray(data) ? data : [];
-    if (rows.length === 0) {
+    const t30 = new Date(Date.now() - 30*24*60*60*1000).toISOString();
+    const [{ data: rows }, { data: lpRows }] = await Promise.all([
+      sb(`wa_clicks?select=src,created_at&px=eq.epos&created_at=gte.${t30}&order=created_at.desc`),
+      sb(`wa_clicks?select=content,created_at&px=eq.epos&src=eq.lp&created_at=gte.${t30}`)
+    ]);
+    const all = Array.isArray(rows) ? rows : [];
+    const lp  = Array.isArray(lpRows) ? lpRows : [];
+    if (all.length === 0) {
       el.innerHTML = `<div style="font-family:var(--fM);font-size:11px;color:var(--dim);padding:12px 0">Nenhum clique registrado ainda nos últimos 30 dias.</div>`;
       return;
     }
     const bySrc = {};
-    rows.forEach(r => {
-      const k = (r.src || 'desconhecido').trim() || 'desconhecido';
-      bySrc[k] = (bySrc[k] || 0) + 1;
-    });
-    const total = rows.length;
+    all.forEach(r => { const k=(r.src||'desconhecido').trim()||'desconhecido'; bySrc[k]=(bySrc[k]||0)+1; });
+    const total = all.length;
     const cores = ['var(--neon)', 'var(--purple)', '#4AAEFF', '#FFA500', 'var(--warn)', 'var(--dim)'];
     const sortedSrc = Object.entries(bySrc).sort((a,b) => b[1]-a[1]);
     const rowsHtml = sortedSrc.map(([src,n], i) => {
@@ -1242,7 +1243,19 @@ async function loadWaClicks() {
       const cor = cores[i % cores.length];
       return `<div class="utm-row" style="margin-bottom:6px"><div class="utm-src" style="color:${cor}">${src}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${cor}22"></div></div><div class="utm-n" style="color:${cor}">${n}</div><div class="utm-p">${pct}%</div></div>`;
     }).join('');
-    el.innerHTML = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Total: ${total} cliques</div>${rowsHtml}`;
+    let lpHtml = '';
+    if (lp.length > 0) {
+      const byBtn = {};
+      lp.forEach(r => { const k=(r.content||'—').trim()||'—'; byBtn[k]=(byBtn[k]||0)+1; });
+      const lpTotal = lp.length;
+      const btnLbl = { cta_hero:'Hero', cta_preco:'Preço', cta_float:'Flutuante', cta_final:'Final', cta_area:'Área' };
+      const lpRowsHtml = Object.entries(byBtn).sort((a,b)=>b[1]-a[1]).map(([btn,n]) => {
+        const pct = Math.round(n/lpTotal*100);
+        return `<div class="utm-row" style="margin-bottom:4px"><div class="utm-src" style="color:#4AAEFF;font-size:10px">${btnLbl[btn]||btn}</div><div class="utm-track"><div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:#4AAEFF22"></div></div><div class="utm-n" style="color:#4AAEFF">${n}</div><div class="utm-p">${pct}%</div></div>`;
+      }).join('');
+      lpHtml = `<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(74,174,255,.15)"><div style="font-family:var(--fM);font-size:9px;color:#4AAEFF;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Whats LP — por botão (${lpTotal} cliques)</div>${lpRowsHtml}</div>`;
+    }
+    el.innerHTML = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Total: ${total} cliques</div>${rowsHtml}${lpHtml}`;
   } catch (e) {
     el.innerHTML = `<div style="font-family:var(--fM);font-size:11px;color:var(--dim);padding:12px 0">Erro ao carregar cliques.</div>`;
   }
