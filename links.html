@@ -125,6 +125,67 @@
     gap: 12px;
   }
   .gen-output div { font-size: 11px; font-family: ui-monospace, Consolas, monospace; color: var(--gold-soft); word-break: break-all; }
+
+  .guide {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 22px 24px;
+    margin-bottom: 28px;
+  }
+  .guide h2 {
+    font-size: 15px;
+    color: var(--gold-soft);
+    margin: 0 0 4px;
+  }
+  .guide .sub { color: var(--muted); font-size: 12px; margin: 0 0 18px; }
+  .stage-row {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 4px 14px;
+    margin-bottom: 16px;
+  }
+  .stage-tag {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    padding-top: 2px;
+  }
+  .stage-body p { margin: 0 0 4px; font-size: 13px; line-height: 1.5; }
+  .stage-body .where { color: var(--muted); font-size: 12px; }
+  .stage-body .where b { color: var(--text); font-weight: 600; }
+  .guide-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12.5px; }
+  .guide-table th, .guide-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .guide-table th { color: var(--gold); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .guide-table td { color: var(--text); }
+  .guide-table td.dim { color: var(--muted); }
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 10px 0 0; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--gold);
+    color: var(--gold-soft);
+    border-radius: 50%;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: ui-monospace, Consolas, monospace;
+  }
 </style>
 </head>
 <body>
@@ -133,6 +194,55 @@
     <h1>Links de rastreamento — WhatsApp</h1>
     <p>Clique em "copiar" e cole onde for divulgar. Cada link já dispara o pixel certo e identifica a origem.</p>
   </header>
+
+  <div class="guide">
+    <h2>Como usar isso — guia rápido</h2>
+    <p class="sub">Cada link já está colocado nas LPs. Você só precisa saber quais usar em cada rede social e como ler os resultados.</p>
+
+    <div class="stage-row">
+      <div class="stage-tag">Etapa 1<br>Topo</div>
+      <div class="stage-body">
+        <p><b>Onde a pessoa te conhece</b> — Instagram/Facebook (bio, stories, feed), ainda não sabe se quer falar com você.</p>
+        <p class="where">Objetivo aqui não é vender — é fazer a pessoa clicar e abrir o WhatsApp por curiosidade. Use os links de <b>canal</b> (seção "Por Canal" abaixo).</p>
+      </div>
+    </div>
+
+    <div class="stage-row">
+      <div class="stage-tag">Etapa 2<br>Meio</div>
+      <div class="stage-body">
+        <p><b>Pessoa entrando na LP</b> — clicou num anúncio ou link, tá lendo a página, decidindo se continua.</p>
+        <p class="where">Cada botão de WhatsApp da LP (topo, meio da página, botão flutuante, final) já tem um link diferente — isso já foi feito nas páginas ativas (dentistas, esteticistas, médicos, EPOS AI base/madmen/twitch, FM sistema). Você não precisa fazer nada aqui, só saber que cada botão é rastreado separado.</p>
+      </div>
+    </div>
+
+    <div class="stage-row">
+      <div class="stage-tag">Etapa 3<br>Fundo</div>
+      <div class="stage-body">
+        <p><b>Pessoa decidida, quer falar de um serviço específico</b> — você já trocou mensagem, ou ela veio de uma indicação/DM.</p>
+        <p class="where">Use os links da seção <b>"Por Serviço"</b> — já vem com a mensagem certa pro que ela quer (WhatsApp, conteúdo, tráfego, branding, estratégia).</p>
+      </div>
+    </div>
+
+    <table class="guide-table">
+      <thead><tr><th>Onde postar</th><th>Qual link usar</th><th>Por quê</th></tr></thead>
+      <tbody>
+        <tr><td>Bio do Instagram</td><td>Instagram — Bio</td><td class="dim">Fixo, sempre visível — é o link "de plantão"</td></tr>
+        <tr><td>Stories (todo dia)</td><td>Instagram — Stories</td><td class="dim">Alto volume, mede o que engaja no dia a dia</td></tr>
+        <tr><td>Post no feed</td><td>Instagram — Feed</td><td class="dim">Conteúdo mais permanente, métrica separada do story</td></tr>
+        <tr><td>Post no Facebook</td><td>Facebook — Página</td><td class="dim">Público diferente do Instagram, mesmo pixel</td></tr>
+        <tr><td>Anúncio pago (Meta)</td><td>Anúncio Meta pago<br><span class="dim">troque NOME_CAMPANHA pelo nome real</span></td><td class="dim">Sem isso, não dá pra saber se o anúncio X paga o investimento</td></tr>
+        <tr><td>DM manual / WhatsApp Status / indicação</td><td>Por Serviço (o que a pessoa quer)</td><td class="dim">Mensagem certa já pré-preenchida, sem confundir o assunto</td></tr>
+        <tr><td>Cliente Farias &amp; Moura</td><td>qualquer link com <code>&px=fm</code></td><td class="dim">Dispara o pixel do Facebook da FM, não o da Epos</td></tr>
+      </tbody>
+    </table>
+
+    <ol class="steps">
+      <li><b>Pra usar um link pronto:</b> ache na lista abaixo, clique "copiar", cole onde for postar.</li>
+      <li><b>Pra criar um link novo</b> (campanha nova, serviço novo, canal que não existe ainda): use o gerador logo abaixo — escolhe fonte/mídia/campanha, o link monta sozinho.</li>
+      <li><b>Pra ver o resultado:</b> abra o dashboard Epos, card "Cliques WhatsApp Rastreados" — mostra quantos cliques vieram de cada fonte nos últimos 30 dias.</li>
+      <li><b>Regra de ouro:</b> nunca cole o link puro do WhatsApp (wa.me/...) em lugar nenhum — sempre um desses aqui, senão o clique some sem deixar rastro.</li>
+    </ol>
+  </div>
 
   <div class="gen">
     <div class="gen-title">Criar link personalizado</div>
