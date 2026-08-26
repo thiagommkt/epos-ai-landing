@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Epos Marketing — Acesso</title>
+<title>Clinica Sorriso — Acesso</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -198,8 +198,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <script src="/assets/supabase-js-2.112.3.min.js"></script>
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const DASHBOARD_URL = 'epos-dashboard.html';
-const BIO_KEY = 'epos_bio_credential';
+const DASHBOARD_URL = 'sorriso-dashboard.html';
+const BIO_KEY = 'sorriso_bio_credential';
 const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
 const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
@@ -272,7 +272,7 @@ async function entrar() {
       bioRegister.classList.add('show');
       showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
     } else {
-      if (credId) sessionStorage.setItem('epos_bio_verified', '1');
+      if (credId) sessionStorage.setItem('sorriso_bio_verified', '1');
       setTimeout(() => location.href = DASHBOARD_URL, 400);
     }
   } catch (e) {
@@ -315,7 +315,7 @@ async function autenticarBio(silencioso = false) {
         btn.classList.remove('scanning');
         return;
       }
-      sessionStorage.setItem('epos_bio_verified', '1');
+      sessionStorage.setItem('sorriso_bio_verified', '1');
       showMsg('bio-msg', '✓ Identidade confirmada', 'ok');
       btn.classList.remove('scanning');
       setTimeout(() => location.href = DASHBOARD_URL, 500);
@@ -371,8 +371,6 @@ async function registrarBio() {
 }
 
 // ─── FORGOT / RECOVERY ───────────────────────────────────
-const LOGIN_FIELDS = ['bio-section','field','btn-enter','.forgot-link','bio-register'];
-
 function showLogin() {
   document.getElementById('forgot-section').classList.remove('show');
   document.getElementById('recovery-section').classList.remove('show');
@@ -432,12 +430,10 @@ async function saveNewPassword() {
 (function handleRecoveryHash() {
   const hash = window.location.hash;
   if (!hash.includes('type=recovery') && !hash.includes('access_token')) return;
-  // Supabase SDK lida com o token automaticamente ao instanciar
   document.querySelectorAll('.card-inner > .field, .card-inner > .btn-enter, .card-inner > .forgot-link').forEach(el => el.style.display = 'none');
   document.getElementById('bio-section').classList.remove('show');
   document.getElementById('recovery-section').classList.add('show');
   document.getElementById('new-pwd')?.focus();
-  // Limpar hash sem recarregar
   history.replaceState(null, '', window.location.pathname + window.location.search);
 })();
 
