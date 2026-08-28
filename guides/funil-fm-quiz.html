@@ -440,7 +440,7 @@ h1.end-title{
       <div class="q-eyebrow">Pergunta 2 de 3</div>
       <h2 class="q-title">Você tem ou já teve alguma destas condições?</h2>
       <p class="q-help">Mesmo que já esteja curado(a) ou controlado(a).</p>
-      <div class="opt-list" data-group="doenca">
+      <div class="opt-list" data-group="doenca" id="doencaList">
         <button class="opt" aria-pressed="false" data-value="Cardiopatia Grave"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Cardiopatia Grave</button>
         <button class="opt" aria-pressed="false" data-value="Neoplasia Maligna (Câncer)"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Neoplasia Maligna (Câncer)</button>
         <button class="opt" aria-pressed="false" data-value="Aids/HIV"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Aids/HIV</button>
@@ -457,10 +457,25 @@ h1.end-title{
         <button class="opt" aria-pressed="false" data-value="Doença de Paget (Osteíte Deformante)"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Doença de Paget (Osteíte Deformante)</button>
         <button class="opt" aria-pressed="false" data-value="Contaminação por Radiação"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Contaminação por Radiação</button>
         <button class="opt" aria-pressed="false" data-value="Tuberculose Ativa"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Tuberculose Ativa</button>
+        <button class="opt" aria-pressed="false" data-value="Moléstia Profissional"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Moléstia Profissional</button>
         <button class="opt" aria-pressed="false" data-value="Acidente de Trabalho"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Acidente de Trabalho</button>
+        <button class="opt" aria-pressed="false" data-value="Outra" data-custom="true" id="doencaOutraBtn"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Outra</button>
         <button class="opt opt-last" aria-pressed="false" data-value="Nenhuma dessas" data-disqualify="true"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Nenhuma dessas</button>
       </div>
-      <div class="step-nav">
+
+      <div class="custom-panel" id="doencaCustom" style="display:none">
+        <div class="field" id="fieldDoencaCustom">
+          <label for="doencaCustomInput">Qual doença ou condição?</label>
+          <input type="text" id="doencaCustomInput" placeholder="Digite aqui">
+          <div class="field-error">Digite a condição para continuar.</div>
+        </div>
+        <div class="btn-stack">
+          <button type="button" class="btn btn-primary" id="doencaCustomContinuar">Continuar</button>
+          <button type="button" class="btn btn-ghost" id="doencaCustomVoltar">Voltar para a lista</button>
+        </div>
+      </div>
+
+      <div class="step-nav" id="doencaStepNav">
         <button class="btn-back" onclick="goTo('perfil')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       </div>
     </section>
@@ -548,6 +563,13 @@ h1.end-title{
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var target = document.querySelector('[data-screen="'+screen+'"]');
     target.classList.add('active');
+
+    if(screen === 'doenca'){
+      document.getElementById('doencaCustom').style.display = 'none';
+      document.getElementById('fieldDoencaCustom').classList.remove('invalid');
+      document.getElementById('doencaList').style.display = 'flex';
+      document.getElementById('doencaStepNav').style.display = 'flex';
+    }
     target.scrollTop = 0;
     document.getElementById('progressFill').style.width = (progressMap[screen] || 0) + '%';
     window.scrollTo(0,0);
@@ -559,6 +581,17 @@ h1.end-title{
     list.addEventListener('click', function(e){
       var btn = e.target.closest('.opt');
       if(!btn) return;
+
+      if(btn.getAttribute('data-custom') === 'true'){
+        document.getElementById('doencaList').style.display = 'none';
+        document.getElementById('doencaStepNav').style.display = 'none';
+        var panel = document.getElementById('doencaCustom');
+        panel.style.display = 'flex';
+        panel.style.flexDirection = 'column';
+        document.getElementById('doencaCustomInput').focus();
+        return;
+      }
+
       list.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed','false'); });
       btn.classList.add('selected');
       btn.setAttribute('aria-pressed','true');
@@ -577,6 +610,27 @@ h1.end-title{
         else if(group === 'renda') goTo('contato');
       }, 260);
     });
+  });
+
+  document.getElementById('doencaCustomVoltar').addEventListener('click', function(){
+    document.getElementById('doencaCustom').style.display = 'none';
+    document.getElementById('fieldDoencaCustom').classList.remove('invalid');
+    document.getElementById('doencaCustomInput').value = '';
+    document.getElementById('doencaList').style.display = 'flex';
+    document.getElementById('doencaStepNav').style.display = 'flex';
+  });
+
+  document.getElementById('doencaCustomContinuar').addEventListener('click', function(){
+    var input = document.getElementById('doencaCustomInput');
+    var field = document.getElementById('fieldDoencaCustom');
+    var value = input.value.trim();
+    if(value.length < 2){
+      field.classList.add('invalid');
+      return;
+    }
+    field.classList.remove('invalid');
+    answers.doenca = value;
+    goTo('renda');
   });
 
   function validPhone(v){
