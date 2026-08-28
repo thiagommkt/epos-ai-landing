@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Isenção de Imposto de Renda | Farias &amp; Moura Advocacia</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Lato:wght@400;600;700;800&display=swap');
+
+:root{
+  --green-900:#0B211D;
+  --green-800:#0F2E27;
+  --green-700:#153B32;
+  --green-100:#E8EFEC;
+  --gold-600:#B4934F;
+  --gold-500:#C9A876;
+  --gold-300:#E3CFA0;
+  --gold-100:#F4EBDA;
+  --white:#FFFFFF;
+  --paper:#FDFCFA;
+  --ink:#132420;
+  --ink-muted:#5B6E68;
+  --line:#E4E0D6;
+  --error:#A33B2C;
+  --radius:14px;
+  --radius-sm:10px;
+  --shadow-card: 0 20px 50px -20px rgba(11,33,29,0.35);
+  --font-display:'EB Garamond', Georgia, serif;
+  --font-body:'Lato', -apple-system, sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-body);
+  background:var(--green-900);
+  color:var(--ink);
+  min-height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  line-height:1.5;
+}
+
+/* ambient background */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(201,168,118,0.16), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(201,168,118,0.10), transparent 45%),
+    linear-gradient(160deg, var(--green-900) 0%, var(--green-800) 55%, var(--green-700) 100%);
+  z-index:0;
+}
+
+.app{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:560px;
+  min-height:100dvh;
+  margin:0 auto;
+  background:var(--paper);
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 90px rgba(0,0,0,0.35);
+}
+
+@media (min-width:640px){
+  body{padding:32px 16px}
+  .app{min-height:min(760px, 92dvh);border-radius:20px;overflow:hidden}
+}
+
+/* progress */
+.progress-track{
+  height:4px;
+  background:var(--line);
+  width:100%;
+  flex-shrink:0;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg, var(--gold-600), var(--gold-500));
+  width:8%;
+  transition:width .45s cubic-bezier(0.16,1,0.3,1);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:22px 24px 6px;
+  flex-shrink:0;
+}
+.brand-logo{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  object-fit:cover;
+  flex-shrink:0;
+  box-shadow:0 4px 14px -4px rgba(11,33,29,0.4);
+}
+
+.screens{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+
+.screen{
+  display:none;
+  flex-direction:column;
+  flex:1;
+  padding:8px 28px 28px;
+  overflow-y:auto;
+  animation:enter .38s cubic-bezier(0.16,1,0.3,1);
+}
+.screen.active{display:flex}
+
+@keyframes enter{
+  from{opacity:0; transform:translateY(10px)}
+  to{opacity:1; transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .screen{animation:none}
+  .progress-fill{transition:none}
+}
+
+/* ---- Hook screen ---- */
+.hook{justify-content:center;text-align:center;flex:1;padding-top:12px}
+.hook-badge{
+  width:64px;height:64px;margin:0 auto 20px;
+  border-radius:50%;
+  background:var(--green-800);
+  display:flex;align-items:center;justify-content:center;
+}
+.hook-badge svg{width:30px;height:30px;stroke:var(--gold-500)}
+h1.headline{
+  font-family:var(--font-display);
+  font-size:28px;
+  font-weight:600;
+  line-height:1.22;
+  color:var(--green-800);
+  margin-bottom:14px;
+}
+.headline .accent{color:var(--gold-600)}
+.sub{
+  font-size:16px;
+  color:var(--ink-muted);
+  line-height:1.6;
+  max-width:44ch;
+  margin:0 auto 28px;
+}
+.sub strong{color:var(--ink);font-weight:700}
+
+.trust-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  margin-top:24px;
+  flex-wrap:wrap;
+}
+.trust-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:12.5px;color:var(--ink-muted);font-weight:600;
+}
+.trust-item svg{width:15px;height:15px;stroke:var(--gold-600);flex-shrink:0}
+
+/* ---- Buttons ---- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;
+  min-height:54px;
+  border-radius:999px;
+  font-family:var(--font-body);
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:.01em;
+  border:none;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{
+  background:linear-gradient(180deg, var(--green-700), var(--green-800));
+  color:var(--gold-300);
+  box-shadow:0 12px 28px -10px rgba(15,46,39,0.55);
+}
+.btn-primary:hover{box-shadow:0 14px 32px -8px rgba(15,46,39,0.65)}
+.btn-primary:focus-visible{outline:3px solid var(--gold-500);outline-offset:2px}
+.btn-ghost{
+  background:transparent;
+  color:var(--ink-muted);
+  font-weight:600;
+  font-size:14.5px;
+  min-height:44px;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  text-decoration-color:var(--line);
+}
+.btn-ghost:hover{color:var(--ink)}
+.btn-ghost:focus-visible{outline:2px solid var(--gold-500);outline-offset:2px}
+
+.btn-stack{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+
+/* ---- Question screens ---- */
+.q-eyebrow{
+  font-family:var(--font-body);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--gold-600);
+  margin-bottom:10px;
+}
+h2.q-title{
+  font-family:var(--font-display);
+  font-size:23px;
+  font-weight:600;
+  color:var(--green-800);
+  line-height:1.3;
+  margin-bottom:6px;
+}
+.q-help{
+  font-size:14px;
+  color:var(--ink-muted);
+  margin-bottom:18px;
+}
+
+.opt-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  overflow-y:auto;
+  padding-right:2px;
+  margin-bottom:16px;
+}
+.opt{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  min-height:52px;
+  padding:12px 16px;
+  border-radius:var(--radius-sm);
+  border:1.5px solid var(--line);
+  background:var(--white);
+  font-family:var(--font-body);
+  font-size:15px;
+  font-weight:600;
+  color:var(--ink);
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.opt:hover{border-color:var(--gold-500);background:var(--gold-100)}
+.opt:focus-visible{outline:2px solid var(--gold-600);outline-offset:2px}
+.opt.selected{border-color:var(--green-700);background:var(--green-100)}
+.opt-dot{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--line);
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .15s ease, background .15s ease;
+}
+.opt.selected .opt-dot{border-color:var(--green-700);background:var(--green-700)}
+.opt-dot svg{width:11px;height:11px;stroke:var(--white);opacity:0;transition:opacity .1s ease}
+.opt.selected .opt-dot svg{opacity:1}
+.opt-last{margin-top:4px;border-top:1px solid var(--line);padding-top:16px}
+
+.step-nav{
+  display:flex;align-items:center;gap:14px;
+  margin-top:auto;padding-top:6px;
+}
+.btn-back{
+  min-height:44px;min-width:44px;
+  border:none;background:transparent;color:var(--ink-muted);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border-radius:50%;
+  transition:background .15s ease;
+}
+.btn-back:hover{background:var(--green-100)}
+.btn-back svg{width:20px;height:20px;stroke:currentColor}
+.step-nav .btn-primary{flex:1}
+
+/* ---- Form screen ---- */
+.field{margin-bottom:16px}
+.field label{
+  display:block;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--green-800);
+  margin-bottom:7px;
+}
+.field input{
+  width:100%;
+  min-height:52px;
+  padding:0 16px;
+  border-radius:var(--radius-sm);
+  border:1.5px solid var(--line);
+  background:var(--white);
+  font-family:var(--font-body);
+  font-size:16px;
+  color:var(--ink);
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.field input::placeholder{color:#A3AEA9}
+.field input:focus{
+  outline:none;
+  border-color:var(--green-700);
+  box-shadow:0 0 0 3px rgba(21,59,50,0.12);
+}
+.field-error{
+  display:none;
+  font-size:12.5px;
+  color:var(--error);
+  margin-top:6px;
+  font-weight:600;
+}
+.field.invalid input{border-color:var(--error)}
+.field.invalid .field-error{display:block}
+
+.consent{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:6px 0 22px;
+}
+.consent input[type=checkbox]{
+  width:20px;height:20px;flex-shrink:0;margin-top:1px;
+  accent-color:var(--green-700);
+}
+.consent label{font-size:12.5px;color:var(--ink-muted);line-height:1.5}
+.consent a{color:var(--green-800);font-weight:700;text-decoration:underline}
+
+/* ---- End screens ---- */
+.end{justify-content:center;text-align:center;flex:1;padding-top:20px}
+.end-icon{
+  width:76px;height:76px;margin:0 auto 22px;
+  border-radius:50%;
+  background:var(--green-100);
+  display:flex;align-items:center;justify-content:center;
+}
+.end-icon svg{width:34px;height:34px;stroke:var(--green-800)}
+.end-icon.muted{background:var(--gold-100)}
+.end-icon.muted svg{stroke:var(--gold-600)}
+h1.end-title{
+  font-family:var(--font-display);
+  font-size:25px;font-weight:600;color:var(--green-800);
+  margin-bottom:12px;
+}
+.end-sub{
+  font-size:15.5px;color:var(--ink-muted);line-height:1.6;
+  max-width:38ch;margin:0 auto 26px;
+}
+.end-links{display:flex;flex-direction:column;gap:10px}
+
+.footer-note{
+  text-align:center;
+  font-size:11px;
+  color:#9AA6A1;
+  padding:14px 24px 20px;
+  flex-shrink:0;
+}
+</style>
+</head>
+<body>
+
+<noscript>
+  <div style="max-width:480px;margin:60px auto;padding:24px;font-family:Georgia,serif;text-align:center;color:#0F2E27">
+    <p style="font-size:18px;font-weight:600;margin-bottom:10px">Ative o JavaScript para continuar</p>
+    <p style="font-size:15px">Este formulário precisa de JavaScript ativado no navegador. Você também pode falar direto conosco pelo site <a href="https://fariasemoura.com" style="color:#B4934F">fariasemoura.com</a>.</p>
+  </div>
+</noscript>
+
+<main class="app">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="brand">
+    <img class="brand-logo" src="assets/fm/perfil-avatar.png" alt="Farias &amp; Moura Advocacia" width="52" height="52">
+  </div>
+
+  <div class="screens">
+
+    <!-- 0: HOOK -->
+    <section class="screen active hook" data-screen="hook">
+      <div class="hook-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4z"/></svg>
+      </div>
+      <h1 class="headline">Descubra se você tem direito à <span class="accent">isenção do Imposto de Renda</span></h1>
+      <p class="sub">Se você é <strong>aposentado(a), pensionista ou militar reformado(a)</strong> e tem (ou já teve) alguma doença grave, pode ter direito a parar de pagar IR e ainda receber de volta o que pagou nos últimos anos.</p>
+      <div class="btn-stack">
+        <button class="btn btn-primary" onclick="goTo('perfil')">Quero verificar se tenho direito</button>
+        <button class="btn btn-ghost" onclick="goTo('desqualificado')">Não tenho interesse</button>
+      </div>
+      <div class="trust-row">
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>2 minutos</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4z"/></svg>100% gratuito</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Sem compromisso</span>
+      </div>
+    </section>
+
+    <!-- 1: PERFIL -->
+    <section class="screen" data-screen="perfil">
+      <div class="q-eyebrow">Pergunta 1 de 3</div>
+      <h2 class="q-title">Qual é a sua situação hoje?</h2>
+      <p class="q-help">Selecione a opção que melhor descreve você.</p>
+      <div class="opt-list" data-group="perfil">
+        <button class="opt" aria-pressed="false" data-value="Aposentado(a)">
+          <span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+          Aposentado(a)
+        </button>
+        <button class="opt" aria-pressed="false" data-value="Pensionista">
+          <span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+          Pensionista
+        </button>
+        <button class="opt" aria-pressed="false" data-value="Militar Reformado(a)">
+          <span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+          Militar Reformado(a)
+        </button>
+        <button class="opt opt-last" aria-pressed="false" data-value="Nenhuma dessas" data-disqualify="true">
+          <span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+          Nenhuma dessas
+        </button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goTo('hook')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      </div>
+    </section>
+
+    <!-- 2: DOENCA -->
+    <section class="screen" data-screen="doenca">
+      <div class="q-eyebrow">Pergunta 2 de 3</div>
+      <h2 class="q-title">Você tem ou já teve alguma destas condições?</h2>
+      <p class="q-help">Mesmo que já esteja curado(a) ou controlado(a).</p>
+      <div class="opt-list" data-group="doenca">
+        <button class="opt" aria-pressed="false" data-value="Cardiopatia Grave"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Cardiopatia Grave</button>
+        <button class="opt" aria-pressed="false" data-value="Neoplasia Maligna (Câncer)"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Neoplasia Maligna (Câncer)</button>
+        <button class="opt" aria-pressed="false" data-value="Aids/HIV"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Aids/HIV</button>
+        <button class="opt" aria-pressed="false" data-value="Cegueira (inclusive monocular)"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Cegueira (inclusive monocular)</button>
+        <button class="opt" aria-pressed="false" data-value="Nefropatia Grave"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Nefropatia Grave</button>
+        <button class="opt" aria-pressed="false" data-value="Paralisia Irreversível e Incapacitante"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Paralisia Irreversível e Incapacitante</button>
+        <button class="opt" aria-pressed="false" data-value="Espondiloartrose Anquilosante"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Espondiloartrose Anquilosante</button>
+        <button class="opt" aria-pressed="false" data-value="Esclerose Múltipla"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Esclerose Múltipla</button>
+        <button class="opt" aria-pressed="false" data-value="Alienação Mental"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Alienação Mental</button>
+        <button class="opt" aria-pressed="false" data-value="Doença de Parkinson"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Doença de Parkinson</button>
+        <button class="opt" aria-pressed="false" data-value="Hepatopatia Grave"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Hepatopatia Grave</button>
+        <button class="opt" aria-pressed="false" data-value="Fibrose Cística (Mucoviscidose)"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Fibrose Cística (Mucoviscidose)</button>
+        <button class="opt" aria-pressed="false" data-value="Hanseníase"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Hanseníase</button>
+        <button class="opt" aria-pressed="false" data-value="Doença de Paget (Osteíte Deformante)"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Doença de Paget (Osteíte Deformante)</button>
+        <button class="opt" aria-pressed="false" data-value="Contaminação por Radiação"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Contaminação por Radiação</button>
+        <button class="opt" aria-pressed="false" data-value="Tuberculose Ativa"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Tuberculose Ativa</button>
+        <button class="opt" aria-pressed="false" data-value="Acidente de Trabalho"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Acidente de Trabalho</button>
+        <button class="opt opt-last" aria-pressed="false" data-value="Nenhuma dessas" data-disqualify="true"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Nenhuma dessas</button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goTo('perfil')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      </div>
+    </section>
+
+    <!-- 3: RENDA -->
+    <section class="screen" data-screen="renda">
+      <div class="q-eyebrow">Pergunta 3 de 3</div>
+      <h2 class="q-title">Qual sua remuneração bruta mensal?</h2>
+      <p class="q-help">Usamos isso apenas para confirmar seu direito.</p>
+      <div class="opt-list" data-group="renda">
+        <button class="opt" aria-pressed="false" data-value="Menos de R$3.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Menos de R$ 3.000,00</button>
+        <button class="opt" aria-pressed="false" data-value="De R$3.000,00 até R$5.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 3.000,00 até R$ 5.000,00</button>
+        <button class="opt" aria-pressed="false" data-value="De R$5.000,00 até R$7.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 5.000,00 até R$ 7.000,00</button>
+        <button class="opt" aria-pressed="false" data-value="De R$7.000,00 até R$10.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 7.000,00 até R$ 10.000,00</button>
+        <button class="opt" aria-pressed="false" data-value="Acima de R$10.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Acima de R$ 10.000,00</button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goTo('doenca')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      </div>
+    </section>
+
+    <!-- 4: CONTATO -->
+    <section class="screen" data-screen="contato">
+      <div class="q-eyebrow">Último passo</div>
+      <h2 class="q-title">Ótimo! Você pode ter direito.</h2>
+      <p class="q-help">Deixe seus dados que um especialista entra em contato.</p>
+      <form id="leadForm" novalidate>
+        <div class="field" id="fieldNome">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" autocomplete="name">
+          <div class="field-error">Digite seu nome completo.</div>
+        </div>
+        <div class="field" id="fieldTelefone">
+          <label for="telefone">WhatsApp / Telefone</label>
+          <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="tel">
+          <div class="field-error">Digite um telefone válido com DDD.</div>
+        </div>
+        <div class="consent">
+          <input type="checkbox" id="consent" name="consent">
+          <label for="consent">Concordo com o uso dos meus dados conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page-fm" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
+        </div>
+        <div class="btn-stack">
+          <button type="submit" class="btn btn-primary">Enviar e falar com especialista</button>
+        </div>
+      </form>
+      <div class="step-nav" style="margin-top:12px">
+        <button class="btn-back" onclick="goTo('renda')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      </div>
+    </section>
+
+    <!-- 5: SUCESSO -->
+    <section class="screen end" data-screen="sucesso">
+      <div class="end-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h1 class="end-title">Recebemos seus dados!</h1>
+      <p class="end-sub">Um especialista vai te chamar em breve.</p>
+    </section>
+
+    <!-- 6: DESQUALIFICADO -->
+    <section class="screen end" data-screen="desqualificado">
+      <div class="end-icon muted">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16h.01M12 2L2 20h20L12 2z"/></svg>
+      </div>
+      <h1 class="end-title" id="dqTitle">Agradecemos a participação!</h1>
+      <p class="end-sub" id="dqSub">Compartilhamos o link do nosso site, caso queira conhecer nosso trabalho.</p>
+      <div class="end-links">
+        <a class="btn btn-primary" href="https://fariasemoura.com" target="_blank" rel="noopener" style="text-decoration:none">Visitar o site</a>
+        <a class="btn btn-ghost" href="https://instagram.com/fariasemoura" target="_blank" rel="noopener">Seguir no Instagram</a>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="footer-note">Farias &amp; Moura Advocacia · seus dados estão protegidos</p>
+</main>
+
+<script>
+(function(){
+  var order = ['hook','perfil','doenca','renda','contato','sucesso','desqualificado'];
+  var progressMap = { hook:8, perfil:28, doenca:50, renda:72, contato:90, sucesso:100, desqualificado:100 };
+  var answers = {};
+
+  function goTo(screen){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    var target = document.querySelector('[data-screen="'+screen+'"]');
+    target.classList.add('active');
+    target.scrollTop = 0;
+    document.getElementById('progressFill').style.width = (progressMap[screen] || 0) + '%';
+    window.scrollTo(0,0);
+  }
+  window.goTo = goTo;
+
+  document.querySelectorAll('.opt-list').forEach(function(list){
+    var group = list.getAttribute('data-group');
+    list.addEventListener('click', function(e){
+      var btn = e.target.closest('.opt');
+      if(!btn) return;
+      list.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed','false'); });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-pressed','true');
+      answers[group] = btn.getAttribute('data-value');
+
+      var disqualify = btn.getAttribute('data-disqualify') === 'true';
+      setTimeout(function(){
+        if(disqualify){
+          document.getElementById('dqTitle').textContent = 'Agradecemos a participação!';
+          document.getElementById('dqSub').textContent = 'Infelizmente, pelas respostas informadas, você não se qualifica para a isenção hoje. Compartilhamos o link do nosso site, caso queira conhecer nosso trabalho.';
+          goTo('desqualificado');
+          return;
+        }
+        if(group === 'perfil') goTo('doenca');
+        else if(group === 'doenca') goTo('renda');
+        else if(group === 'renda') goTo('contato');
+      }, 260);
+    });
+  });
+
+  function validPhone(v){
+    var digits = v.replace(/\D/g,'');
+    return digits.length >= 10 && digits.length <= 11;
+  }
+
+  document.getElementById('leadForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var nome = document.getElementById('nome');
+    var telefone = document.getElementById('telefone');
+    var fieldNome = document.getElementById('fieldNome');
+    var fieldTelefone = document.getElementById('fieldTelefone');
+    var ok = true;
+
+    if(nome.value.trim().length < 3){
+      fieldNome.classList.add('invalid'); ok = false;
+    } else { fieldNome.classList.remove('invalid'); }
+
+    if(!validPhone(telefone.value)){
+      fieldTelefone.classList.add('invalid'); ok = false;
+    } else { fieldTelefone.classList.remove('invalid'); }
+
+    if(!ok) return;
+
+    answers.nome = nome.value.trim();
+    answers.telefone = telefone.value.trim();
+    answers.consent = document.getElementById('consent').checked;
+
+    // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
+    goTo('sucesso');
+  });
+
+  document.getElementById('telefone').addEventListener('input', function(e){
+    var v = e.target.value.replace(/\D/g,'').slice(0,11);
+    if(v.length > 6){
+      e.target.value = '('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);
+    } else if(v.length > 2){
+      e.target.value = '('+v.slice(0,2)+') '+v.slice(2);
+    } else {
+      e.target.value = v;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
