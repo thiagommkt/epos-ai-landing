@@ -413,6 +413,48 @@ canvas{display:block;width:100%!important}
   </div>
 </div>
 
+<div class="lead-panel-overlay" id="novo-contato-overlay" onclick="fecharModalNovoContato()">
+  <div class="lead-panel" style="max-width:440px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title">Novo Contato Manual</div>
+      <button class="panel-close" onclick="fecharModalNovoContato()">✕</button>
+    </div>
+    <div class="panel-body" style="padding:20px 24px 24px">
+      <div style="display:grid;gap:14px">
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Nome *</label>
+          <input id="nc-nome" type="text" placeholder="Nome completo" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">WhatsApp *</label>
+          <input id="nc-telefone" type="text" placeholder="5561999998888" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+          <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:4px">DDI + DDD + número, sem espaços. Ex: 5561999998888</div>
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Perfil</label>
+          <input id="nc-perfil" type="text" placeholder="Ex: Empresário, CLT..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Condicao / Patologia</label>
+          <input id="nc-patologia" type="text" placeholder="Ex: LER, Acidente de trabalho..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Cidade</label>
+          <input id="nc-cidade" type="text" placeholder="Ex: Brasilia, Goiania..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Observacoes</label>
+          <textarea id="nc-notas" rows="3" placeholder="Contexto, indicacao, observacoes internas..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s;resize:vertical" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onclick="fecharModalNovoContato()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">Cancelar</button>
+        <button id="nc-save-btn" onclick="criarContato()" style="flex:2;padding:10px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='rgba(145,70,255,.18)'" onmouseout="this.style.background='var(--pur-l)'">+ Criar Contato</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 <div class="mobile-header">
   <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -464,6 +506,10 @@ canvas{display:block;width:100%!important}
     <a data-sec="campanhas" onclick="navTo('campanhas')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
       Campanhas
+    </a>
+    <a data-sec="prospeccao" onclick="navTo('prospeccao')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l4 4" stroke="currentColor" stroke-width="1.5"/></svg>
+      Prospecção
     </a>
     <div class="nav-section">Sistema</div>
     <a data-sec="status" onclick="navTo('status')">
@@ -703,6 +749,7 @@ canvas{display:block;width:100%!important}
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'30')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">30d</button>
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'14')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">14d</button>
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'7')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">7d</button>
+      <button onclick="abrirModalNovoContato()" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer;margin-left:6px" onmouseover="this.style.background='rgba(145,70,255,.18)'" onmouseout="this.style.background='var(--pur-l)'">＋ Novo Contato</button>
     </div>
   </div>
   <div class="rule"></div>
@@ -856,6 +903,22 @@ canvas{display:block;width:100%!important}
   <div id="campanhas-container"><div class="loading"></div></div>
 </section>
 
+<!-- ══ PROSPECÇÃO ══ -->
+<section class="section" id="s-prospeccao">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">PROSPECÇÃO <span>COLD OUTREACH</span></div>
+      <div class="sec-sub">DISPARO SWaaS · API OFICIAL WHATSAPP · RESPOSTAS AO VIVO</div>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <div style="background:rgba(145,70,255,.06);border:1px solid var(--bd);padding:20px 24px;font-size:13px;color:var(--muted);line-height:1.8;font-family:var(--fB);text-align:center">
+    <div style="font-family:var(--fD);font-size:28px;font-weight:700;color:var(--purple);margin-bottom:8px">Em breve</div>
+    <div style="font-size:12px;letter-spacing:.04em">Prospecção ativa via API Oficial WhatsApp não configurada para este cliente ainda.</div>
+    <div style="font-size:11px;color:var(--dim);margin-top:6px">Disponível após setup de instância Evolution + template aprovado.</div>
+  </div>
+</section>
+
 <!-- ══ STATUS ══ -->
 <section class="section" id="s-status">
   <div class="sec-head">
@@ -972,6 +1035,26 @@ canvas{display:block;width:100%!important}
     location.replace('login-fm.html');
     throw new Error('bio_required');
   }
+})();
+
+// ═══ AUTO-REFRESH TOKEN SUPABASE ═══
+(function() {
+  const SB_URL_AR = 'https://phszzzwqkujmmfregtsj.supabase.co';
+  const SB_ANON_AR = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+  const SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
+  try {
+    const raw = localStorage.getItem(SESS_KEY);
+    if (!raw) return;
+    const sess = JSON.parse(raw);
+    if (!sess.refresh_token) return;
+    const client = window.supabase.createClient(SB_URL_AR, SB_ANON_AR, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
+    client.auth.setSession({ access_token: sess.access_token, refresh_token: sess.refresh_token })
+      .then(({ data }) => { if (data?.session?.access_token) window._ACCESS_TOKEN = data.session.access_token; });
+    client.auth.onAuthStateChange((_ev, s) => { if (s?.access_token) window._ACCESS_TOKEN = s.access_token; });
+    window._sbClient = client;
+  } catch(e) {}
 })();
 
 // ═══ CONFIG v2026-06-02 ═══
@@ -1185,7 +1268,7 @@ async function loadDashboard() {
   const drop = (a,b) => a>0 ? Math.round((a-b)/a*100) : 0;
   const funil = document.getElementById('funnel-container');
   funil.innerHTML = `
-    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="100%"><span class="f-pct">100%</span></div></div><div class="f-n">${leadsTotal}</div></div>
+    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="${leadsTotal>0?'100%':'0%'}"><span class="f-pct">${leadsTotal>0?'100%':'0%'}</span></div></div><div class="f-n">${leadsTotal}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(leadsTotal,fEC)}%</div></div>
     <div class="f-row"><div class="f-lbl">Em Conversa</div><div class="f-track"><div class="f-fill f1-5" data-w="${pct(fEC)}%"><span class="f-pct">${pct(fEC)}%</span></div></div><div class="f-n">${fEC}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fEC,fQL)}%</div></div>
@@ -1607,6 +1690,7 @@ function show(id) {
     if(id==='crm') loadCRM();
     if(id==='status') loadStatus();
     if(id==='campanhas') loadCampanhas();
+    if(id==='prospeccao') { /* placeholder — não carrega dados, seção exibe aviso */ }
     if(id==='analista') loadAnalista();
   }
   if(id==='dashboard') {
@@ -1704,7 +1788,7 @@ function openLeadPanel(lead) {
   };
 
   document.getElementById('panel-body').innerHTML = `
-    <div class="panel-score">${lead.score||0}<small>score de qualificação</small></div>
+    ${(cs => { const n=parseInt(cs)||0; if(!n) return `<div class="panel-score" style="color:var(--muted)">${lead.score||0}<small>score manual (sem IA ainda)</small></div>`; const c=n>=9?'#3fb950':n>=7?'#e8893d':n>=4?'#e3b341':'#FF5E5B'; const lbl=n>=9?'Quente':n>=7?'Engajado':n>=4?'Morno':'Frio'; return `<div class="panel-score" style="color:${c}">${n}<small>O Analista · ${lbl}</small></div>`; })(lead.crm_score)}
 
     ${lead.chatwoot_conversation_id ? `
     <button onclick="openConversationInChat(${lead.chatwoot_conversation_id})"
@@ -1735,16 +1819,20 @@ function openLeadPanel(lead) {
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
 
     <div class="panel-section">Contexto Evolutivo (IA)</div>
-    ${(lead.auditoria_ia_resumo || lead.auditoria_ia_motivo_perda) ? `
+    ${(lead.auditoria_ia_resumo || lead.auditoria_ia_motivo_perda || lead.crm_score) ? `
       ${lead.auditoria_ia_resumo ? `<div style="padding:10px 12px;background:rgba(145,70,255,.04);border:1px solid var(--bd);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Resumo da conversa (IA)</div>
         <div style="font-size:12px;line-height:1.6;color:var(--text)">${lead.auditoria_ia_resumo}</div>
+      </div>` : ''}
+      ${lead.auditoria_ia_proxima_acao ? `<div style="padding:10px 12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.25);margin-bottom:8px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">▶ Próxima ação (O Analista)</div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text)">${lead.auditoria_ia_proxima_acao}</div>
       </div>` : ''}
       ${lead.auditoria_ia_motivo_perda ? `<div style="padding:10px 12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--warn);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">⚠️ Objeção detectada</div>
         <div style="font-size:12px;line-height:1.5;color:var(--text)">${lead.auditoria_ia_motivo_perda}</div>
       </div>` : ''}
-      <div class="panel-row"><div class="panel-key">Última auditoria</div><div class="panel-val">${fmtDate(lead.auditoria_ia_em)}</div></div>
+      <div class="panel-row"><div class="panel-key">Última auditoria</div><div class="panel-val">${fmtDate(lead.crm_auditoria_at || lead.auditoria_ia_em)}</div></div>
     ` : `<div style="padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Ainda sem análise da IA — aguardando próxima auditoria de O Analista</div>`}
 
     <div class="panel-section">Editar Qualificação</div>
@@ -1921,6 +2009,67 @@ async function saveQualification(telefone) {
   } catch(e) {
     toast('Erro ao salvar — ' + e.message, 'err');
     if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar Qualificação'; }
+  }
+}
+
+// ═══ NOVO CONTATO MANUAL ═══
+function abrirModalNovoContato() {
+  ['nc-nome','nc-telefone','nc-perfil','nc-patologia','nc-cidade','nc-notas'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const btn = document.getElementById('nc-save-btn');
+  if (btn) { btn.disabled = false; btn.textContent = '+ Criar Contato'; }
+  document.getElementById('novo-contato-overlay')?.classList.add('show');
+  setTimeout(() => document.getElementById('nc-nome')?.focus(), 100);
+}
+
+function fecharModalNovoContato() {
+  document.getElementById('novo-contato-overlay')?.classList.remove('show');
+}
+
+async function criarContato() {
+  const nome = document.getElementById('nc-nome')?.value?.trim();
+  const telefone = document.getElementById('nc-telefone')?.value?.trim().replace(/\D/g, '');
+  const perfil = document.getElementById('nc-perfil')?.value?.trim() || null;
+  const patologia = document.getElementById('nc-patologia')?.value?.trim() || null;
+  const cidade = document.getElementById('nc-cidade')?.value?.trim() || null;
+  const notas = document.getElementById('nc-notas')?.value?.trim() || null;
+
+  if (!nome) { toast('Nome obrigatorio', 'err'); return; }
+  if (!telefone || telefone.length < 10) { toast('WhatsApp invalido — inclua DDI+DDD+numero', 'err'); return; }
+
+  const btn = document.getElementById('nc-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Criando...'; }
+
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify({
+        nome, telefone, perfil, patologia, cidade, notas,
+        canal: 'manual',
+        qualificado: false,
+        agendou: false,
+        score: 0,
+        dify_ativo: false
+      })
+    });
+    if (!r.ok) {
+      const err = await r.text();
+      throw new Error(`HTTP ${r.status}: ${err}`);
+    }
+    toast('Contato criado com sucesso', 'ok');
+    fecharModalNovoContato();
+    loadCRM();
+  } catch(e) {
+    toast('Erro ao criar contato — ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '+ Criar Contato'; }
   }
 }
 
@@ -2285,7 +2434,7 @@ function renderColPanel() {
   const sel = getSelectedCols();
   const bEl = document.getElementById('col-presets-builtin');
   if (bEl) bEl.innerHTML = COL_BUILTIN_PRESETS.map(p =>
-    `<button class="col-preset-chip" onclick="applyColPreset(${JSON.stringify(p.cols)})">${p.label}</button>`
+    `<button class="col-preset-chip" onclick='applyColPreset(${JSON.stringify(p.cols)})'>${p.label}</button>`
   ).join('');
   const ups = getUserPresets();
   const uSec = document.getElementById('col-user-presets-section');
@@ -2293,7 +2442,7 @@ function renderColPanel() {
   if (uSec && uEl) {
     uSec.style.display = ups.length ? '' : 'none';
     uEl.innerHTML = ups.map((p,i) =>
-      `<button class="col-preset-chip" onclick="applyColPreset(${JSON.stringify(p.cols)})">${p.label} <span onclick="event.stopPropagation();deleteColPreset(${i})" style="opacity:.5;margin-left:2px">✕</span></button>`
+      `<button class="col-preset-chip" onclick='applyColPreset(${JSON.stringify(p.cols)})'>${p.label} <span onclick="event.stopPropagation();deleteColPreset(${i})" style="opacity:.5;margin-left:2px">✕</span></button>`
     ).join('');
   }
   const cats = [...new Set(COLUNAS_DEF.map(c => c.cat))];
@@ -2715,10 +2864,10 @@ function renderAnRecentes() {
         <td style="text-align:center">${canalTxt}</td>
         <td style="text-align:center">${(s=>{
   const n=parseInt(s)||0;
-  const c=n>=8?'#3fb950':n>=6?'rgba(0,245,160,0.8)':n>=4?'#e3b341':n>=2?'rgba(145,70,255,0.6)':'#8b949e';
-  const lbl=n>=10?'Fechado':n>=9?'Agendado':n>=8?'Quente':n>=7?'Engajado':n>=6?'Qualif.':n>=5?'Potencial':n>=4?'Interesse':n>=3?'Morno':n>=2?'Curioso':'Frio';
+  const c=n>=9?'#3fb950':n>=7?'#e8893d':n>=4?'#e3b341':n>=1?'#FF5E5B':'#8b949e';
+  const lbl=n>=9?'Quente':n>=7?'Engajado':n>=4?'Morno':n>=1?'Frio':'—';
   return n>0?`<span style="font-family:var(--fM);font-size:10px;font-weight:700;color:${c}">${n}</span><div style="font-size:8px;color:${c};opacity:0.8">${lbl}</div>`:'—';
-})(l.score)}</td>
+})(l.crm_score)}</td>
         <td>${etapa}</td>
         <td style="font-size:11px;color:var(--muted);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${l.auditoria_ia_resumo||'—'}</td>
         <td style="font-size:11px;color:var(--warn);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${l.auditoria_ia_motivo_perda||'—'}</td>
@@ -2749,7 +2898,7 @@ async function loadAnalista(force) {
         periodoParam = '&criado_em=gte.' + d.toISOString();
       }
     }
-    const fields = 'select=canal,qualificado,agendou,compareceu,fechou,score,nome,telefone,perfil,patologia,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,typebot_concluido,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
+    const fields = 'select=canal,qualificado,agendou,compareceu,fechou,score,crm_score,crm_auditoria_at,auditoria_ia_proxima_acao,chatwoot_conversation_id,nome,telefone,perfil,patologia,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,typebot_concluido,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
     const r = await fetch(SB_URL+'/rest/v1/'+TABLE+'?'+fields+periodoParam+'&order=criado_em.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY)}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const leads = await r.json();
@@ -2831,14 +2980,14 @@ async function toggleRobo() {
   if (!confirm(msg)) return;
   btns.forEach(b => { b.dataset.busy = '1'; b.style.opacity = '0.5'; });
   try {
-    const resp = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.fm`, {
-      method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({ robo_ativo: novo, atualizado_em: new Date().toISOString() })
+    const resp = await fetch(`${SB_URL}/rest/v1/system_config`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify({ projeto: 'fm', robo_ativo: novo, atualizado_em: new Date().toISOString() })
     });
     if (!resp.ok) { throw new Error(`HTTP ${resp.status} — verifique permissões do Supabase`); }
     const result = await resp.json().catch(() => []);
-    if (!Array.isArray(result) || result.length === 0) { throw new Error('Nenhuma linha atualizada — sem permissão ou projeto não encontrado'); }
+    if (!Array.isArray(result) || result.length === 0) { throw new Error('Upsert sem retorno — verifique RLS da tabela system_config'); }
     renderRoboStatus(novo);
   } catch (e) {
     alert('Erro ao atualizar status do robô:\n' + e.message);
