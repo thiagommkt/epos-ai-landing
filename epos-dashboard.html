@@ -2261,15 +2261,15 @@ function openLeadPanel(lead) {
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
       <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Controle do Bot</div>
-      ${lead.em_atendimento
+      ${(lead.em_atendimento || !lead.dify_ativo)
         ? `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', true)"
             style="width:100%;padding:12px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
-            ✅ Bot desativado — Reativar
+            ✅ Bot pausado — Reativar
           </button>
-          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Bot silenciado permanentemente para este lead.</div>`
+          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Bot inativo para este lead.</div>`
         : `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', false)"
             style="width:100%;padding:12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.3);color:var(--warn);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
-            🚫 Desativar bot para este lead
+            🚫 Pausar bot para este lead
           </button>
           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">O bot vai parar de responder este contato.</div>`
       }
@@ -2464,11 +2464,15 @@ async function toggleBot(telefone, currentlyDisabled) {
       ? { em_atendimento: false, dify_ativo: true }
       : { em_atendimento: true, dify_ativo: false };
 
-    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
       method: 'PATCH',
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(patch)
     });
+    if (!r.ok) {
+      const errBody = await r.text().catch(() => '');
+      throw new Error(`HTTP ${r.status} — ${errBody}`);
+    }
 
     // Atualizar lead no cache local
     const lead = allLeads.find(l => l.telefone === telefone);
