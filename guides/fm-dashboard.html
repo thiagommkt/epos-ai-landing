@@ -2876,14 +2876,14 @@ async function toggleRobo() {
   if (!confirm(msg)) return;
   btns.forEach(b => { b.dataset.busy = '1'; b.style.opacity = '0.5'; });
   try {
-    const resp = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.fm`, {
-      method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({ robo_ativo: novo, atualizado_em: new Date().toISOString() })
+    const resp = await fetch(`${SB_URL}/rest/v1/system_config`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify({ projeto: 'fm', robo_ativo: novo, atualizado_em: new Date().toISOString() })
     });
     if (!resp.ok) { throw new Error(`HTTP ${resp.status} — verifique permissões do Supabase`); }
     const result = await resp.json().catch(() => []);
-    if (!Array.isArray(result) || result.length === 0) { throw new Error('Nenhuma linha atualizada — sem permissão ou projeto não encontrado'); }
+    if (!Array.isArray(result) || result.length === 0) { throw new Error('Upsert sem retorno — verifique RLS da tabela system_config'); }
     renderRoboStatus(novo);
   } catch (e) {
     alert('Erro ao atualizar status do robô:\n' + e.message);
