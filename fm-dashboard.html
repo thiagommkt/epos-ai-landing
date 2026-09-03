@@ -2984,10 +2984,10 @@ async function toggleRobo() {
   if (!confirm(msg)) return;
   btns.forEach(b => { b.dataset.busy = '1'; b.style.opacity = '0.5'; });
   try {
-    const resp = await fetch(`${SB_URL}/rest/v1/system_config`, {
-      method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ projeto: 'fm', robo_ativo: novo, atualizado_em: new Date().toISOString() })
+    const resp = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.fm`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ robo_ativo: novo, atualizado_em: new Date().toISOString() })
     });
     if (!resp.ok) {
       const errBody = await resp.text().catch(() => '');
