@@ -3428,12 +3428,13 @@ async function toggleRobo() {
   try {
     const resp = await fetch(`${SB_URL}/rest/v1/system_config`, {
       method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=representation' },
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ projeto: 'principal', robo_ativo: novo, atualizado_em: new Date().toISOString() })
     });
-    if (!resp.ok) { throw new Error(`HTTP ${resp.status} — verifique permissões do Supabase`); }
-    const result = await resp.json().catch(() => []);
-    if (!Array.isArray(result) || result.length === 0) { throw new Error('Upsert sem retorno — verifique RLS da tabela system_config'); }
+    if (!resp.ok) {
+      const errBody = await resp.text().catch(() => '');
+      throw new Error(`HTTP ${resp.status} — ${errBody}`);
+    }
     renderRoboStatus(novo);
   } catch (e) {
     alert('Erro ao atualizar status do robô:\n' + e.message);
