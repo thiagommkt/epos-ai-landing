@@ -1520,7 +1520,7 @@ async function loadDashboard() {
   document.getElementById('utm-list').innerHTML = canalHtml + legendHtml + atribSection;
 
   // Leads recentes
-  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,perfil,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&order=criado_em.desc&limit=6`);
+  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao&order=criado_em.desc&limit=6`);
   const recentesHtml = (recentes || []).map(l => {
     const leadJson = encodeURIComponent(JSON.stringify(l));
     return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''"><td class="td-hi">${l.nome||'—'}</td><td>${l.perfil||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${canalBadge(l)}</td><td>${statusBadge(l)}</td></tr>`;
@@ -1789,7 +1789,7 @@ function setCrmPeriod(btn, val) {
 
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,perfil,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
