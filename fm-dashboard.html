@@ -2407,14 +2407,32 @@ function openConversationInChat(convId) {
 
 // ═══ SCROLL HINT ANALYTICS TABS ═══
 document.addEventListener('DOMContentLoaded', function() {
-  // Chatwoot SSO: injeta user_access_token no iframe se disponível
+  // Chatwoot SSO: busca token fresco via Supabase session (sem precisar de senha)
   const cwIframe = document.getElementById('chatwoot-iframe');
   if (cwIframe) {
-    const cwTok = localStorage.getItem('cw_fm_token');
     const cwBase = 'https://chatwoot.eposmktfilmsia.com.br';
-    cwIframe.src = cwTok
-      ? cwBase + '/app/login?user_access_token=' + encodeURIComponent(cwTok)
-      : cwBase + '/app/accounts/2/custom_view/1/conversations';
+    (async () => {
+      let cwTok = null;
+      try {
+        const sbRaw = localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token');
+        const jwt = sbRaw ? JSON.parse(sbRaw)?.access_token : null;
+        if (jwt) {
+          const r = await fetch('https://phszzzwqkujmmfregtsj.supabase.co/functions/v1/chatwoot-auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt }
+          });
+          if (r.ok) {
+            const d = await r.json();
+            cwTok = d?.data?.access_token || null;
+            if (cwTok) localStorage.setItem('cw_fm_token', cwTok);
+          }
+        }
+      } catch {}
+      if (!cwTok) cwTok = localStorage.getItem('cw_fm_token');
+      cwIframe.src = cwTok
+        ? cwBase + '/app/login?user_access_token=' + encodeURIComponent(cwTok)
+        : cwBase + '/app/accounts/2/custom_view/1/conversations';
+    })();
   }
 
   const wrap = document.getElementById('mb-tabs-wrap');
