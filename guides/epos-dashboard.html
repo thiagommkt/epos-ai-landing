@@ -443,6 +443,67 @@ canvas{display:block;width:100%!important}
   </div>
 </div>
 
+<div class="lead-panel-overlay" id="novo-contato-overlay" onclick="fecharModalNovoContato()">
+  <div class="lead-panel" style="max-width:440px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title">Novo Contato Manual</div>
+      <button class="panel-close" onclick="fecharModalNovoContato()">✕</button>
+    </div>
+    <div class="panel-body" style="padding:20px 24px 24px">
+      <div style="display:grid;gap:14px">
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Nome *</label>
+          <input id="nc-nome" type="text" placeholder="Nome completo" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">WhatsApp *</label>
+          <input id="nc-telefone" type="text" placeholder="5561999998888" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+          <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:4px">DDI + DDD + número, sem espaços. Ex: 5561999998888</div>
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Perfil</label>
+          <input id="nc-perfil" type="text" placeholder="Ex: Empresário, Autônomo..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Servico de Interesse</label>
+          <input id="nc-patologia" type="text" placeholder="Ex: Site, Social Media, Tráfego..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Cidade</label>
+          <input id="nc-cidade" type="text" placeholder="Ex: Brasilia, Goiania..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+        </div>
+        <div>
+          <label style="font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Observacoes</label>
+          <textarea id="nc-notas" rows="3" placeholder="Contexto, indicacao, observacoes internas..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s;resize:vertical" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onclick="fecharModalNovoContato()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">Cancelar</button>
+        <button id="nc-save-btn" onclick="criarContato()" style="flex:2;padding:10px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='rgba(145,70,255,.18)'" onmouseout="this.style.background='var(--pur-l)'">+ Criar Contato</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="descarte-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10001;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:var(--bg2);border:1px solid var(--bd);padding:24px;max-width:380px;width:90%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;color:var(--text)">Descartar Lead</div>
+    <div style="font-family:var(--fM);font-size:11px;color:var(--dim);margin-bottom:16px">Por que este lead está sendo descartado? (opcional)</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--fB);font-size:12px;color:var(--text)"><input type="checkbox" value="Não é o perfil" style="accent-color:var(--purple)"> Não é o perfil</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--fB);font-size:12px;color:var(--text)"><input type="checkbox" value="Sem orçamento" style="accent-color:var(--purple)"> Sem orçamento</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--fB);font-size:12px;color:var(--text)"><input type="checkbox" value="Escolheu a concorrência" style="accent-color:var(--purple)"> Escolheu a concorrência</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--fB);font-size:12px;color:var(--text)"><input type="checkbox" value="Desistiu do serviço" style="accent-color:var(--purple)"> Desistiu do serviço</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--fB);font-size:12px;color:var(--text)"><input type="checkbox" value="Não respondia mais" style="accent-color:var(--purple)"> Não respondia mais</label>
+    </div>
+    <input id="descarte-outro-txt" type="text" placeholder="Outro motivo..." style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;outline:none;margin-bottom:16px;transition:border-color .2s" onfocus="this.style.borderColor='var(--warn)'" onblur="this.style.borderColor='var(--bd)'">
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('descarte-overlay').style.display='none'" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Cancelar</button>
+      <button onclick="confirmarDescarte()" style="flex:2;padding:10px;background:rgba(255,94,91,.12);border:1px solid rgba(255,94,91,.35);color:var(--warn);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">🗑️ Confirmar Descarte</button>
+    </div>
+  </div>
+</div>
+
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 <div class="mobile-header">
   <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -796,6 +857,7 @@ canvas{display:block;width:100%!important}
         </div>
       </div>
     </div>
+    <button onclick="abrirModalNovoContato()" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer;margin-left:6px" onmouseover="this.style.background='rgba(145,70,255,.18)'" onmouseout="this.style.background='var(--pur-l)'">＋ Novo Contato</button>
   </div>
   <div class="rule"></div>
   <div class="kanban" id="kanban-board"><div class="loading"></div></div>
@@ -1477,7 +1539,7 @@ async function loadDashboard() {
   document.getElementById('utm-list').innerHTML = canalHtml + legendHtml + atribSection;
 
   // Leads recentes
-  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,perfil,score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&order=criado_em.desc&limit=6`);
+  const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico&order=criado_em.desc&limit=6`);
   const recentesHtml = (recentes || []).map(l => {
     const leadJson = encodeURIComponent(JSON.stringify(l));
     return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''"><td class="td-hi">${l.nome||'—'}</td><td>${l.perfil||'—'}</td><td><span class="score">${l.score||0}</span></td><td>${canalBadge(l)}</td><td>${statusBadge(l)}</td></tr>`;
@@ -1665,7 +1727,7 @@ function renderLeads() {
 }
 
 function filterLeads(btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#dados-filters .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   leadsFilter = btn.dataset.filter;
   renderLeads();
@@ -1746,7 +1808,7 @@ function setCrmPeriod(btn, val) {
 
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,perfil,score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
@@ -1786,6 +1848,7 @@ async function loadCRM() {
         onmousedown="_dragOrClick=false"
         onclick="if(!_dragging)openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))">
         <div class="krm-name" style="pointer-events:none">${l.nome||'Lead sem nome'}</div>
+        ${(function(cs){const n=parseInt(cs)||0;if(n>=9)return '<div style="display:inline-block;padding:2px 6px;background:rgba(255,94,91,.15);color:#FF5E5B;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🔴 URGENTE</div>';if(n>=7)return '<div style="display:inline-block;padding:2px 6px;background:rgba(232,137,61,.15);color:#e8893d;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟠 PRIORITÁRIO</div>';if(n>=4)return '<div style="display:inline-block;padding:2px 6px;background:rgba(227,179,65,.12);color:#e3b341;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟡 NORMAL</div>';return '';})(l.crm_score)}
         <div class="krm-path" style="pointer-events:none">${l.perfil||'—'}</div>
         ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px;pointer-events:none">📱 ${telFmt}</div>` : ''}
         <div class="krm-foot" style="pointer-events:none">
@@ -2118,6 +2181,200 @@ document.addEventListener('click', function(e) {
   if (!e.target.closest('.prd-drop')) closeAllPrdMenus();
 });
 
+// ═══ REATIVAÇÃO ═══
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+const RMKT_ESTADO_LABELS = { parou_conversa:'Parou Conversa', info_incompleta:'Falta Info', qualificado_sem_agenda:'Sem Agenda', nao_compareceu:'Não Compareceu', frio:'Frio >14d' };
+
+const RMKT_TEMPLATES = {
+  parou_conversa: [
+    'Oi, {{nome}}! Vi que tínhamos uma conversa em andamento. Ainda faz sentido continuarmos? O que aconteceu? Estou aqui pra ajudar.',
+    '{{nome}}, você estava bem encaminhado(a) pro próximo passo e perdemos o contato. O que posso fazer pra ajudar agora?',
+    'Olá, {{nome}}! Passando pra saber se ficou alguma dúvida da nossa última conversa. Estou disponível.'
+  ],
+  info_incompleta: [
+    'Oi, {{nome}}! Para entender como posso te ajudar, me conta: qual é exatamente a sua situação?',
+    '{{nome}}, antes de seguirmos preciso entender seu caso. O que está acontecendo com você?',
+    'Olá, {{nome}}! Ainda não temos claro o que te trouxe até nós. Pode me contar o que você precisa?'
+  ],
+  qualificado_sem_agenda: [
+    'Oi, {{nome}}! Analisamos o seu caso e ele tem potencial real. Qual a melhor data e horário pra marcarmos uma consulta?',
+    '{{nome}}, você está qualificado(a) e pronto(a) pra avançar. Qual a melhor data e horário pra conversarmos?',
+    'Olá, {{nome}}! Somos especialistas em casos como o seu e estamos prontos pra ajudar. Qual a melhor data e horário pra marcarmos?'
+  ],
+  nao_compareceu: [
+    'Oi, {{nome}}! Sentimos sua falta na consulta. Imprevistos acontecem — sem problema. Qual a melhor data e horário pra remarcarmos?',
+    '{{nome}}, te esperamos mas você não pôde comparecer. Quando podemos remarcar? Me diga a melhor data e horário.',
+    'Olá, {{nome}}! Ainda temos interesse no seu caso. Qual seria o melhor momento pra remarcarmos a consulta?'
+  ],
+  frio: [
+    'Oi, {{nome}}! Faz um tempo que não conversamos. Você ainda quer resolver o seu caso? É só me responder que a gente retoma.',
+    '{{nome}}, passando pra saber se ainda posso te ajudar. Casos como o seu têm prazo — quanto antes agirmos, melhor.',
+    'Olá, {{nome}}! Não nos falamos há um tempo. O que falta pra você dar o próximo passo? Estou aqui.'
+  ]
+};
+
+function detectRmktState(lead) {
+  const stage = getStage(lead);
+  if (stage === 'agendou' && !lead.compareceu) return 'nao_compareceu';
+  if (lead.qualificado && !lead.agendou) return 'qualificado_sem_agenda';
+  if (!lead.qualificado) return 'info_incompleta';
+  const ultimaInt = lead.ultima_msg_lead_em || lead.ultima_interacao_humano || lead.auditoria_ia_em || lead.criado_em;
+  const dias = ultimaInt ? Math.floor((Date.now() - new Date(ultimaInt).getTime()) / 86400000) : 999;
+  return dias >= 14 ? 'frio' : 'parou_conversa';
+}
+
+function getRmktText(estado, varIdx, nome) {
+  const firstName = (nome||'Lead').split(' ')[0];
+  const tpl = (RMKT_TEMPLATES[estado] || RMKT_TEMPLATES.parou_conversa)[varIdx % 3] || '';
+  return tpl.replace(/\{\{nome\}\}/g, firstName);
+}
+
+function buildRmktSection(lead) {
+  const hist = Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [];
+  const tp = hist.length + 1;
+  const estado = detectRmktState(lead);
+  const nome = lead.nome || 'Lead';
+  const varKey = 'rmkt_var_' + estado;
+  let varIdx = parseInt(localStorage.getItem(varKey) || '0') % 3;
+  const varLbl = ['A','B','C'][varIdx];
+  const tpBadge = tp >= 4 ? 'tentativa-final' : 'tp-' + tp;
+
+  if (window._panelLead) {
+    window._panelLead._rmktEstado = estado;
+    window._panelLead._rmktTp = tp;
+    window._panelLead._rmktVarIdx = varIdx;
+  }
+
+  const btnHtml = Object.keys(RMKT_ESTADO_LABELS).map(e => {
+    const isAct = e === estado;
+    return '<button onclick="prepararRmktEstado(\''+e+'\')" style="padding:5px 4px;background:'+(isAct?'rgba(145,70,255,.15)':'var(--bg3)')+';border:1px solid '+(isAct?'var(--purple)':'var(--bd)')+';color:'+(isAct?'var(--purple)':'var(--muted)')+';font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">'+RMKT_ESTADO_LABELS[e]+'</button>';
+  }).join('');
+
+  const textoInicial = escHtml(getRmktText(estado, varIdx, nome));
+
+  return '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">'
+    + '<div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Reativação <span style="float:right;background:rgba(145,70,255,.1);color:var(--purple);padding:2px 6px;font-size:8px">TP '+tp+' · Var '+varLbl+'</span></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px">'+btnHtml+'</div>'
+    + '<textarea id="rmkt-texto" rows="5" style="width:100%;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;padding:10px 12px;resize:vertical;outline:none;margin-bottom:8px;line-height:1.5;transition:border-color .2s" onfocus="this.style.borderColor=\'var(--purple)\'" onblur="this.style.borderColor=\'var(--bd)\'">'
+    + textoInicial + '</textarea>'
+    + '<div style="display:flex;gap:8px">'
+    + '<button onclick="ciclarVarianteRmkt()" style="flex:1;padding:9px;background:var(--bg3);border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer">↺ Variante</button>'
+    + '<button onclick="enviarRemarketing()" style="flex:2;padding:9px;background:rgba(145,70,255,.12);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer">📤 Enviar Reativação</button>'
+    + '</div></div>';
+}
+
+function buildTimelineSection(lead) {
+  const hist = Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [];
+  if (!hist.length) return '';
+  const entriesHtml = hist.slice().reverse().map((e, i) => {
+    const d = e.data ? new Date(e.data).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}) : '—';
+    return '<div style="padding:8px 10px;background:rgba(145,70,255,.03);border-left:2px solid var(--purple);margin-bottom:6px">'
+      + '<div style="font-family:var(--fM);font-size:8px;color:var(--dim);margin-bottom:3px">'+d+' · TP '+e.touchpoint+' · '+escHtml(e.label_chatwoot||'')+'</div>'
+      + '<div style="font-size:11px;line-height:1.5;color:var(--text)">'+escHtml(e.texto_enviado||'')+'</div>'
+      + '</div>';
+  }).join('');
+  return '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)">'
+    + '<div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:0" onclick="var t=document.getElementById(\'rmkt-timeline\');if(t){var open=t.style.display!==\'none\';t.style.display=open?\'none\':\'block\';this.querySelector(\'span\').textContent=open?\'+\':\'-\'}">'
+    + 'Histórico Reativação ('+hist.length+')<span style="font-size:14px;font-weight:700">+</span></div>'
+    + '<div id="rmkt-timeline" style="display:none;margin-top:8px">'+entriesHtml+'</div>'
+    + '</div>';
+}
+
+function prepararRmktEstado(novoEstado) {
+  const p = window._panelLead;
+  if (!p) return;
+  const varKey = 'rmkt_var_' + novoEstado;
+  const varIdx = parseInt(localStorage.getItem(varKey) || '0') % 3;
+  p._rmktEstado = novoEstado;
+  p._rmktVarIdx = varIdx;
+  const txt = document.getElementById('rmkt-texto');
+  if (txt) txt.value = getRmktText(novoEstado, varIdx, p.nome);
+  document.querySelectorAll('[onclick^="prepararRmktEstado"]').forEach(b => {
+    const isAct = b.getAttribute('onclick').includes("'"+novoEstado+"'");
+    b.style.background = isAct ? 'rgba(145,70,255,.15)' : 'var(--bg3)';
+    b.style.borderColor = isAct ? 'var(--purple)' : 'var(--bd)';
+    b.style.color = isAct ? 'var(--purple)' : 'var(--muted)';
+  });
+}
+
+function ciclarVarianteRmkt() {
+  const p = window._panelLead;
+  if (!p) return;
+  const estado = p._rmktEstado || 'parou_conversa';
+  const varKey = 'rmkt_var_' + estado;
+  const curIdx = parseInt(localStorage.getItem(varKey) || '0');
+  const nextIdx = (curIdx + 1) % 3;
+  localStorage.setItem(varKey, String(nextIdx));
+  p._rmktVarIdx = nextIdx;
+  const txt = document.getElementById('rmkt-texto');
+  if (txt) txt.value = getRmktText(estado, nextIdx, p.nome);
+  toast('Variante ' + ['A','B','C'][nextIdx] + ' carregada', 'ok');
+}
+
+async function enviarRemarketing() {
+  const p = window._panelLead;
+  if (!p) return;
+  const txt = document.getElementById('rmkt-texto');
+  const textoEnviado = txt ? txt.value.trim() : '';
+  if (!textoEnviado) { toast('Escreva o texto antes de enviar', 'err'); return; }
+  const estado = p._rmktEstado || 'parou_conversa';
+  const tp = p._rmktTp || 1;
+  const varIdx = p._rmktVarIdx || 0;
+  const varLbl = ['A','B','C'][varIdx];
+  const sendBtn = document.querySelector('[onclick="enviarRemarketing()"]');
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Enviando...'; }
+  try {
+    const r = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, action: 'remarketing_manual', telefone: p.telefone, texto_enviado: textoEnviado, estado, touchpoint: tp, variante: varLbl, chatwoot_conversation_id: p.chatwootConvId, operador_id: '' })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    const varKey = 'rmkt_var_' + estado;
+    localStorage.setItem(varKey, String((varIdx + 1) % 3));
+    p.rmktHistorico.push({ data: new Date().toISOString(), estado, touchpoint: tp, texto_enviado: textoEnviado, variante: varLbl });
+    p._rmktTp = tp + 1;
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '✅ Enviado'; setTimeout(()=>{ if(sendBtn) sendBtn.textContent = '📤 Enviar Reativação'; }, 3000); }
+    toast('Reativação enviada — TP '+tp+' ('+varLbl+')', 'ok');
+  } catch(e) {
+    toast('Erro: ' + e.message, 'err');
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '📤 Enviar Reativação'; }
+  }
+}
+
+function iniciarDescarte(telefone) {
+  const overlay = document.getElementById('descarte-overlay');
+  if (!overlay) return;
+  overlay.dataset.tel = telefone;
+  overlay.querySelectorAll('input[type=checkbox]').forEach(cb => { cb.checked = false; });
+  const outro = overlay.querySelector('#descarte-outro-txt');
+  if (outro) outro.value = '';
+  overlay.style.display = 'flex';
+}
+
+async function confirmarDescarte() {
+  const overlay = document.getElementById('descarte-overlay');
+  const tel = overlay ? overlay.dataset.tel : '';
+  if (!tel) return;
+  const motivos = Array.from(overlay.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+  const outro = overlay.querySelector('#descarte-outro-txt');
+  if (outro && outro.value.trim()) motivos.push(outro.value.trim());
+  overlay.style.display = 'none';
+  try {
+    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(tel)}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ descartado: true, notas: (motivos.length ? '[Descartado] ' + motivos.join('; ') : '[Descartado]') })
+    });
+    document.getElementById('lead-overlay').classList.remove('show');
+    document.body.style.overflow = '';
+    toast('Lead descartado', 'ok');
+    setTimeout(() => loadCRM(), 800);
+  } catch(e) { toast('Erro ao descartar: ' + e.message, 'err'); }
+}
+
 // ═══ PAINEL DE LEAD ═══
 function openLeadPanel(lead) {
   const tel = (lead.telefone||'').replace(/^55/,'');
@@ -2130,6 +2387,8 @@ function openLeadPanel(lead) {
     agendou:'Agendado', compareceu:'Compareceu', fechou:'Fechou',
     perdido:'Perdido', desqualificado:'Desqualificado'
   };
+
+  window._panelLead = { telefone: lead.telefone, nome: lead.nome || '', crmPersonId: lead.crm_person_id || null, proximaAcao: lead.auditoria_ia_proxima_acao || '', etapaAtual: getStage(lead), chatwootConvId: lead.chatwoot_conversation_id || null, chatwootAccountId: 1, rmktHistorico: Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [], qualificado: !!lead.qualificado, agendou: !!lead.agendou, compareceu: !!lead.compareceu, ultimaInteracao: lead.ultima_msg_lead_em || lead.ultima_interacao_humano || lead.auditoria_ia_em || lead.criado_em };
 
   document.getElementById('panel-body').innerHTML = `
     ${(cs => { const n=parseInt(cs)||0; if(!n) return `<div class="panel-score" style="color:var(--muted)">${lead.score||0}<small>score manual (sem IA ainda)</small></div>`; const c=n>=9?'#3fb950':n>=7?'#e8893d':n>=4?'#e3b341':'#FF5E5B'; const lbl=n>=9?'Quente':n>=7?'Engajado':n>=4?'Morno':'Frio'; return `<div class="panel-score" style="color:${c}">${n}<small>O Analista · ${lbl}</small></div>`; })(lead.crm_score)}
@@ -2151,11 +2410,9 @@ function openLeadPanel(lead) {
     <div class="panel-section">Qualificação</div>
 
     <div class="panel-section">Status no Funil</div>
-    <div class="panel-row"><div class="panel-key">Estágio CRM</div><div class="panel-val">${stageLabel[lead.crm_stage]||lead.crm_stage||'—'}</div></div>
-    <div class="panel-row"><div class="panel-key">Qualificado</div><div class="panel-val">${lead.qualificado?'✅ Sim':'Não'}</div></div>
-    <div class="panel-row"><div class="panel-key">Agendou</div><div class="panel-val">${lead.agendou?'✅ Sim':'Não'}</div></div>
-    <div class="panel-row"><div class="panel-key">Compareceu</div><div class="panel-val">${lead.compareceu?'✅ Sim':'Não'}</div></div>
-    <div class="panel-row"><div class="panel-key">Fechou</div><div class="panel-val">${lead.fechou?'✅ Contrato fechado':'Não'}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 12px">
+      ${STAGES.map(s => { const ativo = getStage(lead) === s.key; return `<button onclick="mudarEtapa('${s.key}')" data-stage-btn="${s.key}" style="padding:8px 6px;background:${ativo?'var(--purple)':'var(--bg3)'};border:1px solid ${ativo?'var(--purple)':'var(--bd)'};color:${ativo?'#fff':'var(--muted)'};font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center">${s.label}</button>`; }).join('')}
+    </div>
     ${!lead.fechou ? '<div style="padding:4px 0 10px"><button id="marcar-fechou-btn" style="width:100%;padding:11px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s">✅ Marcar como Fechado → CAPI Purchase</button></div>' : ''}
     <div class="panel-row"><div class="panel-key">Bot ativo</div><div class="panel-val">${lead.dify_ativo?'✅ Donna ativa':'Pausado'}</div></div>
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
@@ -2168,7 +2425,8 @@ function openLeadPanel(lead) {
       </div>` : ''}
       ${lead.auditoria_ia_proxima_acao ? `<div style="padding:10px 12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.25);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">▶ Próxima ação (O Analista)</div>
-        <div style="font-size:12px;line-height:1.6;color:var(--text)">${lead.auditoria_ia_proxima_acao}</div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text);margin-bottom:8px">${lead.auditoria_ia_proxima_acao}</div>
+        <button onclick="enviarProximaAcao(this)" style="width:100%;padding:8px 10px;background:rgba(0,245,160,.12);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--neon)';this.style.color='#000'" onmouseout="this.style.background='rgba(0,245,160,.12)';this.style.color='var(--neon)'">&#9654; Enviar esta mensagem via WhatsApp</button>
       </div>` : ''}
       ${lead.auditoria_ia_motivo_perda ? `<div style="padding:10px 12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--warn);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">⚠️ Objeção detectada</div>
@@ -2218,15 +2476,15 @@ function openLeadPanel(lead) {
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
       <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Controle do Bot</div>
-      ${lead.em_atendimento
+      ${(lead.em_atendimento || !lead.dify_ativo)
         ? `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', true)"
             style="width:100%;padding:12px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
-            ✅ Bot desativado — Reativar
+            ✅ Bot pausado — Reativar
           </button>
-          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Bot silenciado permanentemente para este lead.</div>`
+          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Bot inativo para este lead.</div>`
         : `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', false)"
             style="width:100%;padding:12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.3);color:var(--warn);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
-            🚫 Desativar bot para este lead
+            🚫 Pausar bot para este lead
           </button>
           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">O bot vai parar de responder este contato.</div>`
       }
@@ -2245,6 +2503,14 @@ function openLeadPanel(lead) {
            <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando o lead comparecer à consulta ou reunião.</div>`
       }
     </div>
+
+    ${buildRmktSection(lead)}
+
+    ${buildTimelineSection(lead)}
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
+      <button onclick="iniciarDescarte('${lead.telefone.replace(/'/g,'')}')" style="width:100%;padding:10px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);color:var(--warn);cursor:pointer;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">🗑️ Descartar Lead</button>
+    </div>
   `;
 
   if (!lead.fechou) {
@@ -2259,6 +2525,59 @@ function openLeadPanel(lead) {
 function closeLeadPanel() {
   document.getElementById('lead-overlay').classList.remove('show');
   document.body.style.overflow = '';
+}
+
+async function mudarEtapa(novaEtapa) {
+  const p = window._panelLead;
+  if (!p) return;
+  document.querySelectorAll('[data-stage-btn]').forEach(b => {
+    const ativo = b.dataset.stageBtn === novaEtapa;
+    b.style.background = ativo ? 'var(--purple)' : 'var(--bg3)';
+    b.style.borderColor = ativo ? 'var(--purple)' : 'var(--bd)';
+    b.style.color = ativo ? '#fff' : 'var(--muted)';
+  });
+  try {
+    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(p.telefone)}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ crm_stage: novaEtapa })
+    });
+    if (p.crmPersonId) await updateCRMStage(p.crmPersonId, novaEtapa, p.telefone);
+    if (p.chatwootConvId) {
+      await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: PROXY_TOKEN, acao: 'aplicar_label', telefone: p.telefone, chatwoot_conversation_id: p.chatwootConvId, chatwoot_account_id: p.chatwootAccountId, label: novaEtapa })
+      }).catch(() => {});
+    }
+    p.etapaAtual = novaEtapa;
+    toast('Etapa atualizada: ' + novaEtapa, 'ok');
+  } catch(e) {
+    toast('Erro ao atualizar etapa — ' + e.message, 'err');
+  }
+}
+
+async function enviarProximaAcao(btn) {
+  const p = window._panelLead;
+  if (!p || !p.proximaAcao) { toast('Sem mensagem para enviar', 'err'); return; }
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  try {
+    const r = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, acao: 'enviar_mensagem', telefone: p.telefone, mensagem: p.proximaAcao })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    btn.textContent = '✅ Enviada — bot silenciado 48h';
+    btn.style.background = 'rgba(0,245,160,.2)';
+    btn.onmouseover = null; btn.onmouseout = null;
+  } catch(e) {
+    toast('Erro ao enviar — ' + e.message, 'err');
+    btn.disabled = false;
+    btn.textContent = '▶ Enviar esta mensagem via WhatsApp';
+  }
 }
 
 async function enviarMensagem(telefone) {
@@ -2351,6 +2670,67 @@ async function saveQualification(telefone) {
   }
 }
 
+// ═══ NOVO CONTATO MANUAL ═══
+function abrirModalNovoContato() {
+  ['nc-nome','nc-telefone','nc-perfil','nc-patologia','nc-cidade','nc-notas'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const btn = document.getElementById('nc-save-btn');
+  if (btn) { btn.disabled = false; btn.textContent = '+ Criar Contato'; }
+  document.getElementById('novo-contato-overlay')?.classList.add('show');
+  setTimeout(() => document.getElementById('nc-nome')?.focus(), 100);
+}
+
+function fecharModalNovoContato() {
+  document.getElementById('novo-contato-overlay')?.classList.remove('show');
+}
+
+async function criarContato() {
+  const nome = document.getElementById('nc-nome')?.value?.trim();
+  const telefone = document.getElementById('nc-telefone')?.value?.trim().replace(/\D/g, '');
+  const perfil = document.getElementById('nc-perfil')?.value?.trim() || null;
+  const patologia = document.getElementById('nc-patologia')?.value?.trim() || null;
+  const cidade = document.getElementById('nc-cidade')?.value?.trim() || null;
+  const notas = document.getElementById('nc-notas')?.value?.trim() || null;
+
+  if (!nome) { toast('Nome obrigatorio', 'err'); return; }
+  if (!telefone || telefone.length < 10) { toast('WhatsApp invalido — inclua DDI+DDD+numero', 'err'); return; }
+
+  const btn = document.getElementById('nc-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Criando...'; }
+
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify({
+        nome, telefone, perfil, patologia, cidade, notas,
+        canal: 'manual',
+        qualificado: false,
+        agendou: false,
+        score: 0,
+        dify_ativo: false
+      })
+    });
+    if (!r.ok) {
+      const err = await r.text();
+      throw new Error(`HTTP ${r.status}: ${err}`);
+    }
+    toast('Contato criado com sucesso', 'ok');
+    fecharModalNovoContato();
+    loadCRM();
+  } catch(e) {
+    toast('Erro ao criar contato — ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '+ Criar Contato'; }
+  }
+}
+
 async function toggleBot(telefone, currentlyDisabled) {
   const btn = document.getElementById('bot-toggle-btn');
   btn.disabled = true;
@@ -2360,11 +2740,15 @@ async function toggleBot(telefone, currentlyDisabled) {
       ? { em_atendimento: false, dify_ativo: true }
       : { em_atendimento: true, dify_ativo: false };
 
-    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
       method: 'PATCH',
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(patch)
     });
+    if (!r.ok) {
+      const errBody = await r.text().catch(() => '');
+      throw new Error(`HTTP ${r.status} — ${errBody}`);
+    }
 
     // Atualizar lead no cache local
     const lead = allLeads.find(l => l.telefone === telefone);
@@ -3318,14 +3702,15 @@ async function toggleRobo() {
   if (!confirm(msg)) return;
   btns.forEach(b => { b.dataset.busy = '1'; b.style.opacity = '0.5'; });
   try {
-    const resp = await fetch(`${SB_URL}/rest/v1/system_config`, {
-      method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=representation' },
-      body: JSON.stringify({ projeto: 'principal', robo_ativo: novo, atualizado_em: new Date().toISOString() })
+    const resp = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.principal`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ robo_ativo: novo, atualizado_em: new Date().toISOString() })
     });
-    if (!resp.ok) { throw new Error(`HTTP ${resp.status} — verifique permissões do Supabase`); }
-    const result = await resp.json().catch(() => []);
-    if (!Array.isArray(result) || result.length === 0) { throw new Error('Upsert sem retorno — verifique RLS da tabela system_config'); }
+    if (!resp.ok) {
+      const errBody = await resp.text().catch(() => '');
+      throw new Error(`HTTP ${resp.status} — ${errBody}`);
+    }
     renderRoboStatus(novo);
   } catch (e) {
     alert('Erro ao atualizar status do robô:\n' + e.message);
