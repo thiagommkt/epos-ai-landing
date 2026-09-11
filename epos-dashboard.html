@@ -1200,6 +1200,12 @@ canvas{display:block;width:100%!important}
     location.replace('login-epos.html');
     throw new Error('auth_required');
   }
+  const EPOS_ALLOWED = ['thiagommkt@gmail.com'];
+  if (!EPOS_ALLOWED.includes((sess.user?.email || '').toLowerCase())) {
+    localStorage.removeItem('sb-phszzzwqkujmmfregtsj-auth-token');
+    location.replace('login-epos.html');
+    throw new Error('access_denied');
+  }
   window._ACCESS_TOKEN = sess.access_token;
   function getCk(n) { const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return m?decodeURIComponent(m.pop()):null; }
   const BIO_KEY = 'epos_bio_credential';
