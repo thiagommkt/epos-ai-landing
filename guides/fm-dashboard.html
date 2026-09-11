@@ -779,7 +779,14 @@ canvas{display:block;width:100%!important}
 <section class="section" id="s-chat">
   <div class="sec-head"><div><div class="sec-title">CENTRAL DE <span>ATENDIMENTO</span></div><div class="sec-sub">CHATWOOT · WHATSAPP FM</div></div></div>
   <div class="rule"></div>
-  <div class="chat-wrap">
+  <div class="chat-wrap" style="display:flex;flex-direction:column">
+    <div style="padding:10px 16px;background:rgba(145,70,255,.06);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0">
+      <span style="font-family:var(--fM);font-size:11px;color:var(--muted)">⚠️ Se aparecer tela de login — <a href="https://chatwoot.eposmktfilmsia.com.br" target="_blank" style="color:var(--purple);text-decoration:none">abra em nova aba</a>, faça login e clique em Recarregar</span>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="window.open('https://chatwoot.eposmktfilmsia.com.br','_blank')" style="padding:5px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↗ Abrir</button>
+        <button onclick="var f=document.getElementById('chatwoot-iframe');f.src=f.src" style="padding:5px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↻ Recarregar</button>
+      </div>
+    </div>
     <iframe
       id="chatwoot-iframe"
       class="chat-iframe"
