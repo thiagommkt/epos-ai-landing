@@ -261,9 +261,9 @@ async function entrar() {
   try {
     const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
     if (error) throw error;
-    // Chatwoot auto-SSO: login com mesmas credenciais, token guardado para o iframe
+    // Chatwoot auto-SSO: proxy via Supabase Edge Function (evita CORS)
     try {
-      const cwR = await fetch('https://chatwoot.eposmktfilmsia.com.br/auth/sign_in', {
+      const cwR = await fetch('https://phszzzwqkujmmfregtsj.supabase.co/functions/v1/chatwoot-auth', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({email, password: pwd})
       });
