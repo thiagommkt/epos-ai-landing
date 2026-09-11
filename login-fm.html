@@ -261,6 +261,18 @@ async function entrar() {
   try {
     const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
     if (error) throw error;
+    // Chatwoot auto-SSO: login com mesmas credenciais, token guardado para o iframe
+    try {
+      const cwR = await fetch('https://chatwoot.eposmktfilmsia.com.br/auth/sign_in', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({email, password: pwd})
+      });
+      if (cwR.ok) {
+        const cwD = await cwR.json();
+        const cwTok = cwD?.data?.access_token;
+        if (cwTok) localStorage.setItem('cw_fm_token', cwTok);
+      }
+    } catch {}
     showMsg('pwd-msg', '✓ Acesso liberado', 'ok');
     if (bioSupported && !credId) {
       bioRegister.classList.add('show');

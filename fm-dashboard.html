@@ -790,7 +790,6 @@ canvas{display:block;width:100%!important}
     <iframe
       id="chatwoot-iframe"
       class="chat-iframe"
-      src="https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/custom_view/1/conversations"
       allow="microphone; camera; clipboard-write"
       title="Chatwoot — Atendimento FM"
     ></iframe>
@@ -2408,6 +2407,16 @@ function openConversationInChat(convId) {
 
 // ═══ SCROLL HINT ANALYTICS TABS ═══
 document.addEventListener('DOMContentLoaded', function() {
+  // Chatwoot SSO: injeta user_access_token no iframe se disponível
+  const cwIframe = document.getElementById('chatwoot-iframe');
+  if (cwIframe) {
+    const cwTok = localStorage.getItem('cw_fm_token');
+    const cwBase = 'https://chatwoot.eposmktfilmsia.com.br';
+    cwIframe.src = cwTok
+      ? cwBase + '/app/login?user_access_token=' + encodeURIComponent(cwTok)
+      : cwBase + '/app/accounts/2/custom_view/1/conversations';
+  }
+
   const wrap = document.getElementById('mb-tabs-wrap');
   const hint = document.getElementById('mb-scroll-hint');
   if (wrap && hint) {
