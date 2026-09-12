@@ -780,15 +780,7 @@ canvas{display:block;width:100%!important}
   <div class="sec-head"><div><div class="sec-title">CENTRAL DE <span>ATENDIMENTO</span></div><div class="sec-sub">CHATWOOT · WHATSAPP FM</div></div></div>
   <div class="rule"></div>
   <div class="chat-wrap" style="display:flex;flex-direction:column">
-    <div style="padding:8px 16px;background:rgba(145,70,255,.06);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-family:var(--fM);font-size:10px;color:var(--muted);white-space:nowrap">👤 Visualizando como:</span>
-        <div id="cw-user-btns" style="display:flex;gap:4px">
-          <button id="cwu-1" onclick="setCwUser(1,'Thiago')" style="padding:3px 10px;font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--muted);transition:all .15s">Thiago</button>
-          <button id="cwu-2" onclick="setCwUser(2,'César')" style="padding:3px 10px;font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--muted);transition:all .15s">César</button>
-          <button id="cwu-3" onclick="setCwUser(3,'Pedro')" style="padding:3px 10px;font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:4px;border:1px solid var(--bd);background:transparent;color:var(--muted);transition:all .15s">Pedro</button>
-        </div>
-      </div>
+    <div style="padding:8px 16px;background:rgba(145,70,255,.06);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-shrink:0;flex-wrap:wrap">
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
         <span style="font-family:var(--fM);font-size:10px;color:var(--muted)">⚠️ Login manual se necessário → <a href="https://chatwoot.eposmktfilmsia.com.br" target="_blank" style="color:var(--purple);text-decoration:none">abrir Chatwoot</a></span>
         <button onclick="window.open('https://chatwoot.eposmktfilmsia.com.br','_blank')" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↗ Abrir</button>
@@ -2415,28 +2407,11 @@ function openConversationInChat(convId) {
 
 // ═══ SCROLL HINT ANALYTICS TABS ═══
 document.addEventListener('DOMContentLoaded', function() {
-  // Chatwoot: caixa de entrada por usuário (custom_view pessoal de cada um)
-  // Thiago=view/5  César=view/11  Pedro=view/12
-  const CW_VIEWS = { 1: 5, 2: 11, 3: 12 };
-  const CW_BASE_URL = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/custom_view/';
-  const CW_BTN_STYLE_ACTIVE = 'background:rgba(145,70,255,.2);border-color:var(--purple);color:var(--purple)';
-  const CW_BTN_STYLE_IDLE   = 'background:transparent;border-color:var(--bd);color:var(--muted)';
-
-  function setCwUser(userId, name) {
-    localStorage.setItem('cwUserId', userId);
-    const viewId = CW_VIEWS[userId] || 5;
-    const iframe = document.getElementById('chatwoot-iframe');
-    if (iframe) iframe.src = CW_BASE_URL + viewId;
-    [1,2,3].forEach(id => {
-      const btn = document.getElementById('cwu-' + id);
-      if (btn) btn.style.cssText = (id === userId ? CW_BTN_STYLE_ACTIVE : CW_BTN_STYLE_IDLE);
-    });
-  }
-  window.setCwUser = setCwUser;
-
-  // Carregar preferência salva ou defaultar para Thiago
-  const savedUser = parseInt(localStorage.getItem('cwUserId') || '1', 10);
-  setCwUser(savedUser, '');
+  // Chatwoot: cada usuário usa sua própria URL do dashboard (?cw=ID)
+  // Thiago: default (view/2) | César: ?cw=15 | Pedro: ?cw=16
+  const CW_VIEW_ID = new URLSearchParams(location.search).get('cw') || '2';
+  const iframe = document.getElementById('chatwoot-iframe');
+  if (iframe) iframe.src = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/custom_view/' + CW_VIEW_ID;
 
   const wrap = document.getElementById('mb-tabs-wrap');
   const hint = document.getElementById('mb-scroll-hint');
