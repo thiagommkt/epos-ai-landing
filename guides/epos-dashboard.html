@@ -1808,7 +1808,7 @@ function setCrmPeriod(btn, val) {
 
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
@@ -2450,6 +2450,18 @@ function openLeadPanel(lead) {
           onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
       </div>
       <div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Serviço prestado</div>
+        <input id="edit-servico" type="text" value="${(lead.servico_prestado||'').replace(/"/g,'&quot;')}" placeholder="Ex: consultoria, processo trabalhista..."
+          style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;outline:none;transition:border-color .2s"
+          onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+      </div>
+      <div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Valor do serviço (R$)</div>
+        <input id="edit-valor-servico" type="number" min="0" step="0.01" value="${lead.valor_servico||''}"
+          style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;outline:none;transition:border-color .2s"
+          onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
+      </div>
+      <div>
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Observações internas</div>
         <textarea id="edit-notas" placeholder="Anotações sobre o lead..." rows="3"
           style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;outline:none;resize:vertical;transition:border-color .2s;line-height:1.5"
@@ -2629,6 +2641,8 @@ async function saveQualification(telefone) {
   const perfil = document.getElementById('edit-perfil')?.value?.trim() || null;
   const score = parseInt(document.getElementById('edit-score')?.value) || 0;
   const notas = document.getElementById('edit-notas')?.value?.trim() || null;
+  const servico_prestado = document.getElementById('edit-servico')?.value?.trim() || null;
+  const valor_servico = document.getElementById('edit-valor-servico')?.value !== '' ? parseFloat(document.getElementById('edit-valor-servico')?.value) : null;
 
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
 
@@ -2641,12 +2655,12 @@ async function saveQualification(telefone) {
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
       },
-      body: JSON.stringify({ perfil, score, notas })
+      body: JSON.stringify({ perfil, score, notas, servico_prestado, valor_servico })
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
 
     const lead = allLeads.find(l => l.telefone === telefone);
-    if (lead) Object.assign(lead, { perfil, score, notas });
+    if (lead) Object.assign(lead, { perfil, score, notas, servico_prestado, valor_servico });
 
     toast('✅ Qualificação salva com sucesso', 'ok');
     if (btn) {
