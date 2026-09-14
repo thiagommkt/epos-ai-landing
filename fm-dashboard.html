@@ -2073,8 +2073,8 @@ function openLeadPanel(lead) {
           onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
       </div>
       <div>
-        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Score (0 – 100)</div>
-        <input id="edit-score" type="number" min="0" max="100" value="${lead.score||0}"
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Score (0 – 10)</div>
+        <input id="edit-score" type="number" min="0" max="10" value="${lead.score||0}"
           style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--bd);color:var(--purple);font-family:var(--fM);font-size:14px;font-weight:600;outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
       </div>
