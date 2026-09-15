@@ -1802,6 +1802,7 @@ function setDBPeriod(btn, period, label) {
 
 // ═══ REATIVAÇÃO ═══
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function stripQuotes(s) { return (s||'').trim().replace(/^["']+|["']+$/g,'').trim(); }
 
 const RMKT_ESTADO_LABELS = { parou_conversa:'Parou Conversa', info_incompleta:'Falta Info', qualificado_sem_agenda:'Sem Agenda', nao_compareceu:'Não Compareceu', frio:'Frio >14d' };
 
@@ -2044,8 +2045,8 @@ function openLeadPanel(lead) {
         <div style="font-size:12px;line-height:1.6;color:var(--text)">${lead.auditoria_ia_resumo}</div>
       </div>` : ''}
       ${lead.auditoria_ia_proxima_acao ? `<div style="padding:10px 12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.25);margin-bottom:8px">
-        <div style="font-family:var(--fM);font-size:9px;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">▶ Próxima ação (O Analista)</div>
-        <div style="font-size:12px;line-height:1.6;color:var(--text);margin-bottom:8px">${lead.auditoria_ia_proxima_acao}</div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">▶ Próxima ação (O Analista) — edite antes de enviar</div>
+        <textarea id="proxima-acao-input" rows="4" style="width:100%;box-sizing:border-box;background:rgba(0,245,160,.04);border:1px solid rgba(0,245,160,.28);border-radius:6px;color:var(--text);font-size:12px;line-height:1.6;padding:9px 11px;resize:vertical;outline:none;margin-bottom:8px;transition:border-color .2s" onfocus="this.style.borderColor='rgba(0,245,160,.7)'" onblur="this.style.borderColor='rgba(0,245,160,.28)'">${escHtml(stripQuotes(lead.auditoria_ia_proxima_acao))}</textarea>
         <button onclick="enviarProximaAcao(this)" style="width:100%;padding:8px 10px;background:rgba(0,245,160,.12);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--neon)';this.style.color='#000'" onmouseout="this.style.background='rgba(0,245,160,.12)';this.style.color='var(--neon)'">▶ Enviar esta mensagem via WhatsApp</button>
       </div>` : ''}
       ${lead.auditoria_ia_motivo_perda ? `<div style="padding:10px 12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);margin-bottom:8px">
@@ -2186,6 +2187,7 @@ async function mudarEtapa(novaEtapa) {
     }
     p.etapaAtual = novaEtapa;
     toast('Etapa atualizada: ' + novaEtapa, 'ok');
+    setTimeout(() => { if(typeof loadCRM === 'function') loadCRM(); }, 800);
   } catch(e) {
     toast('Erro ao atualizar etapa — ' + e.message, 'err');
   }
@@ -2193,14 +2195,17 @@ async function mudarEtapa(novaEtapa) {
 
 async function enviarProximaAcao(btn) {
   const p = window._panelLead;
-  if (!p || !p.proximaAcao) { toast('Sem mensagem para enviar', 'err'); return; }
+  if (!p) return;
+  const txtEl = document.getElementById('proxima-acao-input');
+  const mensagem = txtEl ? txtEl.value.trim() : stripQuotes(p.proximaAcao);
+  if (!mensagem) { toast('Sem mensagem para enviar', 'err'); return; }
   btn.disabled = true;
   btn.textContent = 'Enviando...';
   try {
     const r = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: PROXY_TOKEN, acao: 'enviar_mensagem', telefone: p.telefone, mensagem: p.proximaAcao })
+      body: JSON.stringify({ token: PROXY_TOKEN, acao: 'enviar_mensagem', telefone: p.telefone, mensagem })
     });
     const d = await r.json();
     if (d.error) throw new Error(d.error);
