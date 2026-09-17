@@ -392,7 +392,7 @@ canvas{display:block;width:100%!important}
 .notif-panel.open{display:block}
 .notif-hdr{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-family:var(--fM);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
 .notif-hdr button{padding:3px 8px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:9px;cursor:pointer}
-.notif-item{padding:10px 14px;border-bottom:1px solid rgba(145,70,255,0.1);cursor:default;transition:background .15s}
+.notif-item{padding:10px 14px;border-bottom:1px solid rgba(145,70,255,0.1);cursor:pointer;transition:background .15s}
 .notif-item:hover{background:rgba(145,70,255,0.04)}
 .notif-item.unread{border-left:3px solid var(--purple)}
 .notif-item.unread.sugestao{border-left-color:var(--warn)}
@@ -2279,7 +2279,7 @@ async function loadNotificacoes() {
       : items.map(n => {
           const d = n.criado_em ? new Date(n.criado_em).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'America/Sao_Paulo' }) : '';
           const isSug = n.tipo === 'sugestao_stage';
-          return `<div class="notif-item ${n.lida ? '' : 'unread'} ${isSug ? 'sugestao' : ''}">
+          return `<div class="notif-item ${n.lida ? '' : 'unread'} ${isSug ? 'sugestao' : ''}" onclick="abrirLeadDaNotificacao('${(n.lead_telefone||'').replace(/'/g,"\\'")}', ${n.id})">
             <div class="notif-titulo">${escHtml(n.titulo||'')}</div>
             ${n.descricao ? `<div class="notif-desc">${escHtml(n.descricao)}</div>` : ''}
             <div class="notif-time">${d}</div>
@@ -2303,6 +2303,40 @@ async function markNotificacoesLidas() {
     ['notif-badge-desk', 'notif-badge-mobile'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
     document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
   } catch(e) { /* silencioso */ }
+}
+
+async function abrirLeadDaNotificacao(telefone, notifId) {
+  if (!telefone) return;
+  if (_notifOpen) toggleNotifPanel();
+  // Marcar notif como lida
+  if (notifId) {
+    fetch(`${SB_URL}/rest/v1/crm_notificacoes?id=eq.${notifId}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ lida: true })
+    }).catch(() => {});
+  }
+  // Buscar lead
+  let lead;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/fm_leads?telefone=eq.${telefone}&limit=1`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
+    });
+    const arr = await r.json();
+    if (!arr?.length) { toast('Lead não encontrado', 'warn'); return; }
+    lead = arr[0];
+  } catch(e) { toast('Erro ao buscar lead', 'err'); return; }
+  // Navegar para CRM se não estiver lá
+  const jaCRM = document.getElementById('s-crm')?.classList.contains('active');
+  showSection('crm');
+  if (!jaCRM) {
+    await new Promise(res => setTimeout(res, 300));
+    if (document.querySelectorAll('.krm-card').length === 0) {
+      loadCRM();
+      await new Promise(res => setTimeout(res, 2000));
+    }
+  }
+  openLeadPanel(lead);
 }
 
 function toggleNotifPanel() {

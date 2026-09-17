@@ -55,7 +55,7 @@ nav a.active svg{opacity:1;filter:drop-shadow(0 0 4px var(--purple))}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--neon)}50%{opacity:.5;box-shadow:0 0 2px var(--neon)}}
 
 /* ── MAIN ── */
-main{flex:1;overflow-y:auto;background:var(--bg)}
+main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
 .section{display:none;padding:28px 32px 48px;min-height:100%}
 .section.active{display:block}
 .sec-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -406,6 +406,26 @@ canvas{display:block;width:100%!important}
   /* card-ttl with sort buttons: stack on mobile */
   .crt-card-ttl{flex-direction:column;align-items:flex-start!important}
 }
+/* ── NOTIFICAÇÕES CRM ── */
+.notif-fixed{position:fixed;top:14px;right:28px;z-index:300}
+.notif-wrap{position:relative}
+.notif-bell{background:none;border:none;font-size:20px;cursor:pointer;position:relative;padding:4px 6px;color:var(--text)}
+.notif-bell:hover{opacity:.8}
+.notif-badge{position:absolute;top:-2px;right:-2px;background:var(--warn);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;font-family:var(--fD)}
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:var(--bg2);border:1px solid var(--bd-b);border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.4);display:none;flex-direction:column;max-height:420px;overflow-y:auto;z-index:400}
+.notif-panel.open{display:flex}
+.notif-hdr{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);flex-shrink:0}
+.notif-hdr button{background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;font-family:var(--fD);letter-spacing:.04em;text-transform:uppercase}
+.notif-hdr button:hover{color:var(--text)}
+.notif-item{padding:10px 14px;border-bottom:1px solid rgba(145,70,255,0.1);cursor:pointer;transition:background .15s}
+.notif-item:hover{background:rgba(145,70,255,0.04)}
+.notif-item.unread{border-left:3px solid var(--purple)}
+.notif-item.unread.sugestao{border-left-color:var(--warn)}
+.notif-titulo{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;font-family:var(--fD)}
+.notif-desc{font-size:11px;color:var(--muted);margin-bottom:3px;line-height:1.4}
+.notif-time{font-size:10px;color:var(--dim)}
+.notif-empty{padding:20px 14px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:900px){.notif-fixed{display:none}}
 </style>
 </head>
 <body>
@@ -573,6 +593,12 @@ canvas{display:block;width:100%!important}
     <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .15s" onmouseover="this.style.borderColor='var(--dim)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
   </div>
 </aside>
+<div class="notif-fixed">
+  <div class="notif-wrap">
+    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-desk"></span></button>
+    <div class="notif-panel" id="notif-panel-desk"></div>
+  </div>
+</div>
 <main>
 
 <!-- ══ DASHBOARD ══ -->
@@ -2053,6 +2079,96 @@ async function updateCRMStage(crm_person_id, newStage, telefone) {
     body: JSON.stringify({ crm_stage: newStage })
   });
   if (!r.ok) throw new Error('Erro Supabase: ' + r.status);
+}
+
+// ═══ NOTIFICAÇÕES CRM ═══
+let _notifOpen = false;
+
+async function loadNotificacoes() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/crm_notificacoes?conta=eq.epos&order=criado_em.desc&limit=30`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
+    });
+    const items = await r.json();
+    if (!Array.isArray(items)) return;
+    const unread = items.filter(n => !n.lida).length;
+    const badge = unread > 0 ? String(unread > 99 ? '99+' : unread) : '';
+    const el = document.getElementById('notif-badge-desk');
+    if (el) { el.textContent = badge; el.style.display = badge ? 'flex' : 'none'; }
+    const html = items.length === 0
+      ? '<div class="notif-empty">Nenhuma notificação</div>'
+      : items.map(n => {
+          const d = n.criado_em ? new Date(n.criado_em).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'America/Sao_Paulo' }) : '';
+          const isSug = n.tipo === 'sugestao_stage';
+          return `<div class="notif-item ${n.lida ? '' : 'unread'} ${isSug ? 'sugestao' : ''}" onclick="abrirLeadDaNotificacao('${(n.lead_telefone||'').replace(/'/g,"\\'")}', ${n.id})">
+            <div class="notif-titulo">${escHtml(n.titulo||'')}</div>
+            ${n.descricao ? `<div class="notif-desc">${escHtml(n.descricao)}</div>` : ''}
+            <div class="notif-time">${d}</div>
+          </div>`;
+        }).join('');
+    const fullHtml = `<div class="notif-hdr">Notificações CRM<button onclick="markNotificacoesLidas()">Marcar lidas</button></div>` + html;
+    const panel = document.getElementById('notif-panel-desk');
+    if (panel) panel.innerHTML = fullHtml;
+  } catch(e) { /* silencioso */ }
+}
+
+async function markNotificacoesLidas() {
+  try {
+    await fetch(`${SB_URL}/rest/v1/crm_notificacoes?conta=eq.epos&lida=eq.false`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ lida: true })
+    });
+    const el = document.getElementById('notif-badge-desk');
+    if (el) el.style.display = 'none';
+    document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+  } catch(e) { /* silencioso */ }
+}
+
+function toggleNotifPanel() {
+  _notifOpen = !_notifOpen;
+  const panel = document.getElementById('notif-panel-desk');
+  if (panel) panel.classList.toggle('open', _notifOpen);
+  if (_notifOpen) loadNotificacoes();
+}
+
+document.addEventListener('click', function(e) {
+  if (_notifOpen && !e.target.closest('.notif-wrap')) {
+    _notifOpen = false;
+    const panel = document.getElementById('notif-panel-desk');
+    if (panel) panel.classList.remove('open');
+  }
+});
+
+async function abrirLeadDaNotificacao(telefone, notifId) {
+  if (!telefone) return;
+  if (_notifOpen) toggleNotifPanel();
+  if (notifId) {
+    fetch(`${SB_URL}/rest/v1/crm_notificacoes?id=eq.${notifId}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ lida: true })
+    }).catch(() => {});
+  }
+  let lead;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${telefone}&limit=1`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
+    });
+    const arr = await r.json();
+    if (!arr?.length) { toast('Lead não encontrado', 'warn'); return; }
+    lead = arr[0];
+  } catch(e) { toast('Erro ao buscar lead', 'err'); return; }
+  const jaCRM = document.getElementById('s-crm')?.classList.contains('active');
+  show('crm');
+  if (!jaCRM) {
+    await new Promise(res => setTimeout(res, 300));
+    if (document.querySelectorAll('.krm-card').length === 0) {
+      loadCRM();
+      await new Promise(res => setTimeout(res, 2000));
+    }
+  }
+  openLeadPanel(lead);
 }
 
 // ═══ PERÍODO DO DASHBOARD ═══
@@ -3744,7 +3860,9 @@ async function toggleRobo() {
 loadDashboard();
 loadRoboStatus();
 loadWaClicks();
+loadNotificacoes();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
+setInterval(loadNotificacoes, 60000); // recarrega notificações a cada 1min
 
 // Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
 (function initRealtime() {
