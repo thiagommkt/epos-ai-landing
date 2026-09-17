@@ -58,7 +58,7 @@ nav a.active svg{opacity:1;filter:drop-shadow(0 0 4px var(--purple))}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--neon)}50%{opacity:.5;box-shadow:0 0 2px var(--neon)}}
 
 /* ── MAIN ── */
-main{flex:1;overflow-y:auto;background:var(--bg)}
+main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
 .section{display:none;padding:28px 32px 48px;min-height:100%}
 .section.active{display:block}
 .sec-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -157,11 +157,13 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .filter-btn.active{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
 
 /* ── CRM KANBAN ── */
-.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
-.kanban::-webkit-scrollbar{height:4px}
+.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
+.kanban::-webkit-scrollbar{height:6px}
 .kanban::-webkit-scrollbar-track{background:var(--bg2)}
 .kanban::-webkit-scrollbar-thumb{background:var(--purple)}
-.col{flex-shrink:0;width:210px;background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:12px;transition:border-color .2s;border-radius:10px}
+#s-crm .kanban{min-height:calc(100vh - 220px);align-items:stretch}
+.col-cards{overflow-y:auto;flex:1;min-height:60px}
+.col{flex-shrink:0;width:210px;background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:12px;transition:border-color .2s;border-radius:10px;display:flex;flex-direction:column}
 .col.drag-over{border-color:var(--purple);background:rgba(145,70,255,.06)}
 .col-head{font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .col-count{padding:2px 6px;background:var(--pur-l);border:1px solid var(--bd-b);font-family:var(--fM);font-size:10px;font-weight:700;color:var(--purple);border-radius:3px;white-space:nowrap;line-height:1.4}
@@ -381,6 +383,8 @@ canvas{display:block;width:100%!important}
 }
 /* ── NOTIFICAÇÕES ── */
 .notif-wrap{position:relative}
+.notif-fixed{position:fixed;top:14px;right:28px;z-index:300}
+@media(max-width:900px){.notif-fixed{display:none}}
 .notif-bell{background:transparent;border:1px solid var(--bd);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:15px;flex-shrink:0;position:relative;transition:border-color .15s}
 .notif-bell:hover{border-color:var(--purple)}
 .notif-badge{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#FF5E5B;color:#fff;font-family:var(--fM);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;display:none}
@@ -514,10 +518,6 @@ canvas{display:block;width:100%!important}
       <div class="sb-name" style="font-size:13px;text-transform:none;line-height:1.2">F&M IA</div>
       <div class="sb-c-sub" style="margin-top:1px">por Epos Marketing</div>
     </div>
-    <div class="notif-wrap">
-      <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-desk"></span></button>
-      <div class="notif-panel" id="notif-panel-desk"></div>
-    </div>
   </div>
   <nav>
     <div class="nav-section">Visão Geral</div>
@@ -574,6 +574,14 @@ canvas{display:block;width:100%!important}
   </div>
 </aside>
 <main>
+
+<!-- Bell fixo desktop — visível em todas as seções -->
+<div class="notif-fixed">
+  <div class="notif-wrap">
+    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-desk"></span></button>
+    <div class="notif-panel" id="notif-panel-desk"></div>
+  </div>
+</div>
 
 <!-- ══ DASHBOARD ══ -->
 <section class="section active" id="s-dashboard">
