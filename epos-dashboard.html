@@ -55,7 +55,7 @@ nav a.active svg{opacity:1;filter:drop-shadow(0 0 4px var(--purple))}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--neon)}50%{opacity:.5;box-shadow:0 0 2px var(--neon)}}
 
 /* ── MAIN ── */
-main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
 .section{display:none;padding:28px 32px 48px;min-height:100%}
 .section.active{display:block}
 .sec-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -154,7 +154,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
 .filter-btn.active{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
 
 /* ── CRM KANBAN ── */
-.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;max-width:100%}
 .kanban::-webkit-scrollbar{height:4px}
 .kanban::-webkit-scrollbar-track{background:var(--bg2)}
 .kanban::-webkit-scrollbar-thumb{background:var(--purple)}

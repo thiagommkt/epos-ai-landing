@@ -58,7 +58,7 @@ nav a.active svg{opacity:1;filter:drop-shadow(0 0 4px var(--purple))}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--neon)}50%{opacity:.5;box-shadow:0 0 2px var(--neon)}}
 
 /* ── MAIN ── */
-main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
 .section{display:none;padding:28px 32px 48px;min-height:100%}
 .section.active{display:block}
 .sec-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -157,7 +157,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
 .filter-btn.active{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
 
 /* ── CRM KANBAN ── */
-.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
+.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;align-items:flex-start;max-width:100%}
 .kanban::-webkit-scrollbar{height:6px}
 .kanban::-webkit-scrollbar-track{background:var(--bg2)}
 .kanban::-webkit-scrollbar-thumb{background:var(--purple)}
@@ -403,6 +403,16 @@ canvas{display:block;width:100%!important}
 /* ── LOCK BADGE ── */
 .lock-badge{display:inline-block;font-size:10px;padding:1px 5px;background:rgba(255,94,91,.1);border:1px solid rgba(255,94,91,.3);color:#FF5E5B;font-family:var(--fM);margin-bottom:4px}
 .sugestao-badge{display:inline-block;font-size:10px;padding:1px 5px;background:rgba(255,165,0,.1);border:1px solid rgba(255,165,0,.3);color:#FFA500;font-family:var(--fM);margin-bottom:4px}
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--bg2);border-top:1px solid var(--bd);z-index:250;align-items:stretch}
+.mbn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:var(--muted);font-size:9px;font-family:var(--fM);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;padding:6px 0;transition:color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.mbn-item svg{width:18px;height:18px;flex-shrink:0}
+.mbn-item.active,.mbn-item:hover{color:var(--purple)}
+@media(max-width:768px){
+  .mobile-bottom-nav{display:flex}
+  main{padding-bottom:56px!important}
+  .menu-toggle{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -1744,8 +1754,9 @@ const initialized = {};
 function show(id) {
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('#mobile-bottom-nav .mbn-item').forEach(b=>b.classList.remove('active'));
   const sec = document.getElementById('s-'+id);
-  if(sec){ sec.classList.add('active'); document.querySelector(`[data-sec="${id}"]`)?.classList.add('active'); }
+  if(sec){ sec.classList.add('active'); document.querySelector(`[data-sec="${id}"]`)?.classList.add('active'); document.querySelector(`#mobile-bottom-nav [data-sec="${id}"]`)?.classList.add('active'); }
   if(!initialized[id]){
     initialized[id]=true;
     if(id==='dados') loadLeads();
@@ -3658,5 +3669,27 @@ async function doLogout() {
   location.replace('login-fm.html');
 }
 </script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <button class="mbn-item active" data-sec="dashboard" onclick="navTo('dashboard')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>
+    <span>Painel</span>
+  </button>
+  <button class="mbn-item" data-sec="dados" onclick="navTo('dados')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
+    <span>Leads</span>
+  </button>
+  <button class="mbn-item" data-sec="crm" onclick="navTo('crm')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="3" height="14"/><rect x="6" y="1" width="3" height="10"/><rect x="11" y="1" width="3" height="7"/></svg>
+    <span>CRM</span>
+  </button>
+  <button class="mbn-item" data-sec="chat" onclick="navTo('chat')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v9H9l-3 3V11H1V2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>Chat</span>
+  </button>
+  <button class="mbn-item" onclick="toggleSidebar()">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
+    <span>Menu</span>
+  </button>
+</nav>
 </body>
 </html>
