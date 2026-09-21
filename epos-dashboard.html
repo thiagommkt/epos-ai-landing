@@ -156,8 +156,9 @@ main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
 /* ── CRM KANBAN ── */
 .kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;max-width:100%}
 .kanban::-webkit-scrollbar{height:4px}
-.kanban::-webkit-scrollbar-track{background:var(--bg2)}
-.kanban::-webkit-scrollbar-thumb{background:rgba(145,70,255,0.35);border-radius:3px}
+.kanban::-webkit-scrollbar-track{background:transparent}
+.kanban::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:2px}
+.kanban:hover::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.22)}
 /* CRM section fills viewport — kanban scrollbar always visible */
 #s-crm.active{display:flex;flex-direction:column;height:100%;padding-bottom:0}
 #s-crm .kanban{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;align-items:stretch;max-width:100%}
