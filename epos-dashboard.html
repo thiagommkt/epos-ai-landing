@@ -158,7 +158,11 @@ main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
 .kanban::-webkit-scrollbar{height:4px}
 .kanban::-webkit-scrollbar-track{background:var(--bg2)}
 .kanban::-webkit-scrollbar-thumb{background:var(--purple)}
-.col{flex-shrink:0;width:210px;background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:12px;transition:border-color .2s;border-radius:10px}
+/* CRM section fills viewport — kanban scrollbar always visible */
+#s-crm.active{display:flex;flex-direction:column;height:100%;padding-bottom:0}
+#s-crm .kanban{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;align-items:stretch;max-width:100%}
+.col-cards{overflow-y:auto;flex:1;min-height:0}
+.col{flex-shrink:0;width:210px;background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:12px;transition:border-color .2s;border-radius:10px;display:flex;flex-direction:column}
 .col.drag-over{border-color:var(--purple);background:rgba(145,70,255,.06)}
 .col-head{font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .col-count{padding:2px 6px;background:var(--pur-l);border:1px solid var(--bd-b);font-family:var(--fM);font-size:10px;font-weight:700;color:var(--purple);border-radius:3px;white-space:nowrap;line-height:1.4}
