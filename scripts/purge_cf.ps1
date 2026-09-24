@@ -2,7 +2,7 @@
 # Credenciais lidas do .env.local (nunca commitar valores aqui)
 # Uso: .\scripts\purge_cf.ps1
 
-$envFile = Join-Path $PSScriptRoot "..\..\..\whatsapp-ai-system\.env.local"
+$envFile = Join-Path $PSScriptRoot "..\..\whatsapp-ai-system\.env.local"
 if (-not (Test-Path $envFile)) {
     Write-Error ".env.local nao encontrado em $envFile"
     exit 1
@@ -33,18 +33,15 @@ $urls = @(
     "https://lp.eposmktfilmsia.com.br/login-fm.html"
 )
 
-$jsonFile = [System.IO.Path]::GetTempFileName() + ".json"
-[System.IO.File]::WriteAllText($jsonFile, (@{ files = $urls } | ConvertTo-Json), [System.Text.Encoding]::UTF8)
+$filesJson = ($urls | ForEach-Object { "`"$_`"" }) -join ","
+$bodyJson = "{`"files`":[$filesJson]}"
 
-$bodyBytes = [System.IO.File]::ReadAllBytes($jsonFile)
 $resp = Invoke-RestMethod `
     -Uri "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" `
     -Method Post `
-    -ContentType "application/json; charset=utf-8" `
+    -ContentType "application/json" `
     -Headers @{ Authorization = "Bearer $CF_API_TOKEN" } `
-    -Body $bodyBytes
-
-Remove-Item $jsonFile -ErrorAction SilentlyContinue
+    -Body $bodyJson
 
 if ($resp.success) {
     Write-Host "OK CF cache purgado: $($urls.Count) URLs"
