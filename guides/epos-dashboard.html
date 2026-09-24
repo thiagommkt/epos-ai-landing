@@ -1362,6 +1362,9 @@ html[data-theme="light"] .notif-bell{
 /* Funil: label pct fora da barra para valores pequenos */
 .f-pct-out{font-family:var(--fM);font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:5px;flex-shrink:0}
 html[data-theme="light"] .f-pct-out{color:rgba(15,15,20,0.50)!important}
+/* Funil: track e separador invisíveis em light mode (eram rgba(255,255,255,…) sobre fundo claro) */
+html[data-theme="light"] .f-track{background:rgba(15,15,20,0.10)!important}
+html[data-theme="light"] .f-gline{background:rgba(15,15,20,0.18)!important}
 /* bg light mode: main usava var(--bg)=#F4F3F9 (quase branco) — override p/ lavanda visível */
 html[data-theme="light"] main{background:linear-gradient(160deg,#D9D3EB 0%,#E5E0F3 50%,#DED7EC 100%)!important}
 html[data-theme="light"] body{background:linear-gradient(150deg,#D3CCEC 0%,#E2DDF5 45%,#D9D3EE 100%)!important}
