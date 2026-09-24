@@ -1365,6 +1365,14 @@ html[data-theme="light"] .f-pct-out{color:rgba(15,15,20,0.50)!important}
 /* bg light mode: main usava var(--bg)=#F4F3F9 (quase branco) — override p/ lavanda visível */
 html[data-theme="light"] main{background:linear-gradient(160deg,#D9D3EB 0%,#E5E0F3 50%,#DED7EC 100%)!important}
 html[data-theme="light"] body{background:linear-gradient(150deg,#D3CCEC 0%,#E2DDF5 45%,#D9D3EE 100%)!important}
+/* ── FIXES 2026-09-24 D — col-cards scrollbar (kanban colunas vertical) ── */
+/* Browser default em dark mode = scrollbar clara sobre fundo escuro; override p/ combinar com nav lateral */
+.col-cards::-webkit-scrollbar{width:4px}
+.col-cards::-webkit-scrollbar-track{background:transparent}
+.col-cards::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px;transition:background .2s}
+.col-cards::-webkit-scrollbar-thumb:hover{background:#3d4553}
+html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb{background:rgba(107,40,219,0.22);border-radius:2px;transition:background .2s}
+html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rgba(107,40,219,0.38)}
 </style>
 </head>
 <body>

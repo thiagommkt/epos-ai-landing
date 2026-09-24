@@ -1354,6 +1354,13 @@ html[data-theme="light"] body{background:linear-gradient(150deg,#D3CCEC 0%,#E2DD
 .prd-opt.active{background:var(--pur-l);color:var(--purple);font-weight:600}
 .prd-opt.active::after{content:'✓';font-size:10px;opacity:.9}
 @media(max-width:520px){.prd-drop{display:none!important}.period-sel-mob{display:block!important}}
+/* ── FIXES 2026-09-24 D — col-cards scrollbar (kanban colunas vertical) ── */
+.col-cards::-webkit-scrollbar{width:4px}
+.col-cards::-webkit-scrollbar-track{background:transparent}
+.col-cards::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px;transition:background .2s}
+.col-cards::-webkit-scrollbar-thumb:hover{background:#3d4553}
+html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb{background:rgba(107,40,219,0.22);border-radius:2px;transition:background .2s}
+html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rgba(107,40,219,0.38)}
 </style>
 </head>
 <body>
