@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -55,7 +55,7 @@ nav a.active svg{opacity:1;filter:drop-shadow(0 0 4px var(--purple))}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--neon)}50%{opacity:.5;box-shadow:0 0 2px var(--neon)}}
 
 /* ── MAIN ── */
-main{flex:1;overflow-y:auto;background:var(--bg)}
+main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
 .section{display:none;padding:28px 32px 48px;min-height:100%}
 .section.active{display:block}
 .sec-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -154,11 +154,16 @@ main{flex:1;overflow-y:auto;background:var(--bg)}
 .filter-btn.active{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
 
 /* ── CRM KANBAN ── */
-.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
-.kanban::-webkit-scrollbar{height:4px}
-.kanban::-webkit-scrollbar-track{background:var(--bg2)}
-.kanban::-webkit-scrollbar-thumb{background:var(--purple)}
-.col{flex-shrink:0;width:210px;background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:12px;transition:border-color .2s;border-radius:10px}
+.kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;max-width:100%}
+.kanban::-webkit-scrollbar{height:8px}
+.kanban::-webkit-scrollbar-track{background:#0d1117;border-radius:4px}
+.kanban::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px;transition:background .2s}
+.kanban::-webkit-scrollbar-thumb:hover{background:#3d4553}
+/* CRM section fills viewport — kanban scrollbar always visible */
+#s-crm.active{display:flex;flex-direction:column;height:100%;padding-bottom:0}
+#s-crm .kanban{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;align-items:stretch;max-width:100%}
+.col-cards{overflow-y:auto;flex:1;min-height:0}
+.col{flex-shrink:0;width:210px;background:#161b22;border:1px solid rgba(255,255,255,0.06);padding:12px;transition:border-color .2s;border-radius:10px;display:flex;flex-direction:column}
 .col.drag-over{border-color:var(--purple);background:rgba(145,70,255,.06)}
 .col-head{font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .col-count{padding:2px 6px;background:var(--pur-l);border:1px solid var(--bd-b);font-family:var(--fM);font-size:10px;font-weight:700;color:var(--purple);border-radius:3px;white-space:nowrap;line-height:1.4}
@@ -406,6 +411,968 @@ canvas{display:block;width:100%!important}
   /* card-ttl with sort buttons: stack on mobile */
   .crt-card-ttl{flex-direction:column;align-items:flex-start!important}
 }
+/* ── NOTIFICAÇÕES CRM ── */
+.notif-fixed{position:fixed;top:14px;right:28px;z-index:300}
+.notif-wrap{position:relative}
+.notif-bell{background:none;border:none;font-size:20px;cursor:pointer;position:relative;padding:4px 6px;color:var(--text)}
+.notif-bell:hover{opacity:.8}
+.notif-badge{position:absolute;top:-2px;right:-2px;background:var(--warn);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 3px;font-family:var(--fD)}
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:var(--bg2);border:1px solid var(--bd-b);border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.4);display:none;flex-direction:column;max-height:420px;overflow-y:auto;z-index:400}
+.notif-panel.open{display:flex}
+.notif-hdr{padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text);flex-shrink:0}
+.notif-hdr button{background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;font-family:var(--fD);letter-spacing:.04em;text-transform:uppercase}
+.notif-hdr button:hover{color:var(--text)}
+.notif-item{padding:10px 14px;border-bottom:1px solid rgba(145,70,255,0.1);cursor:pointer;transition:background .15s}
+.notif-item:hover{background:rgba(145,70,255,0.04)}
+.notif-item.unread{border-left:3px solid var(--purple)}
+.notif-item.unread.sugestao{border-left-color:var(--warn)}
+.notif-titulo{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;font-family:var(--fD)}
+.notif-desc{font-size:11px;color:var(--muted);margin-bottom:3px;line-height:1.4}
+.notif-time{font-size:10px;color:var(--dim)}
+.notif-empty{padding:20px 14px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:900px){.notif-fixed{display:none}}
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--bg2);border-top:1px solid var(--bd);z-index:250;align-items:stretch}
+.mbn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:var(--muted);font-size:9px;font-family:var(--fM);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;padding:6px 0;transition:color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.mbn-item svg{width:18px;height:18px;flex-shrink:0}
+.mbn-item.active,.mbn-item:hover{color:var(--purple)}
+@media(max-width:768px){
+  .mobile-bottom-nav{display:flex}
+  main{padding-bottom:56px!important}
+  .menu-toggle{display:none!important}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DEV OVERRIDES — GLASSMORPHISM REDESIGN v3 — VAULTO LEVEL
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── FUNDAÇÃO ── */
+html,body{background:#07070f;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 50% at 0% 0%,   rgba(145,70,255,0.32) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 40% at 100% 100%,rgba(249,115,22,0.24) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 30% at 80% 0%,   rgba(249,115,22,0.08) 0%, transparent 45%),
+    radial-gradient(ellipse 50% 40% at 5% 95%,   rgba(145,70,255,0.10) 0%, transparent 50%);
+}
+/* grain — cria profundidade e acabamento premium */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  width:100vw;height:100vh; /* sobrescreve width:800px/height:400px do CSS base */
+  pointer-events:none;
+  z-index:9998;
+  opacity:.038;
+  background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/></filter><rect width='300' height='300' fill='black' filter='url(%23n)'/></svg>");
+  background-size:220px 220px;
+}
+
+/* ── TOKENS GLASS ── */
+:root{
+  --orange:     #E06010;
+  --orange-d:   #C95208;
+  --g-bg:       rgba(0,0,0,0.60);
+  --g-bg-h:     rgba(8,6,14,0.74);
+  --g-bd:       rgba(145,70,255,0.18);
+  --g-bd-h:     rgba(249,115,22,0.55);
+  --g-blur:     blur(28px) saturate(180%);
+  --g-blur-sm:  blur(16px) saturate(150%);
+  --glow-sm:    0 4px 20px rgba(249,115,22,0.18);
+  --glow-md:    0 8px 36px rgba(249,115,22,0.28), 0 0 0 1px rgba(249,115,22,0.12);
+  --glow-pu:    0 8px 36px rgba(145,70,255,0.28), 0 0 0 1px rgba(145,70,255,0.12);
+  --shine:      linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 50%);
+  --kpi-grad:   linear-gradient(150deg, #ffffff 0%, rgba(240,235,255,0.95) 70%, rgba(249,115,22,0.80) 100%);
+}
+
+/* ── SIDEBAR ── */
+aside{
+  width:248px;
+  background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(40px) saturate(160%);
+  -webkit-backdrop-filter:blur(40px) saturate(160%);
+  border-right:1px solid rgba(145,70,255,0.12);
+  box-shadow:1px 0 0 rgba(255,255,255,0.03), 4px 0 24px rgba(0,0,0,0.40);
+}
+.sb-logo{
+  background:linear-gradient(135deg,rgba(145,70,255,0.12) 0%,transparent 100%);
+  border-bottom:1px solid rgba(145,70,255,0.12);
+  padding:26px 20px;
+}
+.sb-icon{
+  background:linear-gradient(135deg,#9146FF 0%,#EA580C 100%);
+  box-shadow:0 0 20px rgba(249,115,22,0.45),0 0 40px rgba(145,70,255,0.20);
+  border-radius:10px;
+  clip-path:none;
+}
+.sb-name{font-size:21px;letter-spacing:.08em}
+nav{padding:8px 0;display:flex;flex-direction:column}
+.nav-section{
+  color:rgba(255,255,255,0.18);
+  padding:12px 22px 4px;
+  font-size:9px;
+  letter-spacing:.12em;
+  font-weight:500;
+}
+nav a{
+  padding:7px 18px;
+  border-radius:0 10px 10px 0;
+  margin-right:14px;
+  border-left:2px solid transparent;
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:0;
+  color:rgba(255,255,255,0.38);
+  transition:all .15s ease;
+}
+nav a:hover{
+  background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.78);
+  border-left-color:rgba(145,70,255,0.40);
+}
+nav a.active{
+  background:linear-gradient(90deg,rgba(249,115,22,0.16) 0%,rgba(249,115,22,0.03) 100%);
+  border-left-color:var(--orange);
+  color:#fff;
+  font-weight:600;
+}
+nav a.active svg{
+  opacity:1;
+  filter:drop-shadow(0 0 5px rgba(249,115,22,0.80));
+}
+.sb-footer{
+  border-top:1px solid rgba(145,70,255,0.12);
+  padding:16px 20px;
+}
+@media(max-width:768px){aside{width:260px!important}}
+
+/* ── MOBILE HEADER ── */
+.mobile-header{
+  background:rgba(4,4,14,0.88)!important;
+  backdrop-filter:blur(28px)!important;
+  -webkit-backdrop-filter:blur(28px)!important;
+  border-bottom:1px solid rgba(145,70,255,0.14)!important;
+}
+
+/* ── MAIN ── */
+main{position:relative;z-index:1}
+
+/* ── LIGHT THEME ── */
+html[data-theme="light"]{
+  --bg:#F4F3F9;--bg2:#FFFFFF;--bg3:#E8E7F0;
+  --surface:rgba(107,40,219,0.06);--surface-h:rgba(107,40,219,0.11);
+  --bd:rgba(107,40,219,0.16);--bd-b:rgba(107,40,219,0.32);
+  --purple:#6B28DB;--pur-l:rgba(107,40,219,0.10);
+  --neon:#008A58;--neon-l:rgba(0,138,88,0.10);
+  --warn:#D93330;--text:#0F0F14;--muted:rgba(15,15,20,0.68);--dim:rgba(15,15,20,0.48);
+  --g-bg:rgba(255,255,255,0.68);--g-bg-h:rgba(255,255,255,0.86);
+  --g-bd:rgba(107,40,219,0.14);--g-bd-h:rgba(224,96,16,0.45);
+  --glow-sm:0 4px 20px rgba(224,96,16,0.10);
+  --glow-md:0 8px 36px rgba(224,96,16,0.16),0 0 0 1px rgba(224,96,16,0.10);
+  --kpi-grad:linear-gradient(150deg,#0F0F14 0%,rgba(30,20,60,0.90) 70%,rgba(224,96,16,0.85) 100%);
+}
+html[data-theme="light"] body{background:linear-gradient(150deg,#EAE7F4 0%,#F4F2FA 45%,#EDE8F8 100%)!important}
+html[data-theme="light"] body::before{opacity:0.012}
+html[data-theme="light"] body::after{
+  background:radial-gradient(ellipse at 28% 18%,rgba(107,40,219,0.09) 0%,transparent 55%),
+             radial-gradient(ellipse at 72% 82%,rgba(224,96,16,0.06) 0%,transparent 50%)!important;
+  opacity:1!important;
+}
+html[data-theme="light"] aside{background:#1C1932!important;border-right:1px solid rgba(107,40,219,0.35)!important}
+html[data-theme="light"] .col{background:rgba(255,255,255,0.52)!important}
+html[data-theme="light"] .noise-overlay{opacity:0.014}
+/* text invertida para fundo claro */
+html[data-theme="light"] .kpi-val,
+html[data-theme="light"] .kpi-val.g,
+html[data-theme="light"] .kpi-val.n,
+html[data-theme="light"] .f-pct,
+html[data-theme="light"] .f-n{color:var(--text)!important}
+html[data-theme="light"] .kpi-lbl,
+html[data-theme="light"] .kpi-unit,
+html[data-theme="light"] .kpi-note,
+html[data-theme="light"] .kpi-delta,
+html[data-theme="light"] .card-ttl,
+html[data-theme="light"] .f-lbl,
+html[data-theme="light"] .f-n-sub,
+html[data-theme="light"] .f-gdrop{color:var(--muted)!important}
+/* iOS glass — blur+saturate funciona mesmo em fundo claro com gradiente */
+html[data-theme="light"] .card,
+html[data-theme="light"] .kpi{
+  background:rgba(255,255,255,0.86)!important;
+  backdrop-filter:blur(12px) saturate(160%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(160%)!important;
+  border:1px solid rgba(255,255,255,0.80)!important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.96) inset,
+    0 4px 8px rgba(0,0,0,0.06),
+    0 14px 42px rgba(107,40,219,0.13)!important;
+}
+html[data-theme="light"] .card:hover,
+html[data-theme="light"] .kpi:hover{
+  background:rgba(255,255,255,0.95)!important;
+  border-color:rgba(224,96,16,0.28)!important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.98) inset,
+    0 4px 8px rgba(0,0,0,0.07),
+    0 16px 48px rgba(224,96,16,0.16)!important;
+}
+html[data-theme="light"] .col{
+  background:rgba(232,229,246,0.78)!important;
+  backdrop-filter:blur(10px) saturate(140%)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(140%)!important;
+  border:1px solid rgba(255,255,255,0.62)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset, 0 2px 8px rgba(107,40,219,0.08)!important;
+}
+/* chart/meta/funil glass panels */
+html[data-theme="light"] #main-charts-row > div,
+html[data-theme="light"] #main-charts-row > div > div{
+  background:rgba(255,255,255,0.86)!important;
+  backdrop-filter:blur(12px) saturate(160%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(160%)!important;
+  border:1px solid rgba(255,255,255,0.80)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.96) inset, 0 4px 8px rgba(0,0,0,0.06), 0 14px 42px rgba(107,40,219,0.12)!important;
+}
+/* gráfico inline headers */
+html[data-theme="light"] #main-charts-row .chart-sub-lbl{color:rgba(15,15,20,0.52)!important}
+/* tooltip dark sempre — não mudar com tema */
+html[data-theme="light"] [data-tooltip]::after{background:#1f1f23;color:#efeff1}
+/* sec-badge e col-head */
+html[data-theme="light"] .col-head{background:rgba(107,40,219,0.04)!important}
+/* robo toggle glass no light */
+html[data-theme="light"] .robo-toggle-btn{
+  background:rgba(255,255,255,0.97)!important;
+  backdrop-filter:none!important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08)!important;
+  padding:10px 20px!important;
+}
+/* live badge no light */
+html[data-theme="light"] .live-badge{
+  background:rgba(0,138,88,0.10)!important;
+  border-color:rgba(0,138,88,0.28)!important;
+  color:var(--neon)!important;
+  padding:10px 18px!important;
+}
+/* sec-title: redesign hardcoda #fff */
+html[data-theme="light"] .sec-title{color:var(--text)!important}
+html[data-theme="light"] .sec-title span{color:var(--orange)!important}
+/* sidebar nav: rgba branco não funciona em sidebar clara */
+html[data-theme="light"] .nav-section{color:rgba(255,255,255,0.55)!important}
+html[data-theme="light"] nav a{color:rgba(255,255,255,0.68)!important}
+html[data-theme="light"] nav a:hover{background:rgba(255,255,255,0.08)!important;color:rgba(255,255,255,0.95)!important;border-left-color:rgba(255,255,255,0.30)!important}
+html[data-theme="light"] nav a.active{background:rgba(224,96,16,0.18)!important;color:#F97316!important;border-left-color:#F97316!important}
+/* inputs — glass com inset shadow, iOS-inspired */
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select{
+  color:#0F0F14!important;
+  background:rgba(255,255,255,0.88)!important;
+  backdrop-filter:blur(6px)!important;
+  -webkit-backdrop-filter:blur(6px)!important;
+  border:1.5px solid rgba(107,40,219,0.26)!important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.07) inset, 0 1px 3px rgba(107,40,219,0.06)!important;
+}
+html[data-theme="light"] input:focus,
+html[data-theme="light"] textarea:focus,
+html[data-theme="light"] select:focus{
+  border-color:rgba(107,40,219,0.52)!important;
+  box-shadow:0 0 0 3px rgba(107,40,219,0.10), 0 1px 4px rgba(0,0,0,0.07) inset!important;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder{color:rgba(15,15,20,0.38)!important}
+/* action buttons: fundo preto */
+html[data-theme="light"] .action-btn{background:rgba(255,255,255,0.97)!important;border:1px solid rgba(107,40,219,0.15)!important}
+/* krm cards: branco claro com sombra visível sobre coluna escurecida */
+html[data-theme="light"] .krm-card{
+  background:rgba(255,255,255,0.90)!important;
+  backdrop-filter:blur(8px) saturate(150%)!important;
+  -webkit-backdrop-filter:blur(8px) saturate(150%)!important;
+  border:1px solid rgba(255,255,255,0.88)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.97) inset, 0 2px 6px rgba(0,0,0,0.07), 0 4px 14px rgba(107,40,219,0.09)!important;
+}
+html[data-theme="light"] .krm-card:hover{
+  background:rgba(255,255,255,0.97)!important;
+  border-color:rgba(224,96,16,0.25)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.98) inset, 0 4px 16px rgba(224,96,16,0.16), 0 2px 6px rgba(0,0,0,0.07)!important;
+  transform:translateY(-1px);
+}
+/* lead modal / painel */
+html[data-theme="light"] .lead-panel{background:rgba(255,255,255,0.99)!important;border-color:rgba(107,40,219,0.20)!important;box-shadow:0 20px 60px rgba(0,0,0,0.12)!important}
+html[data-theme="light"] .panel-header{background:rgba(248,248,252,0.99)!important;border-bottom-color:rgba(107,40,219,0.12)!important}
+/* notif panel + col panel + menus */
+html[data-theme="light"] .notif-panel{background:rgba(255,255,255,0.99)!important;border-color:rgba(107,40,219,0.18)!important;box-shadow:0 8px 32px rgba(0,0,0,0.10)!important}
+html[data-theme="light"] .col-panel,
+html[data-theme="light"] .prd-menu{background:rgba(255,255,255,0.99)!important;border-color:rgba(107,40,219,0.18)!important;box-shadow:0 8px 32px rgba(0,0,0,0.12)!important}
+/* toast */
+html[data-theme="light"] .toast{background:rgba(255,255,255,0.99)!important;border-color:rgba(107,40,219,0.20)!important}
+/* análises tab bar (inline #161b22) */
+html[data-theme="light"] #mb-tabs-bar{background:rgba(107,40,219,0.06)!important;border-color:rgba(107,40,219,0.12)!important}
+html[data-theme="light"] .mb-tab-pill{color:var(--muted)!important}
+html[data-theme="light"] .mb-tab-pill.active,
+html[data-theme="light"] .mb-tab-pill[data-active="true"]{color:var(--purple)!important;background:rgba(107,40,219,0.12)!important}
+html[data-theme="light"] .mb-tab-pill:hover:not(.active){background:var(--surface)!important;color:var(--text)!important}
+/* metabase expand bar */
+html[data-theme="light"] .mb-expand-bar{background:rgba(248,248,252,0.99)!important;border-bottom-color:rgba(107,40,219,0.10)!important}
+/* mobile header */
+html[data-theme="light"] .mobile-header{background:rgba(255,255,255,0.96)!important;border-bottom-color:rgba(107,40,219,0.12)!important}
+/* cfg section */
+html[data-theme="light"] .cfg-sec{background:rgba(255,255,255,0.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 1px 4px rgba(0,0,0,0.06)!important}
+
+/* ── LIGHT MODE PROFESSIONAL REFINEMENTS ─────────────────────────────── */
+
+/* 1. Neutralizar artefatos dark mode — pseudo-elements neon/shine */
+html[data-theme="light"] .card::after,
+html[data-theme="light"] .kpi::after{
+  display:none!important
+}
+html[data-theme="light"] .card::before,
+html[data-theme="light"] .kpi::before{
+  background:none!important;
+  display:none!important
+}
+html[data-theme="light"] .krm-card::before{display:none!important}
+
+/* 2. Elevação correta — 3 níveis de profundidade */
+html[data-theme="light"] .card,
+html[data-theme="light"] .kpi{
+  background:#FFFFFF!important;
+  border:1px solid rgba(107,40,219,0.13)!important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08), 0 4px 14px rgba(107,40,219,0.08)!important;
+}
+html[data-theme="light"] .card:hover,
+html[data-theme="light"] .kpi:hover{
+  border-color:rgba(224,96,16,0.28)!important;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08), 0 8px 28px rgba(224,96,16,0.12)!important;
+}
+
+/* 3. Tabela — hierarquia visual clara */
+html[data-theme="light"] table{border-collapse:collapse!important}
+html[data-theme="light"] th{
+  background:rgba(107,40,219,0.05)!important;
+  color:rgba(15,15,20,0.62)!important;
+  font-weight:700!important;
+  font-size:.68rem!important;
+  letter-spacing:.07em!important;
+  text-transform:uppercase!important;
+  border-bottom:2px solid rgba(107,40,219,0.14)!important;
+}
+html[data-theme="light"] td{
+  color:#0F0F14!important;
+  font-weight:500!important;
+  border-bottom:1px solid rgba(107,40,219,0.06)!important;
+}
+html[data-theme="light"] tr:hover td{
+  background:rgba(107,40,219,0.05)!important;
+  cursor:pointer;
+}
+html[data-theme="light"] .tab-btn{
+  color:rgba(15,15,20,0.52)!important;
+  font-weight:600!important;
+  border-bottom-color:transparent!important;
+}
+html[data-theme="light"] .tab-btn.active,
+html[data-theme="light"] .tab-btn[style*="border-bottom"]{
+  color:#0F0F14!important;
+  font-weight:700!important;
+}
+
+/* 4. Kanban — glass columns distintas vs fundo da página */
+html[data-theme="light"] .col{
+  background:rgba(232,229,246,0.78)!important;
+  backdrop-filter:blur(10px) saturate(140%)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(140%)!important;
+  border:1px solid rgba(255,255,255,0.62)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset, 0 2px 8px rgba(107,40,219,0.08)!important;
+}
+html[data-theme="light"] .col-head{
+  border-bottom:1px solid rgba(107,40,219,0.12)!important;
+}
+html[data-theme="light"] [data-stage="bot_ativo"]>.col-head{background:rgba(100,116,139,0.14)!important}
+html[data-theme="light"] [data-stage="em_conversa"]>.col-head{background:rgba(59,130,246,0.12)!important}
+html[data-theme="light"] [data-stage="qualificado"]>.col-head{background:rgba(107,40,219,0.12)!important}
+html[data-theme="light"] [data-stage="agendou"]>.col-head{background:rgba(245,158,11,0.14)!important}
+html[data-theme="light"] [data-stage="compareceu"]>.col-head{background:rgba(0,185,120,0.12)!important}
+html[data-theme="light"] [data-stage="fechou"]>.col-head{background:rgba(16,185,129,0.12)!important}
+html[data-theme="light"] [data-stage="perdido"]>.col-head{background:rgba(255,94,91,0.12)!important}
+html[data-theme="light"] [data-stage="desqualificado"]>.col-head{background:rgba(71,85,105,0.10)!important}
+html[data-theme="light"] .kn-name{color:var(--text)!important;font-weight:600!important}
+html[data-theme="light"] .kn-meta,
+html[data-theme="light"] .kn-date,
+html[data-theme="light"] .col-cnt,
+html[data-theme="light"] .kn-badge{color:var(--muted)!important}
+
+/* 5. Sidebar — refinamento typography e separadores */
+html[data-theme="light"] .sb-name{color:rgba(255,255,255,0.95)!important;font-weight:700!important}
+html[data-theme="light"] .sb-c-sub,
+html[data-theme="light"] .sb-c-name{color:rgba(255,255,255,0.45)!important}
+html[data-theme="light"] .sb-footer{border-top-color:rgba(255,255,255,0.12)!important}
+html[data-theme="light"] aside nav{border-top:none!important}
+html[data-theme="light"] nav a svg{opacity:.55}
+html[data-theme="light"] nav a:hover svg,
+html[data-theme="light"] nav a.active svg{opacity:1}
+/* sidebar dark — live badge e toggle adaptados */
+html[data-theme="light"] aside .live-badge{background:rgba(0,185,120,0.20)!important;border-color:rgba(0,185,120,0.40)!important;color:rgba(0,220,150,0.95)!important}
+html[data-theme="light"] aside button,html[data-theme="light"] aside .toggle-btn{background:rgba(255,255,255,0.10)!important;color:rgba(255,255,255,0.80)!important;border-color:rgba(255,255,255,0.16)!important}
+
+/* 6. Sec-sub e textos de apoio */
+html[data-theme="light"] .sec-sub{color:rgba(15,15,20,0.65)!important;font-weight:500!important}
+html[data-theme="light"] .card-ttl{color:rgba(15,15,20,0.78)!important;font-weight:700!important;letter-spacing:.06em!important;font-size:.70rem!important;text-transform:uppercase!important;border-bottom:1px solid rgba(107,40,219,0.13)!important;padding-bottom:12px!important;margin-bottom:14px!important}
+html[data-theme="light"] .tbl thead{background:rgba(107,40,219,0.09)!important}
+html[data-theme="light"] .tbl thead th{color:rgba(15,15,20,0.76)!important;border-bottom-color:rgba(107,40,219,0.22)!important;padding-top:10px!important}
+
+/* 7. Focus ring — mais visível em light */
+html[data-theme="light"] input:focus,
+html[data-theme="light"] textarea:focus,
+html[data-theme="light"] select:focus{
+  border-color:rgba(107,40,219,0.45)!important;
+  box-shadow:0 0 0 3px rgba(107,40,219,0.08)!important;
+}
+/* placeholder — definido no bloco de inputs acima */
+
+/* 8. Badges de status — readable em light */
+html[data-theme="light"] .status-badge{
+  border:1px solid currentColor!important;
+  opacity:1!important;
+}
+html[data-theme="light"] .live-dot{background:var(--neon)!important;box-shadow:0 0 6px var(--neon)!important}
+
+/* 9. Score glow — no light mode não fica bem */
+html[data-theme="light"] [style*="color:#3fb950"],
+html[data-theme="light"] [style*="color:#e8893d"],
+html[data-theme="light"] [style*="color:#e3b341"],
+html[data-theme="light"] [style*="color:#FF5E5B"]{text-shadow:none!important}
+
+/* 10. action-btn hover — fill branco + borda */
+html[data-theme="light"] .action-btn:hover{
+  background:rgba(255,255,255,0.98)!important;
+  border-color:rgba(107,40,219,0.35)!important;
+  color:#0F0F14!important;
+  box-shadow:0 2px 8px rgba(107,40,219,0.12)!important;
+}
+html[data-theme="light"] .action-btn{color:var(--muted)!important}
+
+/* 11. Modais overlay mais sutil */
+html[data-theme="light"] .lead-panel-overlay{background:rgba(0,0,0,0.45)!important;backdrop-filter:blur(4px)!important;-webkit-backdrop-filter:blur(4px)!important}
+
+/* 12. KPI gradient text — bold e impactante */
+html[data-theme="light"] .kpi-val{
+  background:linear-gradient(150deg,#1A1929 0%,rgba(30,20,60,0.92) 65%,rgba(224,96,16,0.90) 100%)!important;
+  -webkit-background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  background-clip:text!important;
+  font-weight:800!important;
+}
+/* 12b. KPI labels — uppercase legível */
+html[data-theme="light"] .kpi-lbl{
+  color:rgba(15,15,20,0.65)!important;
+  font-weight:700!important;
+  font-size:.68rem!important;
+  letter-spacing:.07em!important;
+  text-transform:uppercase!important;
+}
+/* 12c. KPI sub-notas */
+html[data-theme="light"] .kpi-note,
+html[data-theme="light"] .kpi-unit,
+html[data-theme="light"] .kpi-delta{
+  color:rgba(15,15,20,0.60)!important;
+  font-weight:500!important;
+}
+
+/* 13. Robo label e header texts */
+html[data-theme="light"] .robo-toggle-label{color:var(--text)!important}
+html[data-theme="light"] #db-date{color:var(--text)!important}
+html[data-theme="light"] .prd-drop{color:var(--muted)!important;border-color:rgba(107,40,219,0.15)!important}
+/* prd-trigger — mais padding interno */
+html[data-theme="light"] .prd-trigger{
+  padding:9px 14px 9px 12px!important;
+  background:#1A0E3A!important;
+  border-width:0!important;
+  border-style:none!important;
+  border-left-width:0!important;
+  border-left-style:none!important;
+  outline:none!important;
+  border-radius:6px!important;
+  box-shadow:none!important;
+  color:rgba(255,255,255,0.88)!important;
+}
+html[data-theme="light"] .prd-trigger:hover{
+  background:#2A1660!important;
+  border-width:0!important;
+  border-style:none!important;
+}
+html[data-theme="light"] .prd-trigger .prd-ico,
+html[data-theme="light"] .prd-trigger .prd-chev{color:rgba(180,140,255,0.90)!important}
+html[data-theme="light"] .prd-lbl{
+  color:rgba(15,15,20,0.68)!important;
+  font-weight:700!important;
+  font-size:11px!important;
+}
+html[data-theme="light"] .prd-opt{color:rgba(15,15,20,0.68)!important}
+html[data-theme="light"] .prd-opt:hover{background:rgba(107,40,219,0.08)!important;color:#0F0F14!important}
+html[data-theme="light"] .prd-opt.active{color:var(--purple)!important}
+/* 14. Notif panel — cabeçalho */
+html[data-theme="light"] .notif-hdr{border-bottom-color:rgba(107,40,219,0.10)!important;color:var(--text)!important}
+html[data-theme="light"] .notif-item{border-bottom-color:rgba(107,40,219,0.06)!important}
+html[data-theme="light"] .notif-item:hover{background:rgba(107,40,219,0.07)!important}
+
+/* 15. Col panel / context menu — backgrounds visíveis */
+html[data-theme="light"] .col-panel li,
+html[data-theme="light"] .prd-menu li{color:var(--text)!important}
+html[data-theme="light"] .col-panel li:hover,
+html[data-theme="light"] .prd-menu li:hover{background:rgba(107,40,219,0.09)!important;color:#0F0F14!important}
+
+/* 16a. Col-head — texto e definição claros */
+html[data-theme="light"] .col-head{
+  color:rgba(15,15,20,0.72)!important;
+  font-weight:700!important;
+  border-bottom:1px solid rgba(255,255,255,0.55)!important;
+}
+html[data-theme="light"] .col-head *:not(::before){color:rgba(15,15,20,0.72)!important}
+/* Stage col-head tints mais fortes no glass */
+html[data-theme="light"] [data-stage="bot_ativo"]>.col-head{background:rgba(100,116,139,0.22)!important}
+html[data-theme="light"] [data-stage="em_conversa"]>.col-head{background:rgba(59,130,246,0.20)!important}
+html[data-theme="light"] [data-stage="qualificado"]>.col-head{background:rgba(107,40,219,0.20)!important}
+html[data-theme="light"] [data-stage="agendou"]>.col-head{background:rgba(245,158,11,0.22)!important}
+html[data-theme="light"] [data-stage="compareceu"]>.col-head{background:rgba(0,185,120,0.20)!important}
+html[data-theme="light"] [data-stage="fechou"]>.col-head{background:rgba(16,185,129,0.20)!important}
+html[data-theme="light"] [data-stage="perdido"]>.col-head{background:rgba(255,94,91,0.22)!important}
+html[data-theme="light"] [data-stage="desqualificado"]>.col-head{background:rgba(71,85,105,0.18)!important}
+
+/* 16b. Tab buttons — track visível */
+html[data-theme="light"] .tab-bar,
+html[data-theme="light"] [class*="tab-bar"]{
+  background:rgba(107,40,219,0.06)!important;
+  border-radius:10px!important;
+  padding:3px!important;
+  border:1px solid rgba(107,40,219,0.10)!important;
+}
+html[data-theme="light"] .tab-btn{
+  border-radius:7px!important;
+}
+html[data-theme="light"] .tab-btn.active,
+html[data-theme="light"] .tab-btn[style*="border-bottom"]{
+  background:rgba(255,255,255,0.90)!important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.10)!important;
+  border-bottom-color:transparent!important;
+}
+
+/* 16c. Period dropdown — sem borda no container */
+html[data-theme="light"] .prd-drop{
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+}
+
+/* 16d. Action buttons — definição */
+html[data-theme="light"] .action-btn{
+  background:rgba(255,255,255,0.86)!important;
+  border:1.5px solid rgba(107,40,219,0.18)!important;
+  color:rgba(15,15,20,0.65)!important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06)!important;
+}
+
+/* 16e. Status badges — mais visíveis */
+html[data-theme="light"] .status-badge{
+  border:1.5px solid currentColor!important;
+  font-weight:700!important;
+  opacity:1!important;
+  background:rgba(255,255,255,0.70)!important;
+}
+
+/* 16. Tipografia geral — hierarquia clara */
+html[data-theme="light"] .f-lbl{color:#0F0F14!important;font-weight:700!important}
+html[data-theme="light"] .f-pct{color:rgba(255,255,255,0.95)!important;font-weight:700!important;text-shadow:0 1px 3px rgba(0,0,0,0.28)!important}
+html[data-theme="light"] .f-n{font-size:13px!important;font-weight:700!important;color:#0F0F14!important}
+html[data-theme="light"] .f-gdrop{font-size:10px!important;font-weight:600!important;color:rgba(15,15,20,0.58)!important}
+html[data-theme="light"] #main-charts-row .chart-sub-lbl,
+html[data-theme="light"] .chart-sub-lbl{color:rgba(15,15,20,0.62)!important;font-weight:700!important;letter-spacing:.05em!important;text-transform:uppercase!important;font-size:.68rem!important}
+/* textos inline hardcoded */
+html[data-theme="light"] [style*="color:#8b949e"]{color:rgba(15,15,20,0.55)!important}
+html[data-theme="light"] [style*="color:#c9d1d9"]{color:#0F0F14!important}
+html[data-theme="light"] [style*="color:#e6edf3"]{color:#0F0F14!important}
+html[data-theme="light"] [style*="color:#f0f6fc"]{color:#0F0F14!important}
+html[data-theme="light"] [style*="color:rgba(255,255,255,0"]{color:rgba(15,15,20,0.65)!important}
+
+/* 17. Card elevação reforçada */
+html[data-theme="light"] .card,
+html[data-theme="light"] .kpi{
+  box-shadow:0 1px 4px rgba(0,0,0,0.10), 0 4px 18px rgba(107,40,219,0.10)!important;
+}
+html[data-theme="light"] .card:hover,
+html[data-theme="light"] .kpi:hover{
+  box-shadow:0 2px 8px rgba(0,0,0,0.10), 0 8px 32px rgba(224,96,16,0.14)!important;
+}
+
+/* 18. Sec-badge — stage pill no analista */
+html[data-theme="light"] .sec-badge,
+html[data-theme="light"] [class*="stage-"]{font-weight:600!important}
+
+/* 19. CRM col name peso */
+html[data-theme="light"] .col-cnt{color:rgba(15,15,20,0.55)!important;font-weight:600!important}
+
+/* ── END LIGHT MODE REFINEMENTS ────────────────────────────────────────── */
+
+/* ── LIVE BADGE ── */
+.live-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(0,245,160,0.10);border:1px solid rgba(0,245,160,0.30);border-radius:20px;font-family:var(--fM);font-size:10px;font-weight:600;color:var(--neon);letter-spacing:.12em;text-transform:uppercase;box-shadow:0 0 14px rgba(0,245,160,0.12);cursor:default}
+
+/* ── ROBÔ BTN ── */
+.robo-toggle-btn{background:var(--g-bg)!important;backdrop-filter:var(--g-blur-sm)!important;-webkit-backdrop-filter:var(--g-blur-sm)!important;border-radius:10px!important;padding:8px 16px!important;font-size:12px!important;font-weight:600!important;transition:all .2s!important}
+.robo-toggle-btn:hover{border-color:rgba(249,115,22,0.45)!important;box-shadow:var(--glow-sm)!important}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-size:32px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1;
+  color:#ffffff;
+  text-transform:none!important;
+}
+.sec-title span{
+  color:var(--orange);
+  background:none;
+  -webkit-background-clip:unset;
+  -webkit-text-fill-color:unset;
+  background-clip:unset;
+}
+.rule::before{width:40px;height:2px;background:var(--orange);border-radius:2px;opacity:.65}
+
+/* ── KPIs ── */
+.kpi{
+  background:var(--g-bg);
+  backdrop-filter:var(--g-blur);
+  -webkit-backdrop-filter:var(--g-blur);
+  border:1px solid var(--g-bd);
+  border-radius:20px;
+  padding:26px 24px 22px!important;
+  position:relative;
+  overflow:hidden;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.kpi::before{
+  content:'';position:absolute;inset:0;
+  background:var(--shine);
+  pointer-events:none;z-index:0;
+}
+.kpi::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(145,70,255,0.5),rgba(255,255,255,0.18),transparent);
+}
+.kpi>*{position:relative;z-index:1}
+.kpi:hover{
+  background:var(--g-bg-h);
+  border-color:rgba(249,115,22,0.45);
+  box-shadow:var(--glow-md);
+}
+.kpi-val{
+  font-size:62px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-.04em;
+  background:var(--kpi-grad);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.kpi-lbl{
+  color:rgba(255,255,255,0.28);
+  letter-spacing:.06em;
+  font-size:9px;
+  font-weight:500;
+  text-transform:uppercase;
+  margin-bottom:10px!important;
+}
+@media(max-width:768px){.kpi-val{font-size:44px!important}}
+
+/* ── CARDS GENÉRICOS ── */
+.card{
+  background:var(--g-bg);
+  backdrop-filter:var(--g-blur);
+  -webkit-backdrop-filter:var(--g-blur);
+  border:1px solid var(--g-bd);
+  border-radius:20px;
+  padding:24px 22px!important;
+  position:relative;
+  overflow:hidden;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.card::before{
+  content:'';position:absolute;inset:0;
+  background:var(--shine);pointer-events:none;
+}
+.card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(145,70,255,0.4),rgba(255,255,255,0.12),transparent);
+}
+.card>*{position:relative;z-index:1}
+.card:hover{
+  background:var(--g-bg-h);
+  border-color:rgba(249,115,22,0.45);
+  box-shadow:var(--glow-md);
+}
+
+/* ── KANBAN — COLUNAS ── */
+.col{
+  background:rgba(0,0,0,0.64);
+  backdrop-filter:var(--g-blur-sm);
+  -webkit-backdrop-filter:var(--g-blur-sm);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:18px;
+  overflow:hidden;
+  transition:border-color .2s;
+}
+.col:hover{border-color:rgba(224,96,16,0.40);box-shadow:0 4px 24px rgba(224,96,16,0.10)}
+.col-head{
+  padding:10px 14px 10px;
+  margin-bottom:0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  position:relative;
+  display:flex;
+  align-items:center;
+  border-radius:8px;
+}
+/* Dot semântico + background tinted + border-top por stage */
+[data-stage] > .col-head{background:none;border-top:none}
+[data-stage="bot_ativo"]     >.col-head::before{background:#64748b}
+[data-stage="em_conversa"]   >.col-head::before{background:#3b82f6}
+[data-stage="qualificado"]   >.col-head::before{background:#9146ff}
+[data-stage="agendou"]       >.col-head::before{background:#f59e0b}
+[data-stage="compareceu"]    >.col-head::before{background:#00f5a0}
+[data-stage="fechou"]        >.col-head::before{background:#10b981}
+[data-stage="perdido"]       >.col-head::before{background:#ff5e5b}
+[data-stage="desqualificado"]>.col-head::before{background:#475569}
+.col:not([data-stage])       >.col-head::before{background:var(--orange)}
+/* Header: tinted background por stage */
+[data-stage="bot_ativo"]     >.col-head{background:rgba(100,116,139,0.18)}
+[data-stage="em_conversa"]   >.col-head{background:rgba(59,130,246,0.18)}
+[data-stage="qualificado"]   >.col-head{background:rgba(145,70,255,0.18)}
+[data-stage="agendou"]       >.col-head{background:rgba(245,158,11,0.18)}
+[data-stage="compareceu"]    >.col-head{background:rgba(0,245,160,0.12)}
+[data-stage="fechou"]        >.col-head{background:rgba(16,185,129,0.18)}
+[data-stage="perdido"]       >.col-head{background:rgba(255,94,91,0.18)}
+[data-stage="desqualificado"]>.col-head{background:rgba(71,85,105,0.18)}
+/* Border-top por stage */
+[data-stage="bot_ativo"]     {border-top:2px solid #64748b!important}
+[data-stage="em_conversa"]   {border-top:2px solid #3b82f6!important}
+[data-stage="qualificado"]   {border-top:2px solid #9146ff!important}
+[data-stage="agendou"]       {border-top:2px solid #f59e0b!important}
+[data-stage="compareceu"]    {border-top:2px solid #00f5a0!important}
+[data-stage="fechou"]        {border-top:2px solid #10b981!important}
+[data-stage="perdido"]       {border-top:2px solid #ff5e5b!important}
+[data-stage="desqualificado"]{border-top:2px solid #475569!important}
+/* dot base — injetado via ::before no .col-head */
+[data-stage] > .col-head::before,.col:not([data-stage])>.col-head::before{
+  content:'';
+  display:inline-block;
+  width:7px;height:7px;
+  border-radius:50%;
+  margin-right:8px;
+  vertical-align:middle;
+  flex-shrink:0;
+  box-shadow:0 0 6px currentColor;
+}
+.col-cards{padding:10px 10px 14px;overflow-y:auto;flex:1;min-height:0}
+
+/* ── KANBAN — CARDS ── */
+.krm-card{
+  background:rgba(255,255,255,0.038);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  position:relative;
+  overflow:hidden;
+  transition:all .18s ease;
+}
+.krm-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.10),transparent);
+}
+.krm-card:hover{
+  background:rgba(249,115,22,0.07);
+  border-color:rgba(249,115,22,0.30);
+  box-shadow:0 6px 28px rgba(249,115,22,0.14);
+  transform:translateY(-1px);
+}
+
+/* ── MODAL / PAINEL LEAD ── */
+.lead-panel-overlay{
+  background:rgba(0,0,0,0.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.lead-panel{
+  background:rgba(6,4,18,0.92);
+  backdrop-filter:blur(44px) saturate(200%);
+  -webkit-backdrop-filter:blur(44px) saturate(200%);
+  border:1px solid rgba(145,70,255,0.28);
+  border-radius:24px;
+  box-shadow:0 40px 100px rgba(0,0,0,0.65),0 0 0 1px rgba(145,70,255,0.10),var(--glow-sm);
+}
+.lead-panel::before{
+  background:linear-gradient(90deg,rgba(145,70,255,0.70) 0%,rgba(249,115,22,0.50) 100%)!important;
+  height:1px!important;
+}
+.panel-header{
+  background:rgba(8,5,22,0.85);
+  border-radius:24px 24px 0 0;
+  border-bottom:1px solid rgba(145,70,255,0.16);
+}
+
+/* ── DROPDOWNS / MENUS ── */
+.col-panel,.prd-menu{
+  background:rgba(6,4,18,0.92);
+  backdrop-filter:blur(28px) saturate(180%);
+  -webkit-backdrop-filter:blur(28px) saturate(180%);
+  border:1px solid rgba(145,70,255,0.22);
+  border-radius:14px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.55),var(--glow-sm);
+}
+
+/* ── CONFIG ── */
+.cfg-sec{
+  background:var(--g-bg);
+  backdrop-filter:var(--g-blur-sm);
+  -webkit-backdrop-filter:var(--g-blur-sm);
+  border:1px solid var(--g-bd);
+  border-radius:18px;
+}
+
+/* ── MISC ── */
+.mb-frame{border:1px solid var(--g-bd);border-radius:18px}
+.toast{
+  background:rgba(6,4,18,0.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(145,70,255,0.22);
+  border-radius:12px;
+  box-shadow:var(--glow-sm);
+}
+/* Inputs e textareas */
+input,textarea,select{
+  background:rgba(145,70,255,0.06)!important;
+  border-color:rgba(145,70,255,0.22)!important;
+  color:#fff!important;
+  border-radius:10px!important;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:rgba(145,70,255,0.55)!important;
+  box-shadow:0 0 0 3px rgba(145,70,255,0.12)!important;
+  outline:none!important;
+}
+/* Border-radius global em botões */
+button:not([style*="border-radius"]){border-radius:8px!important}
+.filter-btn{border-radius:8px!important}
+.col-btn{border-radius:6px!important}
+.col-preset-chip{border-radius:6px!important}
+.col-apply-btn{border-radius:6px!important}
+.notif-hdr button{border-radius:6px!important}
+
+/* Botões primários */
+button[onclick*="save"],
+.btn-primary,.btn-purple{
+  background:linear-gradient(135deg,var(--orange) 0%,var(--orange-d) 100%)!important;
+  box-shadow:0 4px 20px rgba(249,115,22,0.40)!important;
+  border:none!important;
+  border-radius:10px!important;
+  transition:box-shadow .2s,transform .15s!important;
+}
+button[onclick*="save"]:hover{
+  box-shadow:0 8px 32px rgba(249,115,22,0.58)!important;
+  transform:translateY(-1px)!important;
+}
+/* Ações Rápidas — glass, não laranja */
+.action-btn{background:rgba(6,4,18,0.90)!important;box-shadow:none!important;border:1px solid rgba(255,255,255,0.08)!important}
+/* Fix: save-qual-btn específico — não deve ser laranja */
+#save-qual-btn{
+  background:rgba(145,70,255,0.12)!important;
+  box-shadow:0 4px 16px rgba(145,70,255,0.18)!important;
+  border:1px solid rgba(145,70,255,0.35)!important;
+  color:var(--purple)!important;
+}
+#save-qual-btn:hover{
+  background:rgba(145,70,255,0.20)!important;
+  box-shadow:0 6px 24px rgba(145,70,255,0.32)!important;
+  transform:translateY(-1px)!important;
+}
+/* Barra de progresso / fill */
+[class*="bar-fill"],[class*="fill"],[class*="progress"] > *:first-child{
+  background:linear-gradient(90deg,#9146FF,rgba(0,245,160,0.8))!important;
+}
+/* Score badges cor de glow */
+[style*="color:#3fb950"]{text-shadow:0 0 12px rgba(63,185,80,0.6)}
+[style*="color:#e8893d"]{text-shadow:0 0 12px rgba(232,137,61,0.6)}
+[style*="color:#e3b341"]{text-shadow:0 0 12px rgba(227,179,65,0.5)}
+[style*="color:#FF5E5B"]{text-shadow:0 0 12px rgba(255,94,91,0.6)}
+/* ── FIXES 2026-09-24 — toggle visibility + thead dark mode ── */
+html:not([data-theme="light"]) #theme-toggle-btn{
+  background:rgba(145,70,255,0.15)!important;
+  border-color:rgba(145,70,255,0.45)!important;
+  color:rgba(239,239,241,0.82)!important;
+}
+html:not([data-theme="light"]) #theme-toggle-btn:hover{
+  background:rgba(145,70,255,0.28)!important;
+  border-color:rgba(145,70,255,0.65)!important;
+  color:#fff!important;
+}
+html:not([data-theme="light"]) .tbl thead th{
+  color:rgba(239,239,241,0.62)!important;
+  padding-top:8px!important;
+}
+html:not([data-theme="light"]) .tbl thead{
+  background:rgba(145,70,255,0.06)!important;
+}
+/* ── FIXES 2026-09-24 B — scrollbars + html bg light mode ── */
+/* html bg: linha 444 sobrescrevia html,body — light mode só corrigia body */
+html[data-theme="light"]{background:#F4F3F9!important}
+/* dark mode: barra de altura (main vertical) = mesmo padrão da barra lateral (kanban) */
+html:not([data-theme="light"]) main::-webkit-scrollbar{width:8px}
+html:not([data-theme="light"]) main::-webkit-scrollbar-track{background:#0d1117;border-radius:4px}
+html:not([data-theme="light"]) main::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px;transition:background .2s}
+html:not([data-theme="light"]) main::-webkit-scrollbar-thumb:hover{background:#3d4553}
+/* light mode: barra lateral (kanban horizontal) = mesmo esquema da barra de altura (browser default light) */
+html[data-theme="light"] .kanban::-webkit-scrollbar-track{background:rgba(107,40,219,0.06);border-radius:4px}
+html[data-theme="light"] .kanban::-webkit-scrollbar-thumb{background:rgba(107,40,219,0.22);border-radius:4px;transition:background .2s}
+html[data-theme="light"] .kanban::-webkit-scrollbar-thumb:hover{background:rgba(107,40,219,0.38)}
+/* ── FIXES 2026-09-24 C — funil labels + sino glass + tablet grid ── */
+/* Sino: fundo transparente sobre kanban escuro criava fantasma */
+.notif-bell{
+    background:rgba(10,6,22,0.72)!important;
+    backdrop-filter:blur(14px)!important;
+    -webkit-backdrop-filter:blur(14px)!important;
+    border-color:rgba(145,70,255,0.35)!important;
+    box-shadow:0 2px 16px rgba(0,0,0,0.35)!important;
+}
+.notif-bell:hover{
+    background:rgba(18,10,36,0.88)!important;
+    border-color:rgba(145,70,255,0.55)!important;
+}
+html[data-theme="light"] .notif-bell{
+    background:rgba(255,255,255,0.90)!important;
+    backdrop-filter:blur(12px)!important;
+    -webkit-backdrop-filter:blur(12px)!important;
+    border-color:rgba(107,40,219,0.28)!important;
+    box-shadow:0 2px 12px rgba(0,0,0,0.08)!important;
+    color:#0F0F14!important;
+}
+/* Tablet: 3 colunas KPI, mobile: 2 colunas — ID+!important derrota inline style */
+@media(max-width:900px){#kpi-row{grid-template-columns:repeat(3,1fr)!important}}
+@media(max-width:600px){#kpi-row{grid-template-columns:1fr 1fr!important}}
+/* Funil: label pct fora da barra para valores pequenos */
+.f-pct-out{font-family:var(--fM);font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:5px;flex-shrink:0}
+html[data-theme="light"] .f-pct-out{color:rgba(15,15,20,0.50)!important}
+/* bg light mode: main usava var(--bg)=#F4F3F9 (quase branco) — override p/ lavanda visível */
+html[data-theme="light"] main{background:linear-gradient(160deg,#D9D3EB 0%,#E5E0F3 50%,#DED7EC 100%)!important}
+html[data-theme="light"] body{background:linear-gradient(150deg,#D3CCEC 0%,#E2DDF5 45%,#D9D3EE 100%)!important}
+/* ── FIXES 2026-09-24 D — col-cards scrollbar (kanban colunas vertical) ── */
+/* Browser default em dark mode = scrollbar clara sobre fundo escuro; override p/ combinar com nav lateral */
+.col-cards::-webkit-scrollbar{width:4px}
+.col-cards::-webkit-scrollbar-track{background:transparent}
+.col-cards::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px;transition:background .2s}
+.col-cards::-webkit-scrollbar-thumb:hover{background:#3d4553}
+html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb{background:rgba(107,40,219,0.22);border-radius:2px;transition:background .2s}
+html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rgba(107,40,219,0.38)}
 </style>
 </head>
 <body>
@@ -508,7 +1475,12 @@ canvas{display:block;width:100%!important}
 <div class="mobile-header">
   <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
   <div class="mobile-logo">Epos <span>AI</span></div>
-  <button onclick="doLogout()" style="margin-left:auto;padding:6px 12px;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px">Sair</button>
+  <div class="notif-wrap" style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-mobile"></span></button>
+    <div class="notif-panel" id="notif-panel-mobile"></div>
+        <button id="theme-toggle-btn" onclick="toggleTheme()" style="margin-top:6px;width:100%;padding:6px 0;background:var(--surface);border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="11" height="11" id="theme-icon-svg" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span id="theme-label">Modo Claro</span></button>
+    <button onclick="doLogout()" style="padding:6px 12px;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px">Sair</button>
+  </div>
 </div>
 
 <div class="app">
@@ -570,9 +1542,16 @@ canvas{display:block;width:100%!important}
   <div class="sb-footer">
     <div class="sb-c-name">Epos Marketing</div>
     <div class="sb-live"><div class="live-dot"></div>LIVE · Sistema ativo</div>
+        <button id="theme-toggle-btn" onclick="toggleTheme()" style="margin-top:6px;width:100%;padding:6px 0;background:var(--surface);border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="11" height="11" id="theme-icon-svg" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span id="theme-label">Modo Claro</span></button>
     <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .15s" onmouseover="this.style.borderColor='var(--dim)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
   </div>
 </aside>
+<div class="notif-fixed">
+  <div class="notif-wrap">
+    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-desk"></span></button>
+    <div class="notif-panel" id="notif-panel-desk"></div>
+  </div>
+</div>
 <main>
 
 <!-- ══ DASHBOARD ══ -->
@@ -623,18 +1602,7 @@ canvas{display:block;width:100%!important}
     </div>
   </div>
 
-  <!-- ── FRAME BROWSER (estilo LP) ── -->
-  <div style="background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:16px">
-    <div style="background:#1c2128;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <div style="width:12px;height:12px;border-radius:50%;background:#ff5f57;flex-shrink:0"></div>
-      <div style="width:12px;height:12px;border-radius:50%;background:#febc2e;flex-shrink:0"></div>
-      <div style="width:12px;height:12px;border-radius:50%;background:#28c840;flex-shrink:0"></div>
-      <span style="font-family:var(--fM);font-size:12px;color:#8b949e;margin-left:8px;flex:1">Kairos Method · Dashboard Principal · Epos</span>
-      <span style="display:flex;align-items:center;gap:5px;font-family:var(--fM);font-size:10px;color:#3fb950;font-weight:600">
-        <span style="width:6px;height:6px;border-radius:50%;background:#3fb950;display:inline-block;animation:live-pulse 2s infinite"></span>Ao vivo
-      </span>
-    </div>
-    <div style="padding:16px">
+  <div style="padding:0">
       <!-- ── PENDENTES DE APROVAÇÃO ── -->
       <div id="pendentes-section" style="display:none;margin-bottom:16px;border:1px solid rgba(255,165,0,.35);background:rgba(255,165,0,.04);border-radius:6px;overflow:hidden">
         <div style="padding:10px 16px;background:rgba(255,165,0,.09);border-bottom:1px solid rgba(255,165,0,.2);display:flex;align-items:center;justify-content:space-between;gap:8px">
@@ -658,27 +1626,26 @@ canvas{display:block;width:100%!important}
 
       <!-- Layout 2 colunas: Chart (esq, largo) + Meta+Funil stacked (dir) — igual LP -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px" id="main-charts-row">
-        <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;display:flex;flex-direction:column">
-          <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;flex-shrink:0">Leads por Dia — últimos 30 dias</div>
+        <div style="background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px;display:flex;flex-direction:column">
+          <div class="chart-sub-lbl" style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;flex-shrink:0">Leads por Dia — últimos 30 dias</div>
           <div style="position:relative;flex:1;min-height:90px;overflow:hidden"><canvas id="wk-chart" style="position:absolute;top:0;left:0"></canvas></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <!-- Meta Ads (topo do painel direito) -->
-          <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;flex:1" id="meta-ads-card">
-            <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px;flex:1" id="meta-ads-card">
+            <div class="chart-sub-lbl" style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
               Meta Ads · Período
               <span id="meta-period-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;font-weight:400">30 dias</span>
             </div>
             <div id="meta-ads-content"><div class="loading"></div></div>
           </div>
           <!-- Funil (baixo do painel direito) -->
-          <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;flex:1">
-            <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Funil de Conversão</div>
+          <div style="background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px;flex:1">
+            <div class="chart-sub-lbl" style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Funil de Conversão</div>
             <div class="funnel" id="funnel-container"><div class="loading"></div></div>
           </div>
         </div>
       </div>
-    </div>
   </div>
 
   <!-- Card Atendimento Ativo -->
@@ -1200,6 +2167,12 @@ canvas{display:block;width:100%!important}
     location.replace('login-epos.html');
     throw new Error('auth_required');
   }
+  const EPOS_ALLOWED = ['thiagommkt@gmail.com'];
+  if (!EPOS_ALLOWED.includes((sess.user?.email || '').toLowerCase())) {
+    localStorage.removeItem('sb-phszzzwqkujmmfregtsj-auth-token');
+    location.replace('login-epos.html');
+    throw new Error('access_denied');
+  }
   window._ACCESS_TOKEN = sess.access_token;
   function getCk(n) { const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return m?decodeURIComponent(m.pop()):null; }
   const BIO_KEY = 'epos_bio_credential';
@@ -1480,19 +2453,34 @@ async function loadDashboard() {
   const pct = n => Math.round(n/T*100);
   const drop = (a,b) => a>0 ? Math.round((a-b)/a*100) : 0;
   const funil = document.getElementById('funnel-container');
+  // fp: % label dentro da barra só se largo o suficiente; senão, fora
+  const fp = (p, color) => {
+    const v = parseInt(p);
+    const cs = color ? ` style="color:${color}"` : '';
+    if (v >= 10) return `<span class="f-pct">${p}%</span>`;
+    if (v > 0)   return `<data class="f-pct-out"${cs}>${p}%</data>`;
+    return '';
+  };
+  // Narrow bar: remove pct from inside fill; wide bar: keep inside
+  const fBar = (cls, p, fillStyle, pct_label_out) => {
+    const fill_bg = fillStyle ? ` style="background:${fillStyle}"` : '';
+    if (parseInt(p) >= 10)
+      return `<div class="f-track"><div class="f-fill ${cls}"${fill_bg} data-w="${p}%"><span class="f-pct">${p}%</span></div></div>`;
+    return `<div class="f-track"><div class="f-fill ${cls}"${fill_bg} data-w="${p}%"></div></div>${pct_label_out}`;
+  };
   funil.innerHTML = `
-    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="${leadsTotal>0?'100%':'0%'}"><span class="f-pct">${leadsTotal>0?'100%':'0%'}</span></div></div><div class="f-n">${leadsTotal}</div></div>
+    <div class="f-row"><div class="f-lbl">Chegaram</div>${fBar('f1', leadsTotal>0?'100':'0', '', leadsTotal>0?'<data class="f-pct-out">100%</data>':'')}<div class="f-n">${leadsTotal}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(leadsTotal,fEC)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Em Conversa</div><div class="f-track"><div class="f-fill f1-5" data-w="${pct(fEC)}%"><span class="f-pct">${pct(fEC)}%</span></div></div><div class="f-n">${fEC}</div></div>
+    <div class="f-row"><div class="f-lbl">Em Conversa</div>${fBar('f1-5', pct(fEC), '', fp(pct(fEC)))}<div class="f-n">${fEC}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fEC,fQL)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Qualificado</div><div class="f-track"><div class="f-fill f2" data-w="${pct(fQL)}%"><span class="f-pct">${pct(fQL)}%</span></div></div><div class="f-n">${fQL}</div></div>
+    <div class="f-row"><div class="f-lbl">Qualificado</div>${fBar('f2', pct(fQL), '', fp(pct(fQL)))}<div class="f-n">${fQL}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fQL,fAG)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Agendou</div><div class="f-track"><div class="f-fill f3" data-w="${pct(fAG)}%"><span class="f-pct">${pct(fAG)}%</span></div></div><div class="f-n">${fAG}</div></div>
+    <div class="f-row"><div class="f-lbl">Agendou</div>${fBar('f3', pct(fAG), '', fp(pct(fAG)))}<div class="f-n">${fAG}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fAG,fCO)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Compareceu</div><div class="f-track"><div class="f-fill f4" data-w="${pct(fCO)}%"><span class="f-pct">${pct(fCO)}%</span></div></div><div class="f-n">${fCO}</div></div>
+    <div class="f-row"><div class="f-lbl">Compareceu</div>${fBar('f4', pct(fCO), '', fp(pct(fCO)))}<div class="f-n">${fCO}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fCO,fFE)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Fechou</div><div class="f-track"><div class="f-fill f5" data-w="${pct(fFE)}%"><span class="f-pct">${pct(fFE)}%</span></div></div><div class="f-n">${fFE}</div></div>
-    ${fSA>0?`<div class="f-gap" style="opacity:.45"><div class="f-gline"></div></div><div class="f-row" style="opacity:.75"><div class="f-lbl" style="color:var(--warn)">Sa&#237;ram</div><div class="f-track"><div class="f-fill" style="background:var(--warn)" data-w="${pct(fSA)}%"><span class="f-pct">${pct(fSA)}%</span></div></div><div class="f-n" style="color:var(--warn)">${fSA}</div></div>`:''}
+    <div class="f-row"><div class="f-lbl">Fechou</div>${fBar('f5', pct(fFE), '', fp(pct(fFE)))}<div class="f-n">${fFE}</div></div>
+    ${fSA>0?`<div class="f-gap" style="opacity:.45"><div class="f-gline"></div></div><div class="f-row" style="opacity:.75"><div class="f-lbl" style="color:var(--warn)">Sa&#237;ram</div>${fBar('', pct(fSA), 'var(--warn)', fp(pct(fSA),'var(--warn)'))}<div class="f-n" style="color:var(--warn)">${fSA}</div></div>`:''}
   `;
   setTimeout(() => {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
@@ -2011,8 +2999,10 @@ const initialized = {};
 function show(id) {
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('#mobile-bottom-nav .mbn-item').forEach(b=>b.classList.remove('active'));
+  const mainEl = document.querySelector('main'); if(mainEl) mainEl.scrollTop = 0;
   const sec = document.getElementById('s-'+id);
-  if(sec){ sec.classList.add('active'); document.querySelector(`[data-sec="${id}"]`)?.classList.add('active'); }
+  if(sec){ sec.classList.add('active'); document.querySelector(`[data-sec="${id}"]`)?.classList.add('active'); document.querySelector(`#mobile-bottom-nav [data-sec="${id}"]`)?.classList.add('active'); }
   if(!initialized[id]){
     initialized[id]=true;
     if(id==='dados') loadLeads();
@@ -2047,6 +3037,98 @@ async function updateCRMStage(crm_person_id, newStage, telefone) {
     body: JSON.stringify({ crm_stage: newStage })
   });
   if (!r.ok) throw new Error('Erro Supabase: ' + r.status);
+}
+
+// ═══ NOTIFICAÇÕES CRM ═══
+let _notifOpen = false;
+
+async function loadNotificacoes() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/crm_notificacoes?conta=eq.epos&order=criado_em.desc&limit=30`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
+    });
+    const items = await r.json();
+    if (!Array.isArray(items)) return;
+    const unread = items.filter(n => !n.lida).length;
+    const badge = unread > 0 ? String(unread > 99 ? '99+' : unread) : '';
+    ['notif-badge-desk', 'notif-badge-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = badge; el.style.display = badge ? 'flex' : 'none'; }
+    });
+    const html = items.length === 0
+      ? '<div class="notif-empty">Nenhuma notificação</div>'
+      : items.map(n => {
+          const d = n.criado_em ? new Date(n.criado_em).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', timeZone:'America/Sao_Paulo' }) : '';
+          const isSug = n.tipo === 'sugestao_stage';
+          return `<div class="notif-item ${n.lida ? '' : 'unread'} ${isSug ? 'sugestao' : ''}" onclick="abrirLeadDaNotificacao('${(n.lead_telefone||'').replace(/'/g,"\\'")}', ${n.id})">
+            <div class="notif-titulo">${escHtml(n.titulo||'')}</div>
+            ${n.descricao ? `<div class="notif-desc">${escHtml(n.descricao)}</div>` : ''}
+            <div class="notif-time">${d}</div>
+          </div>`;
+        }).join('');
+    const fullHtml = `<div class="notif-hdr">Notificações CRM<button onclick="markNotificacoesLidas()">Marcar lidas</button></div>` + html;
+    ['notif-panel-desk', 'notif-panel-mobile'].forEach(id => {
+      const panel = document.getElementById(id);
+      if (panel) panel.innerHTML = fullHtml;
+    });
+  } catch(e) { /* silencioso */ }
+}
+
+async function markNotificacoesLidas() {
+  try {
+    await fetch(`${SB_URL}/rest/v1/crm_notificacoes?conta=eq.epos&lida=eq.false`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ lida: true })
+    });
+    ['notif-badge-desk', 'notif-badge-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+  } catch(e) { /* silencioso */ }
+}
+
+function toggleNotifPanel() {
+  _notifOpen = !_notifOpen;
+  ['notif-panel-desk', 'notif-panel-mobile'].forEach(id => {
+    const panel = document.getElementById(id);
+    if (panel) panel.classList.toggle('open', _notifOpen);
+  });
+  if (_notifOpen) loadNotificacoes();
+}
+
+document.addEventListener('click', function(e) {
+  if (_notifOpen && !e.target.closest('.notif-wrap')) {
+    _notifOpen = false;
+    ['notif-panel-desk', 'notif-panel-mobile'].forEach(id => {
+      const panel = document.getElementById(id);
+      if (panel) panel.classList.remove('open');
+    });
+  }
+});
+
+async function abrirLeadDaNotificacao(telefone, notifId) {
+  if (!telefone) { toast('Notificação sem telefone — não é possível abrir o lead', 'warn'); return; }
+  if (_notifOpen) toggleNotifPanel();
+  if (notifId) {
+    fetch(`${SB_URL}/rest/v1/crm_notificacoes?id=eq.${notifId}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ lida: true })
+    }).catch(() => {});
+  }
+  let lead;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}&limit=1`, {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY) }
+    });
+    if (!r.ok) { toast('Erro ao buscar lead (' + r.status + ')', 'err'); return; }
+    const arr = await r.json();
+    if (!Array.isArray(arr) || !arr.length) { toast('Lead não encontrado para ' + telefone, 'warn'); return; }
+    lead = arr[0];
+  } catch(e) { toast('Erro ao buscar lead: ' + e.message, 'err'); return; }
+  openLeadPanel(lead);
 }
 
 // ═══ PERÍODO DO DASHBOARD ═══
@@ -3738,7 +4820,9 @@ async function toggleRobo() {
 loadDashboard();
 loadRoboStatus();
 loadWaClicks();
+loadNotificacoes();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
+setInterval(loadNotificacoes, 60000); // recarrega notificações a cada 1min
 
 // Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
 (function initRealtime() {
@@ -3771,6 +4855,47 @@ async function doLogout() {
   localStorage.removeItem('sb-phszzzwqkujmmfregtsj-auth-token');
   location.replace('login-epos.html');
 }
+// ═══ TEMA CLARO / ESCURO ═══
+(function(){
+  const saved = localStorage.getItem('epos-theme');
+  if (saved === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+function updateThemeBtn(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const lbl = document.getElementById('theme-label');
+  const svg = document.getElementById('theme-icon-svg');
+  if (lbl) lbl.textContent = isLight ? 'Modo Escuro' : 'Modo Claro';
+  if (svg) { svg.innerHTML = isLight ? '<path d="M12 12.5A5 5 0 0 1 6.5 4a.5.5 0 0 0-.6-.6A7 7 0 1 0 13 10.1a.5.5 0 0 0-.5-.6 5 5 0 0 1-.5 3z" fill="currentColor"/>' : '<circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></circle>'; }
+}
+function toggleTheme(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  localStorage.setItem('epos-theme', isLight ? 'dark' : 'light');
+  updateThemeBtn();
+}
+document.addEventListener('DOMContentLoaded', updateThemeBtn);
 </script>
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <button class="mbn-item active" data-sec="dashboard" onclick="navTo('dashboard')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>
+    <span>Painel</span>
+  </button>
+  <button class="mbn-item" data-sec="dados" onclick="navTo('dados')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
+    <span>Leads</span>
+  </button>
+  <button class="mbn-item" data-sec="crm" onclick="navTo('crm')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="3" height="14"/><rect x="6" y="1" width="3" height="10"/><rect x="11" y="1" width="3" height="7"/></svg>
+    <span>CRM</span>
+  </button>
+  <button class="mbn-item" data-sec="chat" onclick="navTo('chat')">
+    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 2h14v9H9l-3 3V11H1V2z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>Chat</span>
+  </button>
+  <button class="mbn-item" onclick="toggleSidebar()">
+    <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
+    <span>Menu</span>
+  </button>
+</nav>
 </body>
 </html>
