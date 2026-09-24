@@ -1323,6 +1323,18 @@ html:not([data-theme="light"]) .tbl thead th{
 html:not([data-theme="light"]) .tbl thead{
   background:rgba(145,70,255,0.06)!important;
 }
+/* ── FIXES 2026-09-24 B — scrollbars + html bg light mode ── */
+/* html bg: linha 444 sobrescrevia html,body — light mode só corrigia body */
+html[data-theme="light"]{background:#F4F3F9!important}
+/* dark mode: barra de altura (main vertical) = mesmo padrão da barra lateral (kanban) */
+html:not([data-theme="light"]) main::-webkit-scrollbar{width:8px}
+html:not([data-theme="light"]) main::-webkit-scrollbar-track{background:#0d1117;border-radius:4px}
+html:not([data-theme="light"]) main::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px;transition:background .2s}
+html:not([data-theme="light"]) main::-webkit-scrollbar-thumb:hover{background:#3d4553}
+/* light mode: barra lateral (kanban horizontal) = mesmo esquema da barra de altura (browser default light) */
+html[data-theme="light"] .kanban::-webkit-scrollbar-track{background:rgba(107,40,219,0.06);border-radius:4px}
+html[data-theme="light"] .kanban::-webkit-scrollbar-thumb{background:rgba(107,40,219,0.22);border-radius:4px;transition:background .2s}
+html[data-theme="light"] .kanban::-webkit-scrollbar-thumb:hover{background:rgba(107,40,219,0.38)}
 </style>
 </head>
 <body>
