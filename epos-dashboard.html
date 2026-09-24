@@ -1335,6 +1335,33 @@ html:not([data-theme="light"]) main::-webkit-scrollbar-thumb:hover{background:#3
 html[data-theme="light"] .kanban::-webkit-scrollbar-track{background:rgba(107,40,219,0.06);border-radius:4px}
 html[data-theme="light"] .kanban::-webkit-scrollbar-thumb{background:rgba(107,40,219,0.22);border-radius:4px;transition:background .2s}
 html[data-theme="light"] .kanban::-webkit-scrollbar-thumb:hover{background:rgba(107,40,219,0.38)}
+/* ── FIXES 2026-09-24 C — funil labels + sino glass + tablet grid ── */
+/* Sino: fundo transparente sobre kanban escuro criava fantasma */
+.notif-bell{
+    background:rgba(10,6,22,0.72)!important;
+    backdrop-filter:blur(14px)!important;
+    -webkit-backdrop-filter:blur(14px)!important;
+    border-color:rgba(145,70,255,0.35)!important;
+    box-shadow:0 2px 16px rgba(0,0,0,0.35)!important;
+}
+.notif-bell:hover{
+    background:rgba(18,10,36,0.88)!important;
+    border-color:rgba(145,70,255,0.55)!important;
+}
+html[data-theme="light"] .notif-bell{
+    background:rgba(255,255,255,0.90)!important;
+    backdrop-filter:blur(12px)!important;
+    -webkit-backdrop-filter:blur(12px)!important;
+    border-color:rgba(107,40,219,0.28)!important;
+    box-shadow:0 2px 12px rgba(0,0,0,0.08)!important;
+    color:#0F0F14!important;
+}
+/* Tablet: 3 colunas KPI, mobile: 2 colunas — ID+!important derrota inline style */
+@media(max-width:900px){#kpi-row{grid-template-columns:repeat(3,1fr)!important}}
+@media(max-width:600px){#kpi-row{grid-template-columns:1fr 1fr!important}}
+/* Funil: label pct fora da barra para valores pequenos */
+.f-pct-out{font-family:var(--fM);font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:5px;flex-shrink:0}
+html[data-theme="light"] .f-pct-out{color:rgba(15,15,20,0.50)!important}
 </style>
 </head>
 <body>
@@ -2427,19 +2454,34 @@ async function loadDashboard() {
   const pct = n => Math.round(n/T*100);
   const drop = (a,b) => a>0 ? Math.round((a-b)/a*100) : 0;
   const funil = document.getElementById('funnel-container');
+  // fp: % label dentro da barra só se largo o suficiente; senão, fora
+  const fp = (p, color) => {
+    const v = parseInt(p);
+    const cs = color ? ` style="color:${color}"` : '';
+    if (v >= 10) return `<span class="f-pct">${p}%</span>`;
+    if (v > 0)   return `<data class="f-pct-out"${cs}>${p}%</data>`;
+    return '';
+  };
+  // Narrow bar: remove pct from inside fill; wide bar: keep inside
+  const fBar = (cls, p, fillStyle, pct_label_out) => {
+    const fill_bg = fillStyle ? ` style="background:${fillStyle}"` : '';
+    if (parseInt(p) >= 10)
+      return `<div class="f-track"><div class="f-fill ${cls}"${fill_bg} data-w="${p}%"><span class="f-pct">${p}%</span></div></div>`;
+    return `<div class="f-track"><div class="f-fill ${cls}"${fill_bg} data-w="${p}%"></div></div>${pct_label_out}`;
+  };
   funil.innerHTML = `
-    <div class="f-row"><div class="f-lbl">Chegaram</div><div class="f-track"><div class="f-fill f1" data-w="${leadsTotal>0?'100%':'0%'}"><span class="f-pct">${leadsTotal>0?'100%':'0%'}</span></div></div><div class="f-n">${leadsTotal}</div></div>
+    <div class="f-row"><div class="f-lbl">Chegaram</div>${fBar('f1', leadsTotal>0?'100':'0', '', leadsTotal>0?'<data class="f-pct-out">100%</data>':'')}<div class="f-n">${leadsTotal}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(leadsTotal,fEC)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Em Conversa</div><div class="f-track"><div class="f-fill f1-5" data-w="${pct(fEC)}%"><span class="f-pct">${pct(fEC)}%</span></div></div><div class="f-n">${fEC}</div></div>
+    <div class="f-row"><div class="f-lbl">Em Conversa</div>${fBar('f1-5', pct(fEC), '', fp(pct(fEC)))}<div class="f-n">${fEC}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fEC,fQL)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Qualificado</div><div class="f-track"><div class="f-fill f2" data-w="${pct(fQL)}%"><span class="f-pct">${pct(fQL)}%</span></div></div><div class="f-n">${fQL}</div></div>
+    <div class="f-row"><div class="f-lbl">Qualificado</div>${fBar('f2', pct(fQL), '', fp(pct(fQL)))}<div class="f-n">${fQL}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fQL,fAG)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Agendou</div><div class="f-track"><div class="f-fill f3" data-w="${pct(fAG)}%"><span class="f-pct">${pct(fAG)}%</span></div></div><div class="f-n">${fAG}</div></div>
+    <div class="f-row"><div class="f-lbl">Agendou</div>${fBar('f3', pct(fAG), '', fp(pct(fAG)))}<div class="f-n">${fAG}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fAG,fCO)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Compareceu</div><div class="f-track"><div class="f-fill f4" data-w="${pct(fCO)}%"><span class="f-pct">${pct(fCO)}%</span></div></div><div class="f-n">${fCO}</div></div>
+    <div class="f-row"><div class="f-lbl">Compareceu</div>${fBar('f4', pct(fCO), '', fp(pct(fCO)))}<div class="f-n">${fCO}</div></div>
     <div class="f-gap"><div class="f-gline"></div><div class="f-gdrop">−${drop(fCO,fFE)}%</div></div>
-    <div class="f-row"><div class="f-lbl">Fechou</div><div class="f-track"><div class="f-fill f5" data-w="${pct(fFE)}%"><span class="f-pct">${pct(fFE)}%</span></div></div><div class="f-n">${fFE}</div></div>
-    ${fSA>0?`<div class="f-gap" style="opacity:.45"><div class="f-gline"></div></div><div class="f-row" style="opacity:.75"><div class="f-lbl" style="color:var(--warn)">Sa&#237;ram</div><div class="f-track"><div class="f-fill" style="background:var(--warn)" data-w="${pct(fSA)}%"><span class="f-pct">${pct(fSA)}%</span></div></div><div class="f-n" style="color:var(--warn)">${fSA}</div></div>`:''}
+    <div class="f-row"><div class="f-lbl">Fechou</div>${fBar('f5', pct(fFE), '', fp(pct(fFE)))}<div class="f-n">${fFE}</div></div>
+    ${fSA>0?`<div class="f-gap" style="opacity:.45"><div class="f-gline"></div></div><div class="f-row" style="opacity:.75"><div class="f-lbl" style="color:var(--warn)">Sa&#237;ram</div>${fBar('', pct(fSA), 'var(--warn)', fp(pct(fSA),'var(--warn)'))}<div class="f-n" style="color:var(--warn)">${fSA}</div></div>`:''}
   `;
   setTimeout(() => {
     funil.querySelectorAll('[data-w]').forEach(b => b.style.width = b.dataset.w);
