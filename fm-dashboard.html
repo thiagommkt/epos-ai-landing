@@ -1581,22 +1581,22 @@ html[data-theme="light"] body{background:linear-gradient(150deg,#D3CCEC 0%,#E2DD
 
       <!-- Layout 2 colunas: Chart (esq, largo) + Meta+Funil stacked (dir) — igual LP -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px" id="main-charts-row">
-        <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;display:flex;flex-direction:column">
-          <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;flex-shrink:0">Leads por Dia — últimos 30 dias</div>
+        <div style="background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px;display:flex;flex-direction:column">
+          <div class="chart-sub-lbl" style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;flex-shrink:0">Leads por Dia — últimos 30 dias</div>
           <div style="position:relative;flex:1;min-height:90px;overflow:hidden"><canvas id="wk-chart" style="position:absolute;top:0;left:0"></canvas></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <!-- Meta Ads (topo do painel direito) -->
-          <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;flex:1" id="meta-ads-card">
-            <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px;flex:1" id="meta-ads-card">
+            <div class="chart-sub-lbl" style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
               Meta Ads · Período
               <span id="meta-period-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;font-weight:400">30 dias</span>
             </div>
             <div id="meta-ads-content"><div class="loading"></div></div>
           </div>
           <!-- Funil (baixo do painel direito) -->
-          <div style="background:#0d1117;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;flex:1">
-            <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Funil de Conversão</div>
+          <div style="background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px;flex:1">
+            <div class="chart-sub-lbl" style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Funil de Conversão</div>
             <div class="funnel" id="funnel-container"><div class="loading"></div></div>
           </div>
         </div>
