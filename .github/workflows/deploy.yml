@@ -37,16 +37,4 @@ jobs:
           publish_dir: ./
           exclude_assets: '.github,scripts,node_modules,*.py,*.md'
 
-      - name: Purge Cloudflare cache
-        if: success()
-        uses: jakejarvis/cloudflare-purge-action@master
-        env:
-          CLOUDFLARE_ZONE: ${{ secrets.CF_ZONE_ID }}
-          CLOUDFLARE_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          PURGE_URLS: |
-            ["https://lp.eposmktfilmsia.com.br/epos-dashboard.html",
-             "https://lp.eposmktfilmsia.com.br/fm-dashboard.html",
-             "https://lp.eposmktfilmsia.com.br/guides/fm-dashboard.html",
-             "https://lp.eposmktfilmsia.com.br/guides/epos-dashboard.html",
-             "https://lp.eposmktfilmsia.com.br/login-epos.html",
-             "https://lp.eposmktfilmsia.com.br/login-fm.html"]
+      # CF purge: rodar localmente com scripts/purge_cf.ps1 após o push
