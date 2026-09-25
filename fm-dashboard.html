@@ -331,7 +331,7 @@ canvas{display:block;width:100%!important}
   main{flex:none;width:100%;overflow-y:auto}
   .section{padding:16px 14px 48px}
   .sec-title{font-size:20px!important}
-  .sec-head{flex-direction:column;align-items:flex-start;gap:8px}
+  .sec-head{flex-direction:column;align-items:flex-start;gap:8px;padding-right:0!important}
   .sec-badge{font-size:9px}
 
   /* Grids */
@@ -1333,6 +1333,9 @@ html[data-theme="light"] .notif-bell{
 @media(max-width:1100px){#kpi-row,#prosp-kpi-row{grid-template-columns:repeat(3,1fr)!important}}
 @media(max-width:600px){#kpi-row{grid-template-columns:1fr 1fr!important}}
 @media(max-width:1100px) and (min-width:769px){.kpi-val{font-size:40px!important}.kpi{padding:20px 18px 16px!important}}
+.theme-mob-btn{display:none;align-items:center;gap:5px;padding:5px 12px;background:var(--surface);border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all .15s;white-space:nowrap}
+.theme-mob-btn:hover{border-color:var(--purple);color:var(--text)}
+@media(max-width:768px){.theme-mob-btn{display:inline-flex}}
 .f-pct-out{font-family:var(--fM);font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:5px;flex-shrink:0}
 html[data-theme="light"] .f-pct-out{color:rgba(15,15,20,0.50)!important}
 html[data-theme="light"] .f-track{background:rgba(15,15,20,0.10)!important}
@@ -1344,16 +1347,16 @@ html[data-theme="light"] body{background:linear-gradient(150deg,#D3CCEC 0%,#E2DD
 .prd-drop{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;align-self:flex-start;width:auto;position:relative}
 .prd-btn-wrap{position:relative;display:inline-block}
 .prd-lbl{font-family:var(--fM);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;flex-shrink:0}
-.prd-trigger{display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;background:var(--bg2);border:1px solid var(--bd-b);border-left:3px solid var(--purple);color:var(--text);font-family:var(--fM);font-size:11px;letter-spacing:.04em;cursor:pointer;border-radius:4px;white-space:nowrap;transition:all .15s;width:auto}
+.prd-trigger{display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;background:var(--bg3);border:1px solid var(--bd-b);border-left:3px solid var(--purple);color:var(--text);font-family:var(--fM);font-size:11px;letter-spacing:.04em;cursor:pointer;border-radius:4px;white-space:nowrap;transition:all .15s;width:auto}
 .prd-trigger:hover{border-color:var(--purple);background:var(--pur-l)}
 .prd-trigger .prd-ico{color:var(--purple);flex-shrink:0}
 .prd-trigger .prd-chev{transition:transform .15s;flex-shrink:0;color:var(--purple);margin-left:4px}
 .prd-trigger.open{background:var(--pur-l);border-color:var(--purple)}
 .prd-trigger.open .prd-chev{transform:rotate(180deg)}
-.prd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:9999;background:var(--bg2);border:1px solid var(--bd-b);border-radius:6px;overflow:hidden;min-width:180px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+.prd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:9999;background:var(--bg3);border:1px solid var(--bd-b);border-radius:6px;overflow:hidden;min-width:180px;box-shadow:0 12px 32px rgba(0,0,0,.65),0 0 0 1px rgba(145,70,255,0.20)}
 .prd-menu.open{display:block}
 .prd-opt{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;font-family:var(--fM);font-size:11px;color:var(--text);letter-spacing:.04em;transition:background .1s;white-space:nowrap;gap:20px}
-.prd-opt:hover{background:rgba(145,70,255,.08);color:var(--text)}
+.prd-opt:hover{background:rgba(145,70,255,.16);color:var(--text)}
 .prd-opt.active{background:var(--pur-l);color:var(--purple);font-weight:600}
 .prd-opt.active::after{content:'✓';font-size:10px;opacity:.9}
 @media(max-width:520px){.prd-drop{display:none!important}.period-sel-mob{display:block!important}}
@@ -1549,12 +1552,13 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <section class="section active" id="s-dashboard">
   <div class="sec-head">
     <div><div class="sec-title">PAINEL <span>GERAL</span></div><div class="sec-sub" id="db-date">Carregando...</div></div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px">
       <button class="robo-toggle-btn" onclick="toggleRobo()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
         <span class="robo-toggle-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
         <span class="robo-toggle-label">🤖 Robô: carregando...</span>
       </button>
       <div class="sec-badge" id="db-live">● LIVE</div>
+      <button class="theme-mob-btn" id="theme-mob-btn" onclick="toggleTheme()"><svg width="11" height="11" id="theme-icon-mob" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span id="theme-label-mob">Modo Claro</span></button>
     </div>
   </div>
   <div class="rule"></div>
@@ -1849,7 +1853,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <div class="sec-title">ANÁLISES <span>& MÉTRICAS</span></div>
       <div class="sec-sub">DASHBOARDS EM TEMPO REAL · METABASE</div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px">
       <button class="robo-toggle-btn" onclick="toggleRobo()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
         <span class="robo-toggle-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
         <span class="robo-toggle-label">🤖 Robô: carregando...</span>
@@ -4682,10 +4686,16 @@ async function doLogout() {
 })();
 function updateThemeBtn(){
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const moonPath = '<path d="M12 12.5A5 5 0 0 1 6.5 4a.5.5 0 0 0-.6-.6A7 7 0 1 0 13 10.1a.5.5 0 0 0-.5-.6 5 5 0 0 1-.5 3z" fill="currentColor"/>';
+  const sunPath = '<circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>';
   const lbl = document.getElementById('theme-label');
   const svg = document.getElementById('theme-icon-svg');
+  const lblMob = document.getElementById('theme-label-mob');
+  const svgMob = document.getElementById('theme-icon-mob');
   if (lbl) lbl.textContent = isLight ? 'Modo Escuro' : 'Modo Claro';
-  if (svg) { svg.innerHTML = isLight ? '<path d="M12 12.5A5 5 0 0 1 6.5 4a.5.5 0 0 0-.6-.6A7 7 0 1 0 13 10.1a.5.5 0 0 0-.5-.6 5 5 0 0 1-.5 3z" fill="currentColor"/>' : '<circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></circle>'; }
+  if (svg) svg.innerHTML = isLight ? moonPath : sunPath;
+  if (lblMob) lblMob.textContent = isLight ? 'Modo Escuro' : 'Modo Claro';
+  if (svgMob) svgMob.innerHTML = isLight ? moonPath : sunPath;
 }
 function toggleTheme(){
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
