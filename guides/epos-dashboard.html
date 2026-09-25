@@ -319,9 +319,9 @@ canvas{display:block;width:100%!important}
   .mobile-header{display:flex;height:56px;flex-shrink:0}
 
   /* Sidebar fora do .app agora, mas estilos ficam aqui */
-  aside{position:fixed;left:-240px;top:56px;bottom:0;z-index:300;width:240px!important;transition:left .25s ease;overflow-y:auto}
+  aside{position:fixed;left:0;top:56px;bottom:0;z-index:300;width:260px!important;transform:translateX(calc(-100% - 1px));transition:transform .25s ease;overflow-y:auto}
   aside nav a{-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;min-height:48px}
-  aside.open{left:0}
+  aside.open{transform:translateX(0)}
   .sidebar-overlay.show{top:56px}
 
   /* Main e sections */
@@ -396,7 +396,7 @@ canvas{display:block;width:100%!important}
 .prd-trigger.open .prd-chev{transform:rotate(180deg)}
 .prd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:200;background:var(--bg2);border:1px solid var(--bd-b);border-radius:6px;overflow:hidden;min-width:180px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
 .prd-menu.open{display:block}
-.prd-opt{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;font-family:var(--fM);font-size:11px;color:var(--muted);letter-spacing:.04em;transition:background .1s;white-space:nowrap;gap:20px}
+.prd-opt{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;font-family:var(--fM);font-size:11px;color:var(--text);letter-spacing:.04em;transition:background .1s;white-space:nowrap;gap:20px}
 .prd-opt:hover{background:rgba(145,70,255,.08);color:var(--text)}
 .prd-opt.active{background:var(--pur-l);color:var(--purple);font-weight:600}
 .prd-opt.active::after{content:'✓';font-size:10px;opacity:.9}
@@ -545,7 +545,7 @@ nav a.active svg{
   border-top:1px solid rgba(145,70,255,0.12);
   padding:16px 20px;
 }
-@media(max-width:768px){aside{width:260px!important}}
+/* aside width já 260px no bloco mobile acima — regra duplicada removida */
 
 /* ── MOBILE HEADER ── */
 .mobile-header{
@@ -1357,7 +1357,7 @@ html[data-theme="light"] .notif-bell{
     color:#0F0F14!important;
 }
 /* Tablet: 3 colunas KPI, mobile: 2 colunas — ID+!important derrota inline style */
-@media(max-width:900px){#kpi-row{grid-template-columns:repeat(3,1fr)!important}}
+@media(max-width:1100px){#kpi-row,#prosp-kpi-row{grid-template-columns:repeat(3,1fr)!important}}
 @media(max-width:600px){#kpi-row{grid-template-columns:1fr 1fr!important}}
 /* Funil: label pct fora da barra para valores pequenos */
 .f-pct-out{font-family:var(--fM);font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:5px;flex-shrink:0}
