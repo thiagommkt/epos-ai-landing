@@ -3979,8 +3979,21 @@ function toggleColPanel() {
   const btn = document.getElementById('col-toggle-btn');
   const isOpen = panel.classList.toggle('open');
   if (btn) btn.classList.toggle('active', isOpen);
-  if (isOpen) { _colBd(true); renderColPanel(); setTimeout(() => document.addEventListener('click', _colOutside, {once:true}), 30); }
-  else { _colBd(false); }
+  if (isOpen) { _colBd(true); _posColDesktop(panel, btn); renderColPanel(); setTimeout(() => document.addEventListener('click', _colOutside, {once:true}), 30); }
+  else { _colBd(false); _clearColDesktop(panel); }
+}
+function _posColDesktop(panel, btn) {
+  if (window.innerWidth <= 1024) return;
+  const r = btn.getBoundingClientRect();
+  Object.assign(panel.style, {
+    position:'fixed', top:(r.bottom+6)+'px', right:(window.innerWidth-r.right)+'px',
+    left:'auto', bottom:'auto', width:'300px', transform:'none',
+    maxHeight:'80vh', overflowY:'auto', zIndex:'9999'
+  });
+}
+function _clearColDesktop(panel) {
+  if (window.innerWidth <= 1024) return;
+  ['position','top','right','left','bottom','width','transform','maxHeight','overflowY','zIndex'].forEach(p => panel.style[p] = '');
 }
 function _colBd(show) {
   if (window.innerWidth > 1024) return;
@@ -3991,7 +4004,7 @@ function _colBd(show) {
     bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:8998;cursor:pointer;display:none';
     bd.onclick = () => {
       const p = document.getElementById('col-panel'), b = document.getElementById('col-toggle-btn');
-      if (p) p.classList.remove('open');
+      if (p) { p.classList.remove('open'); _clearColDesktop(p); }
       if (b) b.classList.remove('active');
       bd.style.display = 'none';
     };
@@ -4005,7 +4018,7 @@ function _colOutside(e) {
   if (bd && e.target === bd) { _colBd(false); return; }
   if (wrap && wrap.contains(e.target)) { document.addEventListener('click', _colOutside, {once:true}); return; }
   const panel = document.getElementById('col-panel');
-  if (panel) panel.classList.remove('open');
+  if (panel) { panel.classList.remove('open'); _clearColDesktop(panel); }
   const btn = document.getElementById('col-toggle-btn');
   if (btn) btn.classList.remove('active');
   _colBd(false);
@@ -4019,7 +4032,8 @@ function aplicarColunas() {
   const checked = [...document.querySelectorAll('#col-checkboxes input[type=checkbox]:checked')].map(cb => cb.dataset.col);
   if (!checked.length) { alert('Selecione ao menos uma coluna.'); return; }
   setSelectedCols(checked);
-  document.getElementById('col-panel').classList.remove('open');
+  const panel = document.getElementById('col-panel');
+  if (panel) { panel.classList.remove('open'); _clearColDesktop(panel); }
   document.getElementById('col-toggle-btn').classList.remove('active');
   _colBd(false);
   _refreshCreativos();
