@@ -1359,6 +1359,7 @@ html[data-theme="light"] .notif-bell{
 /* Tablet: 3 colunas KPI, mobile: 2 colunas — ID+!important derrota inline style */
 @media(max-width:1100px){#kpi-row,#prosp-kpi-row{grid-template-columns:repeat(3,1fr)!important}}
 @media(max-width:600px){#kpi-row{grid-template-columns:1fr 1fr!important}}
+@media(max-width:1100px) and (min-width:769px){.kpi-val{font-size:40px!important}.kpi{padding:20px 18px 16px!important}}
 /* Funil: label pct fora da barra para valores pequenos */
 .f-pct-out{font-family:var(--fM);font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:5px;flex-shrink:0}
 html[data-theme="light"] .f-pct-out{color:rgba(15,15,20,0.50)!important}
