@@ -3979,8 +3979,15 @@ function toggleColPanel() {
   const btn = document.getElementById('col-toggle-btn');
   const isOpen = panel.classList.toggle('open');
   if (btn) btn.classList.toggle('active', isOpen);
-  if (isOpen) { _colBd(true); _posColDesktop(panel, btn); renderColPanel(); setTimeout(() => document.addEventListener('click', _colOutside, {once:true}), 30); }
-  else { _colBd(false); _clearColDesktop(panel); }
+  if (isOpen) {
+    if (!panel._colOrigParent) panel._colOrigParent = panel.parentElement;
+    document.body.appendChild(panel);
+    _colBd(true); _posColDesktop(panel, btn); renderColPanel();
+    setTimeout(() => document.addEventListener('click', _colOutside, {once:true}), 30);
+  } else {
+    _colBd(false); _clearColDesktop(panel);
+    if (panel._colOrigParent) { panel._colOrigParent.appendChild(panel); panel._colOrigParent = null; }
+  }
 }
 function _posColDesktop(panel, btn) {
   if (window.innerWidth <= 1024) return;
@@ -4004,7 +4011,7 @@ function _colBd(show) {
     bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:8998;cursor:pointer;display:none';
     bd.onclick = () => {
       const p = document.getElementById('col-panel'), b = document.getElementById('col-toggle-btn');
-      if (p) { p.classList.remove('open'); _clearColDesktop(p); }
+      if (p) { p.classList.remove('open'); _clearColDesktop(p); if (p._colOrigParent) { p._colOrigParent.appendChild(p); p._colOrigParent = null; } }
       if (b) b.classList.remove('active');
       bd.style.display = 'none';
     };
@@ -4014,11 +4021,13 @@ function _colBd(show) {
 }
 function _colOutside(e) {
   const wrap = document.querySelector('.col-panel-wrap');
+  const panel = document.getElementById('col-panel');
   const bd = document.getElementById('col-panel-bd');
   if (bd && e.target === bd) { _colBd(false); return; }
-  if (wrap && wrap.contains(e.target)) { document.addEventListener('click', _colOutside, {once:true}); return; }
-  const panel = document.getElementById('col-panel');
-  if (panel) { panel.classList.remove('open'); _clearColDesktop(panel); }
+  if ((wrap && wrap.contains(e.target)) || (panel && panel.contains(e.target))) {
+    document.addEventListener('click', _colOutside, {once:true}); return;
+  }
+  if (panel) { panel.classList.remove('open'); _clearColDesktop(panel); if (panel._colOrigParent) { panel._colOrigParent.appendChild(panel); panel._colOrigParent = null; } }
   const btn = document.getElementById('col-toggle-btn');
   if (btn) btn.classList.remove('active');
   _colBd(false);
@@ -4033,7 +4042,7 @@ function aplicarColunas() {
   if (!checked.length) { alert('Selecione ao menos uma coluna.'); return; }
   setSelectedCols(checked);
   const panel = document.getElementById('col-panel');
-  if (panel) { panel.classList.remove('open'); _clearColDesktop(panel); }
+  if (panel) { panel.classList.remove('open'); _clearColDesktop(panel); if (panel._colOrigParent) { panel._colOrigParent.appendChild(panel); panel._colOrigParent = null; } }
   document.getElementById('col-toggle-btn').classList.remove('active');
   _colBd(false);
   _refreshCreativos();
