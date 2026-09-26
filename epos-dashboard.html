@@ -4225,21 +4225,22 @@ function renderColPanel() {
 function toggleColPanel() {
   const panel = document.getElementById('col-panel');
   const btn = document.getElementById('col-toggle-btn');
+  const btnRect = btn ? btn.getBoundingClientRect() : null;
   const isOpen = panel.classList.toggle('open');
   if (btn) btn.classList.toggle('active', isOpen);
   if (isOpen) {
     if (!panel._colOrigParent) panel._colOrigParent = panel.parentElement;
     document.body.appendChild(panel);
-    _colBd(true); _posColDesktop(panel, btn); renderColPanel();
+    _colBd(true); _posColDesktop(panel, btnRect); renderColPanel();
     setTimeout(() => document.addEventListener('click', _colOutside, {once:true}), 30);
   } else {
     _colBd(false); _clearColDesktop(panel);
     if (panel._colOrigParent) { panel._colOrigParent.appendChild(panel); panel._colOrigParent = null; }
   }
 }
-function _posColDesktop(panel, btn) {
+function _posColDesktop(panel, btnRect) {
   if (window.innerWidth <= 1024) return;
-  const r = btn.getBoundingClientRect();
+  const r = btnRect || document.getElementById('col-toggle-btn').getBoundingClientRect();
   Object.assign(panel.style, {
     position:'fixed', top:(r.bottom+6)+'px', right:(window.innerWidth-r.right)+'px',
     left:'auto', bottom:'auto', width:'300px', transform:'none',
