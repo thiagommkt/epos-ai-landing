@@ -343,17 +343,10 @@ canvas{display:block;width:100%!important}
   #main-charts-row{grid-template-columns:1fr!important}
 
   /* Chat — preenche tela toda disponível */
-  .section#s-chat{padding:0!important}
-  .chat-wrap{
-    height:calc(100dvh - 56px);
-    height:calc(100vh - 56px); /* fallback */
-    border:none;
-  }
-  .chat-iframe{
-    height:calc(100dvh - 56px);
-    height:calc(100vh - 56px);
-    width:100%;
-  }
+  .section#s-chat{padding:0!important;height:calc(100dvh - 104px);height:calc(100vh - 104px);display:flex!important;flex-direction:column!important}
+  .section#s-chat .sec-head,.section#s-chat .rule{display:none!important}
+  .chat-wrap{flex:1!important;height:auto!important;border:none!important;overflow:hidden!important;min-height:0!important;display:flex!important;flex-direction:column!important}
+  .chat-iframe{flex:1!important;height:auto!important;min-height:0!important;width:100%!important}
   /* Agenda mobile */
   .agenda-iframe{height:480px!important;min-height:480px!important}
 
