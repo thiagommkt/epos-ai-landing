@@ -1370,7 +1370,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="lead-panel" id="lead-panel" onclick="event.stopPropagation()">
     <div class="panel-header">
       <div class="panel-title" id="panel-name">Lead</div>
-      <button class="panel-close" onclick="closeLeadPanel()">✕</button>
+      <button class="panel-close" onclick="closeLeadPanel()" aria-label="Fechar painel">✕</button>
     </div>
     <div class="panel-body" id="panel-body"></div>
   </div>
@@ -1381,7 +1381,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="lead-panel" style="max-width:420px;border-radius:10px" onclick="event.stopPropagation()">
     <div class="panel-header">
       <div class="panel-title">Confirmar Contrato</div>
-      <button class="panel-close" onclick="fecharModalContrato()">✕</button>
+      <button class="panel-close" onclick="fecharModalContrato()" aria-label="Fechar modal">✕</button>
     </div>
     <div class="panel-body" style="padding:20px 24px 24px">
       <div id="contrato-nome-display" style="font-family:var(--fD);font-size:14px;font-weight:600;color:var(--text);margin-bottom:18px"></div>
@@ -1402,7 +1402,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="lead-panel" style="max-width:440px;border-radius:10px" onclick="event.stopPropagation()">
     <div class="panel-header">
       <div class="panel-title">Novo Contato Manual</div>
-      <button class="panel-close" onclick="fecharModalNovoContato()">✕</button>
+      <button class="panel-close" onclick="fecharModalNovoContato()" aria-label="Fechar modal">✕</button>
     </div>
     <div class="panel-body" style="padding:20px 24px 24px">
       <div style="display:grid;gap:14px">
@@ -1461,10 +1461,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 <div class="mobile-header">
-  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+  <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Abrir menu">☰</button>
   <div class="mobile-logo">F&M IA</div>
   <div class="notif-wrap" style="margin-left:auto">
-    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-mobile"></span></button>
+    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM" aria-label="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-mobile"></span></button>
     <div class="notif-panel" id="notif-panel-mobile"></div>
   </div>
 </div>
@@ -1536,7 +1536,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <!-- Bell fixo desktop — visível em todas as seções -->
 <div class="notif-fixed">
   <div class="notif-wrap">
-    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-desk"></span></button>
+    <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM" aria-label="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-desk"></span></button>
     <div class="notif-panel" id="notif-panel-desk"></div>
   </div>
 </div>
