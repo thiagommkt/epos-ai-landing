@@ -80,6 +80,9 @@ main{flex:1;min-width:0;overflow-y:auto;background:var(--bg)}
 .kpi-delta{font-size:10px;color:#3fb950;margin-top:4px;font-family:var(--fM)}
 @keyframes live-pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .kpi-bar{position:absolute;bottom:0;left:0;height:2px;width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1) .4s}
+@keyframes kpi-shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.kpi-row.loading .kpi-val{position:relative;color:transparent!important}
+.kpi-row.loading .kpi-val::after{content:'';position:absolute;inset:0;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.10) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;animation:kpi-shimmer 1.4s ease infinite}
 [data-tooltip]{cursor:help}
 [data-tooltip]::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1f1f23;border:1px solid rgba(255,255,255,.12);color:#efeff1;font-size:10px;font-family:var(--fM);padding:6px 10px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:200;max-width:220px;white-space:normal;text-align:center;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,.5)}
 [data-tooltip]:hover::after{opacity:1}
@@ -2320,6 +2323,8 @@ async function loadWaClicks() {
 }
 
 async function loadDashboard() {
+  const kpiRowEl = document.getElementById('kpi-row');
+  if (kpiRowEl) kpiRowEl.classList.add('loading');
   const onDashboard = document.getElementById('s-dashboard')?.classList.contains('active');
   const now = new Date();
   const brt = new Date(now.getTime() - 3*60*60*1000);
@@ -2355,6 +2360,7 @@ async function loadDashboard() {
   const kpiLeadsEl = document.querySelector('.kpi-lbl');
   if (kpiLeadsEl) kpiLeadsEl.textContent = `Leads (${pLabel})`;
 
+  if (kpiRowEl) kpiRowEl.classList.remove('loading');
   if (onDashboard) animCount(document.getElementById('kpi-leads'), leadsMonth);
   if (onDashboard) animCount(document.getElementById('kpi-agendou'), agendou);
   if (onDashboard) animCount(document.getElementById('kpi-fechou'), fechou);
