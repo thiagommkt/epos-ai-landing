@@ -1468,9 +1468,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <div class="mobile-header">
   <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Abrir menu">☰</button>
   <div class="mobile-logo">F&M IA</div>
-  <div class="notif-wrap" style="margin-left:auto">
+  <div class="notif-wrap" style="margin-left:auto;display:flex;align-items:center;gap:8px">
     <button class="notif-bell" onclick="toggleNotifPanel()" title="Notificações CRM" aria-label="Notificações CRM">🔔<span class="notif-badge" id="notif-badge-mobile"></span></button>
     <div class="notif-panel" id="notif-panel-mobile"></div>
+    <button onclick="doLogout()" style="padding:7px 14px;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
   </div>
 </div>
 
