@@ -323,8 +323,8 @@ canvas{display:block;width:100%!important}
 }
 @media(max-width:768px){
   /* Layout principal — z-index:auto remove o stacking context, sidebar pode superar o overlay */
-  body{overscroll-behavior-y:contain}
-  .app{flex-direction:column;height:auto;overflow:visible;min-height:calc(100dvh - 56px);z-index:auto!important}
+  html,body{height:100%;overflow:hidden}
+  .app{flex-direction:column;height:calc(100vh - 56px);height:calc(100dvh - 56px);overflow:hidden;z-index:auto!important}
   .mobile-header{display:flex;height:56px;flex-shrink:0}
 
   /* Sidebar fora do .app agora, mas estilos ficam aqui */
@@ -334,7 +334,7 @@ canvas{display:block;width:100%!important}
   .sidebar-overlay.show{top:56px}
 
   /* Main e sections */
-  main{flex:none;width:100%;overflow-y:auto;overscroll-behavior-y:contain}
+  main{flex:1;min-height:0;width:100%;overflow-y:auto;overscroll-behavior-y:contain}
   .section{padding:16px 14px 48px}
   .sec-title{font-size:20px!important}
   .sec-head{flex-direction:column;align-items:flex-start;gap:8px;padding-right:0!important}
@@ -349,8 +349,8 @@ canvas{display:block;width:100%!important}
   #main-charts-row{grid-template-columns:1fr!important}
 
   /* Chat — preenche tela toda disponível */
-  .section#s-chat{padding:0!important;height:calc(100dvh - 104px);height:calc(100vh - 104px);display:flex!important;flex-direction:column!important}
-  .section#s-chat .sec-head,.section#s-chat .rule{display:none!important}
+  .section#s-chat.active{padding:0!important;height:calc(100dvh - 104px);height:calc(100vh - 104px);display:flex!important;flex-direction:column!important}
+  .section#s-chat.active .sec-head,.section#s-chat.active .rule{display:none!important}
   .chat-wrap{flex:1!important;height:auto!important;border:none!important;overflow:hidden!important;min-height:0!important;display:flex!important;flex-direction:column!important}
   .chat-iframe{flex:1!important;height:auto!important;min-height:0!important;width:100%!important}
   /* Agenda mobile */
