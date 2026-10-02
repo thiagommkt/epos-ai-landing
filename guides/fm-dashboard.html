@@ -323,6 +323,7 @@ canvas{display:block;width:100%!important}
 }
 @media(max-width:768px){
   /* Layout principal — z-index:auto remove o stacking context, sidebar pode superar o overlay */
+  body{overscroll-behavior-y:contain}
   .app{flex-direction:column;height:auto;overflow:visible;min-height:calc(100dvh - 56px);z-index:auto!important}
   .mobile-header{display:flex;height:56px;flex-shrink:0}
 
