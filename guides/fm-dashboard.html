@@ -3230,14 +3230,20 @@ function openLeadPanel(lead) {
     </div>
 
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">
-      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Enviar Mensagem</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase">Enviar Mensagem</div>
+        ${(lead.em_atendimento || !lead.dify_ativo)
+          ? `<span style="font-family:var(--fM);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,94,91,.1);color:var(--warn);border:1px solid rgba(255,94,91,.3)">🔇 bot pausado</span>`
+          : `<span style="font-family:var(--fM);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(0,245,160,.08);color:var(--neon);border:1px solid rgba(0,245,160,.25)">🤖 bot ativo</span>`
+        }
+      </div>
       <textarea id="msg-input" placeholder="Digite a mensagem para enviar via WhatsApp..."
         style="width:100%;height:80px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px;padding:10px 12px;resize:vertical;outline:none;margin-bottom:8px;transition:border-color .2s"
         onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'"></textarea>
       <button onclick="enviarMensagem('${lead.telefone}')"
         style="width:100%;padding:11px;background:var(--pur-l);border:1px solid var(--bd-b);color:var(--purple);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s"
         onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='var(--pur-l)';this.style.color='var(--purple)'">
-        💬 Enviar pelo WhatsApp
+        ${(lead.em_atendimento || !lead.dify_ativo) ? '💬 Enviar (bot já pausado)' : '💬 Enviar e silenciar bot por 48h'}
       </button>
     </div>
 
@@ -3464,6 +3470,11 @@ async function enviarProximaAcao(btn) {
     });
     const d = await r.json();
     if (d.error) throw new Error(d.error);
+    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(p.telefone)}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dify_ativo: false, ultima_interacao_humano: new Date().toISOString() })
+    });
     btn.textContent = '✅ Enviada — bot silenciado 48h';
     btn.style.background = 'rgba(0,245,160,.2)';
     btn.onmouseover = null; btn.onmouseout = null;
@@ -3487,6 +3498,11 @@ async function enviarMensagem(telefone) {
     });
     const d = await r.json();
     if (d.error) throw new Error(d.error);
+    await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dify_ativo: false, ultima_interacao_humano: new Date().toISOString() })
+    });
     input.value = '';
     toast('✅ Mensagem enviada — bot silenciado por 48h', 'ok');
   } catch(e) {
