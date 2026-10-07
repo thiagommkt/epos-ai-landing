@@ -724,6 +724,7 @@ fbq('track','PageView');
       body: JSON.stringify(payload),
       keepalive: true
     }).catch(function(){});
+    if(window._lpTrack) window._lpTrack('quiz_submitted');
     goTo('sucesso');
   });
 
@@ -744,5 +745,66 @@ fbq('track','PageView');
 })();
 </script>
 
+<script>
+(function(){
+  var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+  var LP_SLUG = 'funil-fm-quiz';
+
+  var sid;
+  try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
+  if(!sid){
+    sid = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try { localStorage.setItem('_lp_sid', sid); } catch(e){}
+  }
+
+  var p = new URLSearchParams(location.search);
+  var utms = {
+    utm_source:   p.get('utm_source')   || '',
+    utm_medium:   p.get('utm_medium')   || '',
+    utm_campaign: p.get('utm_campaign') || '',
+    utm_content:  p.get('utm_content')  || ''
+  };
+
+  function track(eventType, extra){
+    var body = Object.assign({ lp_slug: LP_SLUG, event_type: eventType, session_id: sid, referrer: document.referrer || '' }, utms, extra || {});
+    fetch(SB_URL + '/rest/v1/lp_events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON },
+      body: JSON.stringify(body),
+      keepalive: true
+    }).catch(function(){});
+  }
+
+  window._lpTrack = track;
+
+  // pageview
+  track('pageview');
+
+  // tempo de visibilidade ativa
+  var visStart = Date.now();
+  var totalVis = 0;
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden'){
+      totalVis += Date.now() - visStart;
+    } else {
+      visStart = Date.now();
+    }
+  });
+  var _timeSent = false;
+  function sendTime(){
+    if(_timeSent) return;
+    _timeSent = true;
+    if(document.visibilityState === 'visible') totalVis += Date.now() - visStart;
+    var dur = Math.round(totalVis / 1000);
+    if(dur < 2) return;
+    track('time_spent', { duration_s: dur });
+  }
+  window.addEventListener('beforeunload', sendTime);
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') sendTime(); });
+})();
+</script>
 </body>
 </html>
