@@ -1676,6 +1676,12 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </div>
   </div>
 
+  <!-- ── QUIZ FM — PERFORMANCE LP ── -->
+  <div class="card" style="margin-top:0">
+    <div class="card-ttl">Quiz FM — Performance da LP</div>
+    <div id="lp-quiz-content" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-top:4px"><div class="loading"></div></div>
+  </div>
+
   <!-- ── CLIQUES WHATSAPP RASTREADOS ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl">Cliques WhatsApp Rastreados <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— últimos 30 dias, por fonte</span></div>
@@ -2421,6 +2427,34 @@ async function loadDashboard() {
   const atribSection = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;margin-top:4px">Atribuição</div>${atribRows}`;
   const legendHtml = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);line-height:1.7;margin-bottom:12px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd)"><div><span style="color:#4AAEFF">📱 WA Direto</span> — lead escreveu direto no WhatsApp, sem clicar em anúncio</div><div><span style="color:var(--purple)">👤 Manual FM</span> — adicionado via auditoria do Chatwoot, sem fluxo automático</div><div><span style="color:var(--neon)">🤖 Ana IA</span> — passou pelo fluxo automático de qualificação</div></div>`;
   document.getElementById('utm-list').innerHTML = canalHtml + legendHtml + atribSection;
+
+  // Quiz FM — Performance LP
+  (async () => {
+    const lpEl = document.getElementById('lp-quiz-content');
+    if (!lpEl) return;
+    try {
+      const lpDate = periodoISO ? `&created_at=gte.${mesISO}${endClause.replace('&criado_em','&created_at')}` : `&created_at=gte.${new Date(Date.now()-30*864e5).toISOString().slice(0,10)}`;
+      const lpEvts = await sb(`lp_events?lp_slug=eq.funil-fm-quiz${lpDate}&select=event_type,session_id,duration_s`).then(r => Array.isArray(r.data) ? r.data : []);
+      const views   = new Set(lpEvts.filter(e => e.event_type === 'pageview').map(e => e.session_id)).size;
+      const submits = lpEvts.filter(e => e.event_type === 'quiz_submitted').length;
+      const times   = lpEvts.filter(e => e.event_type === 'time_spent' && e.duration_s > 0).map(e => e.duration_s);
+      const avgSec  = times.length ? Math.round(times.reduce((a,b)=>a+b,0)/times.length) : 0;
+      const cvr     = views ? Math.round(submits/views*100) : 0;
+      const fmtTime = avgSec ? `${Math.floor(avgSec/60)}m ${avgSec%60}s` : '—';
+      const kpis = [
+        ['Visitas únicas', views, 'var(--neon)'],
+        ['Submissões', submits, 'var(--purple)'],
+        ['Taxa conversão', cvr + '%', cvr >= 10 ? 'var(--neon)' : cvr >= 5 ? '#FFA500' : 'var(--warn)'],
+        ['Tempo médio', fmtTime, 'var(--text)']
+      ];
+      lpEl.innerHTML = kpis.map(([lbl,val,cor]) =>
+        `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em">${lbl}</div>
+          <div style="font-family:var(--fD);font-size:26px;font-weight:700;color:${cor};line-height:1">${val}</div>
+        </div>`
+      ).join('');
+    } catch(e) { if(lpEl) lpEl.innerHTML = '<span style="color:var(--dim);font-size:11px">Sem dados ainda</span>'; }
+  })();
 
   // Leads recentes
   const { data: recentes } = await sb(`${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico&order=criado_em.desc&limit=6`);
