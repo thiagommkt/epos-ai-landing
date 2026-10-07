@@ -339,6 +339,9 @@ h2.q-title{
 }
 .consent label{font-size:12.5px;color:var(--ink-muted);line-height:1.5}
 .consent a{color:var(--green-800);font-weight:700;text-decoration:underline}
+.consent.invalid label{color:var(--error)}
+.consent-error{display:none;font-size:12.5px;color:var(--error);margin:-6px 0 12px}
+.consent.invalid + .consent-error{display:block}
 
 /* ---- End screens ---- */
 .end{justify-content:center;text-align:center;flex:1;padding-top:20px}
@@ -378,6 +381,7 @@ n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('set','autoConfig',false,'2047813996163251');
 fbq('init','2047813996163251');
 fbq('track','PageView');
 </script>
@@ -525,6 +529,7 @@ fbq('track','PageView');
           <input type="checkbox" id="consent" name="consent">
           <label for="consent">Concordo com o uso dos meus dados conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page-fm" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
         </div>
+        <div class="consent-error">Marque a caixa para continuar.</div>
         <div class="btn-stack">
           <button type="submit" class="btn btn-primary">Enviar e falar com especialista</button>
         </div>
@@ -678,6 +683,12 @@ fbq('track','PageView');
       fieldTelefone.classList.add('invalid'); ok = false;
     } else { fieldTelefone.classList.remove('invalid'); }
 
+    var consentBox = document.getElementById('consent');
+    var consentWrap = consentBox.closest('.consent');
+    if(!consentBox.checked){
+      consentWrap.classList.add('invalid'); ok = false;
+    } else { consentWrap.classList.remove('invalid'); }
+
     if(!ok) return;
 
     answers.nome = nome.value.trim();
@@ -714,6 +725,10 @@ fbq('track','PageView');
       keepalive: true
     }).catch(function(){});
     goTo('sucesso');
+  });
+
+  document.getElementById('consent').addEventListener('change', function(e){
+    if(e.target.checked) e.target.closest('.consent').classList.remove('invalid');
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
