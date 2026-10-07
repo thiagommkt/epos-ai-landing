@@ -370,6 +370,17 @@ h1.end-title{
   flex-shrink:0;
 }
 </style>
+
+<!-- Meta Pixel — Farias & Moura -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','2047813996163251');
+fbq('track','PageView');
+</script>
 </head>
 <body>
 
@@ -556,6 +567,22 @@ h1.end-title{
   var progressMap = { hook:8, perfil:28, doenca:50, renda:72, contato:90, sucesso:100, desqualificado:100 };
   var answers = {};
 
+  // Rastreamento: UTMs e IDs de anúncio vêm da URL do anúncio (Parâmetros de URL da Meta)
+  var TRACK_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement','fbclid','test_event_code'];
+  var tracking = (function(){
+    var saved = {};
+    try { saved = JSON.parse(sessionStorage.getItem('fm_track') || '{}'); } catch(e){}
+    var qs = new URLSearchParams(window.location.search);
+    TRACK_KEYS.forEach(function(k){ var v = qs.get(k); if(v) saved[k] = v; });
+    try { sessionStorage.setItem('fm_track', JSON.stringify(saved)); } catch(e){}
+    return saved;
+  })();
+
+  function getCookie(name){
+    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+
   function goTo(screen){
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var target = document.querySelector('[data-screen="'+screen+'"]');
@@ -657,18 +684,34 @@ h1.end-title{
     answers.telefone = telefone.value.trim();
     answers.consent = document.getElementById('consent').checked;
 
+    // event_id compartilhado entre Pixel (navegador) e CAPI (n8n) para a Meta deduplicar
+    var eventId = 'quiz_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+    try { if(window.fbq) fbq('track', 'Lead', { content_name: 'Quiz IR FM' }, { eventID: eventId }); } catch(err){}
+
+    var fbc = getCookie('_fbc');
+    if(!fbc && tracking.fbclid) fbc = 'fb.1.' + Date.now() + '.' + tracking.fbclid;
+
+    var payload = {
+      nome: answers.nome,
+      telefone: answers.telefone,
+      perfil: answers.perfil || '',
+      doenca: answers.doenca || '',
+      renda: answers.renda || '',
+      consent: answers.consent,
+      source: 'funil-fm-quiz',
+      event_id: eventId,
+      fbp: getCookie('_fbp'),
+      fbc: fbc,
+      page_url: window.location.href.split('#')[0],
+      user_agent: navigator.userAgent
+    };
+    TRACK_KEYS.forEach(function(k){ payload[k] = tracking[k] || ''; });
+
     fetch('https://n8n.eposmktfilmsia.com.br/webhook/fm-quiz-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nome: answers.nome,
-        telefone: answers.telefone,
-        perfil: answers.perfil || '',
-        doenca: answers.doenca || '',
-        renda: answers.renda || '',
-        consent: answers.consent,
-        source: 'funil-fm-quiz'
-      })
+      body: JSON.stringify(payload),
+      keepalive: true
     }).catch(function(){});
     goTo('sucesso');
   });
