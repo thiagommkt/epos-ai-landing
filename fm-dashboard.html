@@ -763,6 +763,7 @@ html[data-theme="light"] .col-head{
 }
 html[data-theme="light"] [data-stage="bot_ativo"]>.col-head{background:rgba(100,116,139,0.14)!important}
 html[data-theme="light"] [data-stage="em_conversa"]>.col-head{background:rgba(59,130,246,0.12)!important}
+html[data-theme="light"] [data-stage="follow_up"]>.col-head{background:rgba(14,165,233,0.12)!important}
 html[data-theme="light"] [data-stage="qualificado"]>.col-head{background:rgba(107,40,219,0.12)!important}
 html[data-theme="light"] [data-stage="agendou"]>.col-head{background:rgba(245,158,11,0.14)!important}
 html[data-theme="light"] [data-stage="compareceu"]>.col-head{background:rgba(0,185,120,0.12)!important}
@@ -905,6 +906,7 @@ html[data-theme="light"] .col-head *:not(::before){color:rgba(15,15,20,0.72)!imp
 /* Stage col-head tints mais fortes no glass */
 html[data-theme="light"] [data-stage="bot_ativo"]>.col-head{background:rgba(100,116,139,0.22)!important}
 html[data-theme="light"] [data-stage="em_conversa"]>.col-head{background:rgba(59,130,246,0.20)!important}
+html[data-theme="light"] [data-stage="follow_up"]>.col-head{background:rgba(14,165,233,0.20)!important}
 html[data-theme="light"] [data-stage="qualificado"]>.col-head{background:rgba(107,40,219,0.20)!important}
 html[data-theme="light"] [data-stage="agendou"]>.col-head{background:rgba(245,158,11,0.22)!important}
 html[data-theme="light"] [data-stage="compareceu"]>.col-head{background:rgba(0,185,120,0.20)!important}
@@ -1110,6 +1112,7 @@ html[data-theme="light"] .col-cnt{color:rgba(15,15,20,0.55)!important;font-weigh
 [data-stage] > .col-head{background:none;border-top:none}
 [data-stage="bot_ativo"]     >.col-head::before{background:#64748b}
 [data-stage="em_conversa"]   >.col-head::before{background:#3b82f6}
+[data-stage="follow_up"]     >.col-head::before{background:#0ea5e9}
 [data-stage="qualificado"]   >.col-head::before{background:#9146ff}
 [data-stage="agendou"]       >.col-head::before{background:#f59e0b}
 [data-stage="compareceu"]    >.col-head::before{background:#00f5a0}
@@ -1120,6 +1123,7 @@ html[data-theme="light"] .col-cnt{color:rgba(15,15,20,0.55)!important;font-weigh
 /* Header: tinted background por stage */
 [data-stage="bot_ativo"]     >.col-head{background:rgba(100,116,139,0.18)}
 [data-stage="em_conversa"]   >.col-head{background:rgba(59,130,246,0.18)}
+[data-stage="follow_up"]     >.col-head{background:rgba(14,165,233,0.18)}
 [data-stage="qualificado"]   >.col-head{background:rgba(145,70,255,0.18)}
 [data-stage="agendou"]       >.col-head{background:rgba(245,158,11,0.18)}
 [data-stage="compareceu"]    >.col-head{background:rgba(0,245,160,0.12)}
@@ -1129,6 +1133,7 @@ html[data-theme="light"] .col-cnt{color:rgba(15,15,20,0.55)!important;font-weigh
 /* Border-top por stage */
 [data-stage="bot_ativo"]     {border-top:2px solid #64748b!important}
 [data-stage="em_conversa"]   {border-top:2px solid #3b82f6!important}
+[data-stage="follow_up"]     {border-top:2px solid #0ea5e9!important}
 [data-stage="qualificado"]   {border-top:2px solid #9146ff!important}
 [data-stage="agendou"]       {border-top:2px solid #f59e0b!important}
 [data-stage="compareceu"]    {border-top:2px solid #00f5a0!important}
@@ -2577,10 +2582,11 @@ const STAGES = [
   { key: 'bot_ativo', label: 'Bot Ativo', color: 'var(--muted)' },
   { key: 'em_conversa', label: 'Em Conversa', color: 'var(--purple)' },
   { key: 'sem_resposta', label: 'Sem Resposta', color: '#e8893d' },
+  { key: 'follow_up', label: 'Follow-up', color: '#0ea5e9' },
   { key: 'qualificado', label: 'Qualificado', color: 'var(--purple)' },
-  { key: 'proposta_enviada', label: 'Proposta Env.', color: '#9de8b0' },
   { key: 'agendou', label: 'Agendou', color: 'var(--neon)' },
   { key: 'compareceu', label: 'Compareceu', color: 'var(--neon)' },
+  { key: 'proposta_enviada', label: 'Proposta Env.', color: '#9de8b0' },
   { key: 'fechou', label: 'Fechou', color: 'var(--neon)' },
   { key: 'perdido', label: 'Perdido', color: 'var(--warn)' },
   { key: 'desqualificado', label: 'Desqual.', color: 'var(--warn)' },
@@ -3142,7 +3148,7 @@ function openLeadPanel(lead) {
 
   const stageLabel = {
     novo:'Novo Lead', bot_ativo:'Bot Ativo', em_conversa:'Em Conversa', sem_resposta:'Sem Resposta',
-    qualificado:'Qualificado', proposta_enviada:'Proposta Env.', agendou:'Agendado',
+    follow_up:'Follow-up', qualificado:'Qualificado', agendou:'Agendado', proposta_enviada:'Proposta Env.',
     compareceu:'Compareceu', fechou:'Fechou', perdido:'Perdido', desqualificado:'Desqualificado'
   };
 
