@@ -95,8 +95,8 @@ body::before{
   flex-shrink:0;
 }
 .brand-logo{
-  width:88px;
-  height:88px;
+  width:52px;
+  height:52px;
   border-radius:50%;
   object-fit:cover;
   flex-shrink:0;
@@ -339,9 +339,6 @@ h2.q-title{
 }
 .consent label{font-size:12.5px;color:var(--ink-muted);line-height:1.5}
 .consent a{color:var(--green-800);font-weight:700;text-decoration:underline}
-.consent.invalid label{color:var(--error)}
-.consent-error{display:none;font-size:12.5px;color:var(--error);margin:-6px 0 12px}
-.consent.invalid + .consent-error{display:block}
 
 /* ---- End screens ---- */
 .end{justify-content:center;text-align:center;flex:1;padding-top:20px}
@@ -373,18 +370,6 @@ h1.end-title{
   flex-shrink:0;
 }
 </style>
-
-<!-- Meta Pixel — Farias & Moura -->
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('set','autoConfig',false,'2047813996163251');
-fbq('init','2047813996163251');
-fbq('track','PageView');
-</script>
 </head>
 <body>
 
@@ -399,13 +384,16 @@ fbq('track','PageView');
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 
   <div class="brand">
-    <img class="brand-logo" src="assets/perfil-avatar.png" alt="Farias &amp; Moura Advocacia" width="88" height="88">
+    <img class="brand-logo" src="assets/fm/perfil-avatar.png" alt="Farias &amp; Moura Advocacia" width="52" height="52">
   </div>
 
   <div class="screens">
 
     <!-- 0: HOOK -->
     <section class="screen active hook" data-screen="hook">
+      <div class="hook-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4z"/></svg>
+      </div>
       <h1 class="headline">Descubra se você tem direito à <span class="accent">isenção do Imposto de Renda</span></h1>
       <p class="sub">Se você é <strong>aposentado(a), pensionista ou militar reformado(a)</strong> e tem (ou já teve) alguma doença grave, pode ter direito a parar de pagar IR e ainda receber de volta o que pagou nos últimos anos.</p>
       <div class="btn-stack">
@@ -529,9 +517,8 @@ fbq('track','PageView');
           <input type="checkbox" id="consent" name="consent">
           <label for="consent">Concordo com o uso dos meus dados conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page-fm" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
         </div>
-        <div class="consent-error">Marque a caixa para continuar.</div>
         <div class="btn-stack">
-          <button type="submit" class="btn btn-primary">Enviar e falar com especialista</button>
+          <a id="btnEnviar" href="#" class="btn btn-primary" style="display:block;text-align:center;text-decoration:none;">Enviar e falar com especialista</a>
         </div>
       </form>
       <div class="step-nav" style="margin-top:12px">
@@ -545,7 +532,10 @@ fbq('track','PageView');
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       </div>
       <h1 class="end-title">Recebemos seus dados!</h1>
-      <p class="end-sub">Um especialista vai te chamar em breve.</p>
+      <p class="end-sub">Clique abaixo para falar com um especialista agora.</p>
+      <div class="end-links" style="margin-top:24px">
+        <a id="btnWaSucesso" href="#" class="btn btn-primary" style="text-decoration:none;display:block;text-align:center;">Falar com especialista no WhatsApp</a>
+      </div>
     </section>
 
     <!-- 6: DESQUALIFICADO -->
@@ -572,30 +562,6 @@ fbq('track','PageView');
   var progressMap = { hook:8, perfil:28, doenca:50, renda:72, contato:90, sucesso:100, desqualificado:100 };
   var answers = {};
 
-  // Rastreamento: UTMs e IDs de anúncio vêm da URL do anúncio (Parâmetros de URL da Meta)
-  var TRACK_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement','fbclid','test_event_code'];
-  var tracking = (function(){
-    var saved = {};
-    try { saved = JSON.parse(sessionStorage.getItem('fm_track') || '{}'); } catch(e){}
-    var qs = new URLSearchParams(window.location.search);
-    TRACK_KEYS.forEach(function(k){ var v = qs.get(k); if(v) saved[k] = v; });
-    try { sessionStorage.setItem('fm_track', JSON.stringify(saved)); } catch(e){}
-    return saved;
-  })();
-
-  function getCookie(name){
-    var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-    return m ? decodeURIComponent(m[1]) : '';
-  }
-
-  // Funil: etapa e resposta vão SOMENTE para o nosso banco (lp_events). Nada disso é enviado à Meta.
-  var STEP_INDEX = { hook:0, perfil:1, doenca:2, renda:3, contato:4, sucesso:5, desqualificado:6 };
-  function trackStep(type, step, answer){
-    try {
-      if(window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null });
-    } catch(e){}
-  }
-
   function goTo(screen){
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var target = document.querySelector('[data-screen="'+screen+'"]');
@@ -610,7 +576,6 @@ fbq('track','PageView');
     target.scrollTop = 0;
     document.getElementById('progressFill').style.width = (progressMap[screen] || 0) + '%';
     window.scrollTo(0,0);
-    trackStep('step_view', screen);
   }
   window.goTo = goTo;
 
@@ -636,8 +601,6 @@ fbq('track','PageView');
       answers[group] = btn.getAttribute('data-value');
 
       var disqualify = btn.getAttribute('data-disqualify') === 'true';
-      trackStep('step_answer', group, answers[group]);
-      if(disqualify) trackStep('step_disqualified', group, answers[group]);
       setTimeout(function(){
         if(disqualify){
           document.getElementById('dqTitle').textContent = 'Agradecemos a participação!';
@@ -670,7 +633,6 @@ fbq('track','PageView');
     }
     field.classList.remove('invalid');
     answers.doenca = value;
-    trackStep('step_answer', 'doenca', 'outra: ' + value);
     goTo('renda');
   });
 
@@ -679,70 +641,38 @@ fbq('track','PageView');
     return digits.length >= 10 && digits.length <= 11;
   }
 
-  document.getElementById('leadForm').addEventListener('submit', function(e){
+  document.getElementById('btnEnviar').addEventListener('click', function(e){
     e.preventDefault();
     var nome = document.getElementById('nome');
     var telefone = document.getElementById('telefone');
     var fieldNome = document.getElementById('fieldNome');
     var fieldTelefone = document.getElementById('fieldTelefone');
     var ok = true;
-    var errs = [];
 
     if(nome.value.trim().length < 3){
-      fieldNome.classList.add('invalid'); ok = false; errs.push('nome_invalido');
+      fieldNome.classList.add('invalid'); ok = false;
     } else { fieldNome.classList.remove('invalid'); }
 
     if(!validPhone(telefone.value)){
-      fieldTelefone.classList.add('invalid'); ok = false; errs.push('telefone_invalido');
+      fieldTelefone.classList.add('invalid'); ok = false;
     } else { fieldTelefone.classList.remove('invalid'); }
 
-    var consentBox = document.getElementById('consent');
-    var consentWrap = consentBox.closest('.consent');
-    if(!consentBox.checked){
-      consentWrap.classList.add('invalid'); ok = false; errs.push('sem_consentimento');
-    } else { consentWrap.classList.remove('invalid'); }
-
-    if(!ok){ trackStep('step_error', 'contato', errs.join(',')); return; }
+    if(!ok) return;
 
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
     answers.consent = document.getElementById('consent').checked;
 
-    // event_id compartilhado entre Pixel (navegador) e CAPI (n8n) para a Meta deduplicar
-    var eventId = 'quiz_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-    try { if(window.fbq) fbq('track', 'Lead', { content_name: 'Quiz IR FM' }, { eventID: eventId }); } catch(err){}
-
-    var fbc = getCookie('_fbc');
-    if(!fbc && tracking.fbclid) fbc = 'fb.1.' + Date.now() + '.' + tracking.fbclid;
-
-    var payload = {
-      nome: answers.nome,
-      telefone: answers.telefone,
-      perfil: answers.perfil || '',
-      doenca: answers.doenca || '',
-      renda: answers.renda || '',
-      consent: answers.consent,
-      source: 'funil-fm-quiz',
-      event_id: eventId,
-      fbp: getCookie('_fbp'),
-      fbc: fbc,
-      page_url: window.location.href.split('#')[0],
-      user_agent: navigator.userAgent
-    };
-    TRACK_KEYS.forEach(function(k){ payload[k] = tracking[k] || ''; });
-
-    fetch('https://n8n.eposmktfilmsia.com.br/webhook/fm-quiz-lead', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      keepalive: true
-    }).catch(function(){});
-    if(window._lpTrack) window._lpTrack('quiz_submitted');
+    var waMsg = 'Olá! Acabei de responder o quiz sobre isenção de IR.\n\n'
+      + 'Nome: ' + answers.nome + '\n'
+      + 'Telefone: ' + answers.telefone + '\n'
+      + 'Perfil: ' + (answers.perfil || '') + '\n'
+      + 'Condição: ' + (answers.doenca || '') + '\n'
+      + 'Renda: ' + (answers.renda || '');
+    var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
+    // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
+    document.getElementById('btnWaSucesso').href = waUrl;
     goTo('sucesso');
-  });
-
-  document.getElementById('consent').addEventListener('change', function(e){
-    if(e.target.checked) e.target.closest('.consent').classList.remove('invalid');
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
@@ -758,72 +688,5 @@ fbq('track','PageView');
 })();
 </script>
 
-<script>
-(function(){
-  var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
-  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
-  var LP_SLUG = 'funil-fm-quiz';
-
-  var sid;
-  try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
-  if(!sid){
-    sid = (typeof crypto !== 'undefined' && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2) + Date.now().toString(36);
-    try { localStorage.setItem('_lp_sid', sid); } catch(e){}
-  }
-
-  var p = new URLSearchParams(location.search);
-  var utms = {
-    utm_source:   p.get('utm_source')   || '',
-    utm_medium:   p.get('utm_medium')   || '',
-    utm_campaign: p.get('utm_campaign') || '',
-    utm_content:  p.get('utm_content')  || '',
-    utm_term:     p.get('utm_term')     || '',
-    utm_id:       p.get('utm_id')       || '',
-    ad_id:        p.get('ad_id')        || '',
-    adset_id:     p.get('adset_id')     || '',
-    placement:    p.get('placement')    || ''
-  };
-
-  function track(eventType, extra){
-    var body = Object.assign({ lp_slug: LP_SLUG, event_type: eventType, session_id: sid, referrer: document.referrer || '' }, utms, extra || {});
-    fetch(SB_URL + '/rest/v1/lp_events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON },
-      body: JSON.stringify(body),
-      keepalive: true
-    }).catch(function(){});
-  }
-
-  window._lpTrack = track;
-
-  // pageview + primeira etapa do funil (hook). user_agent/viewport ajudam a separar tráfego real de teste/bot.
-  track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: window.innerWidth + 'x' + window.innerHeight });
-  track('step_view', { step_name: 'hook', step_index: 0 });
-
-  // tempo de visibilidade ativa
-  var visStart = Date.now();
-  var totalVis = 0;
-  document.addEventListener('visibilitychange', function(){
-    if(document.visibilityState === 'hidden'){
-      totalVis += Date.now() - visStart;
-    } else {
-      visStart = Date.now();
-    }
-  });
-  var _timeSent = false;
-  function sendTime(){
-    if(_timeSent) return;
-    _timeSent = true;
-    if(document.visibilityState === 'visible') totalVis += Date.now() - visStart;
-    var dur = Math.round(totalVis / 1000);
-    if(dur < 2) return;
-    track('time_spent', { duration_s: dur });
-  }
-  window.addEventListener('beforeunload', sendTime);
-  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') sendTime(); });
-})();
-</script>
 </body>
 </html>
