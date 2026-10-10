@@ -588,6 +588,14 @@ fbq('track','PageView');
     return m ? decodeURIComponent(m[1]) : '';
   }
 
+  // Funil: etapa e resposta vão SOMENTE para o nosso banco (lp_events). Nada disso é enviado à Meta.
+  var STEP_INDEX = { hook:0, perfil:1, doenca:2, renda:3, contato:4, sucesso:5, desqualificado:6 };
+  function trackStep(type, step, answer){
+    try {
+      if(window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null });
+    } catch(e){}
+  }
+
   function goTo(screen){
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var target = document.querySelector('[data-screen="'+screen+'"]');
@@ -602,6 +610,7 @@ fbq('track','PageView');
     target.scrollTop = 0;
     document.getElementById('progressFill').style.width = (progressMap[screen] || 0) + '%';
     window.scrollTo(0,0);
+    trackStep('step_view', screen);
   }
   window.goTo = goTo;
 
@@ -627,6 +636,8 @@ fbq('track','PageView');
       answers[group] = btn.getAttribute('data-value');
 
       var disqualify = btn.getAttribute('data-disqualify') === 'true';
+      trackStep('step_answer', group, answers[group]);
+      if(disqualify) trackStep('step_disqualified', group, answers[group]);
       setTimeout(function(){
         if(disqualify){
           document.getElementById('dqTitle').textContent = 'Agradecemos a participação!';
@@ -659,6 +670,7 @@ fbq('track','PageView');
     }
     field.classList.remove('invalid');
     answers.doenca = value;
+    trackStep('step_answer', 'doenca', 'outra: ' + value);
     goTo('renda');
   });
 
@@ -674,22 +686,23 @@ fbq('track','PageView');
     var fieldNome = document.getElementById('fieldNome');
     var fieldTelefone = document.getElementById('fieldTelefone');
     var ok = true;
+    var errs = [];
 
     if(nome.value.trim().length < 3){
-      fieldNome.classList.add('invalid'); ok = false;
+      fieldNome.classList.add('invalid'); ok = false; errs.push('nome_invalido');
     } else { fieldNome.classList.remove('invalid'); }
 
     if(!validPhone(telefone.value)){
-      fieldTelefone.classList.add('invalid'); ok = false;
+      fieldTelefone.classList.add('invalid'); ok = false; errs.push('telefone_invalido');
     } else { fieldTelefone.classList.remove('invalid'); }
 
     var consentBox = document.getElementById('consent');
     var consentWrap = consentBox.closest('.consent');
     if(!consentBox.checked){
-      consentWrap.classList.add('invalid'); ok = false;
+      consentWrap.classList.add('invalid'); ok = false; errs.push('sem_consentimento');
     } else { consentWrap.classList.remove('invalid'); }
 
-    if(!ok) return;
+    if(!ok){ trackStep('step_error', 'contato', errs.join(',')); return; }
 
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
@@ -765,7 +778,12 @@ fbq('track','PageView');
     utm_source:   p.get('utm_source')   || '',
     utm_medium:   p.get('utm_medium')   || '',
     utm_campaign: p.get('utm_campaign') || '',
-    utm_content:  p.get('utm_content')  || ''
+    utm_content:  p.get('utm_content')  || '',
+    utm_term:     p.get('utm_term')     || '',
+    utm_id:       p.get('utm_id')       || '',
+    ad_id:        p.get('ad_id')        || '',
+    adset_id:     p.get('adset_id')     || '',
+    placement:    p.get('placement')    || ''
   };
 
   function track(eventType, extra){
@@ -780,8 +798,9 @@ fbq('track','PageView');
 
   window._lpTrack = track;
 
-  // pageview
-  track('pageview');
+  // pageview + primeira etapa do funil (hook). user_agent/viewport ajudam a separar tráfego real de teste/bot.
+  track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: window.innerWidth + 'x' + window.innerHeight });
+  track('step_view', { step_name: 'hook', step_index: 0 });
 
   // tempo de visibilidade ativa
   var visStart = Date.now();
