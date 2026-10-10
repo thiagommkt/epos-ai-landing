@@ -531,8 +531,11 @@ h1.end-title{
       <div class="end-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       </div>
-      <h1 class="end-title">Recebemos seus dados!</h1>
-      <p class="end-sub">Um especialista vai te chamar em breve.</p>
+      <h1 class="end-title">Pronto! Abrindo WhatsApp…</h1>
+      <p class="end-sub">Se não abrir automaticamente, clique no botão abaixo.</p>
+      <div class="end-links">
+        <a id="wa-cta" class="btn btn-primary" href="#" target="_blank" rel="noopener" style="text-decoration:none">Falar com especialista agora</a>
+      </div>
     </section>
 
     <!-- 6: DESQUALIFICADO -->
@@ -666,10 +669,12 @@ h1.end-title{
       + 'Perfil: ' + (answers.perfil || '') + '\n'
       + 'Condição: ' + (answers.doenca || '') + '\n'
       + 'Renda: ' + (answers.renda || '');
-    window.open('https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg), '_blank');
+    var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
+    document.getElementById('wa-cta').href = waUrl;
 
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
     goTo('sucesso');
+    setTimeout(function(){ window.location.href = waUrl; }, 1500);
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
