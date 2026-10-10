@@ -133,12 +133,12 @@ body::before{
 /* ---- Hook screen ---- */
 .hook{justify-content:center;text-align:center;flex:1;padding-top:12px}
 .hook-badge{
-  width:64px;height:64px;margin:0 auto 20px;
+  width:70px;height:70px;margin:0 auto 20px;
   border-radius:50%;
   background:var(--green-800);
   display:flex;align-items:center;justify-content:center;
 }
-.hook-badge svg{width:30px;height:30px;stroke:var(--gold-500)}
+.hook-badge img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
 h1.headline{
   font-family:var(--font-display);
   font-size:28px;
@@ -383,16 +383,14 @@ h1.end-title{
 <main class="app">
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 
-  <div class="brand">
-    <img class="brand-logo" src="assets/fm/perfil-avatar.png" alt="Farias &amp; Moura Advocacia" width="52" height="52">
-  </div>
+  <div class="brand" style="visibility:hidden;height:0;padding:0;overflow:hidden"></div>
 
   <div class="screens">
 
     <!-- 0: HOOK -->
     <section class="screen active hook" data-screen="hook">
       <div class="hook-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4z"/></svg>
+        <img src="assets/fm/perfil-avatar.png" alt="Farias &amp; Moura Advocacia">
       </div>
       <h1 class="headline">Descubra se você tem direito à <span class="accent">isenção do Imposto de Renda</span></h1>
       <p class="sub">Se você é <strong>aposentado(a), pensionista ou militar reformado(a)</strong> e tem (ou já teve) alguma doença grave, pode ter direito a parar de pagar IR e ainda receber de volta o que pagou nos últimos anos.</p>
