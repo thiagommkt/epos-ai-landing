@@ -638,8 +638,8 @@ h1.end-title{
     return digits.length >= 10 && digits.length <= 11;
   }
 
-  // Botão Enviar = <a> real — toque direto do usuário, Instagram IAB permite navegar
   document.getElementById('btnEnviar').addEventListener('click', function(e){
+    e.preventDefault();
     var nome = document.getElementById('nome');
     var telefone = document.getElementById('telefone');
     var fieldNome = document.getElementById('fieldNome');
@@ -654,7 +654,7 @@ h1.end-title{
       fieldTelefone.classList.add('invalid'); ok = false;
     } else { fieldTelefone.classList.remove('invalid'); }
 
-    if(!ok){ e.preventDefault(); return; }
+    if(!ok) return;
 
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
@@ -666,10 +666,11 @@ h1.end-title{
       + 'Perfil: ' + (answers.perfil || '') + '\n'
       + 'Condição: ' + (answers.doenca || '') + '\n'
       + 'Renda: ' + (answers.renda || '');
+    var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
-    this.href = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
+    // click direto no <a> → user gesture preservado → window.location.href funciona
+    window.location.href = waUrl;
     goTo('sucesso');
-    // deixa o <a> navegar naturalmente — usuário tocou diretamente, IAB permite
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
