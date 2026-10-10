@@ -669,7 +669,7 @@ h1.end-title{
     var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
     goTo('sucesso');
-    setTimeout(function(){ window.location.href = waUrl; }, 1500);
+    window.location.href = waUrl;
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
