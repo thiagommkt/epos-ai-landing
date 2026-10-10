@@ -673,7 +673,9 @@ h1.end-title{
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
     document.getElementById('btnWaSucesso').href = waUrl;
     goTo('sucesso');
-    window.location.href = waUrl;
+    // window.open em click direto de <a> = user gesture = popup blocker não bloqueia
+    // Abre WhatsApp sem navegar a página atual (sucesso screen fica visível)
+    window.open(waUrl, '_blank', 'noopener');
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
