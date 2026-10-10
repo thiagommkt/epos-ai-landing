@@ -326,6 +326,7 @@ canvas{display:block;width:100%!important}
   html,body{height:100%;overflow:hidden}
   .app{flex-direction:column;height:calc(100vh - 56px);height:calc(100dvh - 56px);overflow:hidden;z-index:auto!important}
   .mobile-header{display:flex;height:56px;flex-shrink:0}
+  #theme-desk-btn{display:none!important}
 
   /* Sidebar fora do .app agora, mas estilos ficam aqui */
   aside{position:fixed;left:0;top:56px;bottom:0;z-index:300;width:260px!important;transform:translateX(calc(-100% - 1px));transition:transform .25s ease;overflow-y:auto}
@@ -1545,6 +1546,9 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
 </aside>
 <main>
+
+<!-- Botão tema fixo desktop/tablet — oculto no mobile (tem no mobile-header) -->
+<button id="theme-desk-btn" onclick="toggleTheme()" title="Alternar tema" style="position:fixed;top:14px;right:68px;z-index:200;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--surface);border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'"><svg width="11" height="11" id="theme-icon-svg" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span id="theme-label">Modo Claro</span></button>
 
 <!-- Bell fixo desktop — visível em todas as seções -->
 <div class="notif-fixed">
