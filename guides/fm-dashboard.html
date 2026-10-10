@@ -1693,27 +1693,6 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <div id="lp-funnel-content"><div class="loading"></div></div>
   </div>
 
-  <!-- ── QUIZ FM — LEADS ── -->
-  <div class="card" style="margin-top:0;margin-bottom:24px">
-    <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-      Quiz FM — Leads do Questionário
-      <span id="quiz-leads-count" style="font-family:var(--fM);font-size:9px;color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0"></span>
-    </div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bd);margin-top:12px">
-      <table class="tbl" style="min-width:560px">
-        <thead style="background:rgba(145,70,255,0.06)"><tr>
-          <th style="padding:10px 12px;white-space:nowrap">Nome</th>
-          <th style="white-space:nowrap">Telefone</th>
-          <th style="white-space:nowrap">Perfil</th>
-          <th style="white-space:nowrap">Condição</th>
-          <th style="white-space:nowrap">Status</th>
-          <th style="white-space:nowrap">Data</th>
-        </tr></thead>
-        <tbody id="quiz-leads-tbody"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
   <!-- ── CLIQUES WHATSAPP RASTREADOS ── -->
   <div class="card" style="margin-top:0;margin-bottom:24px">
     <div class="card-ttl">Cliques WhatsApp Rastreados <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— últimos 30 dias, por fonte</span></div>
@@ -2567,28 +2546,6 @@ async function loadDashboard() {
         `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">${disqBox}${errBox}${tempoBox}</div>` +
         `<div style="margin-top:16px">${sub('Por criativo (utm_content)')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Criativo</th><th>Sessões</th><th>Iniciaram</th><th>Contato</th><th>Enviaram</th></tr></thead><tbody>${criRows}</tbody></table></div></div>`;
     } catch(err) { el.innerHTML = '<span style="color:var(--dim);font-size:11px">Sem dados ainda</span>'; }
-  })();
-
-  // Quiz FM — Leads do questionário
-  (async () => {
-    const el = document.getElementById('quiz-leads-tbody');
-    const countEl = document.getElementById('quiz-leads-count');
-    if (!el) return;
-    try {
-      const sinceClause = periodoISO ? `&criado_em=gte.${periodoISO}` : '';
-      const untilClause = periodoEndISO ? `&criado_em=lt.${periodoEndISO}` : '';
-      const { data } = await sb(`${TABLE}?canal=eq.quiz_fm&select=nome,telefone,perfil,patologia,qualificado,agendou,fechou,crm_stage,criado_em&order=criado_em.desc${sinceClause}${untilClause}&limit=100`);
-      const rows = data || [];
-      if (countEl) countEl.textContent = rows.length + ' lead' + (rows.length === 1 ? '' : 's');
-      const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',timeZone:'America/Sao_Paulo'}) : '—';
-      const stBadge = r => r.fechou ? '<span style="color:var(--neon);font-size:10px">FECHOU</span>'
-        : r.agendou ? '<span style="color:#FFA500;font-size:10px">AGENDADO</span>'
-        : r.qualificado ? '<span style="color:var(--purple);font-size:10px">QUALIFICADO</span>'
-        : '<span style="color:var(--dim);font-size:10px">NOVO</span>';
-      el.innerHTML = rows.map(r =>
-        `<tr><td class="td-hi">${r.nome||'—'}</td><td style="font-family:var(--fM);font-size:11px">${r.telefone||'—'}</td><td>${r.perfil||'—'}</td><td>${r.patologia||'—'}</td><td>${stBadge(r)}</td><td style="font-family:var(--fM);font-size:11px;color:var(--dim)">${fmtDate(r.criado_em)}</td></tr>`
-      ).join('') || '<tr><td colspan="6" class="empty">Sem leads ainda neste período</td></tr>';
-    } catch(e) { if (el) el.innerHTML = '<tr><td colspan="6" class="empty">Erro ao carregar</td></tr>'; }
   })();
 
   // Leads recentes
