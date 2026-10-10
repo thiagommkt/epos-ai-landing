@@ -518,7 +518,7 @@ h1.end-title{
           <label for="consent">Concordo com o uso dos meus dados conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page-fm" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
         </div>
         <div class="btn-stack">
-          <button type="submit" class="btn btn-primary">Enviar e falar com especialista</button>
+          <a id="btnEnviar" href="#" class="btn btn-primary" style="display:block;text-align:center;text-decoration:none;">Enviar e falar com especialista</a>
         </div>
       </form>
       <div class="step-nav" style="margin-top:12px">
@@ -638,8 +638,8 @@ h1.end-title{
     return digits.length >= 10 && digits.length <= 11;
   }
 
-  document.getElementById('leadForm').addEventListener('submit', function(e){
-    e.preventDefault();
+  // Botão Enviar = <a> real — toque direto do usuário, Instagram IAB permite navegar
+  document.getElementById('btnEnviar').addEventListener('click', function(e){
     var nome = document.getElementById('nome');
     var telefone = document.getElementById('telefone');
     var fieldNome = document.getElementById('fieldNome');
@@ -654,7 +654,7 @@ h1.end-title{
       fieldTelefone.classList.add('invalid'); ok = false;
     } else { fieldTelefone.classList.remove('invalid'); }
 
-    if(!ok) return;
+    if(!ok){ e.preventDefault(); return; }
 
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
@@ -666,17 +666,11 @@ h1.end-title{
       + 'Perfil: ' + (answers.perfil || '') + '\n'
       + 'Condição: ' + (answers.doenca || '') + '\n'
       + 'Renda: ' + (answers.renda || '');
-    var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
-    // <a>.click() simula toque direto — funciona em Instagram IAB (window.location não funciona)
-    var a = document.createElement('a');
-    a.href = waUrl;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    this.href = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
+    this.target = '_blank';
     goTo('sucesso');
+    // deixa o <a> navegar naturalmente — usuário tocou diretamente, IAB permite
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
