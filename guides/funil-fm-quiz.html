@@ -666,10 +666,15 @@ h1.end-title{
       + 'Perfil: ' + (answers.perfil || '') + '\n'
       + 'Condição: ' + (answers.doenca || '') + '\n'
       + 'Renda: ' + (answers.renda || '');
-    var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
+    var waMsg2 = encodeURIComponent(waMsg);
+    // Instagram/Facebook IAB bloqueiam wa.me redirect chain — usar custom scheme direto
+    var isIAB = /Instagram|FBAN|FBAV|FB_IAB|FB4A|FBIOS/i.test(navigator.userAgent || '');
+    var waUrl = isIAB
+      ? 'whatsapp://send?phone=5561995731944&text=' + waMsg2
+      : 'https://wa.me/5561995731944?text=' + waMsg2;
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
-    goTo('sucesso');
     window.location.href = waUrl;
+    goTo('sucesso');
   });
 
   document.getElementById('telefone').addEventListener('input', function(e){
