@@ -660,6 +660,14 @@ h1.end-title{
     answers.telefone = telefone.value.trim();
     answers.consent = document.getElementById('consent').checked;
 
+    var waMsg = 'Olá! Acabei de responder o quiz sobre isenção de IR.\n\n'
+      + 'Nome: ' + answers.nome + '\n'
+      + 'Telefone: ' + answers.telefone + '\n'
+      + 'Perfil: ' + (answers.perfil || '') + '\n'
+      + 'Condição: ' + (answers.doenca || '') + '\n'
+      + 'Renda: ' + (answers.renda || '');
+    window.open('https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg), '_blank');
+
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
     goTo('sucesso');
   });
