@@ -1768,6 +1768,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <button class="filter-btn" data-filter="agendou" onclick="filterLeads(this)">Agendados</button>
     <button class="filter-btn" data-filter="fechou" onclick="filterLeads(this)">Fecharam</button>
     <button class="filter-btn" data-filter="em_conversa" onclick="filterLeads(this)">Em Conversa</button>
+    <button class="filter-btn" data-filter="quiz" onclick="filterLeads(this)">Quiz</button>
   </div>
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bd)">
     <table class="tbl" style="min-width:720px">
@@ -2589,6 +2590,7 @@ function renderLeads() {
     leadsFilter === 'qualificado' ? allLeads.filter(l => l.qualificado && !l.agendou) :
     leadsFilter === 'agendou' ? allLeads.filter(l => l.agendou && !l.fechou) :
     leadsFilter === 'fechou' ? allLeads.filter(l => l.fechou) :
+    leadsFilter === 'quiz' ? allLeads.filter(l => l.canal === 'quiz_fm') :
     allLeads.filter(l => !l.qualificado && !l.agendou && (l.dify_conversation_id || l.dify_ativo));
 
   if (leadsSearch) {
