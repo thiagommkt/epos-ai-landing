@@ -531,8 +531,11 @@ h1.end-title{
       <div class="end-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       </div>
-      <h1 class="end-title">Pronto! Abrindo WhatsApp…</h1>
-      <p class="end-sub">Em instantes você será direcionado para conversar com um especialista.</p>
+      <h1 class="end-title">Recebemos seus dados!</h1>
+      <p class="end-sub">Clique abaixo para falar com um especialista agora.</p>
+      <div class="end-links" style="margin-top:24px">
+        <a id="btnWaSucesso" href="#" class="btn btn-primary" style="text-decoration:none;display:block;text-align:center;">Falar com especialista no WhatsApp</a>
+      </div>
     </section>
 
     <!-- 6: DESQUALIFICADO -->
@@ -668,7 +671,7 @@ h1.end-title{
       + 'Renda: ' + (answers.renda || '');
     var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
-    // click direto no <a> → user gesture preservado → window.location.href funciona
+    document.getElementById('btnWaSucesso').href = waUrl;
     window.location.href = waUrl;
     goTo('sucesso');
   });
