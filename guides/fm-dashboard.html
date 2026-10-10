@@ -1541,7 +1541,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="sb-footer">
     <div class="sb-c-name">Farias &amp; Moura</div>
     <div class="sb-live"><div class="live-dot"></div>LIVE · Sistema ativo</div>
-    <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .15s" onmouseover="this.style.borderColor='var(--dim)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
+    <button onclick="toggleTheme()" style="margin-top:8px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'"><svg width="11" height="11" id="theme-icon-svg" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span id="theme-label">Modo Claro</span></button>
+    <button onclick="doLogout()" style="margin-top:6px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .15s" onmouseover="this.style.borderColor='var(--dim)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
   </div>
 </aside>
 <main>
@@ -1691,6 +1692,24 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="card" style="margin-top:0;margin-bottom:24px">
     <div class="card-ttl">Quiz FM — Funil por Etapa <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— só tráfego real (sem testes e bots) · respostas ficam só no nosso banco</span></div>
     <div id="lp-funnel-content"><div class="loading"></div></div>
+  </div>
+
+  <!-- ── QUIZ FM — LEADS CAPTADOS ── -->
+  <div class="card" style="margin-top:0;margin-bottom:24px">
+    <div class="card-ttl">Quiz FM — Leads Captados</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:8px">
+      <table class="tbl" style="min-width:560px">
+        <thead style="background:rgba(145,70,255,0.06)"><tr>
+          <th style="padding:10px 12px;white-space:nowrap">Nome</th>
+          <th style="white-space:nowrap">Telefone</th>
+          <th style="white-space:nowrap">Condição</th>
+          <th style="white-space:nowrap">Origem</th>
+          <th style="white-space:nowrap">Campanha</th>
+          <th style="white-space:nowrap">Chegou em</th>
+        </tr></thead>
+        <tbody id="quiz-leads-table"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ── CLIQUES WHATSAPP RASTREADOS ── -->
@@ -2547,6 +2566,27 @@ async function loadDashboard() {
         `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">${disqBox}${errBox}${tempoBox}</div>` +
         `<div style="margin-top:16px">${sub('Por criativo (utm_content)')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Criativo</th><th>Sessões</th><th>Iniciaram</th><th>Contato</th><th>Enviaram</th></tr></thead><tbody>${criRows}</tbody></table></div></div>`;
     } catch(err) { el.innerHTML = '<span style="color:var(--dim);font-size:11px">Sem dados ainda</span>'; }
+  })();
+
+  // Quiz FM — Leads captados
+  (async () => {
+    const tbl = document.getElementById('quiz-leads-table');
+    if (!tbl) return;
+    try {
+      const { data } = await sb(`${TABLE}?canal=eq.quiz_fm&select=nome,telefone,patologia,utm_source,utm_campaign,criado_em&order=criado_em.desc&limit=50`);
+      tbl.innerHTML = (data || []).length ? (data.map(l => {
+        const src = l.utm_source || '—';
+        const camp = l.utm_campaign || '—';
+        return `<tr onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
+          <td class="td-hi" style="padding-left:12px">${l.nome||'—'}</td>
+          <td style="font-family:var(--fM);font-size:11px">${(l.telefone||'').replace(/^55/,'')}</td>
+          <td>${l.patologia||'—'}</td>
+          <td><span style="font-family:var(--fM);font-size:10px;color:var(--purple)">${src}</span></td>
+          <td style="font-family:var(--fM);font-size:10px;color:var(--muted)">${camp}</td>
+          <td style="font-family:var(--fM);font-size:10px">${fmtDate(l.criado_em)}</td>
+        </tr>`;
+      }).join('')) : '<tr><td colspan="6" class="empty">Nenhum lead ainda</td></tr>';
+    } catch(e) { tbl.innerHTML = '<tr><td colspan="6" class="empty">Erro ao carregar</td></tr>'; }
   })();
 
   // Leads recentes
