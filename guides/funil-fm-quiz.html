@@ -647,8 +647,10 @@ h1.end-title{
     return digits.length >= 10 && digits.length <= 11;
   }
 
+  var _quizSubmitted = false;
   document.getElementById('btnEnviar').addEventListener('click', function(e){
     e.preventDefault();
+    if (_quizSubmitted) return;
     var nome = document.getElementById('nome');
     var telefone = document.getElementById('telefone');
     var fieldNome = document.getElementById('fieldNome');
@@ -717,6 +719,7 @@ h1.end-title{
       page_url: window.location.href
     };
 
+    _quizSubmitted = true;
     fetch('https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-lead', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
