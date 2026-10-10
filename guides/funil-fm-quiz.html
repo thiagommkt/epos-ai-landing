@@ -666,14 +666,16 @@ h1.end-title{
       + 'Perfil: ' + (answers.perfil || '') + '\n'
       + 'Condição: ' + (answers.doenca || '') + '\n'
       + 'Renda: ' + (answers.renda || '');
-    var waMsg2 = encodeURIComponent(waMsg);
-    // Instagram/Facebook IAB bloqueiam wa.me redirect chain — usar custom scheme direto
-    var isIAB = /Instagram|FBAN|FBAV|FB_IAB|FB4A|FBIOS/i.test(navigator.userAgent || '');
-    var waUrl = isIAB
-      ? 'whatsapp://send?phone=5561995731944&text=' + waMsg2
-      : 'https://wa.me/5561995731944?text=' + waMsg2;
+    var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     // TODO: enviar `answers` para o webhook n8n [FM] Dify - Salvar Dados Lead
-    window.location.href = waUrl;
+    // <a>.click() simula toque direto — funciona em Instagram IAB (window.location não funciona)
+    var a = document.createElement('a');
+    a.href = waUrl;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     goTo('sucesso');
   });
 
