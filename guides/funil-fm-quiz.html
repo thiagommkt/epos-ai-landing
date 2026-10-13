@@ -4,14 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Isenção de Imposto de Renda | Farias &amp; Moura Advocacia</title>
-<!-- Meta Pixel FM — autoConfig OFF antes do init (REGRA #5: evitar envio de dados sensíveis) -->
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('set','autoConfig',false,'2047813996163251');
-fbq('init','2047813996163251');
-fbq('track','PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2047813996163251&ev=PageView&noscript=1"/></noscript>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Lato:wght@400;600;700;800&display=swap');
 
@@ -141,12 +133,12 @@ body::before{
 /* ---- Hook screen ---- */
 .hook{justify-content:center;text-align:center;flex:1;padding-top:12px}
 .hook-badge{
-  width:70px;height:70px;margin:0 auto 20px;
+  width:64px;height:64px;margin:0 auto 20px;
   border-radius:50%;
   background:var(--green-800);
   display:flex;align-items:center;justify-content:center;
 }
-.hook-badge img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
+.hook-badge svg{width:30px;height:30px;stroke:var(--gold-500)}
 h1.headline{
   font-family:var(--font-display);
   font-size:28px;
@@ -391,14 +383,16 @@ h1.end-title{
 <main class="app">
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
 
-  <div class="brand" style="visibility:hidden;height:0;padding:0;overflow:hidden"></div>
+  <div class="brand">
+    <img class="brand-logo" src="assets/fm/perfil-avatar.png" alt="Farias &amp; Moura Advocacia" width="52" height="52">
+  </div>
 
   <div class="screens">
 
     <!-- 0: HOOK -->
     <section class="screen active hook" data-screen="hook">
       <div class="hook-badge">
-        <img src="assets/fm/perfil-avatar.png" alt="Farias &amp; Moura Advocacia">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4z"/></svg>
       </div>
       <h1 class="headline">Descubra se você tem direito à <span class="accent">isenção do Imposto de Renda</span></h1>
       <p class="sub">Se você é <strong>aposentado(a), pensionista ou militar reformado(a)</strong> e tem (ou já teve) alguma doença grave, pode ter direito a parar de pagar IR e ainda receber de volta o que pagou nos últimos anos.</p>
@@ -524,7 +518,7 @@ h1.end-title{
           <label for="consent">Concordo com o uso dos meus dados conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page-fm" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
         </div>
         <div class="btn-stack">
-          <a id="btnEnviar" href="#" class="btn btn-primary" style="text-decoration:none;">Enviar e falar com especialista</a>
+          <a id="btnEnviar" href="#" class="btn btn-primary" style="display:block;text-align:center;text-decoration:none;">Enviar e falar com especialista</a>
         </div>
       </form>
       <div class="step-nav" style="margin-top:12px">
@@ -540,7 +534,7 @@ h1.end-title{
       <h1 class="end-title">Recebemos seus dados!</h1>
       <p class="end-sub">Clique abaixo para falar com um especialista agora.</p>
       <div class="end-links" style="margin-top:24px">
-        <a id="btnWaSucesso" href="#" class="btn btn-primary" style="text-decoration:none;">Falar com especialista no WhatsApp</a>
+        <a id="btnWaSucesso" href="#" class="btn btn-primary" style="text-decoration:none;display:block;text-align:center;">Falar com especialista no WhatsApp</a>
       </div>
     </section>
 
@@ -647,10 +641,8 @@ h1.end-title{
     return digits.length >= 10 && digits.length <= 11;
   }
 
-  var _quizSubmitted = false;
   document.getElementById('btnEnviar').addEventListener('click', function(e){
     e.preventDefault();
-    if (_quizSubmitted) return;
     var nome = document.getElementById('nome');
     var telefone = document.getElementById('telefone');
     var fieldNome = document.getElementById('fieldNome');
@@ -665,66 +657,11 @@ h1.end-title{
       fieldTelefone.classList.add('invalid'); ok = false;
     } else { fieldTelefone.classList.remove('invalid'); }
 
-    var consentBox = document.getElementById('consent');
-    if(!consentBox.checked){
-      var cEl = consentBox.closest('.consent');
-      if(cEl) cEl.style.outline = '2px solid var(--error)';
-      ok = false;
-    } else {
-      var cEl2 = consentBox.closest('.consent');
-      if(cEl2) cEl2.style.outline = '';
-    }
-
     if(!ok) return;
 
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
-    answers.consent = true;
-
-    // Gerar event_id para deduplicação pixel ↔ CAPI
-    var eventId = 'quiz_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,function(c){return(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16);});
-
-    // Pixel Lead (sem dados sensíveis — só eventID)
-    if(typeof fbq === 'function'){
-      fbq('track','Lead',{},{eventID: eventId});
-    }
-
-    // Extrair UTMs e fbclid da URL
-    var urlParams = new URLSearchParams(window.location.search);
-    var fbclid = urlParams.get('fbclid') || '';
-    var fbp = '';
-    try{ fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1] || ''; }catch(e2){}
-    var fbc = fbclid ? ('fb.1.'+Math.floor(Date.now()/1000)+'.'+fbclid) : (document.cookie.match(/_fbc=([^;]+)/)?.[1] || '');
-
-    var webhookPayload = {
-      nome: answers.nome,
-      telefone: answers.telefone.replace(/\D/g,''),
-      perfil: answers.perfil || '',
-      doenca: answers.doenca || '',
-      renda: answers.renda || '',
-      event_id: eventId,
-      utm_source: urlParams.get('utm_source') || 'quiz',
-      utm_medium: urlParams.get('utm_medium') || '',
-      utm_campaign: urlParams.get('utm_campaign') || '',
-      utm_content: urlParams.get('utm_content') || 'funil-fm-quiz',
-      utm_term: urlParams.get('utm_term') || '',
-      utm_id: urlParams.get('utm_id') || '',
-      ad_id: urlParams.get('ad_id') || '',
-      adset_id: urlParams.get('adset_id') || '',
-      placement: urlParams.get('placement') || '',
-      fbclid: fbclid,
-      fbc: fbc,
-      fbp: fbp,
-      user_agent: navigator.userAgent,
-      page_url: window.location.href
-    };
-
-    _quizSubmitted = true;
-    fetch('https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-lead', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(webhookPayload)
-    }).catch(function(){});
+    answers.consent = document.getElementById('consent').checked;
 
     var waMsg = 'Olá! Acabei de responder o quiz sobre isenção de IR.\n\n'
       + 'Nome: ' + answers.nome + '\n'
@@ -734,6 +671,19 @@ h1.end-title{
       + 'Renda: ' + (answers.renda || '');
     var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     document.getElementById('btnWaSucesso').href = waUrl;
+    var _qa = {
+      nome: answers.nome, telefone: answers.telefone,
+      renda: answers.renda || '', patologia: answers.doenca || '',
+      perfil: answers.perfil || '',
+      utm_source: new URLSearchParams(location.search).get('utm_source') || '',
+      utm_campaign: new URLSearchParams(location.search).get('utm_campaign') || ''
+    };
+    document.getElementById('btnWaSucesso').addEventListener('click', function() {
+      fetch('https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-respostas', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(_qa)
+      }).catch(function(){});
+    }, { once: true });
     goTo('sucesso');
   });
 

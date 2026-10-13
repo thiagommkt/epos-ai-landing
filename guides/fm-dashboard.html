@@ -1704,11 +1704,12 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
           <th style="padding:10px 12px;white-space:nowrap">Nome</th>
           <th style="white-space:nowrap">Telefone</th>
           <th style="white-space:nowrap">Condição</th>
+          <th style="white-space:nowrap">Renda</th>
           <th style="white-space:nowrap">Origem</th>
           <th style="white-space:nowrap">Campanha</th>
           <th style="white-space:nowrap">Chegou em</th>
         </tr></thead>
-        <tbody id="quiz-leads-table"><tr><td colspan="6" class="empty">Carregando...</td></tr></tbody>
+        <tbody id="quiz-leads-table"><tr><td colspan="7" class="empty">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -2574,19 +2575,21 @@ async function loadDashboard() {
     const tbl = document.getElementById('quiz-leads-table');
     if (!tbl) return;
     try {
-      const { data } = await sb(`${TABLE}?canal=eq.quiz_fm&select=nome,telefone,patologia,utm_source,utm_campaign,criado_em&order=criado_em.desc&limit=50`);
+      const { data } = await sb(`${TABLE}?canal=eq.quiz_fm&select=nome,telefone,patologia,renda,perfil,cidade,canal,utm_source,utm_campaign,score,crm_score,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_stage_bloqueado,sugestao_stage,crm_stage,stage_historico,ultima_interacao_humano,paga_ir,valor_ir,criado_em&order=criado_em.desc&limit=50`);
       tbl.innerHTML = (data || []).length ? (data.map(l => {
         const src = l.utm_source || '—';
         const camp = l.utm_campaign || '—';
-        return `<tr onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
+        const leadJson = encodeURIComponent(JSON.stringify(l));
+        return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
           <td class="td-hi" style="padding-left:12px">${l.nome||'—'}</td>
           <td style="font-family:var(--fM);font-size:11px">${(l.telefone||'').replace(/^55/,'')}</td>
           <td>${l.patologia||'—'}</td>
+          <td style="font-family:var(--fM);font-size:11px;color:var(--muted)">${l.renda||'—'}</td>
           <td><span style="font-family:var(--fM);font-size:10px;color:var(--purple)">${src}</span></td>
           <td style="font-family:var(--fM);font-size:10px;color:var(--muted)">${camp}</td>
           <td style="font-family:var(--fM);font-size:10px">${fmtDate(l.criado_em)}</td>
         </tr>`;
-      }).join('')) : '<tr><td colspan="6" class="empty">Nenhum lead ainda</td></tr>';
+      }).join('')) : '<tr><td colspan="7" class="empty">Nenhum lead ainda</td></tr>';
     } catch(e) { tbl.innerHTML = '<tr><td colspan="6" class="empty">Erro ao carregar</td></tr>'; }
   })();
 
@@ -3303,6 +3306,7 @@ function openLeadPanel(lead) {
 
     <div class="panel-section">Qualificação</div>
     <div class="panel-row"><div class="panel-key">Condição</div><div class="panel-val">${lead.patologia||'—'}</div></div>
+    <div class="panel-row"><div class="panel-key">Renda</div><div class="panel-val">${lead.renda||'—'}</div></div>
     <div class="panel-row"><div class="panel-key">Paga IR</div><div class="panel-val">${lead.paga_ir===true?'✅ Sim':lead.paga_ir===false?'❌ Não':'—'}</div></div>
     <div class="panel-row"><div class="panel-key">Valor IR</div><div class="panel-val">${lead.valor_ir||'—'}</div></div>
 
@@ -3311,7 +3315,11 @@ function openLeadPanel(lead) {
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);margin-bottom:8px">
       <span style="font-family:var(--fM);font-size:10px;color:#FF5E5B">🔒 Stage travado por humano — automações não alteram</span>
       <button onclick="desbloquearLead('${lead.telefone}')" style="padding:4px 10px;background:transparent;border:1px solid rgba(255,94,91,.4);color:#FF5E5B;font-family:var(--fM);font-size:9px;cursor:pointer">Desbloquear</button>
-    </div>` : ''}
+    </div>` : `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid rgba(145,70,255,.2);margin-bottom:8px">
+      <span style="font-family:var(--fM);font-size:10px;color:var(--dim)">🔓 Stage desbloqueado — automações podem alterar</span>
+      <button onclick="travarLead('${lead.telefone}')" style="padding:4px 10px;background:transparent;border:1px solid rgba(145,70,255,.4);color:var(--purple);font-family:var(--fM);font-size:9px;cursor:pointer">Travar stage</button>
+    </div>`}
     ${lead.sugestao_stage ? `
     <div style="padding:10px 12px;background:rgba(255,165,0,.06);border:1px solid rgba(255,165,0,.3);margin-bottom:8px">
       <div style="font-family:var(--fM);font-size:9px;color:#FFA500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">💡 Sugestão do Analista</div>
@@ -3470,6 +3478,17 @@ async function desbloquearLead(telefone) {
     setTimeout(() => loadCRM(), 600);
     closeLeadPanel();
   } catch(e) { toast('Erro ao desbloquear: ' + e.message, 'err'); }
+}
+
+async function travarLead(telefone) {
+  try {
+    const r = await fetch(PROXY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: PROXY_TOKEN, acao: 'travar_lead', telefone }) });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    toast('🔒 Stage travado — automações não alterarão mais', 'ok');
+    setTimeout(() => loadCRM(), 600);
+    closeLeadPanel();
+  } catch(e) { toast('Erro ao travar: ' + e.message, 'err'); }
 }
 
 async function aprovarSugestao(telefone) {
