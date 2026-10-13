@@ -6,6 +6,7 @@ on:
     paths:
       - 'epos-dashboard.html'
       - 'fm-dashboard.html'
+      - 'funil-fm-quiz.html'
       - 'guides/**'
       - 'login-*.html'
       - 'scripts/**'

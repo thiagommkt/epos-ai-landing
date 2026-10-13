@@ -36,6 +36,11 @@ COPIES = [
         'dst': ROOT_WAS / 'guides' / 'fm-dashboard.html',
         'label': 'fm guides (WAS)',
     },
+    {
+        'src': ROOT_LANDING / 'funil-fm-quiz.html',
+        'dst': ROOT_LANDING / 'guides' / 'funil-fm-quiz.html',
+        'label': 'fm quiz guides',
+    },
 ]
 
 
