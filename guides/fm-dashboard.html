@@ -3304,11 +3304,11 @@ function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Chegou em</div><div class="panel-val">${fmtDate(lead.criado_em)}</div></div>
     <div class="panel-row"><div class="panel-key">Canal</div><div class="panel-val">${lead.canal||'whatsapp'}</div></div>
 
-    <div class="panel-section">Qualificação</div>
-    <div class="panel-row"><div class="panel-key">Condição</div><div class="panel-val">${lead.patologia||'—'}</div></div>
-    <div class="panel-row"><div class="panel-key">Renda</div><div class="panel-val">${lead.renda||'—'}</div></div>
-    <div class="panel-row"><div class="panel-key">Paga IR</div><div class="panel-val">${lead.paga_ir===true?'✅ Sim':lead.paga_ir===false?'❌ Não':'—'}</div></div>
-    <div class="panel-row"><div class="panel-key">Valor IR</div><div class="panel-val">${lead.valor_ir||'—'}</div></div>
+    <div class="panel-section" style="display:flex;align-items:center;justify-content:space-between">Qualificação <button onclick="salvarQualificacao('${lead.telefone}')" id="btn-salvar-qual" style="padding:3px 10px;background:transparent;border:1px solid rgba(145,70,255,.4);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Salvar</button></div>
+    <div class="panel-row"><div class="panel-key">Condição</div><div class="panel-val"><input id="qual-patologia" value="${(lead.patologia||'').replace(/"/g,'&quot;')}" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;box-sizing:border-box"></div></div>
+    <div class="panel-row"><div class="panel-key">Renda</div><div class="panel-val"><input id="qual-renda" value="${(lead.renda||'').replace(/"/g,'&quot;')}" placeholder="ex: R$ 5.000/mês" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;box-sizing:border-box"></div></div>
+    <div class="panel-row"><div class="panel-key">Paga IR</div><div class="panel-val"><select id="qual-paga-ir" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%"><option value="" ${(lead.paga_ir===null||lead.paga_ir===undefined)?'selected':''}>—</option><option value="true" ${lead.paga_ir===true?'selected':''}>✅ Sim</option><option value="false" ${lead.paga_ir===false?'selected':''}>❌ Não</option></select></div></div>
+    <div class="panel-row"><div class="panel-key">Valor IR</div><div class="panel-val"><input id="qual-valor-ir" value="${(lead.valor_ir||'').replace(/"/g,'&quot;')}" placeholder="ex: R$ 10.000" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;box-sizing:border-box"></div></div>
 
     <div class="panel-section">Status no Funil</div>
     ${lead.crm_stage_bloqueado ? `
@@ -3489,6 +3489,26 @@ async function travarLead(telefone) {
     setTimeout(() => loadCRM(), 600);
     closeLeadPanel();
   } catch(e) { toast('Erro ao travar: ' + e.message, 'err'); }
+}
+
+async function salvarQualificacao(telefone) {
+  const patologia = document.getElementById('qual-patologia')?.value;
+  const renda = document.getElementById('qual-renda')?.value;
+  const pagaIrVal = document.getElementById('qual-paga-ir')?.value;
+  const paga_ir = pagaIrVal === 'true' ? true : pagaIrVal === 'false' ? false : null;
+  const valor_ir = document.getElementById('qual-valor-ir')?.value;
+  const btn = document.getElementById('btn-salvar-qual');
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  try {
+    const r = await fetch(PROXY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: PROXY_TOKEN, acao: 'atualizar_qualificacao', telefone, patologia: patologia || null, renda: renda || null, paga_ir, valor_ir: valor_ir || null }) });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    toast('✅ Qualificação salva', 'ok');
+    if (btn) { btn.textContent = 'Salvo ✓'; btn.style.color = 'var(--neon)'; btn.style.borderColor = 'var(--neon)'; }
+  } catch(e) {
+    toast('Erro ao salvar: ' + e.message, 'err');
+    if (btn) { btn.textContent = 'Salvar'; btn.disabled = false; }
+  }
 }
 
 async function aprovarSugestao(telefone) {
