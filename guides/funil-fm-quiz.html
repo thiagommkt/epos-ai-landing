@@ -679,7 +679,7 @@ h1.end-title{
       utm_campaign: new URLSearchParams(location.search).get('utm_campaign') || ''
     };
     document.getElementById('btnWaSucesso').addEventListener('click', function() {
-      fetch('https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-respostas', {
+      fetch('https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-lead', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(_qa)
       }).catch(function(){});
