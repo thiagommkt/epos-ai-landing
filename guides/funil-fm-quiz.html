@@ -568,6 +568,14 @@ h1.end-title{
   var progressMap = { hook:8, perfil:28, doenca:50, renda:72, contato:90, sucesso:100, desqualificado:100 };
   var answers = {};
 
+  // Funil: etapa e resposta vão SOMENTE para o nosso banco (lp_events). Nada disso é enviado à Meta.
+  var STEP_INDEX = { hook:0, perfil:1, doenca:2, renda:3, contato:4, sucesso:5, desqualificado:6 };
+  function trackStep(type, step, answer){
+    try {
+      if(window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null });
+    } catch(e){}
+  }
+
   function goTo(screen){
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var target = document.querySelector('[data-screen="'+screen+'"]');
@@ -582,6 +590,7 @@ h1.end-title{
     target.scrollTop = 0;
     document.getElementById('progressFill').style.width = (progressMap[screen] || 0) + '%';
     window.scrollTo(0,0);
+    trackStep('step_view', screen);
   }
   window.goTo = goTo;
 
@@ -607,6 +616,8 @@ h1.end-title{
       answers[group] = btn.getAttribute('data-value');
 
       var disqualify = btn.getAttribute('data-disqualify') === 'true';
+      trackStep('step_answer', group, answers[group]);
+      if(disqualify) trackStep('step_disqualified', group, answers[group]);
       setTimeout(function(){
         if(disqualify){
           document.getElementById('dqTitle').textContent = 'Agradecemos a participação!';
@@ -639,6 +650,7 @@ h1.end-title{
     }
     field.classList.remove('invalid');
     answers.doenca = value;
+    trackStep('step_answer', 'doenca', 'outra: ' + value);
     goTo('renda');
   });
 
@@ -675,7 +687,14 @@ h1.end-title{
       if(cEl2) cEl2.style.outline = '';
     }
 
-    if(!ok) return;
+    if(!ok){
+      var errs = [];
+      if(fieldNome.classList.contains('invalid')) errs.push('nome_invalido');
+      if(fieldTelefone.classList.contains('invalid')) errs.push('telefone_invalido');
+      if(!consentBox.checked) errs.push('sem_consentimento');
+      trackStep('step_error', 'contato', errs.join(','));
+      return;
+    }
 
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
@@ -712,6 +731,7 @@ h1.end-title{
       ad_id: urlParams.get('ad_id') || '',
       adset_id: urlParams.get('adset_id') || '',
       placement: urlParams.get('placement') || '',
+      test_event_code: urlParams.get('test_event_code') || '',
       fbclid: fbclid,
       fbc: fbc,
       fbp: fbp,
@@ -725,6 +745,7 @@ h1.end-title{
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(webhookPayload)
     }).catch(function(){});
+    if(window._lpTrack) window._lpTrack('quiz_submitted');
 
     var waMsg = 'Olá! Acabei de responder o quiz sobre isenção de IR.\n\n'
       + 'Nome: ' + answers.nome + '\n'
@@ -747,6 +768,76 @@ h1.end-title{
       e.target.value = v;
     }
   });
+})();
+</script>
+
+<script>
+// Rastreamento do funil (restaurado em 16/10 — tinha sumido no commit 8c0dc5a de 10/10).
+// Vai SOMENTE para o nosso banco (lp_events, RLS: só INSERT anônimo com lista fixa de eventos). Nada vai à Meta.
+(function(){
+  var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+  var LP_SLUG = 'funil-fm-quiz';
+
+  var sid;
+  try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
+  if(!sid){
+    sid = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try { localStorage.setItem('_lp_sid', sid); } catch(e){}
+  }
+
+  var p = new URLSearchParams(location.search);
+  var utms = {
+    utm_source:   p.get('utm_source')   || '',
+    utm_medium:   p.get('utm_medium')   || '',
+    utm_campaign: p.get('utm_campaign') || '',
+    utm_content:  p.get('utm_content')  || '',
+    utm_term:     p.get('utm_term')     || '',
+    utm_id:       p.get('utm_id')       || '',
+    ad_id:        p.get('ad_id')        || '',
+    adset_id:     p.get('adset_id')     || '',
+    placement:    p.get('placement')    || ''
+  };
+
+  function track(eventType, extra){
+    var body = Object.assign({ lp_slug: LP_SLUG, event_type: eventType, session_id: sid, referrer: document.referrer || '' }, utms, extra || {});
+    fetch(SB_URL + '/rest/v1/lp_events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON },
+      body: JSON.stringify(body),
+      keepalive: true
+    }).catch(function(){});
+  }
+
+  window._lpTrack = track;
+
+  // pageview + primeira etapa do funil (hook). user_agent/viewport ajudam a separar tráfego real de teste/bot.
+  track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: window.innerWidth + 'x' + window.innerHeight });
+  track('step_view', { step_name: 'hook', step_index: 0 });
+
+  // tempo de visibilidade ativa
+  var visStart = Date.now();
+  var totalVis = 0;
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden'){
+      totalVis += Date.now() - visStart;
+    } else {
+      visStart = Date.now();
+    }
+  });
+  var _timeSent = false;
+  function sendTime(){
+    if(_timeSent) return;
+    _timeSent = true;
+    if(document.visibilityState === 'visible') totalVis += Date.now() - visStart;
+    var dur = Math.round(totalVis / 1000);
+    if(dur < 2) return;
+    track('time_spent', { duration_s: dur });
+  }
+  window.addEventListener('beforeunload', sendTime);
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden') sendTime(); });
 })();
 </script>
 
