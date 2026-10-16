@@ -2049,6 +2049,34 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
   <div class="rule"></div>
 
+  <!-- Torneira (CRM v3): quem está escapando agora — RPC fm_torneira -->
+  <style>
+    #torneira-card .tor-sec{font-family:var(--fD);font-size:12px;font-weight:700;color:var(--text);margin:4px 0 8px}
+    #torneira-card .tor-sec small{display:block;font-family:var(--fM);font-size:10px;font-weight:400;color:var(--dim);margin-top:2px}
+    #torneira-card .tor-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+    #torneira-card .tor-chip{padding:5px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10.5px;border-radius:12px;cursor:pointer;transition:all .15s}
+    #torneira-card .tor-chip b{color:var(--text)}
+    #torneira-card .tor-chip.sr{border-color:rgba(255,94,91,.35)}
+    #torneira-card .tor-chip.pa{border-color:rgba(227,179,65,.35)}
+    #torneira-card .tor-chip.ativo{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
+    #torneira-card .tor-linha{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
+    #torneira-card .tor-linha:hover{background:var(--bg3)}
+    #torneira-card .tor-nome{font-family:var(--fD);font-size:12.5px;color:var(--text);min-width:0;overflow-wrap:anywhere}
+    #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
+    #torneira-card .tor-tempo{font-family:var(--fM);font-size:10.5px;font-weight:700;white-space:nowrap;flex-shrink:0}
+    #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:6px 0}
+    .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
+    .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
+    .tor-selo.pa{background:rgba(227,179,65,.13);color:#e3b341}
+  </style>
+  <div class="card" id="torneira-card" style="margin-bottom:14px">
+    <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+      <span>⏱️ Torneira <span style="font-family:var(--fM);font-size:9px;color:var(--neon);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px">agora</span></span>
+      <button onclick="loadTorneira()" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:4px">↻ Atualizar</button>
+    </div>
+    <div id="torneira-conteudo"><div class="loading"></div></div>
+  </div>
+
   <!-- Seletor de período -->
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:4px">
     <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0">Período:</span>
@@ -2150,6 +2178,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   let sess = null;
   try { sess = storedSess ? JSON.parse(storedSess) : null; } catch {}
   if (!sess || !sess.access_token || (sess.expires_at || 0) * 1000 < Date.now()) {
+    try { const telLink = new URLSearchParams(location.search).get('lead'); if (telLink) sessionStorage.setItem('abrir_lead', telLink); } catch (e) {}
     location.replace('login-fm.html');
     throw new Error('auth_required');
   }
@@ -3184,7 +3213,7 @@ async function loadCRM() {
     query += `&criado_em=gte.${encodeURIComponent(since)}`;
   }
   const { data } = await sb(query);
-  await Promise.all([carregarEquipe(), carregarProximosContatos()]);
+  await Promise.all([carregarEquipe(), carregarProximosContatos(), carregarTorneira().catch(() => {})]);
   const leads = (data || []).filter(l => !crmVendFilter || (crmVendFilter === 'none' ? !l.responsavel_id : l.responsavel_id === crmVendFilter));
   const stageMap = {};
   leads.forEach(l => {
@@ -3219,6 +3248,7 @@ async function loadCRM() {
           ${l.crm_stage_bloqueado ? '<span class="lock-badge" style="pointer-events:none">🔒</span>' : ''}
           ${l.sugestao_stage ? '<span class="sugestao-badge" style="pointer-events:none">💡</span>' : ''}
         </div>
+        ${torSelo(l.telefone)}
         ${(function(cs){const n=parseInt(cs)||0;if(n>=9)return '<div style="display:inline-block;padding:2px 6px;background:rgba(255,94,91,.15);color:#FF5E5B;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🔴 URGENTE</div>';if(n>=7)return '<div style="display:inline-block;padding:2px 6px;background:rgba(232,137,61,.15);color:#e8893d;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟠 PRIORITÁRIO</div>';if(n>=4)return '<div style="display:inline-block;padding:2px 6px;background:rgba(227,179,65,.12);color:#e3b341;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟡 NORMAL</div>';return '';})(l.crm_score)}
         <div class="krm-path" style="pointer-events:none">${l.patologia||'—'}</div>
         ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px;pointer-events:none">📱 ${telFmt}</div>` : ''}
@@ -5168,7 +5198,103 @@ function renderAnRecentes() {
     }).join('') + '</tbody></table></div>';
 }
 
+// ═══ TORNEIRA (CRM v3) — quem está escapando agora (RPC fm_torneira) ═══
+// sem_resposta = o lead escreveu por último; parado = a última mensagem foi nossa. Clique no lead abre a ficha.
+const TOR_FAIXA = { '5min': '5 min', '2h': '2 h', '8h': '8 h', '1d': '1 dia', '3d': '3 dias', '7d': '7 dias', '15d': '15 dias', '30d': '30 dias' };
+const TOR_ORDEM = ['30d', '15d', '7d', '3d', '1d', '8h', '2h', '5min'];
+let _torDados = [];
+let _torFiltro = null;
+
+async function carregarTorneira() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/fm_torneira`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    _torDados = Array.isArray(d) ? d : [];
+  } catch (e) { _torDados = []; throw e; }
+  window._torMapa = {};
+  for (const l of _torDados) if (l.situacao && l.faixa) window._torMapa[l.telefone] = l;
+  return _torDados;
+}
+
+// Selo no card do kanban (ex.: "⏱ 2 h sem resposta")
+function torSelo(tel) {
+  const t = window._torMapa && window._torMapa[tel];
+  if (!t) return '';
+  return t.situacao === 'sem_resposta'
+    ? `<span class="tor-selo sr">⏱ ${TOR_FAIXA[t.faixa]} sem resposta</span>`
+    : `<span class="tor-selo pa">⏳ ${TOR_FAIXA[t.faixa]} sem retorno</span>`;
+}
+
+async function loadTorneira() {
+  const alvo = document.getElementById('torneira-conteudo');
+  if (!alvo) return;
+  alvo.innerHTML = '<div class="loading"></div>';
+  try { await carregarTorneira(); renderTorneira(); }
+  catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
+}
+
+function filtrarTorneira(situacao, faixa) {
+  const mesmo = _torFiltro && _torFiltro.situacao === situacao && _torFiltro.faixa === faixa;
+  _torFiltro = mesmo ? null : { situacao, faixa };
+  renderTorneira();
+}
+
+function renderTorneira() {
+  const alvo = document.getElementById('torneira-conteudo');
+  if (!alvo) return;
+  const comFaixa = _torDados.filter(l => l.situacao && l.faixa);
+  const semPasso = _torDados.filter(l => l.sem_proximo_passo);
+  const ativo = (sit, fx) => _torFiltro && _torFiltro.situacao === sit && _torFiltro.faixa === fx ? ' ativo' : '';
+  const secao = (sit, titulo, explica, cls) => {
+    const grupo = comFaixa.filter(l => l.situacao === sit);
+    const chips = TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
+      .map(([fx, n]) => `<button class="tor-chip ${cls}${ativo(sit, fx)}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
+    return `<div class="tor-sec">${titulo}: ${grupo.length}<small>${explica}</small></div>` +
+      (grupo.length ? `<div class="tor-chips"><button class="tor-chip ${cls}${ativo(sit, null)}" onclick="filtrarTorneira('${sit}',null)">Todos · <b>${grupo.length}</b></button>${chips}</div>` : '<div class="tor-vazio" style="margin-bottom:12px">Nenhum agora.</div>');
+  };
+  // Lista: filtro escolhido; sem filtro, quem espera resposta (o que mais vaza)
+  let lista, tituloLista;
+  if (_torFiltro && _torFiltro.situacao === 'sem_passo') {
+    lista = semPasso; tituloLista = 'Sem próximo passo marcado';
+  } else if (_torFiltro) {
+    lista = comFaixa.filter(l => l.situacao === _torFiltro.situacao && (!_torFiltro.faixa || l.faixa === _torFiltro.faixa));
+    tituloLista = (_torFiltro.situacao === 'sem_resposta' ? 'Esperando nossa resposta' : 'Sem retorno do lead') + (_torFiltro.faixa ? ` · há ${TOR_FAIXA[_torFiltro.faixa]}` : '');
+  } else {
+    lista = comFaixa.filter(l => l.situacao === 'sem_resposta'); tituloLista = 'Esperando nossa resposta';
+  }
+  lista = [...lista].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
+  const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(s => s.key === k)?.label) || k || 'sem etapa';
+  const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
+  const linhas = lista.slice(0, 80).map(l => {
+    const cor = l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : 'var(--muted)';
+    const tempo = l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : (l.situacao ? 'agora' : 'sem tarefa');
+    return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
+      <div style="min-width:0"><div class="tor-nome">${escHtml(nome(l))}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))} · ${escHtml(etapa(l.crm_stage))}</div></div>
+      <div class="tor-tempo" style="color:${cor}">${tempo}</div></div>`;
+  }).join('');
+  alvo.innerHTML = (comFaixa.length || semPasso.length ? '' : '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta nem parado.</div>') +
+    secao('sem_resposta', '🔴 Esperando nossa resposta', 'O lead escreveu e ninguém respondeu.', 'sr') +
+    secao('parado', '🟡 Sem retorno do lead', 'A última mensagem foi nossa.', 'pa') +
+    `<div class="tor-sec">📋 Sem próximo passo marcado: ${semPasso.length}<small>Sem consulta, tarefa ou mensagem programada.</small></div>` +
+    (semPasso.length ? `<div class="tor-chips"><button class="tor-chip${_torFiltro && _torFiltro.situacao === 'sem_passo' ? ' ativo' : ''}" onclick="filtrarTorneira('sem_passo',null)">Ver lista · <b>${semPasso.length}</b></button></div>` : '') +
+    (lista.length ? `<div class="tor-sec" style="margin-top:6px">${tituloLista} <small>Clique no lead para abrir a ficha.</small></div><div id="torneira-lista">${linhas}</div>` +
+      (lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : '') : '');
+}
+
+// Abre a ficha do lead pelo telefone (lista da Torneira e link "Abrir a ficha" dos avisos no WhatsApp)
+async function abrirFichaPorTelefone(tel) {
+  const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(tel)}&select=*&limit=1`);
+  if (Array.isArray(data) && data[0]) openLeadPanel(data[0]);
+  else toast('Lead não encontrado', 'err');
+}
+
 async function loadAnalista(force) {
+  loadTorneira();
   ['an-total','an-ai','an-manual','an-auditados'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
   const compEl=document.getElementById('an-comparativo'), objBox=document.getElementById('an-objections'), recBox=document.getElementById('an-recentes');
   if(compEl)compEl.innerHTML='<div class="loading"></div>';
@@ -5603,6 +5729,12 @@ async function loadWaClicks() {
 }
 
 // ═══ INIT + AUTO-REFRESH + SUPABASE REALTIME ═══
+// Link "Abrir a ficha" dos avisos da Torneira: ?lead=<telefone> (guardado antes do login, se precisou logar)
+(() => {
+  let telLink = null;
+  try { telLink = new URLSearchParams(location.search).get('lead') || sessionStorage.getItem('abrir_lead'); sessionStorage.removeItem('abrir_lead'); } catch (e) {}
+  if (telLink) setTimeout(() => abrirFichaPorTelefone(telLink), 1800);
+})();
 loadDashboard();
 loadPendentes();
 loadRoboStatus();
