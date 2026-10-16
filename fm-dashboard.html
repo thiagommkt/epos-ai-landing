@@ -1401,7 +1401,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <input id="contrato-valor-input" type="number" min="0" step="0.01" placeholder="Ex: 3500.00"
         style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:14px;border-radius:4px;box-sizing:border-box;outline:none;transition:border-color .15s"
         onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
-      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5">Usado para calcular ROAS e ROI por anúncio. Pode deixar em branco — dados de conversão ainda serão enviados ao Meta CAPI.</div>
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5">Entra no relatório de vendas e no cálculo de ROAS e ROI por anúncio. Pode deixar em branco — a venda é registrada do mesmo jeito. Se cancelar, o lead fica em “Pendentes de aprovação” para confirmar depois.</div>
       <div style="display:flex;gap:10px;margin-top:20px">
         <button onclick="fecharModalContrato()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">Cancelar</button>
         <button onclick="executarConfirmacaoContrato()" style="flex:2;padding:10px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s" onmouseover="this.style.background='rgba(0,245,160,.18)'" onmouseout="this.style.background='rgba(0,245,160,.08)'">✅ Confirmar contrato</button>
@@ -1523,6 +1523,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <a data-sec="analista" onclick="navTo('analista')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 15l3.5-7 3 4 2.5-5 3 4 2-4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="3" r="1.5"/></svg>
       O Analista
+    </a>
+    <a data-sec="relatorio" onclick="navTo('relatorio')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="1" width="12" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="9" width="1.6" height="3"/><rect x="7.2" y="7" width="1.6" height="5"/><rect x="9.4" y="5" width="1.6" height="7"/></svg>
+      Relatório
     </a>
     <div class="nav-section">Automação</div>
     <a data-sec="campanhas" onclick="navTo('campanhas')">
@@ -2089,6 +2093,51 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </div>
     <div id="an-recentes"><div class="loading"></div></div>
   </div>
+</section>
+
+<!-- ══ RELATÓRIO DE VENDAS (CRM v3 · RPC fm_relatorio_vendas) ══ -->
+<section class="section" id="s-relatorio">
+  <style>
+    #s-relatorio .rel-pill{padding:5px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;border-radius:4px}
+    #s-relatorio .rel-pill.active{border-color:var(--bd-b);background:var(--pur-l);color:var(--purple)}
+    #s-relatorio .rel-btn{padding:6px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s}
+    #s-relatorio .rel-btn:hover{border-color:var(--purple);color:var(--text)}
+    #s-relatorio .rel-linha{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+    #s-relatorio .rel-linha:last-child{border-bottom:none}
+    #s-relatorio .rel-nome{font-family:var(--fD);font-size:12px;color:var(--text);min-width:0;overflow-wrap:anywhere}
+    #s-relatorio .rel-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
+    #s-relatorio .rel-nums{font-family:var(--fM);font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;line-height:1.6}
+    #s-relatorio .rel-nums b{color:var(--text);font-weight:600}
+    #s-relatorio .rel-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6}
+    #s-relatorio .rel-aviso{font-family:var(--fM);font-size:10.5px;color:var(--muted);line-height:1.6;padding:8px 12px;border-left:2px solid #FFA500;background:rgba(255,165,0,.05);margin-bottom:6px}
+    #s-relatorio .rel-insight{font-family:var(--fD);font-size:13px;color:var(--text);line-height:1.5;padding:12px 14px;border-left:3px solid var(--purple);background:var(--pur-l);margin-bottom:14px}
+    #s-relatorio .rel-funil-top{display:flex;justify-content:space-between;gap:8px;font-family:var(--fD);font-size:12px;color:var(--text);margin-bottom:4px}
+    #s-relatorio .rel-funil-top span:last-child{font-family:var(--fM);color:var(--muted)}
+    #s-relatorio .rel-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+    #s-relatorio .rel-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--neon));border-radius:4px}
+    #s-relatorio .rel-funil-row{margin-bottom:12px}
+    #s-relatorio .rel-conv{font-family:var(--fM);font-size:10px;color:var(--dim);font-weight:400}
+    #s-relatorio .rel-conv.pior{color:#FFA500}
+    #s-relatorio .rel-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    #s-relatorio .rel-chip{font-family:var(--fM);font-size:10.5px;padding:4px 10px;border:1px solid var(--bd);border-radius:12px;color:var(--muted)}
+    #s-relatorio .rel-chip b{color:var(--text)}
+    @media(max-width:600px){#s-relatorio .rel-linha{flex-direction:column;align-items:flex-start;gap:2px}#s-relatorio .rel-nums{text-align:left}}
+  </style>
+  <div class="sec-head">
+    <div><div class="sec-title">RELATÓRIO <span>DE VENDAS</span></div><div class="sec-sub" id="rel-sub">Receita, funil, origem e perdas por período</div></div>
+    <button class="rel-btn" onclick="loadRelatorio()">↻ Atualizar</button>
+  </div>
+  <div class="rule"></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Período:</span>
+    <button class="rel-pill active" data-rel="mes" onclick="setRelPeriodo('mes')">Este mês</button>
+    <button class="rel-pill" data-rel="mes_passado" onclick="setRelPeriodo('mes_passado')">Mês passado</button>
+    <button class="rel-pill" data-rel="30" onclick="setRelPeriodo('30')">30 dias</button>
+    <button class="rel-pill" data-rel="90" onclick="setRelPeriodo('90')">90 dias</button>
+    <button class="rel-pill" data-rel="ano" onclick="setRelPeriodo('ano')">Este ano</button>
+    <button class="rel-pill" data-rel="tudo" onclick="setRelPeriodo('tudo')">Tudo</button>
+  </div>
+  <div id="rel-conteudo"><div class="loading"></div></div>
 </section>
 
 </main>
@@ -3227,6 +3276,8 @@ async function onDrop(e) {
   const [crm_id, tel, fromStage] = e.dataTransfer.getData('text/plain').split('|');
   const toStage = col.dataset.stage;
   if (fromStage === toStage || !dragEl) return;
+  // Guardado antes do await: o dragend zera dragEl enquanto o proxy responde
+  const nomeCard = dragEl.querySelector('.krm-name')?.textContent || '';
 
   // Mover card visualmente imediato
   const cardsEl = col.querySelector('.col-cards');
@@ -3244,6 +3295,8 @@ async function onDrop(e) {
     toast(`✓ Movido para ${STAGES.find(s=>s.key===toStage)?.label||toStage} (travado)`, 'ok');
     // Arrastar para Compareceu = confirmar presença (sincronizado com o botão da ficha): marca a consulta realizada
     if (toStage === 'compareceu') await marcarCompareceu(tel, { semConfirmar: true, semStage: true });
+    // Arrastar para Fechou = pedir o valor do contrato (vai para o relatório de vendas)
+    if (toStage === 'fechou') confirmarContrato(tel, nomeCard);
   } catch(err) {
     toast('Erro ao salvar — tente novamente', 'err');
   }
@@ -3342,6 +3395,7 @@ function show(id) {
     if(id==='campanhas') loadCampanhas();
     if(id==='prospeccao') { /* placeholder — não carrega dados, seção exibe aviso */ }
     if(id==='analista') loadAnalista();
+    if(id==='relatorio') loadRelatorio();
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -4057,6 +4111,8 @@ async function mudarEtapa(novaEtapa) {
     p.bloqueado = true;
     toast('Etapa atualizada: ' + novaEtapa + ' (travado)', 'ok');
     setTimeout(() => { if(typeof loadCRM === 'function') loadCRM(); }, 800);
+    // Marcar Fechou = pedir o valor do contrato (vai para o relatório de vendas)
+    if (novaEtapa === 'fechou') confirmarContrato(p.telefone, p.nome);
   } catch(e) {
     toast('Erro ao atualizar etapa — ' + e.message, 'err');
   }
@@ -5285,6 +5341,7 @@ function confirmarContrato(telefone, nome) {
 function fecharModalContrato() {
   document.getElementById('contrato-overlay').classList.remove('show');
   document.body.style.overflow = '';
+  if (typeof loadPendentes === 'function') loadPendentes();
 }
 
 async function executarConfirmacaoContrato() {
@@ -5312,6 +5369,193 @@ async function rejeitarContrato(telefone) {
     const d = await r.json();
     if (d.success) loadPendentes();
   } catch(e) {}
+}
+
+// ═══ RELATÓRIO DE VENDAS (CRM v3) ═══
+// Números vêm prontos da função fm_relatorio_vendas no Supabase; as definições estão em sql/2026-10-16-crm-v3-relatorio-vendas.sql
+let _relPeriodo = 'mes';
+let _relDados = null;
+const REL_PERDA_LABEL = {
+  sem_resposta_do_lead: 'Lead parou de responder',
+  equipe_nao_deu_continuidade: 'Equipe não deu continuidade',
+  nao_elegivel: 'Não tem direito / não elegível',
+  sem_interesse: 'Sem interesse',
+  preco_ou_condicao: 'Preço ou condição',
+  resolveu_com_outro: 'Resolveu com outro escritório',
+  outro: 'Outro motivo',
+  sem_categoria: 'Sem categoria (análises antigas)'
+};
+const REL_FUNIL_LABEL = { chegaram: 'Chegaram', qualificados: 'Qualificados', agendaram: 'Agendaram', compareceram: 'Compareceram', fecharam: 'Fecharam' };
+const REL_FUNIL_DOS = { chegaram: 'dos que chegaram', qualificados: 'dos qualificados', agendaram: 'dos que agendaram', compareceram: 'dos que compareceram' };
+
+function relIntervalo(chave) {
+  // Meses contados no horário de Brasília (UTC-3)
+  const agora = new Date();
+  const brt = new Date(agora.getTime() - 3 * 3600e3);
+  const ano = brt.getUTCFullYear(), mes = brt.getUTCMonth();
+  const inicioBRT = (a, m) => new Date(Date.UTC(a, m, 1) + 3 * 3600e3);
+  const fim = new Date(agora.getTime() + 60e3);
+  if (chave === 'mes') return { inicio: inicioBRT(ano, mes), fim, label: 'Este mês' };
+  if (chave === 'mes_passado') return { inicio: inicioBRT(ano, mes - 1), fim: inicioBRT(ano, mes), label: 'Mês passado' };
+  if (chave === '30') return { inicio: new Date(agora.getTime() - 30 * 864e5), fim, label: 'Últimos 30 dias' };
+  if (chave === '90') return { inicio: new Date(agora.getTime() - 90 * 864e5), fim, label: 'Últimos 90 dias' };
+  if (chave === 'ano') return { inicio: inicioBRT(ano, 0), fim, label: 'Este ano' };
+  return { inicio: new Date('2000-01-01T00:00:00Z'), fim, label: 'Tudo' };
+}
+
+function setRelPeriodo(chave) {
+  _relPeriodo = chave;
+  document.querySelectorAll('#s-relatorio .rel-pill').forEach(b => b.classList.toggle('active', b.dataset.rel === chave));
+  loadRelatorio();
+}
+
+async function loadRelatorio() {
+  const alvo = document.getElementById('rel-conteudo');
+  if (!alvo) return;
+  alvo.innerHTML = '<div class="loading"></div>';
+  const { inicio, fim, label } = relIntervalo(_relPeriodo);
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/fm_relatorio_vendas`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_inicio: inicio.toISOString(), p_fim: fim.toISOString() })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    _relDados = await r.json();
+    const dataBR = d => d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: '2-digit' });
+    const sub = document.getElementById('rel-sub');
+    if (sub) sub.textContent = _relPeriodo === 'tudo' ? 'Todo o histórico' : `${label} · ${dataBR(inicio)} a ${dataBR(new Date(Math.min(fim.getTime(), Date.now())))}`;
+    renderRelatorio(_relDados);
+  } catch (e) {
+    _relDados = null;
+    alvo.innerHTML = `<div class="card"><div class="rel-vazio">Não foi possível carregar o relatório (${escHtml(e.message)}). Toque em Atualizar para tentar de novo.</div></div>`;
+  }
+}
+
+function renderRelatorio(d) {
+  const alvo = document.getElementById('rel-conteudo');
+  const R = d.resumo || {};
+  const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+  const num = v => String(v ?? 0);
+  const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+  const duracao = min => {
+    if (min == null) return '—';
+    if (min < 60) return `${Math.round(min)} min`;
+    if (min < 1440) return `${Math.floor(min / 60)}h${String(Math.round(min % 60)).padStart(2, '0')}`;
+    return `${(min / 1440).toFixed(1).replace('.', ',')} dias`;
+  };
+  const vazio = txt => `<div class="rel-vazio">${txt}</div>`;
+
+  // Avisos sobre dados incompletos — nada de número que engana
+  const avisos = [];
+  if (R.fechamentos_sem_valor > 0) avisos.push(`${plural(R.fechamentos_sem_valor, 'fechamento', 'fechamentos')} do período sem valor informado: a receita está incompleta. O valor é pedido ao marcar Fechou desde 16/10.`);
+  if (R.fechados_sem_data > 0) avisos.push(`${plural(R.fechados_sem_data, 'fechamento antigo', 'fechamentos antigos')} sem data de fechamento não entram em nenhum período (anteriores ao registro de data).`);
+  if (R.aguardando_confirmacao > 0) avisos.push(`${plural(R.aguardando_confirmacao, 'lead marcado', 'leads marcados')} como Fechou ainda sem contrato confirmado (lista "Pendentes de aprovação" no Dashboard).`);
+
+  // Destaque: a passagem do funil que mais perde gente (com pelo menos 5 leads na etapa anterior)
+  const funil = Array.isArray(d.funil) ? d.funil : [];
+  let pior = null;
+  for (let i = 1; i < funil.length; i++) {
+    const ant = funil[i - 1].n, cur = funil[i].n;
+    if (ant >= 5) { const perda = 1 - cur / ant; if (!pior || perda > pior.perda) pior = { i, perda }; }
+  }
+  const base = funil[0]?.n || 0;
+  let destaque = '';
+  if (!base) destaque = 'Nenhum lead chegou neste período.';
+  else if (pior) destaque = `Maior vazamento: de <b>${REL_FUNIL_LABEL[funil[pior.i - 1].etapa]}</b> para <b>${REL_FUNIL_LABEL[funil[pior.i].etapa]}</b>: ${Math.round(pior.perda * 100)}% não seguem.`;
+
+  const funilHtml = funil.map((f, i) => {
+    const ant = funil[i - 1];
+    const conv = ant && ant.n ? `<span class="rel-conv${pior && pior.i === i ? ' pior' : ''}"> · ${pct(f.n, ant.n)}% ${REL_FUNIL_DOS[ant.etapa]}</span>` : '';
+    return `<div class="rel-funil-row"><div class="rel-funil-top"><span>${REL_FUNIL_LABEL[f.etapa] || escHtml(f.etapa)}${conv}</span><span>${num(f.n)} · ${pct(f.n, base)}% do total</span></div><div class="rel-bar"><i style="width:${pct(f.n, base)}%"></i></div></div>`;
+  }).join('');
+  const S = d.situacao || {};
+  const chips = [
+    ['em aberto', S.em_aberto], ['fechados', S.fechados], ['perdidos', S.perdidos], ['desqualificados', S.desqualificados],
+    ['na etapa Fechou sem contrato registrado', S.fechou_sem_confirmar]
+  ].filter(([, n]) => n > 0).map(([t, n]) => `<span class="rel-chip"><b>${n}</b> ${t}</span>`).join('');
+
+  const origens = (d.origens || []).map(o => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(o.origem || ''))}</div><div class="rel-nums"><b>${o.leads}</b> leads · <b>${o.fechados_da_coorte}</b> fecharam (${pct(o.fechados_da_coorte, o.leads)}%)${o.fechamentos || o.receita ? `<br>no período: ${plural(o.fechamentos, 'fechamento', 'fechamentos')}${o.receita ? ' · ' + brl(o.receita) : ''}` : ''}</div></div>`).join('');
+
+  const totalPerdas = (d.perdas || []).reduce((s, p) => s + p.n, 0);
+  const perdas = (d.perdas || []).map(p => `<div class="rel-linha"><div class="rel-nome">${escHtml(REL_PERDA_LABEL[p.categoria] || String(p.categoria))}</div><div class="rel-nums"><b>${p.n}</b> · ${pct(p.n, totalPerdas)}%</div></div>`).join('');
+
+  const vendedores = d.vendedores || [];
+  const soSemResponsavel = vendedores.length === 1 && vendedores[0].id == null;
+  const vendHtml = vendedores.map(v => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(v.nome || ''))}</div><div class="rel-nums"><b>${v.leads}</b> leads · <b>${v.fechados_da_coorte}</b> fecharam${v.fechamentos || v.receita ? `<br>no período: ${plural(v.fechamentos, 'fechamento', 'fechamentos')}${v.receita ? ' · ' + brl(v.receita) : ''}` : ''}</div></div>`).join('');
+
+  const nomeEtapa = k => STAGES.find(s => s.key === k)?.label || k;
+  const tempo = (d.tempo_etapas || []).map(t => `<div class="rel-linha"><div class="rel-nome">${escHtml(nomeEtapa(t.etapa))}</div><div class="rel-nums">mediana <b>${duracao(t.horas_mediana * 60)}</b> · ${plural(t.n, 'passagem', 'passagens')}</div></div>`).join('');
+
+  const criativos = (d.criativos || []).map(c => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(c.criativo || ''))}<div class="rel-sub">${escHtml(String(c.campanha || ''))}</div></div><div class="rel-nums"><b>${c.leads}</b> leads · <b>${c.fechados_da_coorte}</b> fecharam</div></div>`).join('');
+
+  const fechamentos = (d.fechamentos || []).map(f => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(f.nome || 'Sem nome'))}<div class="rel-sub">${f.fechou_em ? fmtDate(f.fechou_em) : ''} · ${escHtml(String(f.origem || ''))}${f.responsavel ? ' · ' + escHtml(String(f.responsavel)) : ''}</div></div><div class="rel-nums">${f.valor > 0 ? '<b>' + brl(f.valor) + '</b>' : 'sem valor'}</div></div>`).join('');
+
+  alvo.innerHTML = `
+    ${destaque ? `<div class="rel-insight">${destaque}</div>` : ''}
+    ${avisos.map(a => `<div class="rel-aviso">${escHtml(a)}</div>`).join('')}
+    <div class="kpi-row" style="margin-top:12px">
+      <div class="kpi"><div class="kpi-lbl">Receita</div><div class="kpi-val n" id="rel-receita">${brl(R.receita)}</div><div class="kpi-note">${R.fechamentos_com_valor || 0} de ${R.fechamentos || 0} com valor</div></div>
+      <div class="kpi"><div class="kpi-lbl">Fechamentos</div><div class="kpi-val g" id="rel-fechamentos">${num(R.fechamentos)}</div><div class="kpi-note">contratos confirmados no período</div></div>
+      <div class="kpi"><div class="kpi-lbl">Ticket médio</div><div class="kpi-val">${R.ticket_medio ? brl(R.ticket_medio) : '—'}</div><div class="kpi-note">contratos com valor</div></div>
+      <div class="kpi"><div class="kpi-lbl">Taxa de fechamento</div><div class="kpi-val g" id="rel-taxa">${pct(R.fechados_da_coorte, R.leads_novos)}%</div><div class="kpi-note">${R.fechados_da_coorte || 0} dos ${R.leads_novos || 0} leads que chegaram</div></div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-lbl">Leads que chegaram</div><div class="kpi-val" id="rel-leads">${num(R.leads_novos)}</div><div class="kpi-note">no período</div></div>
+      <div class="kpi"><div class="kpi-lbl">Tempo até fechar</div><div class="kpi-val">${R.dias_ate_fechar != null ? String(R.dias_ate_fechar).replace('.', ',') + ' dias' : '—'}</div><div class="kpi-note">média, da chegada ao contrato</div></div>
+      <div class="kpi"><div class="kpi-lbl">1º atendimento humano</div><div class="kpi-val">${duracao(R.primeiro_atendimento_min)}</div><div class="kpi-note">${R.primeiro_atendimento_n ? 'mediana de ' + plural(R.primeiro_atendimento_n, 'lead', 'leads') : 'medido desde 16/10'}</div></div>
+      <div class="kpi"><div class="kpi-lbl">Aguardando confirmação</div><div class="kpi-val">${num(R.aguardando_confirmacao)}</div><div class="kpi-note">na lista Pendentes de aprovação</div></div>
+    </div>
+    <div class="two-col-eq">
+      <div class="card"><div class="card-ttl">Funil dos leads do período</div>${base ? funilHtml + (chips ? `<div class="rel-chips">${chips}</div>` : '') : vazio('Nenhum lead chegou neste período.')}</div>
+      <div class="card"><div class="card-ttl">De onde vieram</div>${origens || vazio('Sem leads neste período.')}</div>
+    </div>
+    <div class="two-col-eq">
+      <div class="card"><div class="card-ttl">Motivos de perda</div>${perdas || vazio('Nenhum lead perdido ou desqualificado entre os que chegaram no período.')}${perdas && (d.perdas || []).some(p => p.categoria === 'sem_categoria') ? vazio('<br>A categoria é preenchida pelo Analista nas análises a partir de 16/10.') : ''}</div>
+      <div class="card"><div class="card-ttl">Por responsável</div>${vendHtml || vazio('Sem leads neste período.')}${soSemResponsavel ? vazio('<br>No FM os leads ainda não têm responsável. Quando alguém assumir um lead, ele aparece aqui.') : ''}</div>
+    </div>
+    <div class="two-col-eq">
+      <div class="card"><div class="card-ttl">Tempo em cada etapa</div>${tempo || vazio('Ainda sem mudanças de etapa suficientes neste período. Enche conforme a equipe move os cards no CRM.')}</div>
+      <div class="card"><div class="card-ttl">Criativos (anúncios)</div>${criativos || vazio('Nenhum lead do período com criativo identificado. Só aparece em leads que chegaram pelo link com UTM.')}</div>
+    </div>
+    <div class="card">
+      <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <span>Fechamentos do período</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="rel-btn" onclick="relBaixarCSV('leads')">⬇ Leads do período (CSV)</button>
+          <button class="rel-btn" onclick="relBaixarCSV('fechamentos')">⬇ Fechamentos (CSV)</button>
+        </span>
+      </div>
+      <div id="rel-fechamentos-lista">${fechamentos || vazio('Nenhum contrato confirmado neste período.')}</div>
+    </div>`;
+}
+
+function relBaixarCSV(tipo) {
+  if (!_relDados) { toast('Carregue o relatório antes de baixar', 'err'); return; }
+  const linhas = (tipo === 'fechamentos' ? _relDados.fechamentos : _relDados.linhas) || [];
+  const cols = tipo === 'fechamentos'
+    ? [['nome', 'Nome'], ['telefone', 'Telefone'], ['fechou_em', 'Fechou em'], ['valor', 'Valor (R$)'], ['servico', 'Serviço'], ['origem', 'Origem'], ['criativo', 'Criativo'], ['responsavel', 'Responsável']]
+    : [['nome', 'Nome'], ['telefone', 'Telefone'], ['chegou_em', 'Chegou em'], ['etapa', 'Etapa'], ['fechou', 'Fechou'], ['fechou_em', 'Fechou em'], ['valor', 'Valor (R$)'], ['origem', 'Origem'], ['campanha', 'Campanha'], ['criativo', 'Criativo'], ['responsavel', 'Responsável'], ['motivo_perda', 'Motivo da perda']];
+  const formatar = (k, v) => {
+    if (v == null || v === '') return '';
+    if (k.endsWith('_em')) return new Date(v).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    if (k === 'fechou') return v ? 'sim' : 'não';
+    if (k === 'valor') return String(v).replace('.', ',');
+    if (k === 'motivo_perda') return REL_PERDA_LABEL[v] || String(v);
+    if (k === 'etapa') return STAGES.find(s => s.key === v)?.label || String(v);
+    return String(v);
+  };
+  // Texto vindo do lead não pode virar fórmula no Excel
+  const celula = s => { if (/^[=+\-@]/.test(s)) s = "'" + s; return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const csv = [cols.map(c => c[1]).join(';'), ...linhas.map(l => cols.map(([k]) => celula(formatar(k, l[k]))).join(';'))].join('\r\n');
+  const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio-fm-${tipo}-${_relPeriodo}-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(`${linhas.length} ${linhas.length === 1 ? 'linha' : 'linhas'} no arquivo`, 'ok');
 }
 
 // ═══ CLIQUES WA RASTREADOS ═══
