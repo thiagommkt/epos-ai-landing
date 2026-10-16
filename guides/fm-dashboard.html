@@ -2792,6 +2792,21 @@ async function trocarResponsavel(telefone, novoId) {
   }
 }
 
+// Vendedor logado assume o lead com um clique (FM sem rodízio: o lead chega para todos e alguém assume)
+function htmlAssumir(telefone, idAtual) {
+  if (!_euEquipe || _euEquipe.papel !== 'vendedor' || idAtual === _euEquipe.id) return '';
+  return `<button id="panel-assumir" onclick="assumirLead('${telefone}')" title="Ficar como responsável por este lead" style="padding:4px 10px;background:transparent;font-family:var(--fM);font-size:9px;cursor:pointer;border:1px solid var(--neon);color:var(--neon);border-radius:6px;white-space:nowrap">✋ Assumir</button>`;
+}
+
+async function assumirLead(telefone) {
+  if (!_euEquipe) return;
+  await trocarResponsavel(telefone, _euEquipe.id);
+  const sel = document.getElementById('panel-responsavel');
+  if (sel) sel.innerHTML = opcoesResponsavel(_euEquipe.id);
+  const wrap = document.getElementById('panel-assumir-wrap');
+  if (wrap) wrap.innerHTML = '';
+}
+
 // Ficha aberta fora do CRM (tabela, buscas) não traz os campos de atendimento: busca na hora
 async function preencherAtendimento(telefone) {
   const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(telefone)}&select=telefone,responsavel_id,atendido_por,primeiro_atendimento_humano_em,compareceu,consulta_realizada_em,consulta_confirmada_por&limit=1`);
@@ -2800,6 +2815,8 @@ async function preencherAtendimento(telefone) {
   if (!_equipe.length) await carregarEquipe();
   const sel = document.getElementById('panel-responsavel');
   if (sel) sel.innerHTML = opcoesResponsavel(l.responsavel_id);
+  const wrapAs = document.getElementById('panel-assumir-wrap');
+  if (wrapAs) wrapAs.innerHTML = htmlAssumir(telefone, l.responsavel_id);
   const at = document.getElementById('panel-atendido-por');
   if (at) at.textContent = l.atendido_por || '—';
   const pr = document.getElementById('panel-primeiro-atend');
@@ -2817,7 +2834,7 @@ function renderPlantaoBtn() {
   btn.textContent = _euEquipe.pausado ? '▶ Voltar ao plantão' : '⏸ Pausar plantão';
   btn.style.color = _euEquipe.pausado ? '#e3b341' : 'var(--muted)';
   btn.style.borderColor = _euEquipe.pausado ? 'rgba(227,179,65,.45)' : 'var(--bd-b)';
-  btn.title = _euEquipe.pausado ? 'Você está fora do rodízio de leads' : 'Você está recebendo leads no rodízio';
+  btn.title = _euEquipe.pausado ? 'Você está de folga: não recebe avisos de leads' : 'Você está recebendo os avisos de leads';
 }
 
 // Admin vê o plantão de toda a equipe e pode pausar/reativar qualquer vendedor
@@ -2828,7 +2845,7 @@ function renderPlantaoEquipe() {
   const vendedores = _equipe.filter(m => m.papel === 'vendedor');
   box.style.display = 'block';
   box.innerHTML = `<div style="font-family:var(--fM);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Plantão da equipe</div>`
-    + (vendedores.map(m => `<button onclick="togglePlantaoMembro('${m.id}')" title="${m.pausado ? 'Clique para voltar ao rodízio' : 'Clique para pausar'}" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 0;background:transparent;border:0;color:var(--text);font-family:var(--fM);font-size:10px;cursor:pointer"><span>${escHtml(m.nome)}</span><span style="color:${m.pausado ? '#e3b341' : 'var(--neon)'}">${m.pausado ? '⏸ pausado' : '● no rodízio'}</span></button>`).join('')
+    + (vendedores.map(m => `<button onclick="togglePlantaoMembro('${m.id}')" title="${m.pausado ? 'Clique para voltar a receber avisos' : 'Clique para pausar (folga)'}" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 0;background:transparent;border:0;color:var(--text);font-family:var(--fM);font-size:10px;cursor:pointer"><span>${escHtml(m.nome)}</span><span style="color:${m.pausado ? '#e3b341' : 'var(--neon)'}">${m.pausado ? '⏸ pausado' : '● de plantão'}</span></button>`).join('')
     || `<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum vendedor cadastrado</div>`);
 }
 
@@ -2846,7 +2863,7 @@ async function togglePlantaoMembro(id) {
     if (!rows.length) throw new Error('sem permissão');
     m.pausado = novo;
     renderPlantaoEquipe();
-    toast(novo ? `⏸ ${m.nome} pausado — fora do rodízio` : `▶ ${m.nome} de volta ao rodízio`, 'ok');
+    toast(novo ? `⏸ ${m.nome} pausado — não recebe avisos de leads` : `▶ ${m.nome} de volta ao plantão`, 'ok');
   } catch(e) {
     toast('Erro ao atualizar plantão — tente novamente', 'err');
   }
@@ -2865,7 +2882,7 @@ async function togglePlantao() {
     if (!rows.length) throw new Error('sem permissão');
     _euEquipe.pausado = novo;
     renderPlantaoBtn();
-    toast(novo ? '⏸ Plantão pausado — você não recebe leads novos' : '▶ Plantão reativado — você volta ao rodízio', 'ok');
+    toast(novo ? '⏸ Plantão pausado — você não recebe avisos de leads novos' : '▶ Plantão reativado — você volta a receber os avisos', 'ok');
   } catch(e) {
     toast('Erro ao atualizar plantão — tente novamente', 'err');
   }
@@ -3671,7 +3688,7 @@ function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Canal</div><div class="panel-val">${lead.canal||'whatsapp'}</div></div>
 
     <div class="panel-section">Atendimento</div>
-    <div class="panel-row"><div class="panel-key">Responsável</div><div class="panel-val"><select id="panel-responsavel" onchange="trocarResponsavel('${lead.telefone}', this.value)" aria-label="Responsável pelo lead" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%">${opcoesResponsavel(lead.responsavel_id)}</select></div></div>
+    <div class="panel-row"><div class="panel-key">Responsável</div><div class="panel-val" style="display:flex;gap:6px;align-items:center"><select id="panel-responsavel" onchange="trocarResponsavel('${lead.telefone}', this.value)" aria-label="Responsável pelo lead" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;min-width:0">${opcoesResponsavel(lead.responsavel_id)}</select><span id="panel-assumir-wrap">${htmlAssumir(lead.telefone, lead.responsavel_id)}</span></div></div>
     <div class="panel-row"><div class="panel-key">Atendido por</div><div class="panel-val" id="panel-atendido-por">${escHtml(lead.atendido_por || '—')}</div></div>
     <div class="panel-row"><div class="panel-key">1º atendimento</div><div class="panel-val" id="panel-primeiro-atend">${lead.primeiro_atendimento_humano_em ? fmtDate(lead.primeiro_atendimento_humano_em) : '—'}</div></div>
 
