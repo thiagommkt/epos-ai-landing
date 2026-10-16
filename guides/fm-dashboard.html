@@ -1542,6 +1542,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="sb-footer">
     <div class="sb-c-name">Farias &amp; Moura</div>
     <div class="sb-live"><div class="live-dot"></div>LIVE · Sistema ativo</div>
+    <button id="plantao-btn" onclick="togglePlantao()" style="display:none;margin-top:10px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .15s"></button>
+    <div id="plantao-equipe" style="display:none;margin-top:10px;padding:8px;border:1px solid var(--bd-b);border-radius:8px"></div>
     <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:6px 0;background:transparent;border:1px solid var(--bd-b);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .15s" onmouseover="this.style.borderColor='var(--dim)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd-b)';this.style.color='var(--muted)'">Sair</button>
   </div>
 </aside>
@@ -1820,6 +1822,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'30')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">30d</button>
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'14')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">14d</button>
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'7')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">7d</button>
+      <select id="crm-vend-filter" onchange="crmVendFilter=this.value;loadCRM()" title="Filtrar por vendedor" aria-label="Filtrar por vendedor" style="padding:4px 8px;border:1px solid var(--bd);background:var(--bg3);color:var(--text);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer;margin-left:6px"><option value="">Todos os vendedores</option><option value="none">Sem responsável</option></select>
       <button onclick="abrirModalNovoContato()" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer;margin-left:6px" onmouseover="this.style.background='rgba(145,70,255,.18)'" onmouseout="this.style.background='var(--pur-l)'">＋ Novo Contato</button>
     </div>
   </div>
@@ -2738,6 +2741,144 @@ function getStage(l) {
 
 let crmPeriodDays = null; // null = tudo
 
+// ═══ CRM v3 — EQUIPE, RESPONSÁVEL E PLANTÃO ═══
+let crmVendFilter = '';   // '' = todos, 'none' = sem responsável, uuid = vendedor
+let _equipe = [];
+let _euEquipe = null;     // linha da equipe do usuário logado
+
+function emailLogado() {
+  try { return (JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.email || '').toLowerCase(); }
+  catch(e) { return ''; }
+}
+
+async function carregarEquipe() {
+  const { data } = await sb('equipe?conta=eq.fm&ativo=eq.true&select=id,nome,papel,pausado,email_login&order=nome.asc');
+  _equipe = data || [];
+  const meuEmail = emailLogado();
+  _euEquipe = _equipe.find(m => (m.email_login || '').toLowerCase() === meuEmail) || null;
+
+  const sel = document.getElementById('crm-vend-filter');
+  if (sel) {
+    const atual = crmVendFilter;
+    sel.innerHTML = '<option value="">Todos os vendedores</option><option value="none">Sem responsável</option>'
+      + _equipe.filter(m => m.papel === 'vendedor').map(m => `<option value="${m.id}">${escHtml(m.nome)}</option>`).join('');
+    sel.value = atual;
+  }
+  renderPlantaoBtn();
+}
+
+function nomeResponsavel(id) {
+  if (!id) return 'Sem responsável';
+  return _equipe.find(m => m.id === id)?.nome || 'Responsável inativo';
+}
+
+function opcoesResponsavel(idAtual) {
+  return `<option value="" ${!idAtual ? 'selected' : ''}>Sem responsável</option>`
+    + _equipe.filter(m => m.papel === 'vendedor').map(m => `<option value="${m.id}" ${m.id === idAtual ? 'selected' : ''}>${escHtml(m.nome)}${m.pausado ? ' (pausado)' : ''}</option>`).join('');
+}
+
+async function trocarResponsavel(telefone, novoId) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ responsavel_id: novoId || null })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast(novoId ? `✅ Responsável: ${nomeResponsavel(novoId)}` : '✅ Lead sem responsável', 'ok');
+    loadCRM();
+  } catch(e) {
+    toast('Erro ao trocar responsável — tente novamente', 'err');
+  }
+}
+
+// Ficha aberta fora do CRM (tabela, buscas) não traz os campos de atendimento: busca na hora
+async function preencherAtendimento(telefone) {
+  const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(telefone)}&select=responsavel_id,atendido_por,primeiro_atendimento_humano_em&limit=1`);
+  const l = (data || [])[0];
+  if (!l || window._panelLead?.telefone !== telefone) return;
+  if (!_equipe.length) await carregarEquipe();
+  const sel = document.getElementById('panel-responsavel');
+  if (sel) sel.innerHTML = opcoesResponsavel(l.responsavel_id);
+  const at = document.getElementById('panel-atendido-por');
+  if (at) at.textContent = l.atendido_por || '—';
+  const pr = document.getElementById('panel-primeiro-atend');
+  if (pr) pr.textContent = l.primeiro_atendimento_humano_em ? fmtDate(l.primeiro_atendimento_humano_em) : '—';
+}
+
+function renderPlantaoBtn() {
+  const btn = document.getElementById('plantao-btn');
+  if (!btn) return;
+  renderPlantaoEquipe();
+  if (!_euEquipe || _euEquipe.papel !== 'vendedor') { btn.style.display = 'none'; return; }
+  btn.style.display = 'block';
+  btn.textContent = _euEquipe.pausado ? '▶ Voltar ao plantão' : '⏸ Pausar plantão';
+  btn.style.color = _euEquipe.pausado ? '#e3b341' : 'var(--muted)';
+  btn.style.borderColor = _euEquipe.pausado ? 'rgba(227,179,65,.45)' : 'var(--bd-b)';
+  btn.title = _euEquipe.pausado ? 'Você está fora do rodízio de leads' : 'Você está recebendo leads no rodízio';
+}
+
+// Admin vê o plantão de toda a equipe e pode pausar/reativar qualquer vendedor
+function renderPlantaoEquipe() {
+  const box = document.getElementById('plantao-equipe');
+  if (!box) return;
+  if (!_euEquipe || _euEquipe.papel !== 'admin') { box.style.display = 'none'; return; }
+  const vendedores = _equipe.filter(m => m.papel === 'vendedor');
+  box.style.display = 'block';
+  box.innerHTML = `<div style="font-family:var(--fM);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">Plantão da equipe</div>`
+    + (vendedores.map(m => `<button onclick="togglePlantaoMembro('${m.id}')" title="${m.pausado ? 'Clique para voltar ao rodízio' : 'Clique para pausar'}" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 0;background:transparent;border:0;color:var(--text);font-family:var(--fM);font-size:10px;cursor:pointer"><span>${escHtml(m.nome)}</span><span style="color:${m.pausado ? '#e3b341' : 'var(--neon)'}">${m.pausado ? '⏸ pausado' : '● no rodízio'}</span></button>`).join('')
+    || `<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum vendedor cadastrado</div>`);
+}
+
+async function togglePlantaoMembro(id) {
+  const m = _equipe.find(x => x.id === id);
+  if (!m) return;
+  const novo = !m.pausado;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/equipe?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ pausado: novo })
+    });
+    const rows = r.ok ? await r.json() : [];
+    if (!rows.length) throw new Error('sem permissão');
+    m.pausado = novo;
+    renderPlantaoEquipe();
+    toast(novo ? `⏸ ${m.nome} pausado — fora do rodízio` : `▶ ${m.nome} de volta ao rodízio`, 'ok');
+  } catch(e) {
+    toast('Erro ao atualizar plantão — tente novamente', 'err');
+  }
+}
+
+async function togglePlantao() {
+  if (!_euEquipe) return;
+  const novo = !_euEquipe.pausado;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/equipe?id=eq.${_euEquipe.id}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({ pausado: novo })
+    });
+    const rows = r.ok ? await r.json() : [];
+    if (!rows.length) throw new Error('sem permissão');
+    _euEquipe.pausado = novo;
+    renderPlantaoBtn();
+    toast(novo ? '⏸ Plantão pausado — você não recebe leads novos' : '▶ Plantão reativado — você volta ao rodízio', 'ok');
+  } catch(e) {
+    toast('Erro ao atualizar plantão — tente novamente', 'err');
+  }
+}
+
+// Modo de plantão "painel": avisa a cada 1 minuto que o vendedor está com o painel aberto
+setInterval(() => {
+  if (!_euEquipe || _euEquipe.papel !== 'vendedor' || document.hidden) return;
+  fetch(`${SB_URL}/rest/v1/equipe?id=eq.${_euEquipe.id}`, {
+    method: 'PATCH',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ visto_em: new Date().toISOString() })
+  }).catch(() => {});
+}, 60000);
+
 function setCrmPeriod(btn, val) {
   document.querySelectorAll('.crm-period-btn').forEach(b => {
     b.style.background = 'transparent';
@@ -2753,7 +2894,7 @@ function setCrmPeriod(btn, val) {
 
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,crm_stage_bloqueado,stage_historico,sugestao_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,crm_stage_bloqueado,stage_historico,sugestao_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico,responsavel_id,atendido_por,primeiro_atendimento_humano_em&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
@@ -2763,7 +2904,8 @@ async function loadCRM() {
     query += `&criado_em=gte.${encodeURIComponent(since)}`;
   }
   const { data } = await sb(query);
-  const leads = data || [];
+  await carregarEquipe();
+  const leads = (data || []).filter(l => !crmVendFilter || (crmVendFilter === 'none' ? !l.responsavel_id : l.responsavel_id === crmVendFilter));
   const stageMap = {};
   leads.forEach(l => {
     const s = getStage(l);
@@ -2800,6 +2942,7 @@ async function loadCRM() {
         ${(function(cs){const n=parseInt(cs)||0;if(n>=9)return '<div style="display:inline-block;padding:2px 6px;background:rgba(255,94,91,.15);color:#FF5E5B;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🔴 URGENTE</div>';if(n>=7)return '<div style="display:inline-block;padding:2px 6px;background:rgba(232,137,61,.15);color:#e8893d;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟠 PRIORITÁRIO</div>';if(n>=4)return '<div style="display:inline-block;padding:2px 6px;background:rgba(227,179,65,.12);color:#e3b341;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟡 NORMAL</div>';return '';})(l.crm_score)}
         <div class="krm-path" style="pointer-events:none">${l.patologia||'—'}</div>
         ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px;pointer-events:none">📱 ${telFmt}</div>` : ''}
+        <div class="krm-resp" style="font-family:var(--fM);font-size:9px;color:${l.responsavel_id ? 'var(--purple)' : 'var(--dim)'};margin-bottom:6px;pointer-events:none">👤 ${escHtml(nomeResponsavel(l.responsavel_id))}</div>
         <div class="krm-foot" style="pointer-events:none">
           <div class="krm-time">${relTime(l.criado_em)}</div>
           <div style="display:flex;align-items:center;gap:4px">
@@ -3285,6 +3428,8 @@ function openLeadPanel(lead) {
     compareceu:'Compareceu', fechou:'Fechou', perdido:'Perdido', desqualificado:'Desqualificado'
   };
 
+  if (lead.responsavel_id === undefined) setTimeout(() => preencherAtendimento(lead.telefone), 0);
+
   window._panelLead = { telefone: lead.telefone, nome: lead.nome || '', crmPersonId: lead.crm_person_id || null, proximaAcao: lead.auditoria_ia_proxima_acao || '', etapaAtual: getStage(lead), chatwootConvId: lead.chatwoot_conversation_id || null, chatwootAccountId: 2, rmktHistorico: Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [], qualificado: !!lead.qualificado, agendou: !!lead.agendou, compareceu: !!lead.compareceu, ultimaInteracao: lead.ultima_msg_lead_em || lead.ultima_interacao_humano || lead.auditoria_ia_em || lead.criado_em, bloqueado: !!lead.crm_stage_bloqueado, sugestaoStage: lead.sugestao_stage || null, stageHistorico: Array.isArray(lead.stage_historico) ? lead.stage_historico : [] };
 
   document.getElementById('panel-body').innerHTML = `
@@ -3303,6 +3448,11 @@ function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Cidade</div><div class="panel-val">${lead.cidade||'—'}</div></div>
     <div class="panel-row"><div class="panel-key">Chegou em</div><div class="panel-val">${fmtDate(lead.criado_em)}</div></div>
     <div class="panel-row"><div class="panel-key">Canal</div><div class="panel-val">${lead.canal||'whatsapp'}</div></div>
+
+    <div class="panel-section">Atendimento</div>
+    <div class="panel-row"><div class="panel-key">Responsável</div><div class="panel-val"><select id="panel-responsavel" onchange="trocarResponsavel('${lead.telefone}', this.value)" aria-label="Responsável pelo lead" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%">${opcoesResponsavel(lead.responsavel_id)}</select></div></div>
+    <div class="panel-row"><div class="panel-key">Atendido por</div><div class="panel-val" id="panel-atendido-por">${escHtml(lead.atendido_por || '—')}</div></div>
+    <div class="panel-row"><div class="panel-key">1º atendimento</div><div class="panel-val" id="panel-primeiro-atend">${lead.primeiro_atendimento_humano_em ? fmtDate(lead.primeiro_atendimento_humano_em) : '—'}</div></div>
 
     <div class="panel-section">Qualificação</div>
     <div class="panel-row"><div class="panel-key">Condição</div><div class="panel-val"><input id="qual-patologia" value="${(lead.patologia||'').replace(/"/g,'&quot;')}" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;box-sizing:border-box"></div></div>
@@ -4950,6 +5100,8 @@ loadPendentes();
 loadRoboStatus();
 loadWaClicks();
 loadNotificacoes();
+setTimeout(carregarEquipe, 1500); // espera o token da sessão (equipe só libera usuário logado)
+setInterval(carregarEquipe, 300000);
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
 setInterval(loadNotificacoes, 60000); // recarrega notificações a cada 1min
 
