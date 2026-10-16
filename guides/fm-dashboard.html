@@ -3017,15 +3017,15 @@ async function cancelarAgendada(id, telefone) {
 function htmlConsultaRealizada(lead) {
   if (lead.consulta_realizada_em) {
     return `<div style="padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.06em">
-      ✅ Consulta realizada — ${dataHoraBRT(lead.consulta_realizada_em)}${lead.consulta_confirmada_por ? ' · ' + escHtml(lead.consulta_confirmada_por) : ''}
+      ✅ Presença confirmada — ${dataHoraBRT(lead.consulta_realizada_em)}${lead.consulta_confirmada_por ? ' · ' + escHtml(lead.consulta_confirmada_por) : ''}
     </div>`;
   }
-  return `${lead.compareceu ? '<div style="font-family:var(--fM);font-size:10px;color:#e3b341;margin-bottom:6px">Marcado como "compareceu", mas a consulta ainda não foi confirmada aqui.</div>' : ''}
+  return `${lead.compareceu ? '<div style="font-family:var(--fM);font-size:10px;color:#e3b341;margin-bottom:6px">Marcado como "compareceu", mas a presença ainda não foi confirmada aqui.</div>' : ''}
     <button id="compareceu-btn" onclick="marcarCompareceu('${lead.telefone}')"
       style="width:100%;padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
-      ✅ Marcar consulta realizada
+      ✅ Confirmar presença na consulta
     </button>
-    <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando a consulta acontecer. Isso envia o evento "consulta realizada" para a Meta.</div>`;
+    <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Confirme quando a consulta acontecer (ou arraste o card para Compareceu). Isso envia o evento "consulta realizada" para a Meta.</div>`;
 }
 
 // Modo de plantão "painel": avisa a cada 1 minuto que o vendedor está com o painel aberto
@@ -3170,10 +3170,8 @@ async function onDrop(e) {
   try {
     await updateCRMStage(crm_id || null, toStage, tel);
     toast(`✓ Movido para ${STAGES.find(s=>s.key===toStage)?.label||toStage} (travado)`, 'ok');
-    // Consulta realizada só vale por marcação explícita: ao soltar em Compareceu, pergunta
-    if (toStage === 'compareceu' && confirm('A consulta aconteceu?\n\nSe sim, ela será marcada como consulta realizada e o evento vai para a Meta.')) {
-      await marcarCompareceu(tel, { semConfirmar: true, semStage: true });
-    }
+    // Arrastar para Compareceu = confirmar presença (sincronizado com o botão da ficha): marca a consulta realizada
+    if (toStage === 'compareceu') await marcarCompareceu(tel, { semConfirmar: true, semStage: true });
   } catch(err) {
     toast('Erro ao salvar — tente novamente', 'err');
   }
@@ -3294,7 +3292,7 @@ async function updateCRMStage(crm_person_id, newStage, telefone) {
   const r = await fetch(PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: PROXY_TOKEN, crm_person_id, statusFunil: newStage, telefone })
+    body: JSON.stringify({ token: PROXY_TOKEN, crm_person_id, statusFunil: newStage, telefone, quem: quemSou() })
   });
   const d = await r.json();
   if (d.error) throw new Error(d.error);
@@ -3780,7 +3778,7 @@ function openLeadPanel(lead) {
     </div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
-      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Consulta realizada</div>
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Presença na Consulta</div>
       <div id="panel-consulta">${htmlConsultaRealizada(lead)}</div>
     </div>
 
