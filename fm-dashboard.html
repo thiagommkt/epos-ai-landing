@@ -2909,11 +2909,23 @@ function seloProximoContato(telefone) {
 async function carregarTarefasLead(telefone) {
   const box = document.getElementById('panel-tarefas');
   if (!box) return;
-  const { data } = await sb(`tarefas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,acao,quando,tipo,responsavel_id&order=quando.asc`);
+  const { data } = await sb(`tarefas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=in.(pendente,sugerida)&select=id,acao,quando,tipo,responsavel_id,status&order=quando.asc`);
   if (window._panelLead?.telefone !== telefone) return;
   const ts = data || [];
   if (!ts.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum contato agendado.</div>'; return; }
   box.innerHTML = ts.map(t => {
+    if (t.status === 'sugerida') {
+      // Sugestão do Analista ainda não confirmada pelo vendedor (ele também pode responder pelo WhatsApp)
+      return `<div class="tarefa-item tarefa-sugerida" style="padding:8px;border:1px dashed rgba(227,179,65,.5);margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:#e3b341;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">💡 Sugestão do Analista</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:4px">${escHtml(t.acao)}</div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:6px">${dataHoraBRT(t.quando)} · ${escHtml(nomeResponsavel(t.responsavel_id))}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="aceitarSugestaoTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">Aceitar</button>
+          <button onclick="descartarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Descartar</button>
+        </div>
+      </div>`;
+    }
     const atrasada = Date.parse(t.quando) < Date.now();
     return `<div class="tarefa-item" style="padding:8px;border:1px solid ${atrasada ? 'rgba(255,94,91,.35)' : 'var(--bd)'};margin-bottom:6px">
       <div style="font-size:12px;color:var(--text);margin-bottom:4px">${t.tipo === 'consulta' ? '🩺' : '📅'} ${escHtml(t.acao)}</div>
@@ -2957,6 +2969,25 @@ async function concluirTarefa(id, telefone) {
     carregarTarefasLead(telefone);
     loadCRM();
   } catch(e) { toast('Erro ao concluir — tente novamente', 'err'); }
+}
+
+async function aceitarSugestaoTarefa(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.sugerida`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'pendente', lembrete_enviado: false }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Sugestão aceita — entra nos lembretes', 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao aceitar — tente novamente', 'err'); }
+}
+
+async function descartarTarefa(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'descartada', concluida_em: new Date().toISOString() }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('Sugestão descartada', 'ok');
+    carregarTarefasLead(telefone);
+  } catch(e) { toast('Erro ao descartar — tente novamente', 'err'); }
 }
 
 async function adiarTarefa(id, telefone) {
