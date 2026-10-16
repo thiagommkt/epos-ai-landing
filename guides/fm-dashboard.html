@@ -2794,7 +2794,7 @@ async function trocarResponsavel(telefone, novoId) {
 
 // Ficha aberta fora do CRM (tabela, buscas) não traz os campos de atendimento: busca na hora
 async function preencherAtendimento(telefone) {
-  const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(telefone)}&select=responsavel_id,atendido_por,primeiro_atendimento_humano_em&limit=1`);
+  const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(telefone)}&select=telefone,responsavel_id,atendido_por,primeiro_atendimento_humano_em,compareceu,consulta_realizada_em,consulta_confirmada_por&limit=1`);
   const l = (data || [])[0];
   if (!l || window._panelLead?.telefone !== telefone) return;
   if (!_equipe.length) await carregarEquipe();
@@ -2804,6 +2804,8 @@ async function preencherAtendimento(telefone) {
   if (at) at.textContent = l.atendido_por || '—';
   const pr = document.getElementById('panel-primeiro-atend');
   if (pr) pr.textContent = l.primeiro_atendimento_humano_em ? fmtDate(l.primeiro_atendimento_humano_em) : '—';
+  const pc = document.getElementById('panel-consulta');
+  if (pc) pc.innerHTML = htmlConsultaRealizada(l);
 }
 
 function renderPlantaoBtn() {
@@ -2869,6 +2871,163 @@ async function togglePlantao() {
   }
 }
 
+// ═══ CRM v3 — PRÓXIMO CONTATO, MENSAGEM AGENDADA E CONSULTA REALIZADA ═══
+let _proxContato = {};   // telefone → tarefa pendente mais próxima (selo do card)
+const _BTN_MINI = 'padding:4px 10px;background:transparent;font-family:var(--fM);font-size:9px;cursor:pointer';
+const _INPUT_MINI = 'background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:10px;padding:3px 5px';
+
+function sbJson(extra) {
+  return { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', ...(extra || {}) };
+}
+function quemSou() { return _euEquipe?.nome || emailLogado() || 'painel'; }
+function inicioDiaBRT(offsetDias) {
+  const brt = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  return Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() + (offsetDias || 0)) + 3 * 60 * 60 * 1000;
+}
+function dataHoraBRT(iso) {
+  return new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+async function carregarProximosContatos() {
+  const { data } = await sb('tarefas?conta=eq.fm&status=eq.pendente&select=lead_telefone,quando,tipo&order=quando.asc&limit=2000');
+  _proxContato = {};
+  for (const t of (data || [])) if (!_proxContato[t.lead_telefone]) _proxContato[t.lead_telefone] = t;
+}
+
+function seloProximoContato(telefone) {
+  const t = _proxContato[telefone];
+  if (!t) return '';
+  const q = Date.parse(t.quando);
+  const hora = new Date(t.quando).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+  let txt, cor, bg;
+  if (q < Date.now()) { txt = 'Atrasado'; cor = '#FF5E5B'; bg = 'rgba(255,94,91,.12)'; }
+  else if (q < inicioDiaBRT(1)) { txt = 'Hoje ' + hora; cor = 'var(--neon)'; bg = 'rgba(0,245,160,.10)'; }
+  else { txt = dataHoraBRT(t.quando); cor = 'var(--dim)'; bg = 'transparent'; }
+  return `<div class="krm-prox" style="display:inline-block;padding:2px 6px;background:${bg};color:${cor};font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;pointer-events:none">${t.tipo === 'consulta' ? '🩺' : '📅'} ${txt}</div>`;
+}
+
+async function carregarTarefasLead(telefone) {
+  const box = document.getElementById('panel-tarefas');
+  if (!box) return;
+  const { data } = await sb(`tarefas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,acao,quando,tipo,responsavel_id&order=quando.asc`);
+  if (window._panelLead?.telefone !== telefone) return;
+  const ts = data || [];
+  if (!ts.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum contato agendado.</div>'; return; }
+  box.innerHTML = ts.map(t => {
+    const atrasada = Date.parse(t.quando) < Date.now();
+    return `<div class="tarefa-item" style="padding:8px;border:1px solid ${atrasada ? 'rgba(255,94,91,.35)' : 'var(--bd)'};margin-bottom:6px">
+      <div style="font-size:12px;color:var(--text);margin-bottom:4px">${t.tipo === 'consulta' ? '🩺' : '📅'} ${escHtml(t.acao)}</div>
+      <div style="font-family:var(--fM);font-size:10px;color:${atrasada ? '#FF5E5B' : 'var(--dim)'};margin-bottom:6px">${dataHoraBRT(t.quando)}${atrasada ? ' · atrasado' : ''} · ${escHtml(nomeResponsavel(t.responsavel_id))}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button onclick="concluirTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">✓ Feito</button>
+        <input id="adiar-${t.id}" type="datetime-local" aria-label="Nova data e hora" style="${_INPUT_MINI}">
+        <button onclick="adiarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">Adiar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function criarTarefa(telefone) {
+  const acao = document.getElementById('tarefa-acao')?.value?.trim();
+  const quandoLocal = document.getElementById('tarefa-quando')?.value;
+  const tipo = document.getElementById('tarefa-tipo')?.value || 'contato';
+  if (!acao || !quandoLocal) { toast('Preencha o que fazer e a data/hora', 'err'); return; }
+  const quando = new Date(quandoLocal);
+  if (isNaN(quando)) { toast('Data/hora inválida', 'err'); return; }
+  const responsavel = document.getElementById('panel-responsavel')?.value || null;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas`, {
+      method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ conta: 'fm', lead_telefone: telefone, responsavel_id: responsavel, acao, quando: quando.toISOString(), status: 'pendente', origem: 'manual', tipo, criada_por: quemSou() })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    document.getElementById('tarefa-acao').value = '';
+    document.getElementById('tarefa-quando').value = '';
+    toast(responsavel ? `✅ Agendado — ${nomeResponsavel(responsavel)} recebe o lembrete` : '✅ Agendado — sem responsável, o lembrete vai ao administrador', 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao agendar — tente novamente', 'err'); }
+}
+
+async function concluirTarefa(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'feita', concluida_em: new Date().toISOString() }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Contato marcado como feito', 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao concluir — tente novamente', 'err'); }
+}
+
+async function adiarTarefa(id, telefone) {
+  const v = document.getElementById('adiar-' + id)?.value;
+  const quando = v ? new Date(v) : null;
+  if (!quando || isNaN(quando)) { toast('Escolha a nova data e hora', 'err'); return; }
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ quando: quando.toISOString(), lembrete_enviado: false, confirmacao_enviada: false }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Adiado para ' + dataHoraBRT(quando.toISOString()), 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao adiar — tente novamente', 'err'); }
+}
+
+async function carregarAgendadasLead(telefone) {
+  const box = document.getElementById('panel-agendadas');
+  if (!box) return;
+  const { data } = await sb(`mensagens_agendadas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,texto,agendada_para&order=agendada_para.asc`);
+  if (window._panelLead?.telefone !== telefone) return;
+  const ms = data || [];
+  box.innerHTML = ms.map(m => `<div class="agendada-item" style="padding:8px;border:1px solid var(--bd);margin-bottom:6px">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--purple);margin-bottom:4px">⏰ ${dataHoraBRT(m.agendada_para)}</div>
+      <div style="font-size:12px;color:var(--text);margin-bottom:6px;white-space:pre-wrap">${escHtml(m.texto)}</div>
+      <button onclick="cancelarAgendada('${m.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Cancelar envio</button>
+    </div>`).join('');
+}
+
+async function agendarMensagem(telefone) {
+  const texto = document.getElementById('msg-input')?.value?.trim();
+  const v = document.getElementById('msg-agendar-quando')?.value;
+  if (!texto) { toast('Digite a mensagem antes de agendar', 'err'); return; }
+  const quando = v ? new Date(v) : null;
+  if (!quando || isNaN(quando)) { toast('Escolha a data e hora do envio', 'err'); return; }
+  if (quando.getTime() < Date.now() + 60 * 1000) { toast('Escolha um horário no futuro', 'err'); return; }
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, {
+      method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ conta: 'fm', lead_telefone: telefone, texto, agendada_para: quando.toISOString(), criada_por: quemSou() })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    document.getElementById('msg-input').value = '';
+    document.getElementById('msg-agendar-quando').value = '';
+    toast('✅ Mensagem agendada para ' + dataHoraBRT(quando.toISOString()), 'ok');
+    carregarAgendadasLead(telefone);
+  } catch(e) { toast('Erro ao agendar — tente novamente', 'err'); }
+}
+
+async function cancelarAgendada(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas?id=eq.${id}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=representation' }), body: JSON.stringify({ status: 'cancelada' }) });
+    const rows = r.ok ? await r.json() : [];
+    toast(rows.length ? 'Envio cancelado' : 'Essa mensagem já tinha sido enviada', rows.length ? 'ok' : 'err');
+    carregarAgendadasLead(telefone);
+  } catch(e) { toast('Erro ao cancelar — tente novamente', 'err'); }
+}
+
+function htmlConsultaRealizada(lead) {
+  if (lead.consulta_realizada_em) {
+    return `<div style="padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.06em">
+      ✅ Consulta realizada — ${dataHoraBRT(lead.consulta_realizada_em)}${lead.consulta_confirmada_por ? ' · ' + escHtml(lead.consulta_confirmada_por) : ''}
+    </div>`;
+  }
+  return `${lead.compareceu ? '<div style="font-family:var(--fM);font-size:10px;color:#e3b341;margin-bottom:6px">Marcado como "compareceu", mas a consulta ainda não foi confirmada aqui.</div>' : ''}
+    <button id="compareceu-btn" onclick="marcarCompareceu('${lead.telefone}')"
+      style="width:100%;padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
+      ✅ Marcar consulta realizada
+    </button>
+    <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando a consulta acontecer. Isso envia o evento "consulta realizada" para a Meta.</div>`;
+}
+
 // Modo de plantão "painel": avisa a cada 1 minuto que o vendedor está com o painel aberto
 setInterval(() => {
   if (!_euEquipe || _euEquipe.papel !== 'vendedor' || document.hidden) return;
@@ -2894,7 +3053,7 @@ function setCrmPeriod(btn, val) {
 
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,crm_stage_bloqueado,stage_historico,sugestao_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico,responsavel_id,atendido_por,primeiro_atendimento_humano_em&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,crm_stage_bloqueado,stage_historico,sugestao_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico,responsavel_id,atendido_por,primeiro_atendimento_humano_em,consulta_realizada_em,consulta_confirmada_por&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
@@ -2904,7 +3063,7 @@ async function loadCRM() {
     query += `&criado_em=gte.${encodeURIComponent(since)}`;
   }
   const { data } = await sb(query);
-  await carregarEquipe();
+  await Promise.all([carregarEquipe(), carregarProximosContatos()]);
   const leads = (data || []).filter(l => !crmVendFilter || (crmVendFilter === 'none' ? !l.responsavel_id : l.responsavel_id === crmVendFilter));
   const stageMap = {};
   leads.forEach(l => {
@@ -2943,6 +3102,7 @@ async function loadCRM() {
         <div class="krm-path" style="pointer-events:none">${l.patologia||'—'}</div>
         ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px;pointer-events:none">📱 ${telFmt}</div>` : ''}
         <div class="krm-resp" style="font-family:var(--fM);font-size:9px;color:${l.responsavel_id ? 'var(--purple)' : 'var(--dim)'};margin-bottom:6px;pointer-events:none">👤 ${escHtml(nomeResponsavel(l.responsavel_id))}</div>
+        ${seloProximoContato(l.telefone)}
         <div class="krm-foot" style="pointer-events:none">
           <div class="krm-time">${relTime(l.criado_em)}</div>
           <div style="display:flex;align-items:center;gap:4px">
@@ -3010,6 +3170,10 @@ async function onDrop(e) {
   try {
     await updateCRMStage(crm_id || null, toStage, tel);
     toast(`✓ Movido para ${STAGES.find(s=>s.key===toStage)?.label||toStage} (travado)`, 'ok');
+    // Consulta realizada só vale por marcação explícita: ao soltar em Compareceu, pergunta
+    if (toStage === 'compareceu' && confirm('A consulta aconteceu?\n\nSe sim, ela será marcada como consulta realizada e o evento vai para a Meta.')) {
+      await marcarCompareceu(tel, { semConfirmar: true, semStage: true });
+    }
   } catch(err) {
     toast('Erro ao salvar — tente novamente', 'err');
   }
@@ -3428,7 +3592,11 @@ function openLeadPanel(lead) {
     compareceu:'Compareceu', fechou:'Fechou', perdido:'Perdido', desqualificado:'Desqualificado'
   };
 
-  if (lead.responsavel_id === undefined) setTimeout(() => preencherAtendimento(lead.telefone), 0);
+  setTimeout(() => {
+    if (lead.responsavel_id === undefined || lead.consulta_realizada_em === undefined) preencherAtendimento(lead.telefone);
+    carregarTarefasLead(lead.telefone);
+    carregarAgendadasLead(lead.telefone);
+  }, 0);
 
   window._panelLead = { telefone: lead.telefone, nome: lead.nome || '', crmPersonId: lead.crm_person_id || null, proximaAcao: lead.auditoria_ia_proxima_acao || '', etapaAtual: getStage(lead), chatwootConvId: lead.chatwoot_conversation_id || null, chatwootAccountId: 2, rmktHistorico: Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [], qualificado: !!lead.qualificado, agendou: !!lead.agendou, compareceu: !!lead.compareceu, ultimaInteracao: lead.ultima_msg_lead_em || lead.ultima_interacao_humano || lead.auditoria_ia_em || lead.criado_em, bloqueado: !!lead.crm_stage_bloqueado, sugestaoStage: lead.sugestao_stage || null, stageHistorico: Array.isArray(lead.stage_historico) ? lead.stage_historico : [] };
 
@@ -3453,6 +3621,22 @@ function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Responsável</div><div class="panel-val"><select id="panel-responsavel" onchange="trocarResponsavel('${lead.telefone}', this.value)" aria-label="Responsável pelo lead" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%">${opcoesResponsavel(lead.responsavel_id)}</select></div></div>
     <div class="panel-row"><div class="panel-key">Atendido por</div><div class="panel-val" id="panel-atendido-por">${escHtml(lead.atendido_por || '—')}</div></div>
     <div class="panel-row"><div class="panel-key">1º atendimento</div><div class="panel-val" id="panel-primeiro-atend">${lead.primeiro_atendimento_humano_em ? fmtDate(lead.primeiro_atendimento_humano_em) : '—'}</div></div>
+
+    <div class="panel-section">Próximo contato</div>
+    <div id="panel-tarefas" style="margin-bottom:8px"><div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--bd);margin-bottom:12px">
+      <input id="tarefa-acao" type="text" placeholder="O que fazer (ex.: ligar para tirar a dúvida do valor)" aria-label="Ação do próximo contato"
+        style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;padding:6px 8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input id="tarefa-quando" type="datetime-local" aria-label="Data e hora do próximo contato"
+          style="flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:5px 6px">
+        <select id="tarefa-tipo" aria-label="Tipo" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:5px 6px">
+          <option value="contato">Contato</option><option value="consulta">Consulta</option>
+        </select>
+      </div>
+      <button onclick="criarTarefa('${lead.telefone}')" style="padding:7px;background:rgba(145,70,255,.1);border:1px solid rgba(145,70,255,.35);color:var(--purple);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">📅 Agendar próximo contato</button>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim)">Lembrete ao responsável às 8h do dia e 1 hora antes.</div>
+    </div>
 
     <div class="panel-section">Qualificação</div>
     <div class="panel-row"><div class="panel-key">Condição</div><div class="panel-val"><input id="qual-patologia" value="${(lead.patologia||'').replace(/"/g,'&quot;')}" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;box-sizing:border-box"></div></div>
@@ -3570,6 +3754,13 @@ function openLeadPanel(lead) {
         onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='var(--pur-l)';this.style.color='var(--purple)'">
         💬 Enviar pelo WhatsApp
       </button>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <input id="msg-agendar-quando" type="datetime-local" aria-label="Data e hora do envio agendado"
+          style="flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:6px">
+        <button onclick="agendarMensagem('${lead.telefone}')" style="padding:7px 12px;background:transparent;border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">⏰ Agendar envio</button>
+      </div>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:4px">A mensagem agendada não pausa a IA — ela fica sabendo o que foi enviado.</div>
+      <div id="panel-agendadas" style="margin-top:8px"></div>
     </div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
@@ -3589,17 +3780,8 @@ function openLeadPanel(lead) {
     </div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
-      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Presença na Consulta</div>
-      ${lead.compareceu
-        ? `<div style="padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.06em">
-            ✅ Compareceu — confirmado
-           </div>`
-        : `<button id="compareceu-btn" onclick="marcarCompareceu('${lead.telefone}')"
-            style="width:100%;padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
-            ✅ Confirmar presença na consulta
-           </button>
-           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando o lead comparecer à consulta ou reunião.</div>`
-      }
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Consulta realizada</div>
+      <div id="panel-consulta">${htmlConsultaRealizada(lead)}</div>
     </div>
 
     ${buildRmktSection(lead)}
@@ -3858,24 +4040,36 @@ async function enviarMensagem(telefone) {
   }
 }
 
-// ═══ MARCAR COMPARECEU ═══
-async function marcarCompareceu(telefone) {
+// ═══ CONSULTA REALIZADA ═══
+// Único caminho que envia o Schedule (consulta realizada) para a Meta: o gatilho do banco reage a consulta_realizada_em.
+async function marcarCompareceu(telefone, opts = {}) {
+  if (!opts.semConfirmar && !confirm('Confirmar que a consulta aconteceu?\n\nIsso envia o evento "consulta realizada" para a Meta e move o lead para Compareceu.')) return;
   const btn = document.getElementById('compareceu-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+  const agora = new Date().toISOString();
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
-      method: 'PATCH',
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({ compareceu: true })
+    const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}&consulta_realizada_em=is.null`, {
+      method: 'PATCH', headers: sbJson({ 'Prefer': 'return=representation' }),
+      body: JSON.stringify({ compareceu: true, consulta_realizada_em: agora, consulta_confirmada_por: quemSou() })
     });
     if (!r.ok) throw new Error('Erro ' + r.status);
-    toast('✅ Presença confirmada', 'ok');
-    // Atualiza o lead localmente e reabre o painel
-    const lead = allLeads.find(l => l.telefone === telefone);
-    if (lead) { lead.compareceu = true; setTimeout(() => openLeadPanel(lead), 200); }
+    // A consulta agendada sai da lista de compromissos
+    await fetch(`${SB_URL}/rest/v1/tarefas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&tipo=eq.consulta&status=eq.pendente`, {
+      method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'feita', concluida_em: agora })
+    });
+    // Stage: vai para Compareceu se ainda estiver antes (mesmo caminho do arrastar: trava, histórico e etiqueta)
+    const ANTES = ['novo', 'bot_ativo', 'em_conversa', 'sem_resposta', 'follow_up', 'qualificado', 'agendou'];
+    if (!opts.semStage && ANTES.includes(window._panelLead?.etapaAtual)) {
+      await updateCRMStage(window._panelLead?.crmPersonId || null, 'compareceu', telefone);
+      window._panelLead.etapaAtual = 'compareceu';
+    }
+    toast('✅ Consulta realizada — evento enviado para a Meta', 'ok');
+    const box = document.getElementById('panel-consulta');
+    if (box && window._panelLead?.telefone === telefone) box.innerHTML = htmlConsultaRealizada({ telefone, compareceu: true, consulta_realizada_em: agora, consulta_confirmada_por: quemSou() });
+    setTimeout(() => loadCRM(), 800);
   } catch(e) {
-    toast('Erro ao marcar compareceu: ' + e.message, 'err');
-    if (btn) { btn.disabled = false; btn.textContent = '✅ Confirmar presença na consulta'; }
+    toast('Erro ao marcar a consulta: ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Marcar consulta realizada'; }
   }
 }
 
