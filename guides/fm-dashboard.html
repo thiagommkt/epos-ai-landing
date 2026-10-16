@@ -2909,7 +2909,7 @@ function seloProximoContato(telefone) {
 async function carregarTarefasLead(telefone) {
   const box = document.getElementById('panel-tarefas');
   if (!box) return;
-  const { data } = await sb(`tarefas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=in.(pendente,sugerida)&select=id,acao,quando,tipo,responsavel_id,status&order=quando.asc`);
+  const { data } = await sb(`tarefas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=in.(pendente,sugerida)&select=id,acao,quando,tipo,responsavel_id,status,mensagem_sugerida&order=quando.asc`);
   if (window._panelLead?.telefone !== telefone) return;
   const ts = data || [];
   if (!ts.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum contato agendado.</div>'; return; }
@@ -2920,7 +2920,9 @@ async function carregarTarefasLead(telefone) {
         <div style="font-family:var(--fM);font-size:9px;color:#e3b341;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">💡 Sugestão do Analista</div>
         <div style="font-size:12px;color:var(--text);margin-bottom:4px">${escHtml(t.acao)}</div>
         <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:6px">${dataHoraBRT(t.quando)} · ${escHtml(nomeResponsavel(t.responsavel_id))}</div>
+        ${t.mensagem_sugerida ? `<div style="font-size:11px;color:var(--muted);white-space:pre-wrap;padding:6px 8px;border-left:2px solid rgba(227,179,65,.5);margin-bottom:6px">✉️ ${escHtml(t.mensagem_sugerida)}</div>` : ''}
         <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${t.mensagem_sugerida ? `<button onclick="programarSugestao('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">⏰ Programar mensagem</button>` : ''}
           <button onclick="aceitarSugestaoTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">Aceitar</button>
           <button onclick="descartarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Descartar</button>
         </div>
@@ -2979,6 +2981,28 @@ async function aceitarSugestaoTarefa(id, telefone) {
     carregarTarefasLead(telefone);
     loadCRM();
   } catch(e) { toast('Erro ao aceitar — tente novamente', 'err'); }
+}
+
+// Programa a mensagem pronta da sugestão para o horário sugerido (a mesma ação do "pode programar" no WhatsApp)
+async function programarSugestao(id, telefone) {
+  const { data } = await sb(`tarefas?id=eq.${id}&status=eq.sugerida&select=id,quando,mensagem_sugerida,responsavel_id`);
+  const t = (data || [])[0];
+  if (!t?.mensagem_sugerida) { toast('Essa sugestão já foi tratada', 'err'); carregarTarefasLead(telefone); return; }
+  const quando = Date.parse(t.quando) > Date.now() + 60 * 1000 ? t.quando : new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, {
+      method: 'POST', headers: sbJson({ 'Prefer': 'return=representation' }),
+      body: JSON.stringify({ conta: 'fm', lead_telefone: telefone, texto: t.mensagem_sugerida, agendada_para: quando, criada_por: quemSou() })
+    });
+    const rows = r.ok ? await r.json() : [];
+    if (!rows.length) throw new Error('HTTP ' + r.status);
+    const patch = { status: 'feita', concluida_em: new Date().toISOString(), mensagem_agendada_id: rows[0].id };
+    if (!t.responsavel_id && _euEquipe?.papel === 'vendedor') patch.responsavel_id = _euEquipe.id;
+    await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify(patch) });
+    toast('✅ Mensagem programada para ' + dataHoraBRT(quando), 'ok');
+    carregarTarefasLead(telefone);
+    carregarAgendadasLead(telefone);
+  } catch(e) { toast('Erro ao programar — tente novamente', 'err'); }
 }
 
 async function descartarTarefa(id, telefone) {
