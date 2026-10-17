@@ -1504,6 +1504,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6"/><rect x="9" y="1" width="6" height="6"/><rect x="1" y="9" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>
       Dashboard
     </a>
+    <a data-sec="clientes" onclick="navTo('clientes')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="5" width="14" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 5V3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1 9h14" stroke="currentColor" stroke-width="1.2"/></svg>
+      Clientes
+    </a>
     <div class="nav-section">Leads</div>
     <a data-sec="dados" onclick="navTo('dados')">
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="14" height="2"/><rect x="1" y="7" width="14" height="2"/><rect x="1" y="12" width="14" height="2"/></svg>
@@ -1573,6 +1577,9 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </div>
   </div>
   <div class="rule"></div>
+
+  <!-- Meta de clientes do mês (Clientes & Vagas) -->
+  <div id="db-meta-clientes" onclick="navTo('clientes')" style="display:none;cursor:pointer;margin-bottom:14px;padding:12px 16px;border:1px solid rgba(249,115,22,.35);background:rgba(249,115,22,.06);border-radius:8px;font-family:var(--fD);font-size:13px;color:var(--text)"></div>
 
   <!-- Seletor de período do Dashboard -->
   <select class="period-sel-mob" id="db-period-sel" onchange="setDBPeriodSel(this)">
@@ -1745,6 +1752,78 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 </section>
 
 <!-- ══ LEADS ══ -->
+<!-- ══ CLIENTES & VAGAS (Epos) — tabela epos_clientes; vagas = meta do mês − fechados no mês ══ -->
+<section class="section" id="s-clientes">
+  <style>
+    #s-clientes .cli-pill{padding:5px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;border-radius:4px}
+    #s-clientes .cli-pill.active{border-color:var(--bd-b);background:var(--pur-l);color:var(--purple)}
+    #s-clientes .cli-btn{padding:7px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px}
+    #s-clientes .cli-btn.primario{border-color:rgba(249,115,22,.5);color:#F97316}
+    #s-clientes .cli-card{padding:14px 16px;border:1px solid var(--bd);border-radius:8px;margin-bottom:10px;background:var(--bg2,transparent)}
+    #s-clientes .cli-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+    #s-clientes .cli-nome{font-family:var(--fD);font-size:14px;font-weight:700;color:var(--text)}
+    #s-clientes .cli-sub{font-family:var(--fM);font-size:10.5px;color:var(--dim);margin-top:3px;line-height:1.5}
+    #s-clientes .cli-status{font-family:var(--fM);font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:10px}
+    #s-clientes .cli-chip{display:inline-block;font-family:var(--fM);font-size:9.5px;padding:2px 8px;border:1px solid var(--bd);border-radius:10px;color:var(--muted);margin:6px 4px 0 0}
+    #s-clientes .cli-vagas{font-family:var(--fD);font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px;line-height:1.3}
+    #s-clientes .cli-vagas span{font-size:40px;font-weight:800;color:#F97316;margin-right:8px;vertical-align:-5px}
+    #s-clientes .cli-vagas small{display:block;font-family:var(--fM);font-size:10.5px;font-weight:400;color:var(--muted);margin-top:4px}
+    #cliente-overlay label{display:block;font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 5px}
+    #cliente-overlay input,#cliente-overlay select,#cliente-overlay textarea{width:100%;box-sizing:border-box;padding:9px 11px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:13px;border-radius:4px}
+    #cliente-overlay .cli-servicos{display:flex;flex-wrap:wrap;gap:10px;font-family:var(--fM);font-size:12px;color:var(--text)}
+    #cliente-overlay .cli-servicos label{display:flex;align-items:center;gap:6px;margin:0;font-size:12px;text-transform:none;letter-spacing:0;font-weight:400;color:var(--text)}
+    #cliente-overlay .cli-servicos input{width:auto}
+  </style>
+  <div class="sec-head">
+    <div><div class="sec-title">CLIENTES <span>&amp; VAGAS</span></div><div class="sec-sub">Quem a Epos atende hoje e a meta do mês</div></div>
+    <button class="cli-btn primario" onclick="abrirCliente(null)">+ Novo cliente</button>
+  </div>
+  <div class="rule"></div>
+  <div id="cli-resumo"><div class="loading"></div></div>
+  <div style="display:flex;align-items:center;gap:8px;margin:6px 0 14px;flex-wrap:wrap">
+    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Status:</span>
+    <button class="cli-pill active" data-cli="todos" onclick="filtrarClientes('todos')">Todos</button>
+    <button class="cli-pill" data-cli="ativo" onclick="filtrarClientes('ativo')">Ativos</button>
+    <button class="cli-pill" data-cli="negociando" onclick="filtrarClientes('negociando')">Negociando</button>
+    <button class="cli-pill" data-cli="pausado" onclick="filtrarClientes('pausado')">Pausados</button>
+    <button class="cli-pill" data-cli="encerrado" onclick="filtrarClientes('encerrado')">Encerrados</button>
+  </div>
+  <div id="cli-lista"></div>
+</section>
+
+<div class="lead-panel-overlay" id="cliente-overlay" onclick="fecharCliente()">
+  <div class="lead-panel" style="max-width:480px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title" id="cli-modal-titulo">Novo cliente</div>
+      <button class="panel-close" onclick="fecharCliente()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="panel-body" style="padding:8px 24px 24px">
+      <input type="hidden" id="cli-id">
+      <label for="cli-nome">Cliente / empresa *</label><input id="cli-nome" placeholder="Ex.: Farias &amp; Moura Advocacia">
+      <label for="cli-contato">Contato</label><input id="cli-contato" placeholder="Nome de quem fecha">
+      <label for="cli-telefone">Telefone</label><input id="cli-telefone" placeholder="(61) 99999-9999">
+      <label for="cli-nicho">Nicho</label><input id="cli-nicho" placeholder="Ex.: advocacia, clínica">
+      <label for="cli-status">Status</label>
+      <select id="cli-status"><option value="negociando">Negociando</option><option value="ativo">Ativo</option><option value="pausado">Pausado</option><option value="encerrado">Encerrado</option></select>
+      <label>Serviços</label>
+      <div class="cli-servicos">
+        <label><input type="checkbox" value="trafego"> Tráfego</label>
+        <label><input type="checkbox" value="sistema"> Sistema</label>
+        <label><input type="checkbox" value="metodo"> Método</label>
+        <label><input type="checkbox" value="audiovisual"> Audiovisual</label>
+      </div>
+      <label for="cli-valor">Valor mensal (R$)</label><input id="cli-valor" type="number" min="0" step="0.01" placeholder="Ex.: 5000">
+      <label for="cli-fechado">Contrato fechado em</label><input id="cli-fechado" type="date">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5">Contrato fechado neste mês ocupa uma das vagas do mês.</div>
+      <label for="cli-obs">Observações</label><textarea id="cli-obs" rows="3"></textarea>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button onclick="fecharCliente()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px">Cancelar</button>
+        <button onclick="salvarCliente()" style="flex:2;padding:10px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.45);color:#F97316;font-family:var(--fD);font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <section class="section" id="s-dados">
   <div class="sec-head">
     <div><div class="sec-title">BASE DE <span>LEADS</span></div><div class="sec-sub" id="dados-count">Carregando...</div></div>
@@ -3063,6 +3142,7 @@ function show(id) {
     if(id==='status') loadStatus();
     if(id==='campanhas') loadCampanhas();
     if(id==='analista') loadAnalista();
+    if(id==='clientes') loadClientes();
     if(id==='prospeccao') loadProspeccao();
   }
   if(id==='dashboard') {
@@ -4949,7 +5029,143 @@ async function toggleRobo() {
   }
 }
 
+// ═══ CLIENTES & VAGAS (Epos) — epos_clientes + epos_vagas_restantes ═══
+const CLI_STATUS = { negociando: ['Negociando', '#e3b341'], ativo: ['Ativo', '#3fb950'], pausado: ['Pausado', '#8b949e'], encerrado: ['Encerrado', '#FF5E5B'] };
+const CLI_SERVICO = { trafego: 'Tráfego', sistema: 'Sistema', metodo: 'Método', audiovisual: 'Audiovisual' };
+let _clientes = [];
+let _cliFiltro = 'todos';
+let _cliMeta = 10;
+const _cliHeaders = () => ({ 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' });
+const _brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+const _mesAtual = () => new Date(Date.now() - 3 * 3600e3).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' });
+
+async function carregarVagas() {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_vagas_restantes`, { method: 'POST', headers: _cliHeaders(), body: '{}' });
+  return r.ok ? await r.json() : null;
+}
+
+async function loadClientes() {
+  const resumo = document.getElementById('cli-resumo');
+  if (!resumo) return;
+  resumo.innerHTML = '<div class="loading"></div>';
+  try {
+    const [r, vagas] = await Promise.all([
+      fetch(`${SB_URL}/rest/v1/epos_clientes?select=*&order=status.asc,fechado_em.desc.nullslast,nome.asc`, { headers: _cliHeaders() }),
+      carregarVagas()
+    ]);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    _clientes = await r.json();
+    renderClientes(vagas);
+    atualizarMetaDashboard(vagas);
+  } catch (e) {
+    resumo.innerHTML = `<div style="font-family:var(--fM);font-size:11px;color:var(--dim)">Não foi possível carregar os clientes (${escHtml(e.message)}).</div>`;
+  }
+}
+
+function renderClientes(vagas) {
+  const ini = new Date(Date.now() - 3 * 3600e3); const mesIni = `${ini.getUTCFullYear()}-${String(ini.getUTCMonth() + 1).padStart(2, '0')}-01`;
+  const fechadosMes = _clientes.filter(c => c.fechado_em && c.fechado_em >= mesIni && c.status !== 'encerrado').length;
+  const ativos = _clientes.filter(c => c.status === 'ativo');
+  const negociando = _clientes.filter(c => c.status === 'negociando').length;
+  const receita = ativos.reduce((s, c) => s + Number(c.valor_mensal || 0), 0);
+  const v = vagas == null ? Math.max(0, _cliMeta - fechadosMes) : vagas;
+  document.getElementById('cli-resumo').innerHTML = `
+    <div class="cli-vagas"><span>${v}</span> vaga${v === 1 ? '' : 's'} para ${_mesAtual()}<small>${fechadosMes} contrato${fechadosMes === 1 ? '' : 's'} fechado${fechadosMes === 1 ? '' : 's'} no mês · meta de ${fechadosMes + v} · a Donna fala esse número para os leads</small></div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-lbl">Clientes ativos</div><div class="kpi-val g" id="cli-ativos">${ativos.length}</div><div class="kpi-note">contrato em andamento</div></div>
+      <div class="kpi"><div class="kpi-lbl">Receita mensal</div><div class="kpi-val n" style="font-size:clamp(22px,2.3vw,34px);white-space:nowrap">${_brl(receita)}</div><div class="kpi-note">soma dos ativos</div></div>
+      <div class="kpi"><div class="kpi-lbl">Negociando</div><div class="kpi-val">${negociando}</div><div class="kpi-note">propostas em aberto</div></div>
+      <div class="kpi"><div class="kpi-lbl">Fechados no mês</div><div class="kpi-val">${fechadosMes}</div><div class="kpi-note">ocupam as vagas</div></div>
+    </div>`;
+  const lista = _clientes.filter(c => _cliFiltro === 'todos' || c.status === _cliFiltro);
+  document.getElementById('cli-lista').innerHTML = lista.length ? lista.map(c => {
+    const [stTxt, stCor] = CLI_STATUS[c.status] || [c.status, 'var(--muted)'];
+    const fechado = c.fechado_em ? new Date(c.fechado_em + 'T12:00:00').toLocaleDateString('pt-BR') : null;
+    const sub = [c.contato, c.telefone, c.nicho].filter(Boolean).map(escHtml).join(' · ');
+    return `<div class="cli-card" data-cliente="${escHtml(c.id)}">
+      <div class="cli-topo">
+        <div style="min-width:0"><div class="cli-nome">${escHtml(c.nome)}</div>${sub ? `<div class="cli-sub">${sub}</div>` : ''}</div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="cli-status" style="color:${stCor};border:1px solid ${stCor}">${stTxt}</span><button class="cli-btn" onclick="abrirCliente('${escHtml(c.id)}')">Editar</button></div>
+      </div>
+      <div class="cli-sub">${c.valor_mensal ? `${_brl(c.valor_mensal)}/mês` : 'Valor mensal não informado'}${fechado ? ` · fechado em ${fechado}` : ''}</div>
+      <div>${(c.servicos || []).map(s => `<span class="cli-chip">${CLI_SERVICO[s] || escHtml(s)}</span>`).join('')}</div>
+      ${c.observacoes ? `<div class="cli-sub" style="margin-top:6px">${escHtml(c.observacoes)}</div>` : ''}
+    </div>`;
+  }).join('') : '<div style="font-family:var(--fM);font-size:11px;color:var(--dim);padding:8px 0">Nenhum cliente neste filtro.</div>';
+}
+
+function filtrarClientes(st) {
+  _cliFiltro = st;
+  document.querySelectorAll('#s-clientes .cli-pill').forEach(b => b.classList.toggle('active', b.dataset.cli === st));
+  renderClientes(null);
+}
+
+function abrirCliente(id) {
+  const c = _clientes.find(x => x.id === id) || {};
+  document.getElementById('cli-modal-titulo').textContent = id ? 'Editar cliente' : 'Novo cliente';
+  document.getElementById('cli-id').value = id || '';
+  document.getElementById('cli-nome').value = c.nome || '';
+  document.getElementById('cli-contato').value = c.contato || '';
+  document.getElementById('cli-telefone').value = c.telefone || '';
+  document.getElementById('cli-nicho').value = c.nicho || '';
+  document.getElementById('cli-status').value = c.status || 'negociando';
+  document.querySelectorAll('#cliente-overlay .cli-servicos input').forEach(i => { i.checked = (c.servicos || []).includes(i.value); });
+  document.getElementById('cli-valor').value = c.valor_mensal ?? '';
+  document.getElementById('cli-fechado').value = c.fechado_em || '';
+  document.getElementById('cli-obs').value = c.observacoes || '';
+  document.getElementById('cliente-overlay').classList.add('show');
+}
+
+function fecharCliente() { document.getElementById('cliente-overlay').classList.remove('show'); }
+
+async function salvarCliente() {
+  const id = document.getElementById('cli-id').value;
+  const nome = document.getElementById('cli-nome').value.trim();
+  if (!nome) { toast('Informe o nome do cliente', 'err'); return; }
+  const valor = document.getElementById('cli-valor').value;
+  const dados = {
+    nome,
+    contato: document.getElementById('cli-contato').value.trim() || null,
+    telefone: document.getElementById('cli-telefone').value.trim() || null,
+    nicho: document.getElementById('cli-nicho').value.trim() || null,
+    status: document.getElementById('cli-status').value,
+    servicos: Array.from(document.querySelectorAll('#cliente-overlay .cli-servicos input:checked')).map(i => i.value),
+    valor_mensal: valor === '' ? null : Number(valor),
+    fechado_em: document.getElementById('cli-fechado').value || null,
+    observacoes: document.getElementById('cli-obs').value.trim() || null
+  };
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/epos_clientes${id ? `?id=eq.${encodeURIComponent(id)}` : ''}`, {
+      method: id ? 'PATCH' : 'POST', headers: { ..._cliHeaders(), 'Prefer': 'return=representation' }, body: JSON.stringify(dados)
+    });
+    const d = await r.json();
+    if (!r.ok || !Array.isArray(d) || !d.length) throw new Error(d?.message || 'sem permissão');
+    fecharCliente();
+    toast(id ? 'Cliente atualizado' : 'Cliente cadastrado', 'ok');
+    loadClientes();
+  } catch (e) { toast('Não foi possível salvar: ' + e.message, 'err'); }
+}
+
+// Faixa no topo do Dashboard: meta do mês e vagas
+function atualizarMetaDashboard(vagas) {
+  const el = document.getElementById('db-meta-clientes');
+  if (!el || vagas == null) return;
+  const ini = new Date(Date.now() - 3 * 3600e3); const mesIni = `${ini.getUTCFullYear()}-${String(ini.getUTCMonth() + 1).padStart(2, '0')}-01`;
+  const fechados = _clientes.filter(c => c.fechado_em && c.fechado_em >= mesIni && c.status !== 'encerrado').length;
+  el.innerHTML = `🎯 <b>Meta de ${_mesAtual()}:</b> ${fechados} de ${fechados + vagas} clientes fechados · <b style="color:#F97316">${vagas} vaga${vagas === 1 ? '' : 's'}</b> <span style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-left:6px">ver clientes →</span>`;
+  el.style.display = 'block';
+}
+async function loadMetaDashboard() {
+  try {
+    const [r, vagas] = await Promise.all([fetch(`${SB_URL}/rest/v1/epos_clientes?select=status,fechado_em`, { headers: _cliHeaders() }), carregarVagas()]);
+    if (!r.ok) return;              // sem permissão: a faixa não aparece
+    _clientes = await r.json();
+    atualizarMetaDashboard(vagas);
+  } catch (e) {}
+}
+
 // ═══ INIT + AUTO-REFRESH + SUPABASE REALTIME ═══
+setTimeout(loadMetaDashboard, 1200);
 loadDashboard();
 loadRoboStatus();
 loadWaClicks();

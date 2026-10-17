@@ -1576,33 +1576,37 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
   <div class="rule"></div>
 
-  <!-- Torneira (CRM v3): quem está escapando agora — RPC fm_torneira -->
+  <!-- Vendas inevitáveis (Torneira, CRM v3): o que está escapando agora — RPC fm_torneira -->
   <style>
-    #torneira-card .tor-total{font-family:var(--fD);font-size:15px;font-weight:600;color:var(--text);margin:2px 0 18px;line-height:1.3}
-    #torneira-card .tor-total span{font-size:38px;font-weight:800;color:#FF5E5B;margin-right:8px;vertical-align:-4px}
-    #torneira-card .tor-total small{display:block;font-family:var(--fM);font-size:10.5px;font-weight:400;color:var(--muted);margin-top:4px}
-    #torneira-card .tor-sec{font-family:var(--fD);font-size:12px;font-weight:700;color:var(--text);margin:4px 0 8px}
-    #torneira-card .tor-sec small{display:block;font-family:var(--fM);font-size:10px;font-weight:400;color:var(--dim);margin-top:2px}
-    #torneira-card .tor-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-    #torneira-card .tor-chip{padding:5px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10.5px;border-radius:12px;cursor:pointer;transition:all .15s}
+    #torneira-card .tor-kpis{grid-template-columns:repeat(4,1fr);margin-bottom:12px}
+    #torneira-card .tor-kpi{cursor:pointer}
+    #torneira-card .tor-kpi.ativo{border-color:var(--tor-cor);box-shadow:inset 0 0 0 1px var(--tor-cor)}
+    #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
+    #torneira-card .tor-painel-topo{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+    #torneira-card .tor-dica{font-family:var(--fM);font-size:9px;text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400}
+    #torneira-card .tor-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    #torneira-card .tor-chip{padding:5px 10px;border:1px solid var(--g-bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10.5px;border-radius:12px;cursor:pointer;transition:all .15s}
     #torneira-card .tor-chip b{color:var(--text)}
-    #torneira-card .tor-chip.sr{border-color:rgba(255,94,91,.35)}
-    #torneira-card .tor-chip.pa{border-color:rgba(227,179,65,.35)}
     #torneira-card .tor-chip.ativo{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
-    #torneira-card .tor-linha{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
-    #torneira-card .tor-linha:hover{background:var(--bg3)}
-    #torneira-card .tor-nome{font-family:var(--fD);font-size:12.5px;color:var(--text);min-width:0;overflow-wrap:anywhere}
+    #torneira-card .tor-linha{display:flex;align-items:center;gap:12px;padding:10px 8px;border-top:1px solid var(--g-bd);cursor:pointer;border-radius:8px;transition:background .15s}
+    #torneira-card .tor-linha:hover{background:rgba(145,70,255,.07)}
+    #torneira-card .tor-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pur-l);color:var(--purple);font-family:var(--fD);font-weight:700;font-size:12px;flex-shrink:0}
+    #torneira-card .tor-nome{font-family:var(--fD);font-size:13px;font-weight:600;color:var(--text);overflow-wrap:anywhere}
     #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
-    #torneira-card .tor-tempo{font-family:var(--fM);font-size:10.5px;font-weight:700;white-space:nowrap;flex-shrink:0}
-    #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:6px 0}
+    #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+    #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
+    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}}
     .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
     .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
     .tor-selo.pa{background:rgba(227,179,65,.13);color:#e3b341}
   </style>
-  <div class="card" id="torneira-card" style="margin-bottom:14px">
-    <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-      <span>⏱️ Torneira <span style="font-family:var(--fM);font-size:9px;color:var(--neon);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px">agora</span></span>
-      <button onclick="loadTorneira()" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:4px">↻ Atualizar</button>
+  <div id="torneira-card" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <div>
+        <div class="sec-title" style="font-size:clamp(17px,2.1vw,23px)">MANTENHA SUAS VENDAS <span>INEVITÁVEIS</span></div>
+        <div class="sec-sub">Não deixe pendências · Garantia Torneira Fechada · atualizado a cada minuto</div>
+      </div>
+      <button onclick="loadTorneira()" style="padding:5px 12px;background:transparent;border:1px solid var(--g-bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:6px">↻ Atualizar</button>
     </div>
     <div id="torneira-conteudo"><div class="loading"></div></div>
   </div>
@@ -2979,6 +2983,12 @@ function sbJson(extra) {
   return { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', ...(extra || {}) };
 }
 function quemSou() { return _euEquipe?.nome || emailLogado() || 'painel'; }
+// Texto do Analista com "[Seu Nome]" (e variações) sai assinado com o primeiro nome de quem está logado
+function assinarComEu(txt) {
+  const primeiro = String(_euEquipe?.nome || '').trim().split(/\s+/)[0];
+  if (!primeiro || !txt) return txt || '';
+  return String(txt).replace(/\[\s*(?:seu|teu|meu)\s+nome[^\]]*\]|\[\s*nome\s+(?:do|da|de)\s+(?:atendente|vendedor|vendedora|advogad[oa]|respons[aá]vel|consultor[a]?)[^\]]*\]/gi, primeiro);
+}
 function inicioDiaBRT(offsetDias) {
   const brt = new Date(Date.now() - 3 * 60 * 60 * 1000);
   return Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() + (offsetDias || 0)) + 3 * 60 * 60 * 1000;
@@ -3019,7 +3029,7 @@ async function carregarTarefasLead(telefone) {
         <div style="font-family:var(--fM);font-size:9px;color:#e3b341;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">💡 Sugestão do Analista</div>
         <div style="font-size:12px;color:var(--text);margin-bottom:4px">${escHtml(t.acao)}</div>
         <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:6px">${dataHoraBRT(t.quando)} · ${escHtml(nomeResponsavel(t.responsavel_id))}</div>
-        ${t.mensagem_sugerida ? `<div style="font-size:11px;color:var(--muted);white-space:pre-wrap;padding:6px 8px;border-left:2px solid rgba(227,179,65,.5);margin-bottom:6px">✉️ ${escHtml(t.mensagem_sugerida)}</div>` : ''}
+        ${t.mensagem_sugerida ? `<div style="font-size:11px;color:var(--muted);white-space:pre-wrap;padding:6px 8px;border-left:2px solid rgba(227,179,65,.5);margin-bottom:6px">✉️ ${escHtml(assinarComEu(t.mensagem_sugerida))}</div>` : ''}
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${t.mensagem_sugerida ? `<button onclick="programarSugestao('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">⏰ Programar mensagem</button>` : ''}
           <button onclick="aceitarSugestaoTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">Aceitar</button>
@@ -3091,7 +3101,7 @@ async function programarSugestao(id, telefone) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, {
       method: 'POST', headers: sbJson({ 'Prefer': 'return=representation' }),
-      body: JSON.stringify({ conta: 'fm', lead_telefone: telefone, texto: t.mensagem_sugerida, agendada_para: quando, criada_por: quemSou() })
+      body: JSON.stringify({ conta: 'fm', lead_telefone: telefone, texto: assinarComEu(t.mensagem_sugerida), agendada_para: quando, criada_por: quemSou() })
     });
     const rows = r.ok ? await r.json() : [];
     if (!rows.length) throw new Error('HTTP ' + r.status);
@@ -3847,7 +3857,7 @@ function openLeadPanel(lead) {
       </div>` : ''}
       ${lead.auditoria_ia_proxima_acao ? `<div style="padding:10px 12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.25);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--neon);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">▶ Próxima ação (O Analista) — edite antes de enviar</div>
-        <textarea id="proxima-acao-input" rows="4" style="width:100%;box-sizing:border-box;background:rgba(0,245,160,.04);border:1px solid rgba(0,245,160,.28);border-radius:6px;color:var(--text);font-size:12px;line-height:1.6;padding:9px 11px;resize:vertical;outline:none;margin-bottom:8px;transition:border-color .2s" onfocus="this.style.borderColor='rgba(0,245,160,.7)'" onblur="this.style.borderColor='rgba(0,245,160,.28)'">${escHtml(stripQuotes(lead.auditoria_ia_proxima_acao))}</textarea>
+        <textarea id="proxima-acao-input" rows="4" style="width:100%;box-sizing:border-box;background:rgba(0,245,160,.04);border:1px solid rgba(0,245,160,.28);border-radius:6px;color:var(--text);font-size:12px;line-height:1.6;padding:9px 11px;resize:vertical;outline:none;margin-bottom:8px;transition:border-color .2s" onfocus="this.style.borderColor='rgba(0,245,160,.7)'" onblur="this.style.borderColor='rgba(0,245,160,.28)'">${escHtml(assinarComEu(stripQuotes(lead.auditoria_ia_proxima_acao)))}</textarea>
         <button onclick="enviarProximaAcao(this)" style="width:100%;padding:8px 10px;background:rgba(0,245,160,.12);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.background='var(--neon)';this.style.color='#000'" onmouseout="this.style.background='rgba(0,245,160,.12)';this.style.color='var(--neon)'">▶ Enviar esta mensagem via WhatsApp</button>
       </div>` : ''}
       ${lead.auditoria_ia_motivo_perda ? `<div style="padding:10px 12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.25);margin-bottom:8px">
@@ -5242,9 +5252,15 @@ async function loadTorneira() {
   catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
 }
 
+function torDuracao(min) {
+  if (min < 60) return `${min} min`;
+  if (min < 1440) return `${Math.floor(min / 60)} h`;
+  const d = Math.floor(min / 1440); return `${d} dia${d === 1 ? '' : 's'}`;
+}
+
 function filtrarTorneira(situacao, faixa) {
   const mesmo = _torFiltro && _torFiltro.situacao === situacao && _torFiltro.faixa === faixa;
-  _torFiltro = mesmo ? null : { situacao, faixa };
+  _torFiltro = { situacao, faixa: mesmo ? null : faixa };
   renderTorneira();
 }
 
@@ -5252,46 +5268,46 @@ function renderTorneira() {
   const alvo = document.getElementById('torneira-conteudo');
   if (!alvo) return;
   const comFaixa = _torDados.filter(l => l.situacao && l.faixa);
+  const sr = comFaixa.filter(l => l.situacao === 'sem_resposta');
+  const pa = comFaixa.filter(l => l.situacao === 'parado');
   const semPasso = _torDados.filter(l => l.sem_proximo_passo);
-  const ativo = (sit, fx) => _torFiltro && _torFiltro.situacao === sit && _torFiltro.faixa === fx ? ' ativo' : '';
-  const secao = (sit, titulo, explica, cls) => {
-    const grupo = comFaixa.filter(l => l.situacao === sit);
-    const chips = TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
-      .map(([fx, n]) => `<button class="tor-chip ${cls}${ativo(sit, fx)}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
-    return `<div class="tor-sec">${titulo}: ${grupo.length}<small>${explica}</small></div>` +
-      (grupo.length ? `<div class="tor-chips"><button class="tor-chip ${cls}${ativo(sit, null)}" onclick="filtrarTorneira('${sit}',null)">Todos · <b>${grupo.length}</b></button>${chips}</div>` : '<div class="tor-vazio" style="margin-bottom:12px">Nenhum agora.</div>');
-  };
-  // Lista: filtro escolhido; sem filtro, quem espera resposta (o que mais vaza)
-  let lista, tituloLista;
-  if (_torFiltro && _torFiltro.situacao === 'sem_passo') {
-    lista = semPasso; tituloLista = 'Sem próximo passo marcado';
-  } else if (_torFiltro) {
-    lista = comFaixa.filter(l => l.situacao === _torFiltro.situacao && (!_torFiltro.faixa || l.faixa === _torFiltro.faixa));
-    tituloLista = (_torFiltro.situacao === 'sem_resposta' ? 'Esperando nossa resposta' : 'Sem retorno do lead') + (_torFiltro.faixa ? ` · há ${TOR_FAIXA[_torFiltro.faixa]}` : '');
-  } else {
-    lista = comFaixa.filter(l => l.situacao === 'sem_resposta'); tituloLista = 'Esperando nossa resposta';
+  if (!comFaixa.length && !semPasso.length) {
+    alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
+    return;
   }
-  lista = [...lista].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
-  const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(s => s.key === k)?.label) || k || 'sem etapa';
+  const maisAntigo = g => { const m = g.reduce((x, l) => Math.max(x, l.minutos || 0), 0); return m ? `mais antigo há ${torDuracao(m)}` : 'nenhum agora'; };
+  const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : 'sem_passo');
+  const faixaSel = _torFiltro?.faixa || null;
+  const card = (chave, rotulo, n, cor, nota) => `<div class="kpi tor-kpi${sit === chave ? ' ativo' : ''}" data-tor="${chave}" style="--tor-cor:${cor}" onclick="filtrarTorneira('${chave}',null)">
+      <div class="kpi-lbl">${rotulo}</div><div class="kpi-val" style="color:${cor}">${n}</div><div class="kpi-note">${nota}</div></div>`;
+  const grupo = sit === 'todos' ? comFaixa : sit === 'sem_passo' ? semPasso : sit === 'sem_resposta' ? sr : pa;
+  const titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', sem_passo: 'Sem próximo passo marcado' }[sit];
+  const chips = sit === 'sem_passo' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
+    .map(([fx, n]) => `<button class="tor-chip${faixaSel === fx ? ' ativo' : ''}" data-faixa="${fx}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
+  const lista = [...(faixaSel ? grupo.filter(l => l.faixa === faixaSel) : grupo)].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
+  const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(x => x.key === k)?.label) || k || 'sem etapa';
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
   const linhas = lista.slice(0, 80).map(l => {
-    const cor = l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : 'var(--muted)';
-    const tempo = l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : (l.situacao ? 'agora' : 'sem tarefa');
+    const cor = l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
+    const tempo = l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'sem tarefa';
+    const n = nome(l);
     return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
-      <div style="min-width:0"><div class="tor-nome">${escHtml(nome(l))}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))} · ${escHtml(etapa(l.crm_stage))}</div></div>
-      <div class="tor-tempo" style="color:${cor}">${tempo}</div></div>`;
+      <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
+      <div style="flex:1;min-width:0"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))} · ${escHtml(etapa(l.crm_stage))}${sit === 'todos' ? (l.situacao === 'sem_resposta' ? ' · esperando resposta' : ' · sem retorno') : ''}</div></div>
+      <span class="tor-tempo" style="color:${cor};background:${cor}1f">${tempo}</span></div>`;
   }).join('');
-  const nSr = comFaixa.filter(l => l.situacao === 'sem_resposta').length, nPa = comFaixa.length - nSr;
-  const cabecalho = comFaixa.length
-    ? `<div class="tor-total"><span>${comFaixa.length}</span> leads escapando agora<small>${nSr} esperando nossa resposta · ${nPa} sem retorno · ${semPasso.length} sem próximo passo</small></div>`
-    : '';
-  alvo.innerHTML = cabecalho + (comFaixa.length || semPasso.length ? '' : '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta nem parado.</div>') +
-    secao('sem_resposta', '🔴 Esperando nossa resposta', 'O lead escreveu e ninguém respondeu.', 'sr') +
-    secao('parado', '🟡 Sem retorno do lead', 'A última mensagem foi nossa.', 'pa') +
-    `<div class="tor-sec">📋 Sem próximo passo marcado: ${semPasso.length}<small>Sem consulta, tarefa ou mensagem programada.</small></div>` +
-    (semPasso.length ? `<div class="tor-chips"><button class="tor-chip${_torFiltro && _torFiltro.situacao === 'sem_passo' ? ' ativo' : ''}" onclick="filtrarTorneira('sem_passo',null)">Ver lista · <b>${semPasso.length}</b></button></div>` : '') +
-    (lista.length ? `<div class="tor-sec" style="margin-top:6px">${tituloLista} <small>Clique no lead para abrir a ficha.</small></div><div id="torneira-lista">${linhas}</div>` +
-      (lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : '') : '');
+  alvo.innerHTML = `<div class="kpi-row tor-kpis">
+      ${card('todos', 'Leads escapando agora', comFaixa.length, '#FF5E5B', 'esperando resposta ou sem retorno')}
+      ${card('sem_resposta', 'Esperando nossa resposta', sr.length, '#FF5E5B', maisAntigo(sr))}
+      ${card('parado', 'Sem retorno do lead', pa.length, '#e3b341', maisAntigo(pa))}
+      ${card('sem_passo', 'Sem próximo passo', semPasso.length, '#9146FF', 'sem consulta, tarefa ou mensagem')}
+    </div>
+    <div class="tor-painel">
+      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${faixaSel ? ' · há ' + TOR_FAIXA[faixaSel] : ''} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
+      ${chips ? `<div class="tor-chips">${chips}</div>` : ''}
+      <div id="torneira-lista">${linhas || '<div class="tor-vazio">Nenhum lead aqui. ✅</div>'}</div>
+      ${lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : ''}
+    </div>`;
 }
 
 // Abre a ficha do lead pelo telefone (lista da Torneira e link "Abrir a ficha" dos avisos no WhatsApp)
