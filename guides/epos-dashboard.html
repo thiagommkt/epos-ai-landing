@@ -3095,6 +3095,7 @@ async function loadRelatorio() {
     const sub = document.getElementById('rel-sub');
     if (sub) sub.textContent = _relPeriodo === 'tudo' ? 'Todo o histórico' : `${label} · ${dataBR(inicio)} a ${dataBR(new Date(Math.min(fim.getTime(), Date.now())))}`;
     renderRelatorio(_relDados);
+    requestAnimationFrame(() => caberKpis(document.getElementById('rel-conteudo')));
     carregarNotasRelatorio(inicio, fim);
   } catch (e) {
     _relDados = null;
@@ -3654,6 +3655,17 @@ async function cancelarAgendada(id, telefone) {
     carregarAgendadasLead(telefone);
   } catch(e) { toast('Erro ao cancelar — tente novamente', 'err'); }
 }
+
+// Número grande não pode estourar o card (17/10): "R$ 168.000" era cortado no Relatório. Diminui a fonte até caber.
+function caberKpis(raiz) {
+  (raiz || document).querySelectorAll('.kpi-val').forEach(el => {
+    el.style.removeProperty('font-size');
+    let fs = parseFloat(getComputedStyle(el).fontSize) || 40, n = 0;
+    while (el.scrollWidth > el.clientWidth + 1 && fs > 20 && n++ < 25) { fs -= 2; el.style.setProperty('font-size', fs + 'px', 'important'); }
+  });
+}
+let _caberKpisT = null;
+addEventListener('resize', () => { clearTimeout(_caberKpisT); _caberKpisT = setTimeout(() => ['rel-conteudo', 'socio-conteudo'].forEach(id => { const r = document.getElementById(id); if (r) caberKpis(r); }), 200); });
 
 // ═══ TOAST ═══
 function toast(msg, type='ok') {
