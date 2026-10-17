@@ -1545,6 +1545,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 15l3.5-7 3 4 2.5-5 3 4 2-4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="3" r="1.5"/></svg>
       O Analista
     </a>
+    <a data-sec="relatorio" onclick="navTo('relatorio')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="1" width="12" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="9" width="1.6" height="3"/><rect x="7.2" y="7" width="1.6" height="5"/><rect x="9.4" y="5" width="1.6" height="7"/></svg>
+      Relatório
+    </a>
     <div class="nav-section">Automação</div>
     <a data-sec="campanhas" onclick="navTo('campanhas')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
@@ -1590,6 +1594,42 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
   <!-- Meta de clientes do mês (Clientes & Vagas) -->
   <div id="db-meta-clientes" onclick="navTo('clientes')" style="display:none;cursor:pointer;margin-bottom:14px;padding:12px 16px;border:1px solid rgba(249,115,22,.35);background:rgba(249,115,22,.06);border-radius:8px;font-family:var(--fD);font-size:13px;color:var(--text)"></div>
+
+  <!-- Vendas inevitáveis (Torneira, CRM v3): o que está escapando agora — RPC epos_torneira -->
+  <style>
+    #torneira-card .tor-kpis{grid-template-columns:repeat(4,1fr);margin-bottom:12px}
+    #torneira-card .tor-kpi{cursor:pointer}
+    #torneira-card .tor-kpi.ativo{border-color:rgba(249,115,22,.45)}
+    #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
+    #torneira-card .tor-painel-topo{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+    #torneira-card .tor-dica{font-family:var(--fM);font-size:9px;text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400}
+    #torneira-card .tor-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    #torneira-card .tor-chip{padding:5px 10px;border:1px solid var(--g-bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10.5px;border-radius:12px;cursor:pointer;transition:all .15s}
+    #torneira-card .tor-chip b{color:var(--text)}
+    #torneira-card .tor-chip.ativo{background:var(--pur-l);border-color:var(--purple);color:var(--purple)}
+    #torneira-card .tor-linha{display:flex;align-items:center;gap:12px;padding:10px 8px;border-top:1px solid var(--g-bd);cursor:pointer;border-radius:8px;transition:background .15s}
+    #torneira-card .tor-linha:hover{background:rgba(145,70,255,.07)}
+    #torneira-card .tor-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pur-l);color:var(--purple);font-family:var(--fD);font-weight:700;font-size:12px;flex-shrink:0}
+    #torneira-card .tor-nome{font-family:var(--fD);font-size:13px;font-weight:600;color:var(--text);overflow-wrap:anywhere}
+    #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
+    #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+    #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
+    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}}
+    @media(max-width:768px){.socio-kpis{grid-template-columns:1fr 1fr!important}}
+    .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
+    .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
+    .tor-selo.pa{background:rgba(227,179,65,.13);color:#e3b341}
+  </style>
+  <div id="torneira-card" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <div>
+        <div class="sec-title" style="font-size:clamp(17px,2.1vw,23px)">MANTENHA SUAS VENDAS <span>INEVITÁVEIS</span></div>
+        <div class="sec-sub">Não deixe pendências · Garantia Torneira Fechada · atualizado a cada minuto</div>
+      </div>
+      <button onclick="loadTorneira()" style="padding:5px 12px;background:transparent;border:1px solid var(--g-bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;border-radius:6px">↻ Atualizar</button>
+    </div>
+    <div id="torneira-conteudo"><div class="loading"></div></div>
+  </div>
 
   <!-- Seletor de período do Dashboard -->
   <select class="period-sel-mob" id="db-period-sel" onchange="setDBPeriodSel(this)">
@@ -2146,6 +2186,52 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <div id="an-recentes"><div class="loading"></div></div>
   </div>
 </section>
+
+<!-- ══ RELATÓRIO DE VENDAS (espelho do FM, 17/10 · RPC epos_relatorio_vendas) ══ -->
+<section class="section" id="s-relatorio">
+  <style>
+    #s-relatorio .rel-pill{padding:5px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;border-radius:4px}
+    #s-relatorio .rel-pill.active{border-color:var(--bd-b);background:var(--pur-l);color:var(--purple)}
+    #s-relatorio .rel-btn{padding:6px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .15s}
+    #s-relatorio .rel-btn:hover{border-color:var(--purple);color:var(--text)}
+    #s-relatorio .rel-linha{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+    #s-relatorio .rel-linha:last-child{border-bottom:none}
+    #s-relatorio .rel-nome{font-family:var(--fD);font-size:12px;color:var(--text);min-width:0;overflow-wrap:anywhere}
+    #s-relatorio .rel-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
+    #s-relatorio .rel-nums{font-family:var(--fM);font-size:11px;color:var(--muted);text-align:right;flex-shrink:0;line-height:1.6}
+    #s-relatorio .rel-nums b{color:var(--text);font-weight:600}
+    #s-relatorio .rel-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6}
+    #s-relatorio .rel-aviso{font-family:var(--fM);font-size:10.5px;color:var(--muted);line-height:1.6;padding:8px 12px;border-left:2px solid #FFA500;background:rgba(255,165,0,.05);margin-bottom:6px}
+    #s-relatorio .rel-insight{font-family:var(--fD);font-size:13px;color:var(--text);line-height:1.5;padding:12px 14px;border-left:3px solid var(--purple);background:var(--pur-l);margin-bottom:14px}
+    #s-relatorio .rel-funil-top{display:flex;justify-content:space-between;gap:8px;font-family:var(--fD);font-size:12px;color:var(--text);margin-bottom:4px}
+    #s-relatorio .rel-funil-top span:last-child{font-family:var(--fM);color:var(--muted)}
+    #s-relatorio .rel-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+    #s-relatorio .rel-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--neon));border-radius:4px}
+    #s-relatorio .rel-funil-row{margin-bottom:12px}
+    #s-relatorio .rel-conv{font-family:var(--fM);font-size:10px;color:var(--dim);font-weight:400}
+    #s-relatorio .rel-conv.pior{color:#FFA500}
+    #s-relatorio .rel-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    #s-relatorio .rel-chip{font-family:var(--fM);font-size:10.5px;padding:4px 10px;border:1px solid var(--bd);border-radius:12px;color:var(--muted)}
+    #s-relatorio .rel-chip b{color:var(--text)}
+    @media(max-width:600px){#s-relatorio .rel-linha{flex-direction:column;align-items:flex-start;gap:2px}#s-relatorio .rel-nums{text-align:left}}
+  </style>
+  <div class="sec-head">
+    <div><div class="sec-title">RELATÓRIO <span>DE VENDAS</span></div><div class="sec-sub" id="rel-sub">Receita, funil, origem e perdas por período</div></div>
+    <button class="rel-btn" onclick="loadRelatorio()">↻ Atualizar</button>
+  </div>
+  <div class="rule"></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Período:</span>
+    <button class="rel-pill active" data-rel="mes" onclick="setRelPeriodo('mes')">Este mês</button>
+    <button class="rel-pill" data-rel="mes_passado" onclick="setRelPeriodo('mes_passado')">Mês passado</button>
+    <button class="rel-pill" data-rel="30" onclick="setRelPeriodo('30')">30 dias</button>
+    <button class="rel-pill" data-rel="90" onclick="setRelPeriodo('90')">90 dias</button>
+    <button class="rel-pill" data-rel="ano" onclick="setRelPeriodo('ano')">Este ano</button>
+    <button class="rel-pill" data-rel="tudo" onclick="setRelPeriodo('tudo')">Tudo</button>
+  </div>
+  <div id="rel-conteudo"><div class="loading"></div></div>
+</section>
+
 
 </main>
 </div>
@@ -2930,6 +3016,644 @@ async function naoFechouLista(btn) {
   } catch (e) { btn.disabled = false; alert('Erro: ' + e.message); }
 }
 
+async function carregarNotasRelatorio(inicio, fim) {
+  const alvo = document.getElementById('rel-conteudo');
+  if (!alvo) return;
+  const dia = d => new Date(d.getTime() - 3 * 3600e3).toISOString().slice(0, 10);
+  let lista = [];
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/crm_notas_vendedores`, { method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_conta: TABLE === 'fm_leads' ? 'fm' : 'epos', p_inicio: dia(inicio), p_fim: dia(new Date(Math.min(fim.getTime(), Date.now()))) }) });
+    lista = r.ok ? await r.json() : [];
+  } catch (e) { lista = []; }
+  document.getElementById('rel-notas')?.remove();
+  const card = document.createElement('div');
+  card.className = 'card'; card.id = 'rel-notas';
+  const v = x => x == null ? '—' : String(x).replace('.', ',');
+  card.innerHTML = `<div class="card-ttl">Nota do atendimento por vendedor</div>
+    <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:10px;line-height:1.6">Nota de 0 a 10 dada pelo Analista ao atendimento humano de cada dia: velocidade 20% · qualificação 25% · objeção 20% · próximo passo 25% · tom 10%. Critérios de 1 a 5.</div>
+    ${lista.length ? `<div style="overflow-x:auto"><table class="tbl" style="min-width:720px;width:100%"><thead><tr><th>Vendedor</th><th style="text-align:center">Atend.</th><th style="text-align:center">Nota</th>${NOTA_CRITERIOS.map(([, r]) => `<th style="text-align:center">${r}</th>`).join('')}<th>Dica mais recente</th></tr></thead><tbody>
+      ${lista.map(x => `<tr><td class="td-hi">${escHtml(x.vendedor)}</td><td style="text-align:center">${x.atendimentos}</td><td style="text-align:center;font-weight:700;color:${notaCor(Number(x.nota_media))}">${v(x.nota_media)}</td>${NOTA_CRITERIOS.map(([k]) => `<td style="text-align:center">${v(x[k])}</td>`).join('')}<td style="font-size:11px;color:var(--muted);white-space:normal">${escHtml(x.dica_mais_recente || '—')}</td></tr>`).join('')}
+    </tbody></table></div>` : '<div class="rel-vazio">Nenhum atendimento humano avaliado no período. O Analista avalia todo dia às 7h o atendimento do dia anterior.</div>'}`;
+  alvo.appendChild(card);
+}
+
+// ═══ RELATÓRIO DE VENDAS (CRM v3) ═══
+// Números vêm prontos da função epos_relatorio_vendas no Supabase; as definições estão em sql/2026-10-16-crm-v3-relatorio-vendas.sql
+let _relPeriodo = 'mes';
+let _relDados = null;
+const REL_PERDA_LABEL = {
+  sem_resposta_do_lead: 'Lead parou de responder',
+  equipe_nao_deu_continuidade: 'Equipe não deu continuidade',
+  nao_elegivel: 'Não tem direito / não elegível',
+  sem_interesse: 'Sem interesse',
+  preco_ou_condicao: 'Preço ou condição',
+  resolveu_com_outro: 'Resolveu com outro escritório',
+  outro: 'Outro motivo',
+  sem_categoria: 'Sem categoria (análises antigas)'
+};
+const REL_FUNIL_LABEL = { chegaram: 'Chegaram', qualificados: 'Qualificados', agendaram: 'Agendaram', compareceram: 'Compareceram', fecharam: 'Fecharam' };
+const REL_FUNIL_DOS = { chegaram: 'dos que chegaram', qualificados: 'dos qualificados', agendaram: 'dos que agendaram', compareceram: 'dos que compareceram' };
+
+function relIntervalo(chave) {
+  // Meses contados no horário de Brasília (UTC-3)
+  const agora = new Date();
+  const brt = new Date(agora.getTime() - 3 * 3600e3);
+  const ano = brt.getUTCFullYear(), mes = brt.getUTCMonth();
+  const inicioBRT = (a, m) => new Date(Date.UTC(a, m, 1) + 3 * 3600e3);
+  const fim = new Date(agora.getTime() + 60e3);
+  if (chave === 'mes') return { inicio: inicioBRT(ano, mes), fim, label: 'Este mês' };
+  if (chave === 'mes_passado') return { inicio: inicioBRT(ano, mes - 1), fim: inicioBRT(ano, mes), label: 'Mês passado' };
+  if (chave === '30') return { inicio: new Date(agora.getTime() - 30 * 864e5), fim, label: 'Últimos 30 dias' };
+  if (chave === '90') return { inicio: new Date(agora.getTime() - 90 * 864e5), fim, label: 'Últimos 90 dias' };
+  if (chave === 'ano') return { inicio: inicioBRT(ano, 0), fim, label: 'Este ano' };
+  return { inicio: new Date('2000-01-01T00:00:00Z'), fim, label: 'Tudo' };
+}
+
+function setRelPeriodo(chave) {
+  _relPeriodo = chave;
+  document.querySelectorAll('#s-relatorio .rel-pill').forEach(b => b.classList.toggle('active', b.dataset.rel === chave));
+  loadRelatorio();
+}
+
+async function loadRelatorio() {
+  const alvo = document.getElementById('rel-conteudo');
+  if (!alvo) return;
+  alvo.innerHTML = '<div class="loading"></div>';
+  const { inicio, fim, label } = relIntervalo(_relPeriodo);
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_relatorio_vendas`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_inicio: inicio.toISOString(), p_fim: fim.toISOString() })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    _relDados = await r.json();
+    const dataBR = d => d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: '2-digit' });
+    const sub = document.getElementById('rel-sub');
+    if (sub) sub.textContent = _relPeriodo === 'tudo' ? 'Todo o histórico' : `${label} · ${dataBR(inicio)} a ${dataBR(new Date(Math.min(fim.getTime(), Date.now())))}`;
+    renderRelatorio(_relDados);
+    carregarNotasRelatorio(inicio, fim);
+  } catch (e) {
+    _relDados = null;
+    alvo.innerHTML = `<div class="card"><div class="rel-vazio">Não foi possível carregar o relatório (${escHtml(e.message)}). Toque em Atualizar para tentar de novo.</div></div>`;
+  }
+}
+
+function renderRelatorio(d) {
+  const alvo = document.getElementById('rel-conteudo');
+  const R = d.resumo || {};
+  const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+  const num = v => String(v ?? 0);
+  const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+  const duracao = min => {
+    if (min == null) return '—';
+    if (min < 60) return `${Math.round(min)} min`;
+    if (min < 1440) return `${Math.floor(min / 60)}h${String(Math.round(min % 60)).padStart(2, '0')}`;
+    return `${(min / 1440).toFixed(1).replace('.', ',')} dias`;
+  };
+  const vazio = txt => `<div class="rel-vazio">${txt}</div>`;
+
+  // Avisos sobre dados incompletos — nada de número que engana
+  const avisos = [];
+  if (R.fechamentos_sem_valor > 0) avisos.push(`${plural(R.fechamentos_sem_valor, 'fechamento', 'fechamentos')} do período sem valor informado: a receita está incompleta. O valor é pedido ao marcar Fechou desde 16/10.`);
+  if (R.fechados_sem_data > 0) avisos.push(`${plural(R.fechados_sem_data, 'fechamento antigo', 'fechamentos antigos')} sem data de fechamento não entram em nenhum período (anteriores ao registro de data).`);
+  if (R.aguardando_confirmacao > 0) avisos.push(`${plural(R.aguardando_confirmacao, 'lead marcado', 'leads marcados')} como Fechou ainda sem contrato confirmado (link "para confirmar" no card Contratos do Dashboard).`);
+
+  // Destaque: a passagem do funil que mais perde gente (com pelo menos 5 leads na etapa anterior)
+  const funil = Array.isArray(d.funil) ? d.funil : [];
+  let pior = null;
+  for (let i = 1; i < funil.length; i++) {
+    const ant = funil[i - 1].n, cur = funil[i].n;
+    if (ant >= 5) { const perda = 1 - cur / ant; if (!pior || perda > pior.perda) pior = { i, perda }; }
+  }
+  const base = funil[0]?.n || 0;
+  let destaque = '';
+  if (!base) destaque = 'Nenhum lead chegou neste período.';
+  else if (pior) destaque = `Maior vazamento: de <b>${REL_FUNIL_LABEL[funil[pior.i - 1].etapa]}</b> para <b>${REL_FUNIL_LABEL[funil[pior.i].etapa]}</b>: ${Math.round(pior.perda * 100)}% não seguem.`;
+
+  const funilHtml = funil.map((f, i) => {
+    const ant = funil[i - 1];
+    const conv = ant && ant.n ? `<span class="rel-conv${pior && pior.i === i ? ' pior' : ''}"> · ${pct(f.n, ant.n)}% ${REL_FUNIL_DOS[ant.etapa]}</span>` : '';
+    return `<div class="rel-funil-row"><div class="rel-funil-top"><span>${REL_FUNIL_LABEL[f.etapa] || escHtml(f.etapa)}${conv}</span><span>${num(f.n)} · ${pct(f.n, base)}% do total</span></div><div class="rel-bar"><i style="width:${pct(f.n, base)}%"></i></div></div>`;
+  }).join('');
+  const S = d.situacao || {};
+  const chips = [
+    ['em aberto', S.em_aberto], ['fechados', S.fechados], ['perdidos', S.perdidos], ['desqualificados', S.desqualificados],
+    ['na etapa Fechou sem contrato registrado', S.fechou_sem_confirmar]
+  ].filter(([, n]) => n > 0).map(([t, n]) => `<span class="rel-chip"><b>${n}</b> ${t}</span>`).join('');
+
+  const origens = (d.origens || []).map(o => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(o.origem || ''))}</div><div class="rel-nums"><b>${o.leads}</b> leads · <b>${o.fechados_da_coorte}</b> fecharam (${pct(o.fechados_da_coorte, o.leads)}%)${o.fechamentos || o.receita ? `<br>no período: ${plural(o.fechamentos, 'fechamento', 'fechamentos')}${o.receita ? ' · ' + brl(o.receita) : ''}` : ''}</div></div>`).join('');
+
+  const totalPerdas = (d.perdas || []).reduce((s, p) => s + p.n, 0);
+  const perdas = (d.perdas || []).map(p => `<div class="rel-linha"><div class="rel-nome">${escHtml(REL_PERDA_LABEL[p.categoria] || String(p.categoria))}</div><div class="rel-nums"><b>${p.n}</b> · ${pct(p.n, totalPerdas)}%</div></div>`).join('');
+
+  const vendedores = d.vendedores || [];
+  const soSemResponsavel = vendedores.length === 1 && vendedores[0].id == null;
+  const vendHtml = vendedores.map(v => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(v.nome || ''))}</div><div class="rel-nums"><b>${v.leads}</b> leads · <b>${v.fechados_da_coorte}</b> fecharam${v.fechamentos || v.receita ? `<br>no período: ${plural(v.fechamentos, 'fechamento', 'fechamentos')}${v.receita ? ' · ' + brl(v.receita) : ''}` : ''}</div></div>`).join('');
+
+  const nomeEtapa = k => STAGES.find(s => s.key === k)?.label || k;
+  const tempo = (d.tempo_etapas || []).map(t => `<div class="rel-linha"><div class="rel-nome">${escHtml(nomeEtapa(t.etapa))}</div><div class="rel-nums">mediana <b>${duracao(t.horas_mediana * 60)}</b> · ${plural(t.n, 'passagem', 'passagens')}</div></div>`).join('');
+
+  const criativos = (d.criativos || []).map(c => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(c.criativo || ''))}<div class="rel-sub">${escHtml(String(c.campanha || ''))}</div></div><div class="rel-nums"><b>${c.leads}</b> leads · <b>${c.fechados_da_coorte}</b> fecharam</div></div>`).join('');
+
+  const fechamentos = (d.fechamentos || []).map(f => `<div class="rel-linha"><div class="rel-nome">${escHtml(String(f.nome || 'Sem nome'))}<div class="rel-sub">${f.fechou_em ? fmtDate(f.fechou_em) : ''} · ${escHtml(String(f.origem || ''))}${f.responsavel ? ' · ' + escHtml(String(f.responsavel)) : ''}</div></div><div class="rel-nums">${f.valor > 0 ? '<b>' + brl(f.valor) + '</b>' : 'sem valor'}</div></div>`).join('');
+
+  alvo.innerHTML = `
+    ${destaque ? `<div class="rel-insight">${destaque}</div>` : ''}
+    ${avisos.map(a => `<div class="rel-aviso">${escHtml(a)}</div>`).join('')}
+    <div class="kpi-row" style="margin-top:12px">
+      <div class="kpi"><div class="kpi-lbl">Receita</div><div class="kpi-val n" id="rel-receita">${brl(R.receita)}</div><div class="kpi-note">${R.fechamentos_com_valor || 0} de ${R.fechamentos || 0} com valor</div></div>
+      <div class="kpi"><div class="kpi-lbl">Fechamentos</div><div class="kpi-val g" id="rel-fechamentos">${num(R.fechamentos)}</div><div class="kpi-note">contratos confirmados no período</div></div>
+      <div class="kpi"><div class="kpi-lbl">Ticket médio</div><div class="kpi-val">${R.ticket_medio ? brl(R.ticket_medio) : '—'}</div><div class="kpi-note">contratos com valor</div></div>
+      <div class="kpi"><div class="kpi-lbl">Taxa de fechamento</div><div class="kpi-val g" id="rel-taxa">${pct(R.fechados_da_coorte, R.leads_novos)}%</div><div class="kpi-note">${R.fechados_da_coorte || 0} dos ${R.leads_novos || 0} leads que chegaram</div></div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-lbl">Leads que chegaram</div><div class="kpi-val" id="rel-leads">${num(R.leads_novos)}</div><div class="kpi-note">no período</div></div>
+      <div class="kpi"><div class="kpi-lbl">Tempo até fechar</div><div class="kpi-val">${R.dias_ate_fechar != null ? String(R.dias_ate_fechar).replace('.', ',') + ' dias' : '—'}</div><div class="kpi-note">média, da chegada ao contrato</div></div>
+      <div class="kpi"><div class="kpi-lbl">1º atendimento humano</div><div class="kpi-val">${duracao(R.primeiro_atendimento_min)}</div><div class="kpi-note">${R.primeiro_atendimento_n ? 'mediana de ' + plural(R.primeiro_atendimento_n, 'lead', 'leads') : 'medido desde 16/10'}</div></div>
+      <div class="kpi"><div class="kpi-lbl">Aguardando confirmação</div><div class="kpi-val">${num(R.aguardando_confirmacao)}</div><div class="kpi-note">na lista Pendentes de aprovação</div></div>
+    </div>
+    <div class="two-col-eq">
+      <div class="card"><div class="card-ttl">Funil dos leads do período</div>${base ? funilHtml + (chips ? `<div class="rel-chips">${chips}</div>` : '') : vazio('Nenhum lead chegou neste período.')}</div>
+      <div class="card"><div class="card-ttl">De onde vieram</div>${origens || vazio('Sem leads neste período.')}</div>
+    </div>
+    <div class="two-col-eq">
+      <div class="card"><div class="card-ttl">Motivos de perda</div>${perdas || vazio('Nenhum lead perdido ou desqualificado entre os que chegaram no período.')}${perdas && (d.perdas || []).some(p => p.categoria === 'sem_categoria') ? vazio('<br>A categoria é preenchida pelo Analista nas análises a partir de 16/10.') : ''}</div>
+      <div class="card"><div class="card-ttl">Por responsável</div>${vendHtml || vazio('Sem leads neste período.')}${soSemResponsavel ? vazio('<br>No FM os leads ainda não têm responsável. Quando alguém assumir um lead, ele aparece aqui.') : ''}</div>
+    </div>
+    <div class="two-col-eq">
+      <div class="card"><div class="card-ttl">Tempo em cada etapa</div>${tempo || vazio('Ainda sem mudanças de etapa suficientes neste período. Enche conforme a equipe move os cards no CRM.')}</div>
+      <div class="card"><div class="card-ttl">Criativos (anúncios)</div>${criativos || vazio('Nenhum lead do período com criativo identificado. Só aparece em leads que chegaram pelo link com UTM.')}</div>
+    </div>
+    <div class="card">
+      <div class="card-ttl" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <span>Fechamentos do período</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="rel-btn" onclick="relBaixarCSV('leads')">⬇ Leads do período (CSV)</button>
+          <button class="rel-btn" onclick="relBaixarCSV('fechamentos')">⬇ Fechamentos (CSV)</button>
+        </span>
+      </div>
+      <div id="rel-fechamentos-lista">${fechamentos || vazio('Nenhum contrato confirmado neste período.')}</div>
+    </div>`;
+}
+
+function relBaixarCSV(tipo) {
+  if (!_relDados) { toast('Carregue o relatório antes de baixar', 'err'); return; }
+  const linhas = (tipo === 'fechamentos' ? _relDados.fechamentos : _relDados.linhas) || [];
+  const cols = tipo === 'fechamentos'
+    ? [['nome', 'Nome'], ['telefone', 'Telefone'], ['fechou_em', 'Fechou em'], ['valor', 'Valor (R$)'], ['servico', 'Serviço'], ['origem', 'Origem'], ['criativo', 'Criativo'], ['responsavel', 'Responsável']]
+    : [['nome', 'Nome'], ['telefone', 'Telefone'], ['chegou_em', 'Chegou em'], ['etapa', 'Etapa'], ['fechou', 'Fechou'], ['fechou_em', 'Fechou em'], ['valor', 'Valor (R$)'], ['origem', 'Origem'], ['campanha', 'Campanha'], ['criativo', 'Criativo'], ['responsavel', 'Responsável'], ['motivo_perda', 'Motivo da perda']];
+  const formatar = (k, v) => {
+    if (v == null || v === '') return '';
+    if (k.endsWith('_em')) return new Date(v).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    if (k === 'fechou') return v ? 'sim' : 'não';
+    if (k === 'valor') return String(v).replace('.', ',');
+    if (k === 'motivo_perda') return REL_PERDA_LABEL[v] || String(v);
+    if (k === 'etapa') return STAGES.find(s => s.key === v)?.label || String(v);
+    return String(v);
+  };
+  // Texto vindo do lead não pode virar fórmula no Excel
+  const celula = s => { if (/^[=+\-@]/.test(s)) s = "'" + s; return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const csv = [cols.map(c => c[1]).join(';'), ...linhas.map(l => cols.map(([k]) => celula(formatar(k, l[k]))).join(';'))].join('\r\n');
+  const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio-epos-${tipo}-${_relPeriodo}-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast(`${linhas.length} ${linhas.length === 1 ? 'linha' : 'linhas'} no arquivo`, 'ok');
+}
+
+// ═══ TORNEIRA (CRM v3) — quem está escapando agora (RPC epos_torneira) ═══
+// sem_resposta = o lead escreveu por último; parado = a última mensagem foi nossa. Clique no lead abre a ficha.
+const TOR_FAIXA = { '5min': '5 min', '2h': '2 h', '8h': '8 h', '1d': '1 dia', '3d': '3 dias', '7d': '7 dias', '15d': '15 dias', '30d': '30 dias' };
+const TOR_ORDEM = ['30d', '15d', '7d', '3d', '1d', '8h', '2h', '5min'];
+let _torDados = [];
+let _torFiltro = null;
+
+async function carregarTorneira() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_torneira`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    _torDados = Array.isArray(d) ? d : [];
+  } catch (e) { _torDados = []; throw e; }
+  window._torMapa = {};
+  for (const l of _torDados) if (l.situacao && l.faixa) window._torMapa[l.telefone] = l;
+  return _torDados;
+}
+
+// Selo no card do kanban (ex.: "⏱ 2 h sem resposta")
+function torSelo(tel) {
+  const t = window._torMapa && window._torMapa[tel];
+  if (!t) return '';
+  return t.situacao === 'sem_resposta'
+    ? `<span class="tor-selo sr">⏱ ${TOR_FAIXA[t.faixa]} sem resposta</span>`
+    : `<span class="tor-selo pa">⏳ ${TOR_FAIXA[t.faixa]} sem retorno</span>`;
+}
+
+async function loadTorneira() {
+  const alvo = document.getElementById('torneira-conteudo');
+  if (!alvo) return;
+  alvo.innerHTML = '<div class="loading"></div>';
+  try { await carregarTorneira(); renderTorneira(); }
+  catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
+}
+
+function torDuracao(min) {
+  if (min < 60) return `${min} min`;
+  if (min < 1440) return `${Math.floor(min / 60)} h`;
+  const d = Math.floor(min / 1440); return `${d} dia${d === 1 ? '' : 's'}`;
+}
+
+function filtrarTorneira(situacao, faixa) {
+  const mesmo = _torFiltro && _torFiltro.situacao === situacao && _torFiltro.faixa === faixa;
+  _torFiltro = { situacao, faixa: mesmo ? null : faixa };
+  renderTorneira();
+}
+
+function renderTorneira() {
+  const alvo = document.getElementById('torneira-conteudo');
+  if (!alvo) return;
+  const comFaixa = _torDados.filter(l => l.situacao && l.faixa);
+  const sr = comFaixa.filter(l => l.situacao === 'sem_resposta');
+  const pa = comFaixa.filter(l => l.situacao === 'parado');
+  // Aguardando a equipe: o sistema já planejou (sugestão com mensagem e horário), falta aceitar ou programar
+  const semPasso = _torDados.filter(l => l.aguardando_equipe || l.sem_proximo_passo);
+  if (!comFaixa.length && !semPasso.length) {
+    alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
+    return;
+  }
+  const maisAntigo = g => { const m = g.reduce((x, l) => Math.max(x, l.minutos || 0), 0); return m ? `mais antigo há ${torDuracao(m)}` : 'nenhum agora'; };
+  const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : 'aguardando');
+  const faixaSel = _torFiltro?.faixa || null;
+  // Número no mesmo estilo dos KPIs de baixo (pedido do Thiago: sem cor própria)
+  const card = (chave, rotulo, n, nota) => `<div class="kpi tor-kpi${sit === chave ? ' ativo' : ''}" data-tor="${chave}" onclick="filtrarTorneira('${chave}',null)">
+      <div class="kpi-lbl">${rotulo}</div><div class="kpi-val">${n}</div><div class="kpi-note">${nota}</div></div>`;
+  const grupo = sit === 'todos' ? comFaixa : sit === 'aguardando' ? semPasso : sit === 'sem_resposta' ? sr : pa;
+  const titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', aguardando: 'Aguardando a equipe: próximo passo pronto' }[sit];
+  const chips = sit === 'aguardando' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
+    .map(([fx, n]) => `<button class="tor-chip${faixaSel === fx ? ' ativo' : ''}" data-faixa="${fx}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
+  const lista = [...(faixaSel ? grupo.filter(l => l.faixa === faixaSel) : grupo)].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
+  const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(x => x.key === k)?.label) || k || 'sem etapa';
+  const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
+  const linhas = lista.slice(0, 80).map(l => {
+    const cor = sit === 'aguardando' ? '#9146FF' : l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
+    const tempo = sit === 'aguardando' ? 'falta dar o start' : (l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'falta dar o start');
+    const n = nome(l);
+    return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
+      <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
+      <div style="flex:1;min-width:0"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))} · ${escHtml(etapa(l.crm_stage))}${sit === 'todos' ? (l.situacao === 'sem_resposta' ? ' · esperando resposta' : ' · sem retorno') : ''}</div></div>
+      <span class="tor-tempo" style="color:${cor};background:${cor}1f">${tempo}</span></div>`;
+  }).join('');
+  alvo.innerHTML = `<div class="kpi-row tor-kpis">
+      ${card('todos', 'Leads escapando agora', comFaixa.length, 'esperando resposta ou sem retorno')}
+      ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
+      ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
+      ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
+    </div>
+    <div class="tor-painel">
+      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${faixaSel ? ' · há ' + TOR_FAIXA[faixaSel] : ''} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
+      ${chips ? `<div class="tor-chips">${chips}</div>` : ''}
+      <div id="torneira-lista">${linhas || '<div class="tor-vazio">Nenhum lead aqui. ✅</div>'}</div>
+      ${lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : ''}
+    </div>`;
+}
+
+// Abre a ficha do lead pelo telefone (lista da Torneira e link "Abrir a ficha" dos avisos no WhatsApp)
+async function abrirFichaPorTelefone(tel) {
+  const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(tel)}&select=*&limit=1`);
+  if (Array.isArray(data) && data[0]) openLeadPanel(data[0]);
+  else toast('Lead não encontrado', 'err');
+}
+
+async function loadAnalista(force) {
+  ['an-total','an-ai','an-manual','an-auditados'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+  const compEl=document.getElementById('an-comparativo'), objBox=document.getElementById('an-objections'), recBox=document.getElementById('an-recentes');
+  if(compEl)compEl.innerHTML='<div class="loading"></div>';
+  if(objBox)objBox.innerHTML='<div class="loading"></div>';
+  if(recBox)recBox.innerHTML='<div class="loading"></div>';
+  try {
+    // Filtro de período
+    let periodoParam = '';
+    if (anPeriodVal !== 'all') {
+      const brtNow = new Date(Date.now() - 3*60*60*1000);
+      if (anPeriodVal === 'this_month') {
+        const mes0 = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), 1));
+        periodoParam = '&criado_em=gte.' + mes0.toISOString();
+      } else if (anPeriodVal === 'last_month') {
+        const mes0 = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth() - 1, 1));
+        const mes1 = new Date(Date.UTC(brtNow.getUTCFullYear(), brtNow.getUTCMonth(), 1));
+        periodoParam = '&criado_em=gte.' + mes0.toISOString() + '&criado_em=lt.' + mes1.toISOString();
+      } else {
+        const d = new Date(); d.setDate(d.getDate() - parseInt(anPeriodVal));
+        periodoParam = '&criado_em=gte.' + d.toISOString();
+      }
+    }
+    const fields = 'select=crm_stage,descartado,canal,qualificado,agendou,compareceu,fechou,score,crm_score,crm_auditoria_at,auditoria_ia_proxima_acao,chatwoot_conversation_id,nome,telefone,perfil,patologia,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,typebot_concluido,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
+    const r = await fetch(SB_URL+'/rest/v1/'+TABLE+'?'+fields+periodoParam+'&order=criado_em.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY)}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const leads = await r.json();
+    anLeadsCache = leads;
+    renderAnFiltros();
+
+    const ai=leads.filter(l=>l.canal!=='chatwoot_auditoria');
+    const manual=leads.filter(l=>l.canal==='chatwoot_auditoria');
+    const auditados=leads.filter(l=>l.auditoria_ia_em);
+    document.getElementById('an-total').textContent=leads.length;
+    const noteEl = document.getElementById('an-total-note');
+    const anLabels = { all:'base completa', this_month:'este mês', last_month:'mês passado' };
+    if(noteEl) noteEl.textContent = anLabels[anPeriodVal] || 'últimos '+anPeriodVal+'d';
+    document.getElementById('an-ai').textContent=ai.length;
+    document.getElementById('an-manual').textContent=manual.length;
+    document.getElementById('an-auditados').textContent=auditados.length;
+
+    function calcM(g){const n=g.length||1;return{total:g.length,pctQual:((g.filter(l=>l.qualificado).length/n)*100).toFixed(1),pctAg:((g.filter(l=>l.agendou).length/n)*100).toFixed(1),pctCo:((g.filter(l=>l.compareceu).length/n)*100).toFixed(1),pctFe:((g.filter(l=>l.fechou).length/n)*100).toFixed(1),score:g.length?(g.reduce((s,l)=>s+(l.score||0),0)/g.length).toFixed(1):'—'};}
+    const ma=calcM(ai), mm=calcM(manual);
+    if(compEl) compEl.innerHTML=`<table class="tbl" style="width:100%"><thead><tr><th>Métrica</th><th style="text-align:right;color:var(--neon)">Sistema IA (${ma.total})</th><th style="text-align:right;color:var(--purple)">Manual (${mm.total})</th></tr></thead><tbody>
+      <tr><td>Score médio</td><td style="text-align:right;font-family:var(--fM);color:var(--neon)">${ma.score}</td><td style="text-align:right;font-family:var(--fM);color:var(--purple)">${mm.score}</td></tr>
+      <tr><td>% Qualificados</td><td style="text-align:right;font-family:var(--fM);color:var(--neon)">${ma.pctQual}%</td><td style="text-align:right;font-family:var(--fM);color:var(--purple)">${mm.pctQual}%</td></tr>
+      <tr><td>% Agendaram</td><td style="text-align:right;font-family:var(--fM);color:var(--neon)">${ma.pctAg}%</td><td style="text-align:right;font-family:var(--fM);color:var(--purple)">${mm.pctAg}%</td></tr>
+      <tr><td>% Compareceram</td><td style="text-align:right;font-family:var(--fM);color:var(--neon)">${ma.pctCo}%</td><td style="text-align:right;font-family:var(--fM);color:var(--purple)">${mm.pctCo}%</td></tr>
+      <tr><td class="td-hi">% Fecharam</td><td style="text-align:right;font-family:var(--fD);font-size:15px;font-weight:700;color:var(--neon)">${ma.pctFe}%</td><td style="text-align:right;font-family:var(--fD);font-size:15px;font-weight:700;color:var(--purple)">${mm.pctFe}%</td></tr>
+    </tbody></table>`;
+
+    if(objBox){const oc={};leads.filter(l=>l.auditoria_ia_motivo_perda).forEach(l=>{oc[l.auditoria_ia_motivo_perda]=(oc[l.auditoria_ia_motivo_perda]||0)+1;});const sorted=Object.entries(oc).sort((a,b)=>b[1]-a[1]).slice(0,8);if(!sorted.length){objBox.innerHTML='<div class="empty">Nenhuma objeção registrada ainda</div>';}else{const max=sorted[0][1];objBox.innerHTML=sorted.map(([m,n])=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--text)">${m}</span><span style="font-family:var(--fM);font-size:11px;color:var(--muted)">${n}</span></div><div style="height:4px;background:rgba(145,70,255,.08);position:relative"><div style="position:absolute;left:0;top:0;height:100%;width:${(n/max*100).toFixed(0)}%;background:var(--purple)"></div></div></div>`).join('');}}
+
+    renderAnRecentes();
+  } catch(e) {
+    if(compEl)compEl.innerHTML='<div class="empty">Erro: '+e.message+'</div>';
+  }
+}
+
+// ═══ EQUIPE DA EPOS (espelho do FM, 17/10) — vazia até cadastrar; sem ela os nomes saem como "Sem responsável" ═══
+let _equipe = [], _euEquipe = null;
+function emailLogado() {
+  try { return (JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.email || '').toLowerCase(); }
+  catch(e) { return ''; }
+}
+async function carregarEquipe() {
+  const { data } = await sb('equipe?conta=eq.epos&ativo=eq.true&select=id,nome,papel,email_login');
+  _equipe = data || [];
+  const eu = emailLogado();
+  _euEquipe = _equipe.find(m => String(m.email_login || '').toLowerCase() === eu) || null;
+}
+function nomeResponsavel(id) {
+  if (!id) return 'Sem responsável';
+  return _equipe.find(m => m.id === id)?.nome || 'Responsável inativo';
+}
+
+// ═══ CRM v3 — PRÓXIMO CONTATO, MENSAGEM AGENDADA E CONSULTA REALIZADA ═══
+let _proxContato = {};   // telefone → tarefa pendente mais próxima (selo do card)
+const _BTN_MINI = 'padding:4px 10px;background:transparent;font-family:var(--fM);font-size:9px;cursor:pointer';
+const _INPUT_MINI = 'background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:10px;padding:3px 5px';
+
+function sbJson(extra) {
+  return { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json', ...(extra || {}) };
+}
+function quemSou() { return _euEquipe?.nome || emailLogado() || 'painel'; }
+// Texto do Analista com "[Seu Nome]" (e variações) sai assinado com o primeiro nome de quem está logado
+function assinarComEu(txt) {
+  const primeiro = String(_euEquipe?.nome || '').trim().split(/\s+/)[0];
+  if (!primeiro || !txt) return txt || '';
+  return String(txt).replace(/\[\s*(?:seu|teu|meu)\s+nome[^\]]*\]|\[\s*nome\s+(?:do|da|de)\s+(?:atendente|vendedor|vendedora|advogad[oa]|respons[aá]vel|consultor[a]?)[^\]]*\]/gi, primeiro);
+}
+function inicioDiaBRT(offsetDias) {
+  const brt = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  return Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), brt.getUTCDate() + (offsetDias || 0)) + 3 * 60 * 60 * 1000;
+}
+function dataHoraBRT(iso) {
+  return new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+async function carregarProximosContatos() {
+  const { data } = await sb('tarefas?conta=eq.epos&status=eq.pendente&select=lead_telefone,quando,tipo&order=quando.asc&limit=2000');
+  _proxContato = {};
+  for (const t of (data || [])) if (!_proxContato[t.lead_telefone]) _proxContato[t.lead_telefone] = t;
+}
+
+function seloProximoContato(telefone) {
+  const t = _proxContato[telefone];
+  if (!t) return '';
+  const q = Date.parse(t.quando);
+  const hora = new Date(t.quando).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+  let txt, cor, bg;
+  if (q < Date.now()) { txt = 'Atrasado'; cor = '#FF5E5B'; bg = 'rgba(255,94,91,.12)'; }
+  else if (q < inicioDiaBRT(1)) { txt = 'Hoje ' + hora; cor = 'var(--neon)'; bg = 'rgba(0,245,160,.10)'; }
+  else { txt = dataHoraBRT(t.quando); cor = 'var(--dim)'; bg = 'transparent'; }
+  return `<div class="krm-prox" style="display:inline-block;padding:2px 6px;background:${bg};color:${cor};font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;pointer-events:none">${t.tipo === 'consulta' ? '🤝' : '📅'} ${txt}</div>`;
+}
+
+async function carregarTarefasLead(telefone) {
+  const box = document.getElementById('panel-tarefas');
+  if (!box) return;
+  const { data } = await sb(`tarefas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(telefone)}&status=in.(pendente,sugerida)&select=id,acao,quando,tipo,responsavel_id,status,mensagem_sugerida&order=quando.asc`);
+  if (window._panelLead?.telefone !== telefone) return;
+  const ts = data || [];
+  if (!ts.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum contato agendado.</div>'; return; }
+  box.innerHTML = ts.map(t => {
+    if (t.status === 'sugerida') {
+      // Sugestão do Analista ainda não confirmada pelo vendedor (ele também pode responder pelo WhatsApp)
+      return `<div class="tarefa-item tarefa-sugerida" style="padding:8px;border:1px dashed rgba(227,179,65,.5);margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:#e3b341;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">💡 Sugestão do Analista</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:4px">${escHtml(t.acao)}</div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:6px">${dataHoraBRT(t.quando)} · ${escHtml(nomeResponsavel(t.responsavel_id))}</div>
+        ${t.mensagem_sugerida ? `<div style="font-size:11px;color:var(--muted);white-space:pre-wrap;padding:6px 8px;border-left:2px solid rgba(227,179,65,.5);margin-bottom:6px">✉️ ${escHtml(assinarComEu(t.mensagem_sugerida))}</div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${t.mensagem_sugerida ? `<button onclick="programarSugestao('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">⏰ Programar mensagem</button>` : ''}
+          <button onclick="aceitarSugestaoTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">Aceitar</button>
+          <button onclick="descartarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Descartar</button>
+        </div>
+      </div>`;
+    }
+    const atrasada = Date.parse(t.quando) < Date.now();
+    return `<div class="tarefa-item" style="padding:8px;border:1px solid ${atrasada ? 'rgba(255,94,91,.35)' : 'var(--bd)'};margin-bottom:6px">
+      <div style="font-size:12px;color:var(--text);margin-bottom:4px">${t.tipo === 'consulta' ? '🤝' : '📅'} ${escHtml(t.acao)}</div>
+      <div style="font-family:var(--fM);font-size:10px;color:${atrasada ? '#FF5E5B' : 'var(--dim)'};margin-bottom:6px">${dataHoraBRT(t.quando)}${atrasada ? ' · atrasado' : ''} · ${escHtml(nomeResponsavel(t.responsavel_id))}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button onclick="concluirTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">✓ Feito</button>
+        <input id="adiar-${t.id}" type="datetime-local" aria-label="Nova data e hora" style="${_INPUT_MINI}">
+        <button onclick="adiarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">Adiar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function criarTarefa(telefone) {
+  const acao = document.getElementById('tarefa-acao')?.value?.trim();
+  const quandoLocal = document.getElementById('tarefa-quando')?.value;
+  const tipo = document.getElementById('tarefa-tipo')?.value || 'contato';
+  if (!acao || !quandoLocal) { toast('Preencha o que fazer e a data/hora', 'err'); return; }
+  const quando = new Date(quandoLocal);
+  if (isNaN(quando)) { toast('Data/hora inválida', 'err'); return; }
+  const responsavel = null;   // Epos: sem seletor de responsável na ficha (equipe ainda não cadastrada)
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas`, {
+      method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ conta: 'epos', lead_telefone: telefone, responsavel_id: responsavel, acao, quando: quando.toISOString(), status: 'pendente', origem: 'manual', tipo, criada_por: quemSou() })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    document.getElementById('tarefa-acao').value = '';
+    document.getElementById('tarefa-quando').value = '';
+    toast('✅ Próximo contato agendado', 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao agendar — tente novamente', 'err'); }
+}
+
+async function concluirTarefa(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'feita', concluida_em: new Date().toISOString() }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Contato marcado como feito', 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao concluir — tente novamente', 'err'); }
+}
+
+async function aceitarSugestaoTarefa(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.sugerida`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'pendente', lembrete_enviado: false }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Sugestão aceita — entra nos lembretes', 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao aceitar — tente novamente', 'err'); }
+}
+
+// Nunca 2 mensagens programadas para o mesmo lead: mostra quem já programou e pergunta se substitui (o banco também trava)
+async function liberarAgendamento(telefone) {
+  const { data } = await sb(`mensagens_agendadas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,texto,agendada_para,criada_por&limit=1`);
+  const ja = (data || [])[0];
+  if (!ja) return true;
+  const ok = confirm(`Já existe uma mensagem programada para este lead.\n\nPor: ${ja.criada_por || 'alguém da equipe'}\nPara: ${dataHoraBRT(ja.agendada_para)}\n"${String(ja.texto || '').slice(0, 200)}"\n\nSubstituir pela nova? A atual será cancelada.`);
+  if (!ok) return false;
+  const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas?id=eq.${ja.id}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=representation' }), body: JSON.stringify({ status: 'cancelada' }) });
+  const rows = r.ok ? await r.json() : [];
+  if (!rows.length) { toast('Essa mensagem acabou de ser enviada. Confira antes de programar outra.', 'err'); carregarAgendadasLead(telefone); return false; }
+  return true;
+}
+function avisoAgendadaDupla(r, telefone) {
+  if (r.status !== 409) return false;
+  toast('Outra pessoa acabou de programar uma mensagem para este lead. Confira na ficha.', 'err');
+  carregarAgendadasLead(telefone);
+  return true;
+}
+
+// Programa a mensagem pronta da sugestão para o horário sugerido (a mesma ação do "pode programar" no WhatsApp)
+async function programarSugestao(id, telefone) {
+  const { data } = await sb(`tarefas?id=eq.${id}&status=eq.sugerida&select=id,quando,mensagem_sugerida,responsavel_id`);
+  const t = (data || [])[0];
+  if (!t?.mensagem_sugerida) { toast('Essa sugestão já foi tratada', 'err'); carregarTarefasLead(telefone); return; }
+  const quando = Date.parse(t.quando) > Date.now() + 60 * 1000 ? t.quando : new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  if (!(await liberarAgendamento(telefone))) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, {
+      method: 'POST', headers: sbJson({ 'Prefer': 'return=representation' }),
+      body: JSON.stringify({ conta: 'epos', lead_telefone: telefone, texto: assinarComEu(t.mensagem_sugerida), agendada_para: quando, criada_por: quemSou() })
+    });
+    if (avisoAgendadaDupla(r, telefone)) return;
+    const rows = r.ok ? await r.json() : [];
+    if (!rows.length) throw new Error('HTTP ' + r.status);
+    const patch = { status: 'feita', concluida_em: new Date().toISOString(), mensagem_agendada_id: rows[0].id };
+    if (!t.responsavel_id && _euEquipe?.papel === 'vendedor') patch.responsavel_id = _euEquipe.id;
+    await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify(patch) });
+    toast('✅ Mensagem programada para ' + dataHoraBRT(quando), 'ok');
+    carregarTarefasLead(telefone);
+    carregarAgendadasLead(telefone);
+  } catch(e) { toast('Erro ao programar — tente novamente', 'err'); }
+}
+
+async function descartarTarefa(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'descartada', concluida_em: new Date().toISOString() }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('Sugestão descartada', 'ok');
+    carregarTarefasLead(telefone);
+  } catch(e) { toast('Erro ao descartar — tente novamente', 'err'); }
+}
+
+async function adiarTarefa(id, telefone) {
+  const v = document.getElementById('adiar-' + id)?.value;
+  const quando = v ? new Date(v) : null;
+  if (!quando || isNaN(quando)) { toast('Escolha a nova data e hora', 'err'); return; }
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ quando: quando.toISOString(), lembrete_enviado: false, confirmacao_enviada: false }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Adiado para ' + dataHoraBRT(quando.toISOString()), 'ok');
+    carregarTarefasLead(telefone);
+    loadCRM();
+  } catch(e) { toast('Erro ao adiar — tente novamente', 'err'); }
+}
+
+// Teto de reativação (Thiago, 17/10): 25 mensagens por dia para leads que não falaram nas últimas 24 h, por número de WhatsApp
+async function mostrarCotaReativacao() {
+  const el = document.getElementById('panel-cota-reativacao');
+  if (!el) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/whatsapp_reativacao_hoje`, { method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_conta: 'epos' }) });
+    const c = await r.json();
+    if (!c || typeof c.restantes !== 'number') { el.textContent = ''; return; }
+    el.innerHTML = c.restantes > 0
+      ? `Reativação hoje: ${c.restantes} de ${c.limite} livres neste número (lead parado há mais de 24 h).`
+      : `<span style="color:var(--warn)">⏳ Limite de ${c.limite} reativações de hoje atingido: mensagem para lead parado há mais de 24 h vai amanhã às 9h.</span>`;
+  } catch (e) { el.textContent = ''; }
+}
+
+async function carregarAgendadasLead(telefone) {
+  const box = document.getElementById('panel-agendadas');
+  if (!box) return;
+  const { data } = await sb(`mensagens_agendadas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,texto,agendada_para,erro&order=agendada_para.asc`);
+  if (window._panelLead?.telefone !== telefone) return;
+  mostrarCotaReativacao();
+  const ms = data || [];
+  box.innerHTML = ms.map(m => `<div class="agendada-item" style="padding:8px;border:1px solid var(--bd);margin-bottom:6px">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--purple);margin-bottom:4px">⏰ ${dataHoraBRT(m.agendada_para)}</div>
+      ${m.erro && /Limite/.test(m.erro) ? `<div style="font-family:var(--fM);font-size:10px;color:var(--warn);margin-bottom:4px">⏳ ${escHtml(m.erro)}</div>` : ''}
+      <div style="font-size:12px;color:var(--text);margin-bottom:6px;white-space:pre-wrap">${escHtml(m.texto)}</div>
+      <button onclick="cancelarAgendada('${m.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Cancelar envio</button>
+    </div>`).join('');
+}
+
+async function agendarMensagem(telefone) {
+  const texto = document.getElementById('msg-input')?.value?.trim();
+  const v = document.getElementById('msg-agendar-quando')?.value;
+  if (!texto) { toast('Digite a mensagem antes de agendar', 'err'); return; }
+  const quando = v ? new Date(v) : null;
+  if (!quando || isNaN(quando)) { toast('Escolha a data e hora do envio', 'err'); return; }
+  if (quando.getTime() < Date.now() + 60 * 1000) { toast('Escolha um horário no futuro', 'err'); return; }
+  if (!(await liberarAgendamento(telefone))) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, {
+      method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ conta: 'epos', lead_telefone: telefone, texto, agendada_para: quando.toISOString(), criada_por: quemSou() })
+    });
+    if (avisoAgendadaDupla(r, telefone)) return;
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    document.getElementById('msg-input').value = '';
+    document.getElementById('msg-agendar-quando').value = '';
+    toast('✅ Mensagem agendada para ' + dataHoraBRT(quando.toISOString()), 'ok');
+    carregarAgendadasLead(telefone);
+  } catch(e) { toast('Erro ao agendar — tente novamente', 'err'); }
+}
+
+async function cancelarAgendada(id, telefone) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas?id=eq.${id}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=representation' }), body: JSON.stringify({ status: 'cancelada' }) });
+    const rows = r.ok ? await r.json() : [];
+    toast(rows.length ? 'Envio cancelado' : 'Essa mensagem já tinha sido enviada', rows.length ? 'ok' : 'err');
+    carregarAgendadasLead(telefone);
+  } catch(e) { toast('Erro ao cancelar — tente novamente', 'err'); }
+}
+
 // ═══ TOAST ═══
 function toast(msg, type='ok') {
   let t = document.getElementById('toast');
@@ -2987,7 +3711,7 @@ async function loadCRM() {
     const since = new Date(Date.now() - crmPeriodDays * 24 * 60 * 60 * 1000).toISOString();
     query += `&criado_em=gte.${encodeURIComponent(since)}`;
   }
-  const { data } = await sb(query);
+  const [{ data }] = await Promise.all([sb(query), carregarEquipe().catch(() => {}), carregarProximosContatos().catch(() => {})]);
   const leads = data || [];
   const stageMap = {};
   leads.forEach(l => {
@@ -3018,6 +3742,8 @@ async function loadCRM() {
         onmousedown="_dragOrClick=false"
         onclick="if(!_dragging)openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))">
         <div class="krm-name" style="pointer-events:none">${l.nome||'Lead sem nome'}</div>
+        ${torSelo(l.telefone)}
+        ${seloProximoContato(l.telefone)}
         ${(function(cs){const n=parseInt(cs)||0;if(n>=9)return '<div style="display:inline-block;padding:2px 6px;background:rgba(255,94,91,.15);color:#FF5E5B;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🔴 URGENTE</div>';if(n>=7)return '<div style="display:inline-block;padding:2px 6px;background:rgba(232,137,61,.15);color:#e8893d;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟠 PRIORITÁRIO</div>';if(n>=4)return '<div style="display:inline-block;padding:2px 6px;background:rgba(227,179,65,.12);color:#e3b341;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟡 NORMAL</div>';return '';})(l.crm_score)}
         <div class="krm-path" style="pointer-events:none">${l.perfil||'—'}</div>
         ${tel ? `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-bottom:6px;pointer-events:none">📱 ${telFmt}</div>` : ''}
@@ -3195,6 +3921,7 @@ function show(id) {
     if(id==='status') loadStatus();
     if(id==='campanhas') loadCampanhas();
     if(id==='analista') loadAnalista();
+    if(id==='relatorio') loadRelatorio();
     if(id==='clientes') loadClientes();
     if(id==='prospeccao') loadProspeccao();
   }
@@ -3712,6 +4439,22 @@ function openLeadPanel(lead) {
     <div class="panel-section">Qualificação</div>
 
     ${linhaDoTempoLead(lead)}
+    <div class="panel-section">Próximo contato</div>
+    <div id="panel-tarefas" style="margin-bottom:8px"><div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--bd);margin-bottom:12px">
+      <input id="tarefa-acao" type="text" placeholder="O que fazer (ex.: ligar para tirar a dúvida do valor)" aria-label="Ação do próximo contato"
+        style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:12px;padding:6px 8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input id="tarefa-quando" type="datetime-local" aria-label="Data e hora do próximo contato"
+          style="flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:5px 6px">
+        <select id="tarefa-tipo" aria-label="Tipo" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:5px 6px">
+          <option value="contato">Contato</option><option value="consulta">Reunião</option>
+        </select>
+      </div>
+      <button onclick="criarTarefa('${lead.telefone}')" style="padding:7px;background:rgba(145,70,255,.1);border:1px solid rgba(145,70,255,.35);color:var(--purple);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">📅 Agendar próximo contato</button>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim)">Fica marcado na ficha e no card do CRM.</div>
+    </div>
+
     <div class="panel-section">Status no Funil</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 12px">
       ${STAGES.map(s => { const ativo = getStage(lead) === s.key; return `<button onclick="mudarEtapa('${s.key}')" data-stage-btn="${s.key}" style="padding:8px 6px;background:${ativo?'var(--purple)':'var(--bg3)'};border:1px solid ${ativo?'var(--purple)':'var(--bd)'};color:${ativo?'#fff':'var(--muted)'};font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center">${s.label}</button>`; }).join('')}
@@ -3788,6 +4531,14 @@ function openLeadPanel(lead) {
         onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='var(--pur-l)';this.style.color='var(--purple)'">
         💬 Enviar pelo WhatsApp
       </button>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <input id="msg-agendar-quando" type="datetime-local" aria-label="Data e hora do envio agendado"
+          style="flex:1;min-width:150px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:6px">
+        <button onclick="agendarMensagem('${lead.telefone}')" style="padding:7px 12px;background:transparent;border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">⏰ Agendar envio</button>
+      </div>
+      <div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:4px">A mensagem agendada não pausa a IA — ela fica sabendo o que foi enviado.</div>
+      <div id="panel-cota-reativacao" style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:2px"></div>
+      <div id="panel-agendadas" style="margin-top:8px"></div>
     </div>
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
@@ -3836,7 +4587,7 @@ function openLeadPanel(lead) {
   document.getElementById('lead-panel').classList.add('open');
   document.getElementById('lead-overlay').classList.add('show');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => carregarNotaAtendimento(lead.telefone), 0);
+  setTimeout(() => { carregarNotaAtendimento(lead.telefone); carregarTarefasLead(lead.telefone); carregarAgendadasLead(lead.telefone); }, 0);
 }
 
 function closeLeadPanel() {
@@ -5258,6 +6009,8 @@ loadRoboStatus();
 loadWaClicks();
 loadNotificacoes();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
+loadTorneira();
+setInterval(loadTorneira, 60000); // Torneira: atualiza a cada minuto
 setInterval(loadNotificacoes, 60000); // recarrega notificações a cada 1min
 
 // Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
