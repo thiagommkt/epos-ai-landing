@@ -1417,6 +1417,20 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
 </div>
 
+<!-- Contratos a confirmar (17/10): a equipe diz quem fechou de verdade (data e valor) ou "não fechou" -->
+<div class="lead-panel-overlay" id="contratos-conf-overlay" onclick="fecharConfirmarContratos()">
+  <div class="lead-panel" style="max-width:760px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title">Confirmar contratos</div>
+      <button class="panel-close" onclick="fecharConfirmarContratos()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="panel-body" style="padding:18px 22px 22px">
+      <div style="font-family:var(--fM);font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px">Leads marcados como <b>Fechou</b> que ninguém confirmou. Para cada um: <b>Fechou</b> com a data e o valor do contrato, ou <b>Não fechou</b> (volta para a etapa anterior). Só os confirmados contam no card Contratos e no relatório. O evento de compra vai à Meta só para fechamento de até 7 dias.</div>
+      <div id="contratos-conf-lista"><div class="loading"></div></div>
+    </div>
+  </div>
+</div>
+
 <div class="lead-panel-overlay" id="novo-contato-overlay" onclick="fecharModalNovoContato()">
   <div class="lead-panel" style="max-width:440px;border-radius:10px" onclick="event.stopPropagation()">
     <div class="panel-header">
@@ -1628,7 +1642,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <div class="kpi-row" id="kpi-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Total de leads que chegaram pelo WhatsApp no período selecionado">Leads recebidos</div><div class="kpi-val g" id="kpi-leads">—</div><div class="kpi-delta" id="kpi-delta-1"></div><div class="kpi-note" id="kpi-leads-note">...</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" id="kpi-bar-1"></div><svg class="kpi-spark" id="spark-leads"></svg></div>
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Leads que confirmaram consulta. Taxa = agendamentos ÷ leads do período">Agendamentos</div><div class="kpi-val n" id="kpi-agendou">—</div><div class="kpi-delta" id="kpi-delta-2"></div><div class="kpi-note" id="kpi-agendou-note">confirmados</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-2"></div><svg class="kpi-spark" id="spark-agendou"></svg></div>
-        <div class="kpi"><div class="kpi-lbl" data-tooltip="Total histórico de contratos fechados. Independente do período selecionado">Contratos</div><div class="kpi-val" id="kpi-fechou">—</div><div class="kpi-delta" id="kpi-delta-3"></div><div class="kpi-note">total histórico</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" id="kpi-bar-3"></div></div>
+        <div class="kpi"><div class="kpi-lbl" data-tooltip="Contratos confirmados (com data de fechamento), total histórico. Os marcados como Fechou sem confirmação aparecem em 'para confirmar'">Contratos</div><div class="kpi-val" id="kpi-fechou">—</div><div class="kpi-delta" id="kpi-delta-3"></div><div class="kpi-note">confirmados · total histórico</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" id="kpi-bar-3"></div></div>
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Custo por Agendamento = gasto total Meta Ads ÷ número de agendamentos no período">CPL real</div><div class="kpi-val g" id="kpi-cpl">—</div><div class="kpi-delta" id="kpi-delta-4" style="color:#3fb950"></div><div class="kpi-note">gasto/agendamento</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-4"></div></div>
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Tempo médio de resposta da Donna IA — calculado sobre leads com conversa Dify ativa, excluindo outliers acima de 10 min">Resp. médio</div><div class="kpi-val n" id="kpi-resposta">—</div><div class="kpi-delta" id="kpi-delta-5" style="color:#3fb950"></div><div class="kpi-note">Donna IA · leads ativos</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-5"></div></div>
       </div>
@@ -1812,6 +1826,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <label for="cli-fechado">Contrato fechado em</label><input id="cli-fechado" type="date">
       <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5">Contrato fechado neste mês ocupa uma das vagas do mês.</div>
       <label for="cli-obs">Observações</label><textarea id="cli-obs" rows="3"></textarea>
+      <div id="cli-uso-gestor-box" style="display:none;margin-top:14px;padding:10px 12px;border:1px solid var(--bd)">
+        <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:var(--text)"><input id="cli-uso-gestor" type="checkbox" style="width:auto"> Mostrar ao gestor do cliente o uso do painel pela equipe (aba Visão do sócio)</label>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5">Mostra quem entrou e quanto tempo mexeu nos últimos 7 dias. Desligado para quem tem sócios na equipe (ex.: FM).</div>
+      </div>
       <div style="display:flex;gap:10px;margin-top:18px">
         <button onclick="fecharCliente()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px">Cancelar</button>
         <button onclick="salvarCliente()" style="flex:2;padding:10px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.45);color:#F97316;font-family:var(--fD);font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px">Salvar</button>
@@ -2328,17 +2346,20 @@ async function loadDashboard() {
 
   // Filtros de período para agendou/fechou/compareceu
   const agFilter = periodoISO ? `agendou=eq.true&criado_em=gte.${mesISO}${endClause}` : 'agendou=eq.true';
-  const fchFilter = 'fechou=eq.true'; // sempre total histórico — não filtra por período
+  // Contratos = só os confirmados pela equipe (com data de fechamento). Marcados como Fechou sem confirmação ficam "para confirmar" (17/10)
+  const fchFilter = 'fechou=eq.true&fechou_em=not.is.null&descartado=eq.false'; // total histórico
+  const fchPendFilter = 'or=(fechou.eq.true,crm_stage.eq.fechou)&fechou_em=is.null&descartado=eq.false';
   const cmpFilter = 'compareceu=eq.true'; // sempre total histórico
 
-  const [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu] = await Promise.all([
+  const [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu, fechouPend] = await Promise.all([
     sbCount('descartado=eq.false'),
     sbCount(`criado_em=gte.${mesISO}${endClause}&descartado=eq.false`),
     sbCount(agFilter),
     sbCount(fchFilter),
     sbCount('or=(em_atendimento.eq.true,dify_ativo.eq.true)'),
     sbCount(`criado_em=gte.${dia30ISO}`),
-    sbCount(cmpFilter)
+    sbCount(cmpFilter),
+    sbCount(fchPendFilter)
   ]);
 
   // Label dinâmico do período
@@ -2362,7 +2383,9 @@ async function loadDashboard() {
   const d4 = document.getElementById('kpi-delta-4');
   if (d1) d1.textContent = leadsMonth > 0 ? `↑ ${leadsMonth} total rastreados` : '';
   if (d2) d2.textContent = txAgend > 0 ? `↑ ${txAgend}% de conversão` : '';
-  if (d3) d3.textContent = txFech > 0 ? `↑ ${txFech}% dos agendados` : '';
+  if (d3) {
+    d3.innerHTML = fechouPend > 0 ? `<a onclick="abrirConfirmarContratos()" style="cursor:pointer;color:var(--warn);text-decoration:underline">⚠ ${fechouPend} para confirmar</a>` : '';
+  }
   if (d4) d4.textContent = agendou > 0 ? `↓ por agendamento` : '';
   // CPL real (gasto Meta / agendamentos)
   const kpiCpl = document.getElementById('kpi-cpl');
@@ -2406,8 +2429,8 @@ async function loadDashboard() {
   }, 300);
 
   document.getElementById('kpi-leads-note').textContent = `${leadsTotal} total histórico`;
-  const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
-  document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
+  // Compareceram é total histórico e agendamentos é do período: percentual entre os dois não faz sentido
+  document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram no total`;
 
   // Resp. médio Donna IA — calculado do Supabase (não hardcoded)
   sb(`${TABLE}?select=tempo_resposta_medio_min&dify_conversation_id=not.is.null&tempo_resposta_medio_min=not.is.null&tempo_resposta_medio_min=lt.10`)
@@ -2783,6 +2806,128 @@ function exportCSV() {
   const a = document.createElement('a'); a.href=url; a.download='epos-leads-'+new Date().toISOString().slice(0,10)+'.csv';
   a.click(); URL.revokeObjectURL(url);
   toast('✅ CSV exportado com sucesso', 'ok');
+}
+
+// ═══ LINHA DO TEMPO DO LEAD (ficha, 17/10) ═══
+// Chegou → 1º atendimento humano → Agendou → Compareceu → Fechou, com as datas que o sistema registrou.
+function linhaDoTempoLead(l) {
+  const hist = Array.isArray(l.stage_historico) ? l.stage_historico : [];
+  const quando = etapa => { const h = hist.find(x => x && x.para === etapa && x.em); return h ? h.em : null; };
+  const passos = [
+    ['Chegou', l.criado_em, true],
+    ['1º atendimento humano', l.primeiro_atendimento_humano_em, !!l.primeiro_atendimento_humano_em],
+    ['Agendou', l.data_agendamento && !quando('agendou') ? null : quando('agendou'), !!(l.agendou || quando('agendou'))],
+    ['Compareceu', l.consulta_realizada_em || quando('compareceu'), !!(l.compareceu || l.consulta_realizada_em || quando('compareceu'))],
+    ['Fechou', l.fechou_em || quando('fechou'), !!(l.fechou || l.fechou_em || quando('fechou'))],
+  ];
+  const fmt = iso => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', timeZone: 'America/Sao_Paulo' });
+  return `<div class="panel-section">Linha do tempo</div>
+    <div class="lead-timeline" style="display:flex;gap:0;margin:4px 0 14px;overflow-x:auto">${passos.map(([rot, data, feito], i) => `
+      <div class="lt-passo${feito ? ' feito' : ''}" style="flex:1;min-width:84px;text-align:center;position:relative">
+        <div style="height:2px;background:${feito ? 'var(--purple)' : 'var(--bd)'};position:absolute;top:7px;left:${i ? 0 : '50%'};right:${i === passos.length - 1 ? '50%' : 0}"></div>
+        <div style="width:14px;height:14px;border-radius:50%;margin:0 auto 6px;position:relative;background:${feito ? 'var(--purple)' : 'var(--bg3)'};border:2px solid ${feito ? 'var(--purple)' : 'var(--bd)'}"></div>
+        <div style="font-family:var(--fD);font-size:10px;font-weight:600;color:${feito ? 'var(--text)' : 'var(--dim)'}">${rot}</div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim)">${data ? fmt(data) : (feito ? 'sem data' : '—')}</div>
+      </div>`).join('')}</div>`;
+}
+
+// ═══ NOTA DO ATENDIMENTO (CRM v3, 17/10) ═══
+// O Analista avalia todo dia às 7h o atendimento humano do dia anterior (tabela atendimento_notas).
+// Nota 0–10: velocidade 20% · qualificação 25% · objeção 20% · próximo passo 25% · tom 10% (critério que não se aplica sai da conta).
+const NOTA_CRITERIOS = [['velocidade', 'Velocidade'], ['qualificacao', 'Qualificação'], ['objecao', 'Objeção'], ['proximo_passo', 'Próximo passo'], ['tom', 'Tom']];
+const notaCor = n => n >= 8 ? 'var(--neon)' : n >= 6 ? '#e3b341' : '#FF5E5B';
+
+async function carregarNotaAtendimento(telefone) {
+  const box = document.getElementById('panel-nota-atendimento');
+  if (!box) return;
+  box.innerHTML = '';
+  const conta = TABLE === 'fm_leads' ? 'fm' : 'epos';
+  const { data } = await sb(`atendimento_notas?conta=eq.${conta}&lead_telefone=eq.${encodeURIComponent(telefone)}&select=dia,vendedor,nota,criterios,justificativa,dica,evidencia&order=dia.desc&limit=1`);
+  if (window._panelLead?.telefone !== telefone) return;
+  const n = Array.isArray(data) && data[0];
+  if (!n) return;
+  const crit = NOTA_CRITERIOS.filter(([k]) => n.criterios && n.criterios[k] != null)
+    .map(([k, rot]) => `<span style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-right:10px">${rot} <b style="color:var(--text)">${n.criterios[k]}/5</b></span>`).join('');
+  box.innerHTML = `<div class="nota-atendimento" style="padding:10px 12px;border:1px solid var(--bd);margin-bottom:8px;background:rgba(255,255,255,.02)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Nota do atendimento · ${new Date(n.dia + 'T12:00:00').toLocaleDateString('pt-BR')} · ${escHtml(n.vendedor || 'Equipe')}</div>
+        <div class="nota-valor" style="font-family:var(--fD);font-size:20px;font-weight:800;color:${notaCor(Number(n.nota))}">${String(n.nota).replace('.', ',')}</div>
+      </div>
+      <div style="margin-bottom:6px">${crit}</div>
+      ${n.justificativa ? `<div style="font-size:12px;line-height:1.5;color:var(--text);margin-bottom:6px">${escHtml(n.justificativa)}</div>` : ''}
+      ${n.dica ? `<div style="font-size:12px;line-height:1.5;color:var(--neon)">💡 ${escHtml(n.dica)}</div>` : ''}
+      ${n.evidencia ? `<div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px">“${escHtml(n.evidencia)}”</div>` : ''}
+    </div>`;
+}
+
+// ═══ CONTRATOS A CONFIRMAR (17/10) ═══
+// A equipe diz quem fechou de verdade: data real + valor (Purchase à Meta só até 7 dias) ou "não fechou" (volta à etapa anterior).
+async function abrirConfirmarContratos() {
+  document.getElementById('contratos-conf-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  await carregarContratosAConfirmar();
+}
+
+function fecharConfirmarContratos() {
+  document.getElementById('contratos-conf-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  loadDashboard();
+}
+
+async function carregarContratosAConfirmar() {
+  const box = document.getElementById('contratos-conf-lista');
+  box.innerHTML = '<div class="loading"></div>';
+  const { data } = await sb(`${TABLE}?select=telefone,nome,crm_stage,criado_em,valor_servico&or=(fechou.eq.true,crm_stage.eq.fechou)&fechou_em=is.null&descartado=eq.false&order=criado_em.desc&limit=200`);
+  const lista = Array.isArray(data) ? data : [];
+  if (!lista.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:12px;color:var(--dim)">✅ Nenhum contrato para confirmar.</div>'; return; }
+  const hoje = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const campo = 'padding:7px 9px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:12px;border-radius:4px;box-sizing:border-box';
+  box.innerHTML = lista.map(l => `<div class="cc-linha" data-tel="${escHtml(l.telefone)}" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--bd)">
+      <div class="cc-quem" style="flex:1 1 200px;min-width:0;cursor:pointer" onclick="abrirFichaPorTelefone(this.closest('.cc-linha').dataset.tel)">
+        <div class="cc-nome" style="font-family:var(--fD);font-size:13px;font-weight:600;color:var(--text);overflow-wrap:anywhere">${escHtml(l.nome || 'Sem nome')}</div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim)">${escHtml(maskPhone(l.telefone))} · chegou ${fmtDate(l.criado_em)} · abrir ficha</div>
+      </div>
+      <input class="cc-data" type="date" max="${hoje}" aria-label="Data do fechamento" style="${campo};width:140px">
+      <input class="cc-valor" type="number" min="0" step="0.01" placeholder="Valor R$" aria-label="Valor do contrato" value="${l.valor_servico || ''}" style="${campo};width:110px">
+      <button class="cc-sim" onclick="confirmarContratoLista(this)" style="padding:8px 12px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px">Fechou</button>
+      <button class="cc-nao" onclick="naoFechouLista(this)" style="padding:8px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px">Não fechou</button>
+    </div>`).join('');
+}
+
+async function acaoContrato(corpo) {
+  const r = await fetch(ACOES_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ token: PROXY_TOKEN }, corpo)) });
+  return r.json();
+}
+
+async function confirmarContratoLista(btn) {
+  const linha = btn.closest('.cc-linha');
+  const tel = linha.dataset.tel;
+  const dataFech = linha.querySelector('.cc-data').value;
+  if (!dataFech) { alert('Informe a data em que o contrato foi fechado.'); linha.querySelector('.cc-data').focus(); return; }
+  const valor = parseFloat(linha.querySelector('.cc-valor').value) || 0;
+  btn.disabled = true;
+  try {
+    const d = await acaoContrato({ action: 'confirmar_contrato', telefone: tel, valor_estimado: valor, fechou_em: dataFech });
+    if (!d.success) throw new Error(d.error || 'falha ao confirmar');
+    linha.remove();
+    toast('Contrato confirmado' + (d.capi === 'enviado' ? ' · evento de compra enviado à Meta' : d.capi === 'mais_de_7_dias_sem_evento' ? ' · mais de 7 dias: sem evento na Meta' : ''), 'ok');
+    if (!document.querySelector('#contratos-conf-lista .cc-linha')) carregarContratosAConfirmar();
+  } catch (e) { btn.disabled = false; alert('Erro: ' + e.message); }
+}
+
+async function naoFechouLista(btn) {
+  const linha = btn.closest('.cc-linha');
+  const tel = linha.dataset.tel;
+  const nome = linha.querySelector('.cc-nome').textContent;
+  if (!confirm(nome + ' NÃO fechou?\n\nA marca de Fechou sai e o lead volta para a etapa anterior.')) return;
+  btn.disabled = true;
+  try {
+    const d = await acaoContrato({ action: 'desfazer_fechou', telefone: tel });
+    if (!d.success) throw new Error(d.error || 'falha');
+    linha.remove();
+    toast('Marcado como não fechou · voltou para ' + ((typeof STAGES !== 'undefined' && STAGES.find(x => x.key === d.etapa)?.label) || d.etapa), 'ok');
+    if (!document.querySelector('#contratos-conf-lista .cc-linha')) carregarContratosAConfirmar();
+  } catch (e) { btn.disabled = false; alert('Erro: ' + e.message); }
 }
 
 // ═══ TOAST ═══
@@ -3566,6 +3711,7 @@ function openLeadPanel(lead) {
 
     <div class="panel-section">Qualificação</div>
 
+    ${linhaDoTempoLead(lead)}
     <div class="panel-section">Status no Funil</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 12px">
       ${STAGES.map(s => { const ativo = getStage(lead) === s.key; return `<button onclick="mudarEtapa('${s.key}')" data-stage-btn="${s.key}" style="padding:8px 6px;background:${ativo?'var(--purple)':'var(--bg3)'};border:1px solid ${ativo?'var(--purple)':'var(--bd)'};color:${ativo?'#fff':'var(--muted)'};font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center">${s.label}</button>`; }).join('')}
@@ -3575,6 +3721,7 @@ function openLeadPanel(lead) {
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
 
     <div class="panel-section">Contexto Evolutivo (IA)</div>
+    <div id="panel-nota-atendimento"></div>
     ${(lead.auditoria_ia_resumo || lead.auditoria_ia_motivo_perda || lead.crm_score) ? `
       ${lead.auditoria_ia_resumo ? `<div style="padding:10px 12px;background:rgba(145,70,255,.04);border:1px solid var(--bd);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Resumo da conversa (IA)</div>
@@ -3689,6 +3836,7 @@ function openLeadPanel(lead) {
   document.getElementById('lead-panel').classList.add('open');
   document.getElementById('lead-overlay').classList.add('show');
   document.body.style.overflow = 'hidden';
+  setTimeout(() => carregarNotaAtendimento(lead.telefone), 0);
 }
 
 function closeLeadPanel() {
@@ -5039,6 +5187,14 @@ function abrirCliente(id) {
   document.getElementById('cli-valor').value = c.valor_mensal ?? '';
   document.getElementById('cli-fechado').value = c.fechado_em || '';
   document.getElementById('cli-obs').value = c.observacoes || '';
+  const usoBox = document.getElementById('cli-uso-gestor-box');
+  usoBox.style.display = c.conta ? '' : 'none';
+  usoBox.dataset.conta = c.conta || '';
+  document.getElementById('cli-uso-gestor').checked = false;
+  if (c.conta) {
+    fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.${encodeURIComponent(c.conta)}&select=uso_painel_gestor`, { headers: _cliHeaders() })
+      .then(r => r.json()).then(d => { document.getElementById('cli-uso-gestor').checked = !!(Array.isArray(d) && d[0]?.uso_painel_gestor); }).catch(() => {});
+  }
   document.getElementById('cliente-overlay').classList.add('show');
 }
 
@@ -5066,6 +5222,11 @@ async function salvarCliente() {
     });
     const d = await r.json();
     if (!r.ok || !Array.isArray(d) || !d.length) throw new Error(d?.message || 'sem permissão');
+    const usoConta = document.getElementById('cli-uso-gestor-box').dataset.conta;
+    if (usoConta) {
+      await fetch(`${SB_URL}/rest/v1/rpc/epos_definir_uso_gestor`, { method: 'POST', headers: _cliHeaders(),
+        body: JSON.stringify({ p_conta: usoConta, p_mostrar: document.getElementById('cli-uso-gestor').checked }) });
+    }
     fecharCliente();
     toast(id ? 'Cliente atualizado' : 'Cliente cadastrado', 'ok');
     loadClientes();
