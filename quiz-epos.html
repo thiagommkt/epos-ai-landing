@@ -75,6 +75,8 @@ html.board body{background:transparent;padding:0;min-height:0;display:block}
 html.board body::before, html.board body::after{display:none}
 html.board .app{min-height:560px;max-width:none;border-radius:18px;border:1px solid var(--line);box-shadow:none;overflow:hidden}
 html.board .footer-note{display:none}
+html.board .app{min-height:0}
+html.board .screens,html.board .screen{overflow:visible}
 
 /* topo: marca + leitura do progresso */
 .top{display:flex;align-items:center;justify-content:space-between;padding:20px 26px 0;flex-shrink:0}
@@ -144,6 +146,12 @@ h2.q-title{font-size:24px;line-height:1.2;letter-spacing:-.015em;font-weight:700
   font-family:var(--fM);font-size:12px;color:var(--dim);border:1px solid var(--line-strong);transition:all .15s ease}
 .opt.selected{border-color:var(--purple);background:linear-gradient(90deg,var(--purple-soft),rgba(145,70,255,.04))}
 .opt.selected .key{background:var(--purple);border-color:var(--purple);color:#fff}
+.q-eyebrow .multi{color:var(--orange2,#FF9A55);letter-spacing:.08em}
+.opt-list[data-multi] .opt .key{border-radius:6px}
+.opt-list[data-multi] .opt.selected .key{background:var(--orange);border-color:var(--orange)}
+.opt-list[data-multi] .opt.selected{border-color:var(--orange);background:linear-gradient(90deg,var(--orange-soft),rgba(224,96,16,.03))}
+#dorContinuar{margin:2px 0 10px}
+#dorContinuar:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
 .step-nav{display:flex;align-items:center;margin-top:auto;padding-top:4px}
 .btn-back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 6px;border:none;background:transparent;
   color:var(--dim);font-family:var(--fM);font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px}
@@ -329,10 +337,10 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
 
     <!-- 7 DOR -->
     <section class="screen" data-screen="dor">
-      <div class="q-eyebrow">Pergunta 07</div>
+      <div class="q-eyebrow">Pergunta 07 · <span class="multi">pode marcar mais de uma</span></div>
       <h2 class="q-title">Hoje, o que mais trava as suas vendas?</h2>
-      <p class="q-help">Escolha o que mais pesa.</p>
-      <div class="opt-list" data-group="dor">
+      <p class="q-help">Marque tudo o que pesa hoje.</p>
+      <div class="opt-list" data-group="dor" data-multi="true">
         <button class="opt" data-value="Chegam poucos contatos">Chegam poucos contatos</button>
         <button class="opt" data-value="Chegam contatos sem perfil">Chegam contatos sem perfil</button>
         <button class="opt" data-value="A resposta demora">A resposta demora</button>
@@ -340,6 +348,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
         <button class="opt" data-value="A equipe não consegue fechar">A equipe não consegue fechar</button>
         <button class="opt" data-value="Não sei qual anúncio dá resultado">Não sei qual anúncio dá resultado</button>
       </div>
+      <button type="button" class="btn btn-primary" id="dorContinuar" disabled>Continuar</button>
       <div class="step-nav"><button class="btn-back" onclick="goTo('conteudo')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
     </section>
 
@@ -401,6 +410,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
 (function(){
   var PERGUNTAS = ['segmento','ticket','investimento','volume','atendimento','conteudo','dor'];
   var ROTULOS = { segmento:'Segmento', ticket:'Ticket médio', investimento:'Anúncios/mês', volume:'Contatos/mês', atendimento:'Quem atende', conteudo:'Conteúdo', dor:'O que trava' };
+  var ROTULOS_WA = { segmento:'Segmento', ticket:'Ticket médio', investimento:'Anúncios por mês', volume:'Contatos por mês', atendimento:'Quem atende hoje', conteudo:'Conteúdo e criativos', dor:'O que trava as vendas' };
   var STEP_INDEX = { hook:0, segmento:1, ticket:2, investimento:3, volume:4, atendimento:5, conteudo:6, dor:7, contato:8, sucesso:9, sair:10 };
   var DONNA_WA = '556190448205';
   var answers = {};
@@ -449,6 +459,14 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     list.addEventListener('click', function(e){
       var btn = e.target.closest('.opt'); if (!btn) return;
       if (btn.getAttribute('data-custom') === 'true') { abrirOutro(); return; }
+      if (list.hasAttribute('data-multi')) {   // pergunta 7: múltipla escolha
+        var on = !btn.classList.contains('selected');
+        btn.classList.toggle('selected', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        var marcados = Array.prototype.map.call(list.querySelectorAll('.opt.selected'), function(o){ return o.getAttribute('data-value'); });
+        answers[group] = marcados.join('; ');
+        document.getElementById('dorContinuar').disabled = !marcados.length;
+        return;
+      }
       list.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
       btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true');
       answers[group] = btn.getAttribute('data-value');
@@ -458,6 +476,12 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
         goTo(prox);
       }, 240);
     });
+  });
+
+  document.getElementById('dorContinuar').addEventListener('click', function(){
+    if (!answers.dor) return;
+    trackStep('step_answer', 'dor', answers.dor);
+    goTo('contato');
   });
 
   function abrirOutro(){
@@ -537,13 +561,23 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     document.getElementById('readout').innerHTML = PERGUNTAS.map(function(k){
       return '<div><span>' + ROTULOS[k] + '</span><b>' + esc(answers[k] || '—') + '</b></div>';
     }).join('');
-    document.getElementById('btnWa').href = 'https://wa.me/' + DONNA_WA + '?text=' + encodeURIComponent('Oi, Donna! Acabei de fazer o raio-X do meu comercial.');
+    // Mensagem pronta com tudo o que ele respondeu (como no FM): a Donna segue a conversa mesmo se a chamada automática não chegar
+    var waTexto = 'Oi, Donna! Acabei de fazer o raio-X do meu comercial.\n\nNome: ' + answers.nome + '\n'
+      + PERGUNTAS.map(function(k){ return ROTULOS_WA[k] + ': ' + (answers[k] || '—'); }).join('\n');
+    document.getElementById('btnWa').href = 'https://wa.me/' + DONNA_WA + '?text=' + encodeURIComponent(waTexto);
     // modo board: avisa a página do Método que o formulário já foi preenchido (o botão "Agendar diagnóstico" muda de texto)
     if (BOARD && window.parent !== window) { try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'enviado', primeiro_nome: primeiro }, location.origin); } catch(e3){} }
     goTo('sucesso');
   });
 
   atualizarTopo('hook');
+
+  // modo board: informa a altura para a página do Método (o quadro aparece inteiro, sem rolagem interna)
+  if (BOARD && window.parent !== window) {
+    var postarAltura = function(){ try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'altura', h: document.querySelector('.app').getBoundingClientRect().height }, location.origin); } catch(eA){} };
+    if (window.ResizeObserver) new ResizeObserver(postarAltura).observe(document.querySelector('.app'));
+    window.addEventListener('load', postarAltura); setTimeout(postarAltura, 300);
+  }
 })();
 </script>
 
