@@ -1410,6 +1410,20 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
 </div>
 
+<!-- Contratos a confirmar (17/10): a equipe diz quem fechou de verdade (data e valor) ou "não fechou" -->
+<div class="lead-panel-overlay" id="contratos-conf-overlay" onclick="fecharConfirmarContratos()">
+  <div class="lead-panel" style="max-width:760px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title">Confirmar contratos</div>
+      <button class="panel-close" onclick="fecharConfirmarContratos()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="panel-body" style="padding:18px 22px 22px">
+      <div style="font-family:var(--fM);font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:14px">Leads marcados como <b>Fechou</b> que ninguém confirmou. Para cada um: <b>Fechou</b> com a data e o valor do contrato, ou <b>Não fechou</b> (volta para a etapa anterior). Só os confirmados contam no card Contratos e no relatório. O evento de compra vai à Meta só para fechamento de até 7 dias.</div>
+      <div id="contratos-conf-lista"><div class="loading"></div></div>
+    </div>
+  </div>
+</div>
+
 <div class="lead-panel-overlay" id="novo-contato-overlay" onclick="fecharModalNovoContato()">
   <div class="lead-panel" style="max-width:440px;border-radius:10px" onclick="event.stopPropagation()">
     <div class="panel-header">
@@ -1516,10 +1530,6 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       Agenda
     </a>
     <div class="nav-section">Analytics</div>
-    <a data-sec="analises" onclick="navTo('analises')">
-      <svg viewBox="0 0 16 16" fill="currentColor"><polyline points="1,12 5,6 9,9 13,2 15,4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      Análises
-    </a>
     <a data-sec="analista" onclick="navTo('analista')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 15l3.5-7 3 4 2.5-5 3 4 2-4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="3" r="1.5"/></svg>
       O Analista
@@ -1662,7 +1672,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <div class="kpi-row" id="kpi-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Total de leads que chegaram pelo WhatsApp no período selecionado">Leads recebidos</div><div class="kpi-val g" id="kpi-leads">—</div><div class="kpi-delta" id="kpi-delta-1"></div><div class="kpi-note" id="kpi-leads-note">...</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),transparent)" id="kpi-bar-1"></div><svg class="kpi-spark" id="spark-leads"></svg></div>
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Leads que confirmaram consulta com o escritório. Taxa = agendamentos ÷ leads do período">Agendamentos</div><div class="kpi-val n" id="kpi-agendou">—</div><div class="kpi-delta" id="kpi-delta-2"></div><div class="kpi-note" id="kpi-agendou-note">confirmados</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-2"></div><svg class="kpi-spark" id="spark-agendou"></svg></div>
-        <div class="kpi"><div class="kpi-lbl" data-tooltip="Total histórico de contratos fechados (processos abertos). Independente do período selecionado">Contratos</div><div class="kpi-val" id="kpi-fechou">—</div><div class="kpi-delta" id="kpi-delta-3"></div><div class="kpi-note">total histórico</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" id="kpi-bar-3"></div></div>
+        <div class="kpi"><div class="kpi-lbl" data-tooltip="Contratos confirmados pela equipe (com data de fechamento), total histórico. Os marcados como Fechou sem confirmação aparecem em 'para confirmar'">Contratos</div><div class="kpi-val" id="kpi-fechou">—</div><div class="kpi-delta" id="kpi-delta-3"></div><div class="kpi-note">confirmados · total histórico</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--text),transparent)" id="kpi-bar-3"></div></div>
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Custo por Agendamento = gasto total Meta Ads ÷ número de agendamentos no período">CPL real</div><div class="kpi-val g" id="kpi-cpl">—</div><div class="kpi-delta" id="kpi-delta-4" style="color:#3fb950"></div><div class="kpi-note">gasto/agendamento</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-4"></div></div>
         <div class="kpi"><div class="kpi-lbl" data-tooltip="Tempo médio de resposta da Ana IA — calculado sobre leads com conversa Dify ativa, excluindo outliers acima de 10 min">Resp. médio</div><div class="kpi-val n" id="kpi-resposta">—</div><div class="kpi-delta" id="kpi-delta-5" style="color:#3fb950"></div><div class="kpi-note">Ana IA · leads ativos</div><div class="kpi-bar" style="background:linear-gradient(90deg,var(--neon),transparent)" id="kpi-bar-5"></div></div>
       </div>
@@ -1921,81 +1931,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
 </section>
 
-<!-- ══ ANÁLISES ══ -->
-<section class="section" id="s-analises">
-  <div class="sec-head">
-    <div>
-      <div class="sec-title">ANÁLISES <span>& MÉTRICAS</span></div>
-      <div class="sec-sub">DASHBOARDS EM TEMPO REAL · METABASE</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="robo-toggle-btn" onclick="toggleRobo()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
-        <span class="robo-toggle-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
-        <span class="robo-toggle-label">🤖 Robô: carregando...</span>
-      </button>
-      <div class="sec-badge">● LIVE</div>
-    </div>
-  </div>
-  <div class="rule"></div>
-
-  <!-- Seletor de período -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;padding-bottom:4px">
-    <span style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-right:4px">Período:</span>
-    <button class="period-btn active" onclick="setPeriod(this,'past7days','Últimos 7 dias')" style="padding:4px 12px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">7 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'past30days','Últimos 30 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">30 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'thismonth','Este mês')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Este mês</button>
-    <button class="period-btn" onclick="setPeriod(this,'past90days','Últimos 90 dias')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">90 dias</button>
-    <button class="period-btn" onclick="setPeriod(this,'thisyear','Este ano')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Este ano</button>
-    <button class="period-btn" onclick="setPeriod(this,'','Todos os dados')" style="padding:4px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;transition:all .15s">Tudo</button>
-    <span id="period-label" style="font-family:var(--fM);font-size:10px;color:var(--neon);margin-left:8px;letter-spacing:.06em">· Últimos 7 dias</span>
-  </div>
-
-  <!-- Tabs análises -->
-  <div style="position:relative;margin-bottom:20px;background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:4px;display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
-    <style>#mb-tabs-wrap::-webkit-scrollbar{display:none}.mb-tab-pill{padding:7px 14px;background:transparent;border:none;border-radius:8px;color:#8b949e;font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}.mb-tab-pill.active,.mb-tab-pill[data-active="true"]{background:rgba(145,70,255,0.15);color:var(--purple)}.mb-tab-pill:hover:not(.active){background:rgba(255,255,255,0.04);color:#e6edf3}</style>
-    <button class="mb-tab-pill" id="mb-tabs-wrap" data-active="true" onclick="showMB(this,'mb-campanhas')">Campanhas</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-funil')">Funil</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-perfil')">Perfil</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-saude')">Saúde</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-volume')">Volume</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-leads-fonte')">Origem</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-pago-org')">Pago/Org</button>
-  </div>
-
-  <!-- Iframes -->
-  <div id="mb-campanhas" class="mb-frame" style="display:block"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📊 Campanhas</span><button onclick="toggleMBExpand('mb-campanhas')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-campanhas" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/2729e7fe-88d5-45ae-8726-56dcbecd6714" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/2729e7fe-88d5-45ae-8726-56dcbecd6714?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-funil" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📉 Funil</span><button onclick="toggleMBExpand('mb-funil')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-funil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/fa1a6254-a58c-48af-91bd-20b979b2eabf" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/fa1a6254-a58c-48af-91bd-20b979b2eabf?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-perfil" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">👤 Perfil</span><button onclick="toggleMBExpand('mb-perfil')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-perfil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/68e9c94f-c846-4999-9f1d-0eac7ecb6bec" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/68e9c94f-c846-4999-9f1d-0eac7ecb6bec?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-saude" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">💚 Saúde</span><button onclick="toggleMBExpand('mb-saude')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-saude" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/2a7bf41f-6c52-4cf0-ad54-d109089a283e" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/2a7bf41f-6c52-4cf0-ad54-d109089a283e?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-volume" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📈 Volume</span><button onclick="toggleMBExpand('mb-volume')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-volume" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/f67de9b2-d23e-422a-8d15-e9fe60c42044" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/f67de9b2-d23e-422a-8d15-e9fe60c42044?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-leads-fonte" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">🎯 Origem</span><button onclick="toggleMBExpand('mb-leads-fonte')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-leads-fonte" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/795a6543-133a-4231-8d27-7d0b62af4ccc" src="https://metabase.eposmktfilmsia.com.br/public/question/795a6543-133a-4231-8d27-7d0b62af4ccc#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-pago-org" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">⚖️ Pago/Org</span><button onclick="toggleMBExpand('mb-pago-org')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-pago-org" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/b04844f9-e636-4ac2-88de-3a9705c2d752" src="https://metabase.eposmktfilmsia.com.br/public/question/b04844f9-e636-4ac2-88de-3a9705c2d752#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.06em">
-    <span style="width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);animation:pulse 2s ease infinite;flex-shrink:0"></span>
-    Metabase · Dados em tempo real · <span id="period-footer">Últimos 7 dias</span>
-  </div>
-</section>
+<!-- Aba Análises (Metabase) removida em 17/10 a pedido do Thiago -->
 
 <!-- ══ CAMPANHAS (A4) ══ -->
 <section class="section" id="s-campanhas">
@@ -2112,15 +2048,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="card">
     <div class="card-ttl">Análises — O Analista <span id="an-count-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px"></span></div>
     <!-- Filtro de etapa -->
-    <div class="filters" style="margin-bottom:14px">
-      <button class="filter-btn active" data-an-filter="todos" onclick="setAnFilter(this,'todos')">Todos</button>
-      <button class="filter-btn" data-an-filter="qualificado" onclick="setAnFilter(this,'qualificado')">Qualificados</button>
-      <button class="filter-btn" data-an-filter="agendou" onclick="setAnFilter(this,'agendou')">Agendaram</button>
-      <button class="filter-btn" data-an-filter="fechou" onclick="setAnFilter(this,'fechou')">Fecharam</button>
-      <button class="filter-btn" data-an-filter="objection" onclick="setAnFilter(this,'objection')">Com Objeção</button>
-      <button class="filter-btn" data-an-filter="ia" onclick="setAnFilter(this,'ia')">Sistema IA</button>
-      <button class="filter-btn" data-an-filter="manual" onclick="setAnFilter(this,'manual')">Manual FM</button>
-    </div>
+    <!-- Filtros = etapas do CRM + objeção + origem (montados em renderAnFiltros) -->
+    <div class="filters" id="an-filters" style="margin-bottom:14px"></div>
     <div id="an-recentes"><div class="loading"></div></div>
   </div>
 </section>
@@ -2321,19 +2250,22 @@ async function loadDashboard() {
 
   // Filtros de período para agendou/fechou/compareceu
   const agFilter = periodoISO ? `agendou=eq.true&criado_em=gte.${mesISO}${endClause}` : 'agendou=eq.true';
-  const fchFilter = 'fechou=eq.true'; // sempre total histórico — não filtra por período
+  // Contratos = só os confirmados pela equipe (com data de fechamento). Marcados como Fechou sem confirmação ficam "para confirmar" (17/10)
+  const fchFilter = 'fechou=eq.true&fechou_em=not.is.null&descartado=eq.false'; // total histórico
+  const fchPendFilter = 'or=(fechou.eq.true,crm_stage.eq.fechou)&fechou_em=is.null&descartado=eq.false';
   const cmpFilter = 'compareceu=eq.true'; // sempre total histórico
 
-  let leadsTotal = 0, leadsMonth = 0, agendou = 0, fechou = 0, anaAtiva = 0, total30 = 0, compareceu = 0;
+  let leadsTotal = 0, leadsMonth = 0, agendou = 0, fechou = 0, anaAtiva = 0, total30 = 0, compareceu = 0, fechouPend = 0;
   try {
-    [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu] = await Promise.all([
+    [leadsTotal, leadsMonth, agendou, fechou, anaAtiva, total30, compareceu, fechouPend] = await Promise.all([
       sbCount('descartado=eq.false'),
       sbCount(`criado_em=gte.${mesISO}${endClause}&descartado=eq.false`),
       sbCount(agFilter),
       sbCount(fchFilter),
       sbCount('or=(em_atendimento.eq.true,dify_ativo.eq.true)'),
       sbCount(`criado_em=gte.${dia30ISO}`),
-      sbCount(cmpFilter)
+      sbCount(cmpFilter),
+      sbCount(fchPendFilter)
     ]);
   } catch(e) {
     const kpiRow = document.getElementById('kpi-row');
@@ -2363,7 +2295,9 @@ async function loadDashboard() {
   const d4 = document.getElementById('kpi-delta-4');
   if (d1) d1.textContent = leadsMonth > 0 ? `↑ ${leadsMonth} total rastreados` : '';
   if (d2) d2.textContent = txAgend > 0 ? `↑ ${txAgend}% de conversão` : '';
-  if (d3) d3.textContent = txFech > 0 ? `↑ ${txFech}% dos agendados` : '';
+  if (d3) {
+    d3.innerHTML = fechouPend > 0 ? `<a onclick="abrirConfirmarContratos()" style="cursor:pointer;color:var(--warn);text-decoration:underline">⚠ ${fechouPend} para confirmar</a>` : '';
+  }
   if (d4) d4.textContent = agendou > 0 ? `↓ por agendamento` : '';
   // CPL real (gasto Meta / agendamentos)
   const kpiCpl = document.getElementById('kpi-cpl');
@@ -2407,8 +2341,8 @@ async function loadDashboard() {
   }, 300);
 
   document.getElementById('kpi-leads-note').textContent = `${leadsTotal} total histórico`;
-  const taxaComp = agendou > 0 ? Math.round(compareceu / agendou * 100) : 0;
-  document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram (${taxaComp}%)`;
+  // Compareceram é total histórico e agendamentos é do período: percentual entre os dois não faz sentido (dava "600%")
+  document.getElementById('kpi-agendou-note').textContent = `${compareceu} compareceram no total`;
 
   // Resp. médio Ana IA — calculado do Supabase (não hardcoded)
   sb(`${TABLE}?select=tempo_resposta_medio_min&dify_conversation_id=not.is.null&tempo_resposta_medio_min=not.is.null&tempo_resposta_medio_min=lt.10`)
@@ -3169,14 +3103,31 @@ async function adiarTarefa(id, telefone) {
   } catch(e) { toast('Erro ao adiar — tente novamente', 'err'); }
 }
 
+// Teto de reativação (Thiago, 17/10): 25 mensagens por dia para leads que não falaram nas últimas 24 h, por número de WhatsApp
+async function mostrarCotaReativacao() {
+  const el = document.getElementById('panel-cota-reativacao');
+  if (!el) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/whatsapp_reativacao_hoje`, { method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_conta: 'fm' }) });
+    const c = await r.json();
+    if (!c || typeof c.restantes !== 'number') { el.textContent = ''; return; }
+    el.innerHTML = c.restantes > 0
+      ? `Reativação hoje: ${c.restantes} de ${c.limite} livres neste número (lead parado há mais de 24 h).`
+      : `<span style="color:var(--warn)">⏳ Limite de ${c.limite} reativações de hoje atingido: mensagem para lead parado há mais de 24 h vai amanhã às 9h.</span>`;
+  } catch (e) { el.textContent = ''; }
+}
+
 async function carregarAgendadasLead(telefone) {
   const box = document.getElementById('panel-agendadas');
   if (!box) return;
-  const { data } = await sb(`mensagens_agendadas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,texto,agendada_para&order=agendada_para.asc`);
+  const { data } = await sb(`mensagens_agendadas?conta=eq.fm&lead_telefone=eq.${encodeURIComponent(telefone)}&status=eq.pendente&select=id,texto,agendada_para,erro&order=agendada_para.asc`);
   if (window._panelLead?.telefone !== telefone) return;
+  mostrarCotaReativacao();
   const ms = data || [];
   box.innerHTML = ms.map(m => `<div class="agendada-item" style="padding:8px;border:1px solid var(--bd);margin-bottom:6px">
       <div style="font-family:var(--fM);font-size:10px;color:var(--purple);margin-bottom:4px">⏰ ${dataHoraBRT(m.agendada_para)}</div>
+      ${m.erro && /Limite/.test(m.erro) ? `<div style="font-family:var(--fM);font-size:10px;color:var(--warn);margin-bottom:4px">⏳ ${escHtml(m.erro)}</div>` : ''}
       <div style="font-size:12px;color:var(--text);margin-bottom:6px;white-space:pre-wrap">${escHtml(m.texto)}</div>
       <button onclick="cancelarAgendada('${m.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Cancelar envio</button>
     </div>`).join('');
@@ -3963,6 +3914,7 @@ function openLeadPanel(lead) {
         <button onclick="agendarMensagem('${lead.telefone}')" style="padding:7px 12px;background:transparent;border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">⏰ Agendar envio</button>
       </div>
       <div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:4px">A mensagem agendada não pausa a IA — ela fica sabendo o que foi enviado.</div>
+      <div id="panel-cota-reativacao" style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:2px"></div>
       <div id="panel-agendadas" style="margin-top:8px"></div>
     </div>
 
@@ -4441,8 +4393,8 @@ function openConversationInChat(convId) {
 // ═══ SCROLL HINT ANALYTICS TABS ═══
 document.addEventListener('DOMContentLoaded', function() {
   // Chatwoot: cada usuário usa sua própria URL do dashboard (?cw=ID)
-  // Thiago: default (view/2) | César: ?cw=15 | Pedro: ?cw=16
-  const CW_VIEW_ID = new URLSearchParams(location.search).get('cw') || '2';
+  // Thiago: default (pasta 🔵 em_conversa, id 73 — pastas recriadas na ordem do funil em 17/10) | César: ?cw=15 | Pedro: ?cw=16
+  const CW_VIEW_ID = new URLSearchParams(location.search).get('cw') || '73';
   const iframe = document.getElementById('chatwoot-iframe');
   if (iframe) iframe.src = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/custom_view/' + CW_VIEW_ID;
 
@@ -5197,50 +5149,60 @@ function setAnFilter(btn, filter) {
   renderAnRecentes();
 }
 
+// Filtros da aba do Analista = etapas do CRM (mesma ordem do quadro) + objeção + origem; só os que têm lead
+function renderAnFiltros() {
+  const box = document.getElementById('an-filters');
+  if (!box) return;
+  const base = anLeadsCache.filter(l => !l.descartado);
+  const botoes = [['todos', 'Todos', base.length]]
+    .concat(STAGES.map(s => [s.key, s.label, base.filter(l => getStage(l) === s.key).length]))
+    .concat([['objection', 'Com objeção', base.filter(l => l.auditoria_ia_motivo_perda).length],
+             ['ia', 'Sistema IA', base.filter(l => l.canal !== 'chatwoot_auditoria').length],
+             ['manual', 'Manual FM', base.filter(l => l.canal === 'chatwoot_auditoria').length]])
+    .filter(([k, , n]) => k === 'todos' || n > 0);
+  if (!botoes.some(([k]) => k === anFilterVal)) anFilterVal = 'todos';
+  box.innerHTML = botoes.map(([k, rot, n]) =>
+    `<button class="filter-btn${k === anFilterVal ? ' active' : ''}" data-an-filter="${k}" onclick="setAnFilter(this,'${k}')">${rot} · ${n}</button>`).join('');
+}
+
 function renderAnRecentes() {
   const recBox = document.getElementById('an-recentes');
   const lbl = document.getElementById('an-count-label');
   if (!recBox) return;
-  let filtered = anLeadsCache;
-  if (anFilterVal === 'qualificado') filtered = filtered.filter(l => l.qualificado);
-  else if (anFilterVal === 'agendou') filtered = filtered.filter(l => l.agendou);
-  else if (anFilterVal === 'fechou') filtered = filtered.filter(l => l.fechou);
-  else if (anFilterVal === 'objection') filtered = filtered.filter(l => l.auditoria_ia_motivo_perda);
+  let filtered = anLeadsCache.filter(l => !l.descartado);
+  if (anFilterVal === 'objection') filtered = filtered.filter(l => l.auditoria_ia_motivo_perda);
   else if (anFilterVal === 'ia') filtered = filtered.filter(l => l.canal !== 'chatwoot_auditoria');
   else if (anFilterVal === 'manual') filtered = filtered.filter(l => l.canal === 'chatwoot_auditoria');
+  else if (anFilterVal !== 'todos') filtered = filtered.filter(l => getStage(l) === anFilterVal);
   const sorted = filtered.sort((a,b) => new Date(b.auditoria_ia_em||b.criado_em) - new Date(a.auditoria_ia_em||a.criado_em));
   if (lbl) lbl.textContent = sorted.length + ' lead(s)';
   if (!sorted.length) { recBox.innerHTML = '<div class="empty">Nenhum lead neste filtro</div>'; return; }
-  recBox.innerHTML = '<div style="overflow-x:auto"><table class="tbl" style="min-width:860px;table-layout:fixed;width:100%">' +
-    '<colgroup><col style="width:10%"><col style="width:6%"><col style="width:4%"><col style="width:8%"><col style="width:40%"><col style="width:32%"></colgroup>' +
+  const cel = 'padding:12px 14px;vertical-align:top';
+  recBox.innerHTML = '<div style="overflow-x:auto"><table class="tbl an-tbl" style="min-width:900px;table-layout:fixed;width:100%">' +
+    '<colgroup><col style="width:16%"><col style="width:8%"><col style="width:8%"><col style="width:12%"><col style="width:33%"><col style="width:23%"></colgroup>' +
     '<thead><tr>' +
-    '<th>Nome</th><th>Canal</th><th style="text-align:center">Score</th><th>Etapa</th><th>Resumo IA</th><th>Objeção</th>' +
+    `<th style="${cel}">Nome</th><th style="${cel};text-align:center">Canal</th><th style="${cel};text-align:center">Score</th><th style="${cel}">Etapa</th><th style="${cel}">Resumo IA</th><th style="${cel}">Objeção</th>` +
     '</tr></thead><tbody>' +
     sorted.map(l => {
-      const leadJson = encodeURIComponent(JSON.stringify(l));
       const isManual = l.canal === 'chatwoot_auditoria';
       const canalBg = isManual ? 'rgba(145,70,255,.1)' : 'rgba(0,245,160,.1)';
       const canalCor = isManual ? 'var(--purple)' : 'var(--neon)';
       const canalTxt = isManual
         ? `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--fM);font-size:8px;padding:3px 6px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg};border-radius:4px"><span style="font-size:12px;line-height:1">👤</span><span>Manual</span></span>`
         : `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--fM);font-size:8px;padding:3px 6px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg};border-radius:4px"><span style="font-size:12px;line-height:1">🤖</span><span>IA</span></span>`;
-      let etapa = '<span class="badge b-ct">contato</span>';
-      if (l.fechou) etapa = '<span class="badge b-ag">fechou</span>';
-      else if (l.compareceu) etapa = '<span class="badge b-ag">compareceu</span>';
-      else if (l.agendou) etapa = '<span class="badge b-ag">agendou</span>';
-      else if (l.qualificado) etapa = '<span class="badge b-ql">qualificado</span>';
-      return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
-        <td class="td-hi" style="font-size:11px;white-space:normal;word-break:break-word;line-height:1.3">${l.nome||'—'}</td>
-        <td style="text-align:center">${canalTxt}</td>
-        <td style="text-align:center">${(s=>{
+      // Etapa = etapa do CRM (mesma do quadro); clique abre a ficha completa
+      return `<tr class="an-linha" data-tel="${escHtml(l.telefone||'')}" style="cursor:pointer" onclick="abrirFichaPorTelefone(this.dataset.tel)" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
+        <td class="td-hi" style="${cel};font-size:12px;white-space:normal;word-break:break-word;line-height:1.35">${escHtml(l.nome||'—')}</td>
+        <td style="${cel};text-align:center">${canalTxt}</td>
+        <td style="${cel};text-align:center">${(s=>{
   const n=parseInt(s)||0;
   const c=n>=9?'#3fb950':n>=7?'#e8893d':n>=4?'#e3b341':n>=1?'#FF5E5B':'#8b949e';
   const lbl=n>=9?'Quente':n>=7?'Engajado':n>=4?'Morno':n>=1?'Frio':'—';
   return n>0?`<span style="font-family:var(--fM);font-size:10px;font-weight:700;color:${c}">${n}</span><div style="font-size:8px;color:${c};opacity:0.8">${lbl}</div>`:'—';
 })(l.crm_score)}</td>
-        <td>${etapa}</td>
-        <td style="font-size:11px;color:var(--muted);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${l.auditoria_ia_resumo||'—'}</td>
-        <td style="font-size:11px;color:var(--warn);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${l.auditoria_ia_motivo_perda||'—'}</td>
+        <td style="${cel}">${stageBadge(l)}</td>
+        <td style="${cel};font-size:11px;color:var(--muted);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${escHtml(l.auditoria_ia_resumo||'—')}</td>
+        <td style="${cel};font-size:11px;color:var(--warn);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${escHtml(l.auditoria_ia_motivo_perda||'—')}</td>
       </tr>`;
     }).join('') + '</tbody></table></div>';
 }
@@ -5375,11 +5337,12 @@ async function loadAnalista(force) {
         periodoParam = '&criado_em=gte.' + d.toISOString();
       }
     }
-    const fields = 'select=canal,qualificado,agendou,compareceu,fechou,score,crm_score,crm_auditoria_at,auditoria_ia_proxima_acao,chatwoot_conversation_id,nome,telefone,perfil,patologia,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,typebot_concluido,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
+    const fields = 'select=crm_stage,descartado,canal,qualificado,agendou,compareceu,fechou,score,crm_score,crm_auditoria_at,auditoria_ia_proxima_acao,chatwoot_conversation_id,nome,telefone,perfil,patologia,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,typebot_concluido,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
     const r = await fetch(SB_URL+'/rest/v1/'+TABLE+'?'+fields+periodoParam+'&order=criado_em.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY)}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const leads = await r.json();
     anLeadsCache = leads;
+    renderAnFiltros();
 
     const ai=leads.filter(l=>l.canal!=='chatwoot_auditoria');
     const manual=leads.filter(l=>l.canal==='chatwoot_auditoria');
@@ -5553,6 +5516,76 @@ async function rejeitarContrato(telefone) {
     const d = await r.json();
     if (d.success) loadPendentes();
   } catch(e) {}
+}
+
+// ═══ CONTRATOS A CONFIRMAR (17/10) ═══
+// A equipe diz quem fechou de verdade: data real + valor (Purchase à Meta só até 7 dias) ou "não fechou" (volta à etapa anterior).
+async function abrirConfirmarContratos() {
+  document.getElementById('contratos-conf-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  await carregarContratosAConfirmar();
+}
+
+function fecharConfirmarContratos() {
+  document.getElementById('contratos-conf-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  loadDashboard();
+}
+
+async function carregarContratosAConfirmar() {
+  const box = document.getElementById('contratos-conf-lista');
+  box.innerHTML = '<div class="loading"></div>';
+  const { data } = await sb(`${TABLE}?select=telefone,nome,crm_stage,criado_em,valor_servico&or=(fechou.eq.true,crm_stage.eq.fechou)&fechou_em=is.null&descartado=eq.false&order=criado_em.desc&limit=200`);
+  const lista = Array.isArray(data) ? data : [];
+  if (!lista.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:12px;color:var(--dim)">✅ Nenhum contrato para confirmar.</div>'; return; }
+  const hoje = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const campo = 'padding:7px 9px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:12px;border-radius:4px;box-sizing:border-box';
+  box.innerHTML = lista.map(l => `<div class="cc-linha" data-tel="${escHtml(l.telefone)}" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--bd)">
+      <div class="cc-quem" style="flex:1 1 200px;min-width:0;cursor:pointer" onclick="abrirFichaPorTelefone(this.closest('.cc-linha').dataset.tel)">
+        <div class="cc-nome" style="font-family:var(--fD);font-size:13px;font-weight:600;color:var(--text);overflow-wrap:anywhere">${escHtml(l.nome || 'Sem nome')}</div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim)">${escHtml(maskPhone(l.telefone))} · chegou ${fmtDate(l.criado_em)} · abrir ficha</div>
+      </div>
+      <input class="cc-data" type="date" max="${hoje}" aria-label="Data do fechamento" style="${campo};width:140px">
+      <input class="cc-valor" type="number" min="0" step="0.01" placeholder="Valor R$" aria-label="Valor do contrato" value="${l.valor_servico || ''}" style="${campo};width:110px">
+      <button class="cc-sim" onclick="confirmarContratoLista(this)" style="padding:8px 12px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.35);color:var(--neon);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px">Fechou</button>
+      <button class="cc-nao" onclick="naoFechouLista(this)" style="padding:8px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:4px">Não fechou</button>
+    </div>`).join('');
+}
+
+async function acaoContrato(corpo) {
+  const r = await fetch(ACOES_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ token: PROXY_TOKEN }, corpo)) });
+  return r.json();
+}
+
+async function confirmarContratoLista(btn) {
+  const linha = btn.closest('.cc-linha');
+  const tel = linha.dataset.tel;
+  const dataFech = linha.querySelector('.cc-data').value;
+  if (!dataFech) { alert('Informe a data em que o contrato foi fechado.'); linha.querySelector('.cc-data').focus(); return; }
+  const valor = parseFloat(linha.querySelector('.cc-valor').value) || 0;
+  btn.disabled = true;
+  try {
+    const d = await acaoContrato({ action: 'confirmar_contrato', telefone: tel, valor_estimado: valor, fechou_em: dataFech });
+    if (!d.success) throw new Error(d.error || 'falha ao confirmar');
+    linha.remove();
+    toast('Contrato confirmado' + (d.capi === 'enviado' ? ' · evento de compra enviado à Meta' : d.capi === 'mais_de_7_dias_sem_evento' ? ' · mais de 7 dias: sem evento na Meta' : ''), 'ok');
+    if (!document.querySelector('#contratos-conf-lista .cc-linha')) carregarContratosAConfirmar();
+  } catch (e) { btn.disabled = false; alert('Erro: ' + e.message); }
+}
+
+async function naoFechouLista(btn) {
+  const linha = btn.closest('.cc-linha');
+  const tel = linha.dataset.tel;
+  const nome = linha.querySelector('.cc-nome').textContent;
+  if (!confirm(nome + ' NÃO fechou?\n\nA marca de Fechou sai e o lead volta para a etapa anterior.')) return;
+  btn.disabled = true;
+  try {
+    const d = await acaoContrato({ action: 'desfazer_fechou', telefone: tel });
+    if (!d.success) throw new Error(d.error || 'falha');
+    linha.remove();
+    toast('Marcado como não fechou · voltou para ' + ((typeof STAGES !== 'undefined' && STAGES.find(x => x.key === d.etapa)?.label) || d.etapa), 'ok');
+    if (!document.querySelector('#contratos-conf-lista .cc-linha')) carregarContratosAConfirmar();
+  } catch (e) { btn.disabled = false; alert('Erro: ' + e.message); }
 }
 
 // ═══ RELATÓRIO DE VENDAS (CRM v3) ═══

@@ -1527,10 +1527,6 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       Agenda
     </a>
     <div class="nav-section">Analytics</div>
-    <a data-sec="analises" onclick="navTo('analises')">
-      <svg viewBox="0 0 16 16" fill="currentColor"><polyline points="1,12 5,6 9,9 13,2 15,4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-      Análises
-    </a>
     <a data-sec="analista" onclick="navTo('analista')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 15l3.5-7 3 4 2.5-5 3 4 2-4" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="3" r="1.5"/></svg>
       O Analista
@@ -1969,101 +1965,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
 </section>
 
-<!-- ══ ANÁLISES ══ -->
-<section class="section" id="s-analises">
-  <div class="sec-head">
-    <div>
-      <div class="sec-title">ANÁLISES <span>& MÉTRICAS</span></div>
-      <div class="sec-sub">DASHBOARDS EM TEMPO REAL · METABASE</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="robo-toggle-btn" onclick="toggleRobo()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
-        <span class="robo-toggle-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
-        <span class="robo-toggle-label">🤖 Robô: carregando...</span>
-      </button>
-      <div class="sec-badge">● LIVE</div>
-    </div>
-  </div>
-  <div class="rule"></div>
-
-  <div style="margin-bottom:12px;padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:4px;font-family:var(--fM);font-size:11px;color:var(--muted);line-height:1.6">
-    ℹ️ Dashboards Metabase precisam ser configurados no Metabase apontando para a tabela <code style="background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">leads</code> — acesse o Metabase para duplicar e ajustar cada painel.
-  </div>
-
-  <!-- Seletor de período -->
-  <select class="period-sel-mob" id="an-period-sel" onchange="setPeriodSel(this)">
-    <option value="past7days" selected>Últimos 7 dias</option>
-    <option value="past30days">Últimos 30 dias</option>
-    <option value="thismonth">Este mês</option>
-    <option value="past90days">Últimos 90 dias</option>
-    <option value="thisyear">Este ano</option>
-    <option value="">Todos os dados</option>
-  </select>
-  <div class="prd-drop" style="margin-bottom:16px">
-    <span class="prd-lbl">Período</span>
-    <div class="prd-btn-wrap">
-      <button class="prd-trigger" id="an-prd-trigger" onclick="togglePrdMenu('an-prd-trigger','an-prd-menu')">
-        <svg class="prd-ico" width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v4M11 1v4M1 7h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <span id="period-label">7 dias</span>
-        <svg class="prd-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <div class="prd-menu" id="an-prd-menu">
-        <div class="prd-opt active" onclick="anPrdPick('past7days','7 dias')">7 dias</div>
-        <div class="prd-opt" onclick="anPrdPick('past30days','30 dias')">30 dias</div>
-        <div class="prd-opt" onclick="anPrdPick('thismonth','Este mês')">Este mês</div>
-        <div class="prd-opt" onclick="anPrdPick('past90days','90 dias')">90 dias</div>
-        <div class="prd-opt" onclick="anPrdPick('thisyear','Este ano')">Este ano</div>
-        <div class="prd-opt" onclick="anPrdPick('','Todos os dados')">Tudo</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tabs análises -->
-  <div style="position:relative;margin-bottom:20px;background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:4px;display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">
-    <style>#mb-tabs-wrap::-webkit-scrollbar{display:none}.mb-tab-pill{padding:7px 14px;background:transparent;border:none;border-radius:8px;color:#8b949e;font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}.mb-tab-pill.active,.mb-tab-pill[data-active="true"]{background:rgba(145,70,255,0.15);color:var(--purple)}.mb-tab-pill:hover:not(.active){background:rgba(255,255,255,0.04);color:#e6edf3}</style>
-    <button class="mb-tab-pill" id="mb-tabs-wrap" data-active="true" onclick="showMB(this,'mb-campanhas')">Campanhas</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-funil')">Funil</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-perfil')">Perfil</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-saude')">Saúde</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-volume')">Volume</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-leads-fonte')">Origem</button>
-    <button class="mb-tab-pill" onclick="showMB(this,'mb-pago-org')">Pago/Org</button>
-  </div>
-
-  <!-- Iframes -->
-  <div id="mb-campanhas" class="mb-frame" style="display:block"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📊 Campanhas</span><button onclick="toggleMBExpand('mb-campanhas')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-campanhas" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/f386263e-f028-4fc1-b9a5-301616c8235c" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/f386263e-f028-4fc1-b9a5-301616c8235c?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-funil" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📉 Funil</span><button onclick="toggleMBExpand('mb-funil')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-funil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/039e953d-b26d-4024-9425-a5513ccd6ea5" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/039e953d-b26d-4024-9425-a5513ccd6ea5?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-perfil" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">👤 Perfil</span><button onclick="toggleMBExpand('mb-perfil')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-perfil" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/4755048f-a0c4-4c85-a5b8-fcb747730323" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/4755048f-a0c4-4c85-a5b8-fcb747730323?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-saude" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">💚 Saúde</span><button onclick="toggleMBExpand('mb-saude')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-saude" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/69beec4d-2094-44f2-b4d2-5f9f9cbe1272" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/69beec4d-2094-44f2-b4d2-5f9f9cbe1272?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-volume" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">📈 Volume</span><button onclick="toggleMBExpand('mb-volume')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-volume" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/dashboard/be17d9e3-d174-44fe-af48-6b193a2aaf8f" src="https://metabase.eposmktfilmsia.com.br/public/dashboard/be17d9e3-d174-44fe-af48-6b193a2aaf8f?date=past7days#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-leads-fonte" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">🎯 Origem</span><button onclick="toggleMBExpand('mb-leads-fonte')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-leads-fonte" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/d100f56b-0bf8-444f-b372-9983f6f31e89" src="https://metabase.eposmktfilmsia.com.br/public/question/d100f56b-0bf8-444f-b372-9983f6f31e89#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div id="mb-pago-org" class="mb-frame" style="display:none"><div class="mb-expand-bar"><span style="font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">⚖️ Pago/Org</span><button onclick="toggleMBExpand('mb-pago-org')" style="padding:4px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">⛶ Maximizar</button></div><div style="position:relative;background:#0d1117;overflow:hidden"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:1"></div>
-    <iframe id="ifr-pago-org" class="mb-iframe" data-base="https://metabase.eposmktfilmsia.com.br/public/question/57fcbe5b-a17e-4739-ad11-9b6df3a4a433" src="https://metabase.eposmktfilmsia.com.br/public/question/57fcbe5b-a17e-4739-ad11-9b6df3a4a433#bordered=false&titled=false&theme=night" style="width:100%;border:none;display:block;filter:hue-rotate(45deg) saturate(1.4) brightness(0.88)" frameborder="0" loading="lazy"></iframe>
-  </div></div>
-
-  <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.06em">
-    <span style="width:6px;height:6px;border-radius:50%;background:var(--neon);box-shadow:0 0 6px var(--neon);animation:pulse 2s ease infinite;flex-shrink:0"></span>
-    Metabase · Dados em tempo real · <span id="period-footer">Últimos 7 dias</span>
-  </div>
-</section>
+<!-- Aba Análises (Metabase) removida em 17/10 a pedido do Thiago -->
 
 <!-- ══ CAMPANHAS (A4) ══ -->
 <section class="section" id="s-campanhas">
@@ -2221,15 +2123,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="card">
     <div class="card-ttl">Análises — O Analista <span id="an-count-label" style="font-family:var(--fM);font-size:9px;color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;margin-left:6px"></span></div>
     <!-- Filtro de etapa -->
-    <div class="filters" style="margin-bottom:14px">
-      <button class="filter-btn active" data-an-filter="todos" onclick="setAnFilter(this,'todos')">Todos</button>
-      <button class="filter-btn" data-an-filter="qualificado" onclick="setAnFilter(this,'qualificado')">Qualificados</button>
-      <button class="filter-btn" data-an-filter="agendou" onclick="setAnFilter(this,'agendou')">Agendaram</button>
-      <button class="filter-btn" data-an-filter="fechou" onclick="setAnFilter(this,'fechou')">Fecharam</button>
-      <button class="filter-btn" data-an-filter="objection" onclick="setAnFilter(this,'objection')">Com Objeção</button>
-      <button class="filter-btn" data-an-filter="ia" onclick="setAnFilter(this,'ia')">Sistema IA</button>
-      <button class="filter-btn" data-an-filter="manual" onclick="setAnFilter(this,'manual')">Manual Epos</button>
-    </div>
+    <!-- Filtros = etapas do CRM + objeção + origem (montados em renderAnFiltros) -->
+    <div class="filters" id="an-filters" style="margin-bottom:14px"></div>
     <div id="an-recentes"><div class="loading"></div></div>
   </div>
 </section>
@@ -4871,50 +4766,67 @@ function setAnFilter(btn, filter) {
   renderAnRecentes();
 }
 
+// Filtros da aba do Analista = etapas do CRM (mesma ordem do quadro) + objeção + origem; só os que têm lead
+async function abrirFichaPorTelefone(tel) {
+  const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(tel)}&select=*&limit=1`);
+  if (Array.isArray(data) && data[0]) openLeadPanel(data[0]);
+  else toast('Lead não encontrado', 'err');
+}
+
+// Filtros da aba do Analista (Epos)
+function renderAnFiltros() {
+  const box = document.getElementById('an-filters');
+  if (!box) return;
+  const base = anLeadsCache.filter(l => !l.descartado);
+  const botoes = [['todos', 'Todos', base.length]]
+    .concat(STAGES.map(s => [s.key, s.label, base.filter(l => getStage(l) === s.key).length]))
+    .concat([['objection', 'Com objeção', base.filter(l => l.auditoria_ia_motivo_perda).length],
+             ['ia', 'Sistema IA', base.filter(l => l.canal !== 'chatwoot_auditoria').length],
+             ['manual', 'Manual Epos', base.filter(l => l.canal === 'chatwoot_auditoria').length]])
+    .filter(([k, , n]) => k === 'todos' || n > 0);
+  if (!botoes.some(([k]) => k === anFilterVal)) anFilterVal = 'todos';
+  box.innerHTML = botoes.map(([k, rot, n]) =>
+    `<button class="filter-btn${k === anFilterVal ? ' active' : ''}" data-an-filter="${k}" onclick="setAnFilter(this,'${k}')">${rot} · ${n}</button>`).join('');
+}
+
 function renderAnRecentes() {
   const recBox = document.getElementById('an-recentes');
   const lbl = document.getElementById('an-count-label');
   if (!recBox) return;
-  let filtered = anLeadsCache;
-  if (anFilterVal === 'qualificado') filtered = filtered.filter(l => l.qualificado);
-  else if (anFilterVal === 'agendou') filtered = filtered.filter(l => l.agendou);
-  else if (anFilterVal === 'fechou') filtered = filtered.filter(l => l.fechou);
-  else if (anFilterVal === 'objection') filtered = filtered.filter(l => l.auditoria_ia_motivo_perda);
+  let filtered = anLeadsCache.filter(l => !l.descartado);
+  if (anFilterVal === 'objection') filtered = filtered.filter(l => l.auditoria_ia_motivo_perda);
   else if (anFilterVal === 'ia') filtered = filtered.filter(l => l.canal !== 'chatwoot_auditoria');
   else if (anFilterVal === 'manual') filtered = filtered.filter(l => l.canal === 'chatwoot_auditoria');
+  else if (anFilterVal !== 'todos') filtered = filtered.filter(l => getStage(l) === anFilterVal);
   const sorted = filtered.sort((a,b) => new Date(b.auditoria_ia_em||b.criado_em) - new Date(a.auditoria_ia_em||a.criado_em));
   if (lbl) lbl.textContent = sorted.length + ' lead(s)';
   if (!sorted.length) { recBox.innerHTML = '<div class="empty">Nenhum lead neste filtro</div>'; return; }
-  recBox.innerHTML = '<div style="overflow-x:auto"><table class="tbl" style="min-width:860px;table-layout:fixed;width:100%">' +
-    '<colgroup><col style="width:10%"><col style="width:6%"><col style="width:4%"><col style="width:8%"><col style="width:40%"><col style="width:32%"></colgroup>' +
+  const cel = 'padding:12px 14px;vertical-align:top';
+  recBox.innerHTML = '<div style="overflow-x:auto"><table class="tbl an-tbl" style="min-width:900px;table-layout:fixed;width:100%">' +
+    '<colgroup><col style="width:16%"><col style="width:8%"><col style="width:8%"><col style="width:12%"><col style="width:33%"><col style="width:23%"></colgroup>' +
     '<thead><tr>' +
-    '<th>Nome</th><th>Canal</th><th style="text-align:center">Score</th><th>Etapa</th><th>Resumo IA</th><th>Objeção</th>' +
+    `<th style="${cel}">Nome</th><th style="${cel};text-align:center">Canal</th><th style="${cel};text-align:center">Score</th><th style="${cel}">Etapa</th><th style="${cel}">Resumo IA</th><th style="${cel}">Objeção</th>` +
     '</tr></thead><tbody>' +
     sorted.map(l => {
-      const leadJson = encodeURIComponent(JSON.stringify(l));
       const isManual = l.canal === 'chatwoot_auditoria';
       const canalBg = isManual ? 'rgba(145,70,255,.1)' : 'rgba(0,245,160,.1)';
       const canalCor = isManual ? 'var(--purple)' : 'var(--neon)';
       const canalTxt = isManual
         ? `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--fM);font-size:8px;padding:3px 6px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg};border-radius:4px"><span style="font-size:12px;line-height:1">👤</span><span>Manual</span></span>`
         : `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-family:var(--fM);font-size:8px;padding:3px 6px;background:${canalBg};color:${canalCor};border:1px solid ${canalBg};border-radius:4px"><span style="font-size:12px;line-height:1">🤖</span><span>IA</span></span>`;
-      let etapa = '<span class="badge b-ct">contato</span>';
-      if (l.fechou) etapa = '<span class="badge b-ag">fechou</span>';
-      else if (l.compareceu) etapa = '<span class="badge b-ag">compareceu</span>';
-      else if (l.agendou) etapa = '<span class="badge b-ag">agendou</span>';
-      else if (l.qualificado) etapa = '<span class="badge b-ql">qualificado</span>';
-      return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
-        <td class="td-hi" style="font-size:11px;white-space:normal;word-break:break-word;line-height:1.3">${l.nome||'—'}</td>
-        <td style="text-align:center">${canalTxt}</td>
-        <td style="text-align:center">${(s=>{
+      // Etapa = etapa do CRM (mesma do quadro); clique abre a ficha completa
+      return `<tr class="an-linha" data-tel="${escHtml(l.telefone||'')}" style="cursor:pointer" onclick="abrirFichaPorTelefone(this.dataset.tel)" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
+        <td class="td-hi" style="${cel};font-size:12px;white-space:normal;word-break:break-word;line-height:1.35">${escHtml(l.nome||'—')}</td>
+        <td style="${cel};text-align:center">${canalTxt}</td>
+        <td style="${cel};text-align:center">${(s=>{
   const n=parseInt(s)||0;
   const c=n>=9?'#3fb950':n>=7?'#e8893d':n>=4?'#e3b341':n>=1?'#FF5E5B':'#8b949e';
   const lbl=n>=9?'Quente':n>=7?'Engajado':n>=4?'Morno':n>=1?'Frio':'—';
   return n>0?`<span style="font-family:var(--fM);font-size:10px;font-weight:700;color:${c}">${n}</span><div style="font-size:8px;color:${c};opacity:0.8">${lbl}</div>`:'—';
 })(l.crm_score)}</td>
-        <td>${etapa}</td>
-        <td style="font-size:11px;color:var(--muted);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${l.auditoria_ia_resumo||'—'}</td>
-        <td style="font-size:11px;color:var(--warn);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${l.auditoria_ia_motivo_perda||'—'}</td>
+        <td style="${cel}">${stageBadge(l)}</td>
+        <td style="${cel};font-size:11px;color:var(--muted);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${escHtml(l.auditoria_ia_resumo||'—')}</td>
+        <td style="${cel};font-size:11px;color:var(--warn);word-break:break-word;overflow-wrap:break-word;white-space:normal;line-height:1.45">${escHtml(l.auditoria_ia_motivo_perda||'—')}</td>
       </tr>`;
     }).join('') + '</tbody></table></div>';
 }
@@ -4942,11 +4854,12 @@ async function loadAnalista(force) {
         periodoParam = '&criado_em=gte.' + d.toISOString();
       }
     }
-    const fields = 'select=canal,qualificado,agendou,compareceu,fechou,score,crm_score,crm_auditoria_at,auditoria_ia_proxima_acao,chatwoot_conversation_id,nome,telefone,perfil,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
+    const fields = 'select=crm_stage,descartado,canal,qualificado,agendou,compareceu,fechou,score,crm_score,crm_auditoria_at,auditoria_ia_proxima_acao,chatwoot_conversation_id,nome,telefone,perfil,cidade,criado_em,data_agendamento,em_atendimento,dify_ativo,dify_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em';
     const r = await fetch(SB_URL+'/rest/v1/'+TABLE+'?'+fields+periodoParam+'&order=criado_em.desc',{headers:{apikey:SB_KEY,Authorization:'Bearer '+(window._ACCESS_TOKEN||SB_KEY)}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const leads = await r.json();
     anLeadsCache = leads;
+    renderAnFiltros();
 
     const ai=leads.filter(l=>l.canal!=='chatwoot_auditoria');
     const manual=leads.filter(l=>l.canal==='chatwoot_auditoria');
