@@ -1580,7 +1580,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <style>
     #torneira-card .tor-kpis{grid-template-columns:repeat(4,1fr);margin-bottom:12px}
     #torneira-card .tor-kpi{cursor:pointer}
-    #torneira-card .tor-kpi.ativo{border-color:var(--tor-cor);box-shadow:inset 0 0 0 1px var(--tor-cor)}
+    #torneira-card .tor-kpi.ativo{border-color:rgba(249,115,22,.45)}
     #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
     #torneira-card .tor-painel-topo{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
     #torneira-card .tor-dica{font-family:var(--fM);font-size:9px;text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400}
@@ -1824,14 +1824,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       style="width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px;outline:none;transition:border-color .2s"
       onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--bd)'">
   </div>
-  <div class="filters" id="dados-filters">
-    <button class="filter-btn active" data-filter="todos" onclick="filterLeads(this)">Todos</button>
-    <button class="filter-btn" data-filter="qualificado" onclick="filterLeads(this)">Qualificados</button>
-    <button class="filter-btn" data-filter="agendou" onclick="filterLeads(this)">Agendados</button>
-    <button class="filter-btn" data-filter="fechou" onclick="filterLeads(this)">Fecharam</button>
-    <button class="filter-btn" data-filter="em_conversa" onclick="filterLeads(this)">Em Conversa</button>
-    <button class="filter-btn" data-filter="quiz" onclick="filterLeads(this)">Quiz</button>
-  </div>
+  <!-- Filtros = etapas do CRM (montados em renderFiltrosLeads) -->
+  <div class="filters" id="dados-filters"></div>
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--bd)">
     <table class="tbl" style="min-width:720px">
       <thead style="background:rgba(145,70,255,0.06)"><tr>
@@ -2350,7 +2344,8 @@ async function loadDashboard() {
   // Label dinâmico do período
   const periodoLabels = { this_month:'este mês', last_month:'mês passado', last_30:'30d', last_60:'60d', last_90:'90d', last_14:'14d', last_7:'7d', all:'histórico' };
   const pLabel = periodoLabels[dbPeriod] || '30d';
-  const kpiLeadsEl = document.querySelector('.kpi-lbl');
+  // Rótulo do card de Leads (não o 1º card da página: a Torneira fica acima)
+  const kpiLeadsEl = document.getElementById('kpi-leads')?.closest('.kpi')?.querySelector('.kpi-lbl');
   if (kpiLeadsEl) kpiLeadsEl.textContent = `Leads (${pLabel})`;
 
   if (kpiRowEl) kpiRowEl.classList.remove('loading');
@@ -2711,20 +2706,38 @@ async function loadDashboard() {
 }
 
 // ═══ LEADS TABLE ═══
+// Base inteira, só os campos da tabela; a ficha completa vem de abrirFichaPorTelefone no clique
 async function loadLeads() {
-  const { data, count } = await sb(`${TABLE}?select=*&order=criado_em.desc&limit=100`);
+  const { data } = await sb(`${TABLE}?select=nome,telefone,perfil,patologia,score,cidade,canal,crm_stage,descartado,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,data_agendamento,criado_em&order=criado_em.desc&limit=5000`);
   allLeads = data || [];
-  document.getElementById('dados-count').textContent = `${count || allLeads.length} REGISTROS`;
+  const desc = allLeads.filter(l => l.descartado).length;
+  document.getElementById('dados-count').textContent = `${allLeads.length - desc} LEADS${desc ? ` · ${desc} DESCARTADOS` : ''}`;
+  renderFiltrosLeads();
   renderLeads();
 }
 
+// Filtros da aba Leads = etapas do CRM (mesma ordem do quadro), só as que têm lead
+function renderFiltrosLeads() {
+  const ativos = allLeads.filter(l => !l.descartado);
+  const botoes = [['todos', 'Todos', ativos.length]]
+    .concat(STAGES.map(s => [s.key, s.label, ativos.filter(l => getStage(l) === s.key).length]))
+    .concat([['quiz', 'Quiz', ativos.filter(l => l.canal === 'quiz_fm').length], ['descartados', 'Descartados', allLeads.length - ativos.length]])
+    .filter(([k, , n]) => k === 'todos' || n > 0);
+  if (!botoes.some(([k]) => k === leadsFilter)) leadsFilter = 'todos';
+  document.getElementById('dados-filters').innerHTML = botoes.map(([k, rot, n]) =>
+    `<button class="filter-btn${k === leadsFilter ? ' active' : ''}" data-filter="${k}" onclick="filterLeads(this)">${rot} · ${n}</button>`).join('');
+}
+
+function stageBadge(l) {
+  const s = STAGES.find(x => x.key === getStage(l)) || { label: getStage(l), color: 'var(--muted)' };
+  return `<span class="badge" style="background:transparent;border:1px solid ${s.color};color:${s.color}">${escHtml(s.label)}</span>`;
+}
+
 function renderLeads() {
-  let filtered = leadsFilter === 'todos' ? allLeads :
-    leadsFilter === 'qualificado' ? allLeads.filter(l => l.qualificado && !l.agendou) :
-    leadsFilter === 'agendou' ? allLeads.filter(l => l.agendou && !l.fechou) :
-    leadsFilter === 'fechou' ? allLeads.filter(l => l.fechou) :
-    leadsFilter === 'quiz' ? allLeads.filter(l => l.canal === 'quiz_fm') :
-    allLeads.filter(l => !l.qualificado && !l.agendou && (l.dify_conversation_id || l.dify_ativo));
+  let filtered = leadsFilter === 'descartados' ? allLeads.filter(l => l.descartado) :
+    leadsFilter === 'todos' ? allLeads.filter(l => !l.descartado) :
+    leadsFilter === 'quiz' ? allLeads.filter(l => !l.descartado && l.canal === 'quiz_fm') :
+    allLeads.filter(l => !l.descartado && getStage(l) === leadsFilter);
 
   if (leadsSearch) {
     const q = leadsSearch.toLowerCase();
@@ -2735,18 +2748,17 @@ function renderLeads() {
   }
 
   const html = filtered.map(l => {
-    const leadJson = encodeURIComponent(JSON.stringify(l));
     const agenda = l.data_agendamento
       ? `<span style="color:var(--neon)">${new Date(l.data_agendamento).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}</span>`
       : '<span style="color:var(--dim)">—</span>';
-    return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
-      <td class="td-hi" style="padding-left:12px">${l.nome||'—'}</td>
-      <td>${l.perfil||'—'}</td>
-      <td>${l.patologia||'—'}</td>
+    return `<tr class="lead-linha" data-tel="${escHtml(l.telefone||'')}" style="cursor:pointer" onclick="abrirFichaPorTelefone(this.dataset.tel)" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
+      <td class="td-hi" style="padding-left:12px">${escHtml(l.nome||'—')}</td>
+      <td>${escHtml(l.perfil||'—')}</td>
+      <td>${escHtml(l.patologia||'—')}</td>
       <td><span class="score">${l.score||0}</span></td>
-      <td>${l.cidade||'—'}</td>
+      <td>${escHtml(l.cidade||'—')}</td>
       <td>${canalBadge(l)}</td>
-      <td>${statusBadge(l)}</td>
+      <td>${stageBadge(l)}</td>
       <td style="font-family:var(--fM);font-size:10px">${agenda}</td>
       <td style="font-family:var(--fM);font-size:10px">${fmtDate(l.criado_em)}</td>
     </tr>`;
@@ -2770,7 +2782,7 @@ function searchLeads(val) {
 function exportCSV() {
   if (!allLeads.length) { toast('Sem dados para exportar', 'err'); return; }
   const cols = ['nome','telefone','perfil','patologia','score','cidade','status','agendamento','criado_em'];
-  const headers = ['Nome','Telefone','Perfil','Condição','Score','Cidade','Status','Agendamento','Chegou em'];
+  const headers = ['Nome','Telefone','Perfil','Condição','Score','Cidade','Etapa','Agendamento','Chegou em'];
   const rows = allLeads.map(l => [
     l.nome||'',
     l.telefone||'',
@@ -2778,7 +2790,7 @@ function exportCSV() {
     l.patologia||'',
     l.score||0,
     l.cidade||'',
-    l.fechou?'Fechou':l.agendou?'Agendou':l.qualificado?'Qualificado':l.em_atendimento?'Humano':'Contato',
+    l.descartado ? 'Descartado' : (STAGES.find(x => x.key === getStage(l))?.label || getStage(l)),
     l.data_agendamento ? new Date(l.data_agendamento).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) : '',
     l.criado_em ? new Date(l.criado_em).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) : ''
   ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
@@ -4403,10 +4415,8 @@ async function toggleBot(telefone, currentlyDisabled) {
     toast(currentlyDisabled ? '✅ Bot reativado para este lead' : '🚫 Bot desativado para este lead',
           currentlyDisabled ? 'ok' : 'err');
 
-    // Reabrir o modal atualizado
-    const updatedLead = allLeads.find(l => l.telefone === telefone) || {};
-    Object.assign(updatedLead, patch);
-    setTimeout(() => openLeadPanel(updatedLead), 200);
+    // Reabrir o modal atualizado (busca o lead completo; a lista da aba Leads só tem os campos da tabela)
+    setTimeout(() => abrirFichaPorTelefone(telefone), 200);
 
   } catch(e) {
     btn.disabled = false;
@@ -5302,8 +5312,9 @@ function renderTorneira() {
   const maisAntigo = g => { const m = g.reduce((x, l) => Math.max(x, l.minutos || 0), 0); return m ? `mais antigo há ${torDuracao(m)}` : 'nenhum agora'; };
   const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : 'aguardando');
   const faixaSel = _torFiltro?.faixa || null;
-  const card = (chave, rotulo, n, cor, nota) => `<div class="kpi tor-kpi${sit === chave ? ' ativo' : ''}" data-tor="${chave}" style="--tor-cor:${cor}" onclick="filtrarTorneira('${chave}',null)">
-      <div class="kpi-lbl">${rotulo}</div><div class="kpi-val" style="color:${cor}">${n}</div><div class="kpi-note">${nota}</div></div>`;
+  // Número no mesmo estilo dos KPIs de baixo (pedido do Thiago: sem cor própria)
+  const card = (chave, rotulo, n, nota) => `<div class="kpi tor-kpi${sit === chave ? ' ativo' : ''}" data-tor="${chave}" onclick="filtrarTorneira('${chave}',null)">
+      <div class="kpi-lbl">${rotulo}</div><div class="kpi-val">${n}</div><div class="kpi-note">${nota}</div></div>`;
   const grupo = sit === 'todos' ? comFaixa : sit === 'aguardando' ? semPasso : sit === 'sem_resposta' ? sr : pa;
   const titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', aguardando: 'Aguardando a equipe: próximo passo pronto' }[sit];
   const chips = sit === 'aguardando' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
@@ -5313,7 +5324,7 @@ function renderTorneira() {
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
   const linhas = lista.slice(0, 80).map(l => {
     const cor = sit === 'aguardando' ? '#9146FF' : l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
-    const tempo = sit === 'aguardando' ? 'aceitar ou programar' : (l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'aceitar ou programar');
+    const tempo = sit === 'aguardando' ? 'falta dar o start' : (l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'falta dar o start');
     const n = nome(l);
     return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
       <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
@@ -5321,10 +5332,10 @@ function renderTorneira() {
       <span class="tor-tempo" style="color:${cor};background:${cor}1f">${tempo}</span></div>`;
   }).join('');
   alvo.innerHTML = `<div class="kpi-row tor-kpis">
-      ${card('todos', 'Leads escapando agora', comFaixa.length, '#FF5E5B', 'esperando resposta ou sem retorno')}
-      ${card('sem_resposta', 'Esperando nossa resposta', sr.length, '#FF5E5B', maisAntigo(sr))}
-      ${card('parado', 'Sem retorno do lead', pa.length, '#e3b341', maisAntigo(pa))}
-      ${card('aguardando', 'Aguardando a equipe', semPasso.length, '#9146FF', 'próximo passo pronto, falta aceitar')}
+      ${card('todos', 'Leads escapando agora', comFaixa.length, 'esperando resposta ou sem retorno')}
+      ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
+      ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
+      ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
     </div>
     <div class="tor-painel">
       <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${faixaSel ? ' · há ' + TOR_FAIXA[faixaSel] : ''} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
