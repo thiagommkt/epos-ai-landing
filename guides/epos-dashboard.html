@@ -5265,5 +5265,53 @@ document.addEventListener('DOMContentLoaded', updateThemeBtn);
     <span>Menu</span>
   </button>
 </nav>
+<script>
+// ═══ USO DO PAINEL (relatório diário do admin, 16/10) ═══
+// Mede a cada 15 s: "aberto" = aba na frente; "mexendo" = aba na frente + clique, rolagem, tecla ou toque no último minuto.
+// Um sinal por minuto para painel_registrar_uso (quem é vem do login, no banco). Auditorias automáticas não contam.
+(function usoDoPainel() {
+  if (navigator.webdriver) return;
+  const CONTA = 'epos';
+  const PASSO = 15;
+  const sessao = crypto.randomUUID ? crypto.randomUUID()
+    : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+  let ultimaMexida = Date.now(), ativos = 0, abertos = 0, fichasNovas = 0, secoes = new Set();
+  const fichasVistas = new Set();
+  const mexeu = () => { ultimaMexida = Date.now(); };
+  ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(ev => addEventListener(ev, mexeu, { passive: true, capture: true }));
+  if (typeof openLeadPanel === 'function') {
+    const abrirOriginal = openLeadPanel;
+    openLeadPanel = function (lead) {
+      const tel = lead && lead.telefone;
+      if (tel && !fichasVistas.has(tel)) { fichasVistas.add(tel); fichasNovas++; }
+      return abrirOriginal.apply(this, arguments);
+    };
+  }
+  setInterval(() => {
+    if (document.hidden) return;
+    abertos += PASSO;
+    if (Date.now() - ultimaMexida <= 60000) {
+      ativos += PASSO;
+      const sec = (document.querySelector('.section.active')?.id || '').replace(/^s-/, '');
+      if (sec) secoes.add(sec);
+    }
+  }, PASSO * 1000);
+  function enviar(saindo) {
+    if (!window._ACCESS_TOKEN || (!abertos && !fichasNovas)) return;
+    const lote = { a: ativos, b: abertos, f: fichasNovas, s: [...secoes] };
+    ativos = 0; abertos = 0; fichasNovas = 0; secoes = new Set();
+    fetch(`${SB_URL}/rest/v1/rpc/painel_registrar_uso`, {
+      method: 'POST', keepalive: !!saindo,
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${window._ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_sessao: sessao, p_conta: CONTA, p_ativos: lote.a, p_abertos: lote.b, p_secoes: lote.s, p_fichas: lote.f,
+        p_dispositivo: matchMedia('(max-width: 768px)').matches ? 'celular' : 'computador' })
+    }).then(r => { if (!r.ok) throw new Error(r.status); })
+      .catch(() => { ativos += lote.a; abertos += lote.b; fichasNovas += lote.f; lote.s.forEach(x => secoes.add(x)); });
+  }
+  setInterval(() => enviar(false), 60000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) enviar(true); });
+  addEventListener('pagehide', () => enviar(true));
+})();
+</script>
 </body>
 </html>
