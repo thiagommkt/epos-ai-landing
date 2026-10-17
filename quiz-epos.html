@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Raio-X do seu comercial | Epos</title>
+<meta name="description" content="7 perguntas, 2 minutos: descubra quantos clientes escapam entre o seu anúncio e o seu WhatsApp.">
+<!-- Meta Pixel Epos — autoConfig OFF antes do init (REGRA #5: nenhuma resposta do quiz vai à Meta) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('set','autoConfig',false,'130141280708842');
+fbq('init','130141280708842');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=130141280708842&ev=PageView&noscript=1"/></noscript>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E10;
+  --card:#141417;
+  --tile:#1A1A1E;
+  --tile-hover:#212126;
+  --line:rgba(255,255,255,.08);
+  --line-strong:rgba(255,255,255,.16);
+  --text:#F4F3F7;
+  --muted:#A3A2AD;
+  --dim:#6E6D78;
+  --purple:#9146FF;
+  --purple-soft:rgba(145,70,255,.14);
+  --orange:#E06010;
+  --orange-soft:rgba(224,96,16,.14);
+  --error:#FF5E5B;
+  --fD:'DM Sans',system-ui,sans-serif;
+  --fM:'DM Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--fD);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+/* atmosfera: brilho roxo, calor laranja e granulação */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(60% 45% at 8% 0%, rgba(145,70,255,.22), transparent 70%),
+    radial-gradient(45% 40% at 100% 100%, rgba(224,96,16,.13), transparent 70%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.app{
+  position:relative;z-index:1;
+  width:100%;max-width:560px;min-height:100dvh;
+  margin:0 auto;
+  background:linear-gradient(180deg, rgba(20,20,23,.96), rgba(14,14,16,.98));
+  display:flex;flex-direction:column;
+}
+@media (min-width:640px){
+  body{padding:32px 16px}
+  .app{min-height:min(780px,92dvh);border-radius:22px;border:1px solid var(--line);overflow:hidden;
+       box-shadow:0 40px 120px -40px rgba(145,70,255,.35), 0 0 0 1px rgba(0,0,0,.4)}
+}
+
+/* modo board: dentro da página de apresentação do Método */
+html.board body{background:transparent;padding:0;min-height:0;display:block}
+html.board body::before, html.board body::after{display:none}
+html.board .app{min-height:560px;max-width:none;border-radius:18px;border:1px solid var(--line);box-shadow:none;overflow:hidden}
+html.board .footer-note{display:none}
+
+/* topo: marca + leitura do progresso */
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 26px 0;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--fM);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.brand-mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--purple),#5B1FC2);display:grid;place-items:center;
+  font-family:var(--fD);font-weight:800;font-size:14px;color:#fff;letter-spacing:0;box-shadow:0 6px 18px -6px rgba(145,70,255,.7)}
+.counter{font-family:var(--fM);font-size:12px;color:var(--dim);letter-spacing:.06em}
+.counter b{color:var(--text);font-weight:500}
+.progress{display:flex;gap:4px;padding:14px 26px 0;flex-shrink:0}
+.progress span{flex:1;height:3px;border-radius:2px;background:var(--line);overflow:hidden;position:relative}
+.progress span::after{content:"";position:absolute;inset:0;transform:scaleX(0);transform-origin:left;
+  background:linear-gradient(90deg,var(--purple),#B07BFF);transition:transform .5s var(--ease)}
+.progress span.on::after{transform:scaleX(1)}
+.progress span.last.on::after{background:linear-gradient(90deg,#B07BFF,var(--orange))}
+
+.screens{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.screen{display:none;flex-direction:column;flex:1;padding:26px 26px 26px;overflow-y:auto}
+.screen.active{display:flex;animation:enter .45s var(--ease)}
+@keyframes enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.active{animation:none}.progress span::after{transition:none}}
+
+/* abertura */
+.hook{justify-content:center}
+.kicker{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:6px 12px;border-radius:999px;
+  border:1px solid rgba(224,96,16,.35);background:var(--orange-soft);color:#FFB27A;
+  font-family:var(--fM);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:22px}
+.kicker i{width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 4px rgba(224,96,16,.2);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(224,96,16,0)}}
+h1.headline{font-size:34px;line-height:1.08;letter-spacing:-.025em;font-weight:800;margin-bottom:16px}
+.headline em{font-style:normal;color:var(--orange)}
+.headline .soft{color:var(--muted);font-weight:600}
+.sub{font-size:16px;color:var(--muted);max-width:42ch;margin-bottom:30px}
+.sub b{color:var(--text);font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:22px}
+.fact{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.015)}
+.fact b{display:block;font-family:var(--fM);font-weight:500;font-size:15px;color:var(--text)}
+.fact span{font-size:11.5px;color:var(--dim)}
+
+/* botões */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;border-radius:14px;
+  font-family:var(--fD);font-weight:700;font-size:16px;border:none;cursor:pointer;text-decoration:none;
+  transition:transform .15s ease, box-shadow .25s ease, background .2s ease;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.985)}
+.btn-primary{background:var(--purple);color:#fff;box-shadow:0 14px 34px -14px rgba(145,70,255,.9)}
+.btn-primary:hover{background:#9C58FF;box-shadow:0 18px 40px -12px rgba(145,70,255,1)}
+.btn-primary:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.btn svg{width:18px;height:18px;flex-shrink:0}
+.btn-ghost{background:transparent;color:var(--dim);font-weight:600;font-size:14px;min-height:44px}
+.btn-ghost:hover{color:var(--muted)}
+.btn-ghost:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+.btn-wa{background:#1FAF5A;color:#fff;box-shadow:0 14px 34px -14px rgba(31,175,90,.8)}
+.btn-wa:hover{background:#22BD62}
+.btn-stack{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+
+/* perguntas */
+.q-eyebrow{font-family:var(--fM);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:#B58CFF;margin-bottom:12px}
+h2.q-title{font-size:24px;line-height:1.2;letter-spacing:-.015em;font-weight:700;margin-bottom:8px}
+.q-help{font-size:14px;color:var(--dim);margin-bottom:20px}
+.opt-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;padding:12px 14px;border-radius:13px;
+  border:1px solid var(--line);background:var(--tile);color:var(--text);
+  font-family:var(--fD);font-size:15.5px;font-weight:500;text-align:left;cursor:pointer;
+  transition:border-color .15s ease, background .15s ease, transform .15s ease;-webkit-tap-highlight-color:transparent}
+.opt:hover{background:var(--tile-hover);border-color:var(--line-strong)}
+.opt:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+.opt .key{flex-shrink:0;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  font-family:var(--fM);font-size:12px;color:var(--dim);border:1px solid var(--line-strong);transition:all .15s ease}
+.opt.selected{border-color:var(--purple);background:linear-gradient(90deg,var(--purple-soft),rgba(145,70,255,.04))}
+.opt.selected .key{background:var(--purple);border-color:var(--purple);color:#fff}
+.step-nav{display:flex;align-items:center;margin-top:auto;padding-top:4px}
+.btn-back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 6px;border:none;background:transparent;
+  color:var(--dim);font-family:var(--fM);font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:8px}
+.btn-back:hover{color:var(--muted)}
+.btn-back:focus-visible{outline:2px solid var(--purple)}
+.btn-back svg{width:16px;height:16px}
+
+/* "outro" digitado */
+.custom-panel{display:none;flex-direction:column;gap:10px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.field input{width:100%;min-height:54px;padding:0 16px;border-radius:13px;border:1px solid var(--line-strong);
+  background:var(--tile);color:var(--text);font-family:var(--fD);font-size:16px;transition:border-color .15s ease, box-shadow .15s ease}
+.field input::placeholder{color:var(--dim)}
+.field input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(145,70,255,.2)}
+.field-error{display:none;font-size:12.5px;color:var(--error);margin-top:6px;font-weight:600}
+.field.invalid input{border-color:var(--error)}
+.field.invalid .field-error{display:block}
+.consent{display:flex;align-items:flex-start;gap:10px;margin:4px 0 20px;padding:10px;border-radius:12px;border:1px solid transparent}
+.consent.invalid{border-color:rgba(255,94,91,.5)}
+.consent input{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--purple)}
+.consent label{font-size:12.5px;color:var(--dim);line-height:1.5}
+.consent a{color:#B58CFF;font-weight:600}
+
+/* fim */
+.end{justify-content:center;text-align:left}
+.end-badge{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;margin-bottom:22px;
+  background:var(--purple-soft);border:1px solid rgba(145,70,255,.35)}
+.end-badge svg{width:28px;height:28px;stroke:#C9A6FF}
+.end-badge.neutral{background:rgba(255,255,255,.04);border-color:var(--line-strong)}
+.end-badge.neutral svg{stroke:var(--muted)}
+h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:800;margin-bottom:12px}
+.end-sub{font-size:15.5px;color:var(--muted);max-width:40ch;margin-bottom:26px}
+.readout{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:22px;background:rgba(255,255,255,.015)}
+.readout div{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.readout div:last-child{border-bottom:none}
+.readout span{color:var(--dim);font-family:var(--fM);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.readout b{font-weight:600;text-align:right}
+.footer-note{text-align:center;font-family:var(--fM);font-size:10.5px;letter-spacing:.08em;color:var(--dim);padding:14px 24px 18px;flex-shrink:0}
+
+@media (max-width:380px){
+  h1.headline{font-size:29px}
+  .screen{padding:22px 18px}
+  .top,.progress{padding-left:18px;padding-right:18px}
+}
+</style>
+<script>if(/[?&]modo=board\b/.test(location.search))document.documentElement.classList.add('board');</script>
+</head>
+<body>
+
+<noscript>
+  <div style="max-width:480px;margin:60px auto;padding:24px;font-family:sans-serif;text-align:center;color:#F4F3F7">
+    Ative o JavaScript para responder o raio-X. Ou fale direto com a gente: <a href="https://wa.me/556190448205" style="color:#B58CFF">WhatsApp da Epos</a>.
+  </div>
+</noscript>
+
+<main class="app">
+  <div class="top">
+    <div class="brand"><span class="brand-mark">E</span>Epos · Raio-X</div>
+    <div class="counter" id="counter" aria-live="polite"></div>
+  </div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <div class="screens">
+
+    <!-- ABERTURA -->
+    <section class="screen active hook" data-screen="hook">
+      <span class="kicker"><i></i>Raio-X do seu comercial</span>
+      <h1 class="headline">Quantos clientes estão <em>escapando</em> entre o seu anúncio e o seu WhatsApp?</h1>
+      <p class="sub">Responda <b>7 perguntas rápidas</b>. No fim, a <b>Donna</b>, a inteligência de atendimento da Epos, te chama no WhatsApp com a leitura das suas respostas.</p>
+      <div class="btn-stack">
+        <button class="btn btn-primary" onclick="goTo('segmento')">Começar meu raio-X
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="btn btn-ghost" onclick="goTo('sair')">Agora não</button>
+      </div>
+      <div class="facts">
+        <div class="fact"><b>2 min</b><span>para responder</span></div>
+        <div class="fact"><b>R$ 0</b><span>sem custo</span></div>
+        <div class="fact"><b>WhatsApp</b><span>resposta na hora</span></div>
+      </div>
+    </section>
+
+    <!-- 1 SEGMENTO -->
+    <section class="screen" data-screen="segmento">
+      <div class="q-eyebrow">Pergunta 01</div>
+      <h2 class="q-title">Qual é o seu segmento?</h2>
+      <p class="q-help">Escolha o mais próximo do seu negócio.</p>
+      <div class="opt-list" data-group="segmento" id="segmentoList">
+        <button class="opt" data-value="Advocacia">Advocacia</button>
+        <button class="opt" data-value="Saúde (clínica ou consultório)">Saúde (clínica ou consultório)</button>
+        <button class="opt" data-value="Odontologia">Odontologia</button>
+        <button class="opt" data-value="Estética">Estética</button>
+        <button class="opt" data-value="Imobiliária">Imobiliária</button>
+        <button class="opt" data-value="Educação e cursos">Educação e cursos</button>
+        <button class="opt" data-value="Consultoria e serviços para empresas">Consultoria e serviços para empresas</button>
+        <button class="opt" data-value="Outro" data-custom="true">Outro</button>
+      </div>
+      <div class="custom-panel" id="segmentoCustom">
+        <div class="field" id="fieldSegmentoCustom">
+          <label for="segmentoCustomInput">Qual é o seu segmento?</label>
+          <input type="text" id="segmentoCustomInput" placeholder="Digite aqui" maxlength="80">
+          <div class="field-error">Digite o seu segmento para continuar.</div>
+        </div>
+        <button type="button" class="btn btn-primary" id="segmentoCustomContinuar">Continuar</button>
+        <button type="button" class="btn btn-ghost" id="segmentoCustomVoltar">Voltar para a lista</button>
+      </div>
+      <div class="step-nav" id="segmentoNav"><button class="btn-back" onclick="goTo('hook')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- 2 TICKET -->
+    <section class="screen" data-screen="ticket">
+      <div class="q-eyebrow">Pergunta 02</div>
+      <h2 class="q-title">Quanto vale, em média, uma venda sua?</h2>
+      <p class="q-help">O valor de um contrato, procedimento ou serviço.</p>
+      <div class="opt-list" data-group="ticket">
+        <button class="opt" data-value="Até R$ 1.000">Até R$ 1.000</button>
+        <button class="opt" data-value="R$ 1.000 a R$ 3.000">R$ 1.000 a R$ 3.000</button>
+        <button class="opt" data-value="R$ 3.000 a R$ 10.000">R$ 3.000 a R$ 10.000</button>
+        <button class="opt" data-value="R$ 10.000 a R$ 30.000">R$ 10.000 a R$ 30.000</button>
+        <button class="opt" data-value="Acima de R$ 30.000">Acima de R$ 30.000</button>
+      </div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('segmento')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- 3 INVESTIMENTO -->
+    <section class="screen" data-screen="investimento">
+      <div class="q-eyebrow">Pergunta 03</div>
+      <h2 class="q-title">Quanto você investe em anúncios por mês?</h2>
+      <p class="q-help">Somando Instagram, Facebook, Google e outros.</p>
+      <div class="opt-list" data-group="investimento">
+        <button class="opt" data-value="Ainda não invisto">Ainda não invisto</button>
+        <button class="opt" data-value="Até R$ 2.000">Até R$ 2.000</button>
+        <button class="opt" data-value="R$ 2.000 a R$ 5.000">R$ 2.000 a R$ 5.000</button>
+        <button class="opt" data-value="R$ 5.000 a R$ 15.000">R$ 5.000 a R$ 15.000</button>
+        <button class="opt" data-value="Acima de R$ 15.000">Acima de R$ 15.000</button>
+      </div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('ticket')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- 4 VOLUME -->
+    <section class="screen" data-screen="volume">
+      <div class="q-eyebrow">Pergunta 04</div>
+      <h2 class="q-title">Quantos contatos chegam no seu WhatsApp por mês?</h2>
+      <p class="q-help">Pessoas interessadas, não clientes que já compraram.</p>
+      <div class="opt-list" data-group="volume">
+        <button class="opt" data-value="Até 50">Até 50</button>
+        <button class="opt" data-value="50 a 200">50 a 200</button>
+        <button class="opt" data-value="200 a 500">200 a 500</button>
+        <button class="opt" data-value="Mais de 500">Mais de 500</button>
+        <button class="opt" data-value="Não sei dizer">Não sei dizer</button>
+      </div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('investimento')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- 5 ATENDIMENTO -->
+    <section class="screen" data-screen="atendimento">
+      <div class="q-eyebrow">Pergunta 05</div>
+      <h2 class="q-title">Quem responde esses contatos hoje?</h2>
+      <p class="q-help">Quem atende primeiro, na maior parte das vezes.</p>
+      <div class="opt-list" data-group="atendimento">
+        <button class="opt" data-value="Eu mesmo">Eu mesmo</button>
+        <button class="opt" data-value="Secretária ou recepção">Secretária ou recepção</button>
+        <button class="opt" data-value="Vendedor ou equipe comercial">Vendedor ou equipe comercial</button>
+        <button class="opt" data-value="Já uso um robô ou IA">Já uso um robô ou IA</button>
+        <button class="opt" data-value="Ninguém fixo">Ninguém fixo</button>
+      </div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('volume')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- 6 CONTEÚDO -->
+    <section class="screen" data-screen="conteudo">
+      <div class="q-eyebrow">Pergunta 06</div>
+      <h2 class="q-title">Quem produz o seu conteúdo e criativos?</h2>
+      <p class="q-help">Posts, vídeos e anúncios.</p>
+      <div class="opt-list" data-group="conteudo">
+        <button class="opt" data-value="Eu mesmo">Eu mesmo</button>
+        <button class="opt" data-value="Alguém da equipe">Alguém da equipe</button>
+        <button class="opt" data-value="Agência ou freelancer">Agência ou freelancer</button>
+        <button class="opt" data-value="Ninguém, ainda não produzimos">Ninguém, ainda não produzimos</button>
+      </div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('atendimento')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- 7 DOR -->
+    <section class="screen" data-screen="dor">
+      <div class="q-eyebrow">Pergunta 07</div>
+      <h2 class="q-title">Hoje, o que mais trava as suas vendas?</h2>
+      <p class="q-help">Escolha o que mais pesa.</p>
+      <div class="opt-list" data-group="dor">
+        <button class="opt" data-value="Chegam poucos contatos">Chegam poucos contatos</button>
+        <button class="opt" data-value="Chegam contatos sem perfil">Chegam contatos sem perfil</button>
+        <button class="opt" data-value="A resposta demora">A resposta demora</button>
+        <button class="opt" data-value="Os contatos somem depois do primeiro papo">Os contatos somem depois do primeiro papo</button>
+        <button class="opt" data-value="A equipe não consegue fechar">A equipe não consegue fechar</button>
+        <button class="opt" data-value="Não sei qual anúncio dá resultado">Não sei qual anúncio dá resultado</button>
+      </div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('conteudo')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- CONTATO -->
+    <section class="screen" data-screen="contato">
+      <div class="q-eyebrow">Último passo</div>
+      <h2 class="q-title">Para onde a Donna manda o seu raio-X?</h2>
+      <p class="q-help">Ela te chama no WhatsApp em instantes, já com as suas respostas.</p>
+      <form id="leadForm" novalidate>
+        <div class="field" id="fieldNome">
+          <label for="nome">Seu nome</label>
+          <input type="text" id="nome" name="nome" placeholder="Como você gosta de ser chamado" autocomplete="name" maxlength="80">
+          <div class="field-error">Digite o seu nome.</div>
+        </div>
+        <div class="field" id="fieldTelefone">
+          <label for="telefone">WhatsApp com DDD</label>
+          <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="tel">
+          <div class="field-error">Digite um WhatsApp válido com DDD.</div>
+        </div>
+        <div class="consent" id="consentBox">
+          <input type="checkbox" id="consent" name="consent">
+          <label for="consent">Concordo com o uso dos meus dados para receber o contato da Epos, conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
+        </div>
+        <div class="btn-stack">
+          <button type="submit" id="btnEnviar" class="btn btn-primary">Receber meu raio-X no WhatsApp</button>
+        </div>
+      </form>
+      <div class="step-nav" style="margin-top:10px"><button class="btn-back" onclick="goTo('dor')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    </section>
+
+    <!-- SUCESSO -->
+    <section class="screen end" data-screen="sucesso">
+      <div class="end-badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+      <h1 class="end-title" id="okTitle">Pronto! A Donna já está te chamando.</h1>
+      <p class="end-sub">Ela vai te mandar a leitura das suas respostas no WhatsApp e combinar o seu diagnóstico.</p>
+      <div class="readout" id="readout"></div>
+      <div class="btn-stack">
+        <a id="btnWa" href="https://wa.me/556190448205" target="_blank" rel="noopener" class="btn btn-wa">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 1.9 1.1.9 2 1.2 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
+          Abrir o WhatsApp agora</a>
+      </div>
+    </section>
+
+    <!-- SAIR -->
+    <section class="screen end" data-screen="sair">
+      <div class="end-badge neutral"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg></div>
+      <h1 class="end-title">Sem problema.</h1>
+      <p class="end-sub">Quando quiser saber quantos clientes estão escapando no seu WhatsApp, o raio-X fica aqui.</p>
+      <div class="btn-stack">
+        <button class="btn btn-primary" onclick="goTo('segmento')">Fazer o raio-X agora</button>
+      </div>
+    </section>
+
+  </div>
+  <p class="footer-note">EPOS · SEUS DADOS ESTÃO PROTEGIDOS</p>
+</main>
+
+<script>
+(function(){
+  var PERGUNTAS = ['segmento','ticket','investimento','volume','atendimento','conteudo','dor'];
+  var ROTULOS = { segmento:'Segmento', ticket:'Ticket médio', investimento:'Anúncios/mês', volume:'Contatos/mês', atendimento:'Quem atende', conteudo:'Conteúdo', dor:'O que trava' };
+  var STEP_INDEX = { hook:0, segmento:1, ticket:2, investimento:3, volume:4, atendimento:5, conteudo:6, dor:7, contato:8, sucesso:9, sair:10 };
+  var DONNA_WA = '556190448205';
+  var answers = {};
+  var BOARD = document.documentElement.classList.contains('board');
+
+  // barra de progresso: 7 perguntas + contato
+  var prog = document.getElementById('progress');
+  for (var i = 0; i < 8; i++) { var s = document.createElement('span'); if (i === 7) s.className = 'last'; prog.appendChild(s); }
+
+  // Funil: etapa e resposta vão SOMENTE para o nosso banco (lp_events). Nada disso vai à Meta.
+  function trackStep(type, step, answer){
+    try { if (window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null }); } catch(e){}
+  }
+
+  function atualizarTopo(screen){
+    var n = PERGUNTAS.indexOf(screen);
+    var counter = document.getElementById('counter');
+    if (n >= 0) counter.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '</b> / 07';
+    else if (screen === 'contato') counter.innerHTML = '<b>Último</b> passo';
+    else if (screen === 'sucesso') counter.innerHTML = '<b>Enviado</b>';
+    else counter.textContent = '2 min';
+    var feitos = screen === 'sucesso' ? 8 : (screen === 'contato' ? 7 : Math.max(n, 0));
+    Array.prototype.forEach.call(prog.children, function(el, idx){ el.classList.toggle('on', idx < feitos); });
+  }
+
+  function goTo(screen){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    var target = document.querySelector('[data-screen="' + screen + '"]');
+    target.classList.add('active');
+    target.scrollTop = 0;
+    if (screen === 'segmento') fecharOutro();
+    atualizarTopo(screen);
+    if (!BOARD) window.scrollTo(0, 0);
+    trackStep('step_view', screen);
+  }
+  window.goTo = goTo;
+
+  // letras A, B, C… nas opções
+  document.querySelectorAll('.opt-list').forEach(function(list){
+    list.querySelectorAll('.opt').forEach(function(btn, idx){
+      btn.setAttribute('aria-pressed', 'false');
+      var k = document.createElement('span'); k.className = 'key'; k.textContent = String.fromCharCode(65 + idx);
+      btn.insertBefore(k, btn.firstChild);
+    });
+    var group = list.getAttribute('data-group');
+    list.addEventListener('click', function(e){
+      var btn = e.target.closest('.opt'); if (!btn) return;
+      if (btn.getAttribute('data-custom') === 'true') { abrirOutro(); return; }
+      list.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
+      btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true');
+      answers[group] = btn.getAttribute('data-value');
+      trackStep('step_answer', group, answers[group]);
+      setTimeout(function(){
+        var prox = PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato';
+        goTo(prox);
+      }, 240);
+    });
+  });
+
+  function abrirOutro(){
+    document.getElementById('segmentoList').style.display = 'none';
+    document.getElementById('segmentoNav').style.display = 'none';
+    document.getElementById('segmentoCustom').style.display = 'flex';
+    document.getElementById('segmentoCustomInput').focus();
+  }
+  function fecharOutro(){
+    document.getElementById('segmentoList').style.display = 'flex';
+    document.getElementById('segmentoNav').style.display = 'flex';
+    document.getElementById('segmentoCustom').style.display = 'none';
+    document.getElementById('fieldSegmentoCustom').classList.remove('invalid');
+  }
+  document.getElementById('segmentoCustomVoltar').addEventListener('click', fecharOutro);
+  document.getElementById('segmentoCustomContinuar').addEventListener('click', function(){
+    var v = document.getElementById('segmentoCustomInput').value.trim();
+    if (v.length < 2) { document.getElementById('fieldSegmentoCustom').classList.add('invalid'); return; }
+    answers.segmento = v;
+    trackStep('step_answer', 'segmento', 'outro: ' + v);
+    goTo('ticket');
+  });
+
+  function validPhone(v){ var d = v.replace(/\D/g, ''); return d.length >= 10 && d.length <= 11; }
+  document.getElementById('telefone').addEventListener('input', function(e){
+    var v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    e.target.value = v.length > 6 ? '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7) : (v.length > 2 ? '(' + v.slice(0,2) + ') ' + v.slice(2) : v);
+  });
+
+  function esc(s){ return String(s || '').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  var enviado = false;
+  document.getElementById('leadForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if (enviado) return;
+    var nome = document.getElementById('nome'), tel = document.getElementById('telefone'), consent = document.getElementById('consent');
+    var fN = document.getElementById('fieldNome'), fT = document.getElementById('fieldTelefone'), cB = document.getElementById('consentBox');
+    var erros = [];
+    if (nome.value.trim().length < 2) { fN.classList.add('invalid'); erros.push('nome_invalido'); } else fN.classList.remove('invalid');
+    if (!validPhone(tel.value)) { fT.classList.add('invalid'); erros.push('telefone_invalido'); } else fT.classList.remove('invalid');
+    if (!consent.checked) { cB.classList.add('invalid'); erros.push('sem_consentimento'); } else cB.classList.remove('invalid');
+    if (erros.length) { trackStep('step_error', 'contato', erros.join(',')); return; }
+
+    enviado = true;
+    answers.nome = nome.value.trim();
+    answers.telefone = tel.value.replace(/\D/g, '');
+
+    // event_id único: o mesmo vai no pixel (navegador) e na API de Conversões (servidor), para a Meta deduplicar
+    var eventId = 'quizepos_' + ((self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)));
+    if (typeof fbq === 'function') fbq('track', 'Lead', {}, { eventID: eventId });   // sem nenhuma resposta do quiz
+
+    var p = new URLSearchParams(location.search);
+    var fbclid = p.get('fbclid') || '';
+    var ck = function(n){ try { var m = document.cookie.match(new RegExp(n + '=([^;]+)')); return m ? m[1] : ''; } catch(e2){ return ''; } };
+    var payload = {
+      nome: answers.nome, telefone: answers.telefone,
+      respostas: { segmento: answers.segmento || '', ticket: answers.ticket || '', investimento: answers.investimento || '', volume: answers.volume || '',
+                   atendimento: answers.atendimento || '', conteudo: answers.conteudo || '', dor: answers.dor || '' },
+      event_id: eventId,
+      utm_source: p.get('utm_source') || (BOARD ? 'metodo' : 'quiz-epos'),
+      utm_medium: p.get('utm_medium') || '', utm_campaign: p.get('utm_campaign') || '',
+      utm_content: p.get('utm_content') || (BOARD ? 'metodo-board' : 'quiz-epos'),
+      utm_term: p.get('utm_term') || '', utm_id: p.get('utm_id') || '',
+      ad_id: p.get('ad_id') || '', adset_id: p.get('adset_id') || '', placement: p.get('placement') || '',
+      test_event_code: p.get('test_event_code') || '',
+      fbclid: fbclid, fbc: fbclid ? ('fb.1.' + Math.floor(Date.now() / 1000) + '.' + fbclid) : ck('_fbc'), fbp: ck('_fbp'),
+      user_agent: navigator.userAgent, page_url: location.href, modo: BOARD ? 'board' : 'pagina'
+    };
+    fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-quiz-lead', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true
+    }).catch(function(){});
+    if (window._lpTrack) window._lpTrack('quiz_submitted');
+
+    // leitura das respostas na tela final
+    var primeiro = answers.nome.split(/\s+/)[0];
+    document.getElementById('okTitle').textContent = 'Pronto, ' + primeiro + '! A Donna já está te chamando.';
+    document.getElementById('readout').innerHTML = PERGUNTAS.map(function(k){
+      return '<div><span>' + ROTULOS[k] + '</span><b>' + esc(answers[k] || '—') + '</b></div>';
+    }).join('');
+    document.getElementById('btnWa').href = 'https://wa.me/' + DONNA_WA + '?text=' + encodeURIComponent('Oi, Donna! Acabei de fazer o raio-X do meu comercial.');
+    // modo board: avisa a página do Método que o formulário já foi preenchido (o botão "Agendar diagnóstico" muda de texto)
+    if (BOARD && window.parent !== window) { try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'enviado', primeiro_nome: primeiro }, location.origin); } catch(e3){} }
+    goTo('sucesso');
+  });
+
+  atualizarTopo('hook');
+})();
+</script>
+
+<script>
+// Rastreamento do funil: vai SOMENTE para o nosso banco (lp_events, RLS: só INSERT anônimo com lista fixa). Nada vai à Meta.
+(function(){
+  var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+  var LP_SLUG = 'quiz-epos';
+  var sid;
+  try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
+  if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem('_lp_sid', sid); } catch(e){} }
+  var p = new URLSearchParams(location.search);
+  var utms = {};
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ utms[k] = p.get(k) || ''; });
+  if (/[?&]modo=board\b/.test(location.search) && !utms.utm_content) utms.utm_content = 'metodo-board';
+  function track(eventType, extra){
+    if (navigator.webdriver) return;   // auditoria automática não conta no funil
+    var body = Object.assign({ lp_slug: LP_SLUG, event_type: eventType, session_id: sid, referrer: (document.referrer || '').slice(0, 490) }, utms, extra || {});
+    fetch(SB_URL + '/rest/v1/lp_events', { method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON }, body: JSON.stringify(body) }).catch(function(){});
+  }
+  window._lpTrack = track;
+  track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: window.innerWidth + 'x' + window.innerHeight });
+  track('step_view', { step_name: 'hook', step_index: 0 });
+  var visStart = Date.now(), totalVis = 0, enviado = false;
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') { totalVis += Date.now() - visStart; sendTime(); } else visStart = Date.now();
+  });
+  function sendTime(){
+    if (enviado) return; enviado = true;
+    var dur = Math.round(totalVis / 1000); if (dur >= 2) track('time_spent', { duration_s: dur });
+  }
+  window.addEventListener('pagehide', function(){ if (document.visibilityState === 'visible') totalVis += Date.now() - visStart; sendTime(); });
+})();
+</script>
+</body>
+</html>
