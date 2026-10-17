@@ -1538,6 +1538,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="1" width="12" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="9" width="1.6" height="3"/><rect x="7.2" y="7" width="1.6" height="5"/><rect x="9.4" y="5" width="1.6" height="7"/></svg>
       Relatório
     </a>
+    <a data-sec="socio" id="nav-socio" onclick="navTo('socio')" style="display:none">
+      <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 15c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      Visão do sócio
+    </a>
     <div class="nav-section">Automação</div>
     <a data-sec="campanhas" onclick="navTo('campanhas')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
@@ -1606,6 +1610,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
     #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
     @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}}
+    @media(max-width:768px){.socio-kpis{grid-template-columns:1fr 1fr!important}}
     .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
     .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
     .tor-selo.pa{background:rgba(227,179,65,.13);color:#e3b341}
@@ -2055,6 +2060,16 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 </section>
 
 <!-- ══ RELATÓRIO DE VENDAS (CRM v3 · RPC fm_relatorio_vendas) ══ -->
+<!-- ══ VISÃO DO SÓCIO (CRM v3 · RPC socio_visao_fm) — somente leitura ══ -->
+<section class="section" id="s-socio">
+  <div class="sec-head">
+    <div><div class="sec-title">VISÃO DO <span>SÓCIO</span></div><div class="sec-sub">Somente leitura · resultado do mês e marcos do projeto</div></div>
+    <button onclick="loadSocio()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↻ Atualizar</button>
+  </div>
+  <div class="rule"></div>
+  <div id="socio-conteudo"><div class="loading"></div></div>
+</section>
+
 <section class="section" id="s-relatorio">
   <style>
     #s-relatorio .rel-pill{padding:5px 12px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;cursor:pointer;border-radius:4px}
@@ -2784,10 +2799,13 @@ function emailLogado() {
 }
 
 async function carregarEquipe() {
-  const { data } = await sb('equipe?conta=eq.fm&ativo=eq.true&select=id,nome,papel,pausado,email_login&order=nome.asc');
+  const { data } = await sb('equipe?conta=eq.fm&ativo=eq.true&select=id,nome,papel,pausado,email_login,ve_painel_socio&order=nome.asc');
   _equipe = data || [];
   const meuEmail = emailLogado();
   _euEquipe = _equipe.find(m => (m.email_login || '').toLowerCase() === meuEmail) || null;
+  // Visão do sócio: só para quem está marcado na equipe (FM: os sócios e o admin)
+  const navSocio = document.getElementById('nav-socio');
+  if (navSocio) navSocio.style.display = (_euEquipe?.ve_painel_socio || _euEquipe?.papel === 'admin') ? '' : 'none';
 
   const sel = document.getElementById('crm-vend-filter');
   if (sel) {
@@ -3203,7 +3221,7 @@ function setCrmPeriod(btn, val) {
 
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,crm_stage_bloqueado,stage_historico,sugestao_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico,responsavel_id,atendido_por,primeiro_atendimento_humano_em,consulta_realizada_em,consulta_confirmada_por&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,patologia,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,crm_stage_bloqueado,stage_historico,sugestao_stage,data_agendamento,chatwoot_conversation_id,paga_ir,valor_ir,perfil,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico,fechou_em,responsavel_id,atendido_por,primeiro_atendimento_humano_em,consulta_realizada_em,consulta_confirmada_por&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
@@ -3426,6 +3444,7 @@ function show(id) {
     if(id==='prospeccao') { /* placeholder — não carrega dados, seção exibe aviso */ }
     if(id==='analista') loadAnalista();
     if(id==='relatorio') loadRelatorio();
+    if(id==='socio') loadSocio();
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -3750,6 +3769,7 @@ function openLeadPanel(lead) {
     if (lead.responsavel_id === undefined || lead.consulta_realizada_em === undefined) preencherAtendimento(lead.telefone);
     carregarTarefasLead(lead.telefone);
     carregarAgendadasLead(lead.telefone);
+    carregarNotaAtendimento(lead.telefone);
   }, 0);
 
   window._panelLead = { telefone: lead.telefone, nome: lead.nome || '', crmPersonId: lead.crm_person_id || null, proximaAcao: lead.auditoria_ia_proxima_acao || '', etapaAtual: getStage(lead), chatwootConvId: lead.chatwoot_conversation_id || null, chatwootAccountId: 2, rmktHistorico: Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [], qualificado: !!lead.qualificado, agendou: !!lead.agendou, compareceu: !!lead.compareceu, ultimaInteracao: lead.ultima_msg_lead_em || lead.ultima_interacao_humano || lead.auditoria_ia_em || lead.criado_em, bloqueado: !!lead.crm_stage_bloqueado, sugestaoStage: lead.sugestao_stage || null, stageHistorico: Array.isArray(lead.stage_historico) ? lead.stage_historico : [] };
@@ -3771,6 +3791,7 @@ function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Chegou em</div><div class="panel-val">${fmtDate(lead.criado_em)}</div></div>
     <div class="panel-row"><div class="panel-key">Canal</div><div class="panel-val">${lead.canal||'whatsapp'}</div></div>
 
+    ${linhaDoTempoLead(lead)}
     <div class="panel-section">Atendimento</div>
     <div class="panel-row"><div class="panel-key">Responsável</div><div class="panel-val" style="display:flex;gap:6px;align-items:center"><select id="panel-responsavel" onchange="trocarResponsavel('${lead.telefone}', this.value)" aria-label="Responsável pelo lead" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;min-width:0">${opcoesResponsavel(lead.responsavel_id)}</select><span id="panel-assumir-wrap">${htmlAssumir(lead.telefone, lead.responsavel_id)}</span></div></div>
     <div class="panel-row"><div class="panel-key">Atendido por</div><div class="panel-val" id="panel-atendido-por">${escHtml(lead.atendido_por || '—')}</div></div>
@@ -3836,6 +3857,7 @@ function openLeadPanel(lead) {
     </div>` : ''}
 
     <div class="panel-section">Contexto Evolutivo (IA)</div>
+    <div id="panel-nota-atendimento"></div>
     ${(lead.auditoria_ia_resumo || lead.auditoria_ia_motivo_perda || lead.crm_score) ? `
       ${lead.auditoria_ia_resumo ? `<div style="padding:10px 12px;background:rgba(145,70,255,.04);border:1px solid var(--bd);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Resumo da conversa (IA)</div>
@@ -5518,6 +5540,120 @@ async function rejeitarContrato(telefone) {
   } catch(e) {}
 }
 
+// ═══ VISÃO DO SÓCIO (CRM v3, Etapa 4 — 17/10) ═══
+// Somente leitura: resultado do mês x mês anterior (mesmos números do Relatório), marcos do projeto e, se o cliente tiver a
+// opção ligada, o uso do painel pela equipe. Dados: RPC socio_visao_fm.
+async function loadSocio() {
+  const alvo = document.getElementById('socio-conteudo');
+  if (!alvo) return;
+  alvo.innerHTML = '<div class="loading"></div>';
+  let d;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/socio_visao_fm`, { method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' }, body: '{}' });
+    if (!r.ok) throw new Error(r.status === 400 ? 'sem acesso' : 'HTTP ' + r.status);
+    d = await r.json();
+  } catch (e) { alvo.innerHTML = `<div class="card"><div class="rel-vazio">Não foi possível carregar (${escHtml(e.message)}).</div></div>`; return; }
+  const f = (rel, etapa) => ((rel?.funil || []).find(x => x.etapa === etapa) || {}).n || 0;
+  const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  const linhas = [
+    ['Leads', f(d.mes, 'chegaram'), f(d.anterior, 'chegaram'), x => x],
+    ['Agendaram', f(d.mes, 'agendaram'), f(d.anterior, 'agendaram'), x => x],
+    ['Compareceram', f(d.mes, 'compareceram'), f(d.anterior, 'compareceram'), x => x],
+    ['Contratos confirmados', d.mes?.resumo?.fechamentos || 0, d.anterior?.resumo?.fechamentos || 0, x => x],
+    ['Receita', d.mes?.resumo?.receita || 0, d.anterior?.resumo?.receita || 0, brl],
+  ];
+  const seta = (a, b) => a > b ? '<span style="color:var(--neon)">▲</span>' : a < b ? '<span style="color:#FF5E5B">▼</span>' : '<span style="color:var(--dim)">=</span>';
+  const kpis = linhas.map(([rot, a, b, fmt]) => `<div class="kpi socio-kpi"><div class="kpi-lbl">${rot} · este mês</div><div class="kpi-val">${fmt(a)}</div><div class="kpi-note">${seta(a, b)} mês passado: ${fmt(b)}</div></div>`).join('');
+  const dataBR = s => new Date(s + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+  const marcos = (d.marcos || []).map(m => `<div class="socio-marco" style="display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--bd)">
+      <div style="flex:0 0 110px;font-family:var(--fM);font-size:11px;color:var(--purple)">${dataBR(m.data)}</div>
+      <div style="flex:1;min-width:0"><div style="font-family:var(--fD);font-size:13px;font-weight:600;color:var(--text)">${escHtml(m.titulo)}</div>
+        ${m.descricao ? `<div style="font-size:12px;color:var(--muted);margin-top:2px">${escHtml(m.descricao)}</div>` : ''}
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);margin-top:4px;text-transform:uppercase;letter-spacing:.08em">${m.automatico ? 'resultado' : 'entrega da Epos'}</div></div></div>`).join('');
+  const uso = Array.isArray(d.uso_equipe) ? `<div class="card"><div class="card-ttl">Uso do painel pela equipe · últimos 7 dias</div>
+      ${d.uso_equipe.length ? `<table class="tbl"><thead><tr><th>Pessoa</th><th style="text-align:center">Dias</th><th style="text-align:center">Mexendo</th><th style="text-align:center">Aberto</th></tr></thead><tbody>
+      ${d.uso_equipe.map(u => `<tr><td class="td-hi">${escHtml(u.nome)}</td><td style="text-align:center">${u.dias}</td><td style="text-align:center">${u.ativos_min} min</td><td style="text-align:center">${u.abertos_min} min</td></tr>`).join('')}</tbody></table>`
+      : '<div class="rel-vazio">Ninguém abriu o painel nos últimos 7 dias.</div>'}</div>` : '';
+  alvo.innerHTML = `<div class="kpi-row socio-kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:14px">${kpis}</div>
+    <div class="card"><div class="card-ttl">Marcos do projeto</div>${marcos || '<div class="rel-vazio">Sem marcos ainda.</div>'}</div>${uso}`;
+}
+
+// ═══ LINHA DO TEMPO DO LEAD (ficha, 17/10) ═══
+// Chegou → 1º atendimento humano → Agendou → Compareceu → Fechou, com as datas que o sistema registrou.
+function linhaDoTempoLead(l) {
+  const hist = Array.isArray(l.stage_historico) ? l.stage_historico : [];
+  const quando = etapa => { const h = hist.find(x => x && x.para === etapa && x.em); return h ? h.em : null; };
+  const passos = [
+    ['Chegou', l.criado_em, true],
+    ['1º atendimento humano', l.primeiro_atendimento_humano_em, !!l.primeiro_atendimento_humano_em],
+    ['Agendou', l.data_agendamento && !quando('agendou') ? null : quando('agendou'), !!(l.agendou || quando('agendou'))],
+    ['Compareceu', l.consulta_realizada_em || quando('compareceu'), !!(l.compareceu || l.consulta_realizada_em || quando('compareceu'))],
+    ['Fechou', l.fechou_em || quando('fechou'), !!(l.fechou || l.fechou_em || quando('fechou'))],
+  ];
+  const fmt = iso => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', timeZone: 'America/Sao_Paulo' });
+  return `<div class="panel-section">Linha do tempo</div>
+    <div class="lead-timeline" style="display:flex;gap:0;margin:4px 0 14px;overflow-x:auto">${passos.map(([rot, data, feito], i) => `
+      <div class="lt-passo${feito ? ' feito' : ''}" style="flex:1;min-width:84px;text-align:center;position:relative">
+        <div style="height:2px;background:${feito ? 'var(--purple)' : 'var(--bd)'};position:absolute;top:7px;left:${i ? 0 : '50%'};right:${i === passos.length - 1 ? '50%' : 0}"></div>
+        <div style="width:14px;height:14px;border-radius:50%;margin:0 auto 6px;position:relative;background:${feito ? 'var(--purple)' : 'var(--bg3)'};border:2px solid ${feito ? 'var(--purple)' : 'var(--bd)'}"></div>
+        <div style="font-family:var(--fD);font-size:10px;font-weight:600;color:${feito ? 'var(--text)' : 'var(--dim)'}">${rot}</div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim)">${data ? fmt(data) : (feito ? 'sem data' : '—')}</div>
+      </div>`).join('')}</div>`;
+}
+
+// ═══ NOTA DO ATENDIMENTO (CRM v3, 17/10) ═══
+// O Analista avalia todo dia às 7h o atendimento humano do dia anterior (tabela atendimento_notas).
+// Nota 0–10: velocidade 20% · qualificação 25% · objeção 20% · próximo passo 25% · tom 10% (critério que não se aplica sai da conta).
+const NOTA_CRITERIOS = [['velocidade', 'Velocidade'], ['qualificacao', 'Qualificação'], ['objecao', 'Objeção'], ['proximo_passo', 'Próximo passo'], ['tom', 'Tom']];
+const notaCor = n => n >= 8 ? 'var(--neon)' : n >= 6 ? '#e3b341' : '#FF5E5B';
+
+async function carregarNotaAtendimento(telefone) {
+  const box = document.getElementById('panel-nota-atendimento');
+  if (!box) return;
+  box.innerHTML = '';
+  const conta = TABLE === 'fm_leads' ? 'fm' : 'epos';
+  const { data } = await sb(`atendimento_notas?conta=eq.${conta}&lead_telefone=eq.${encodeURIComponent(telefone)}&select=dia,vendedor,nota,criterios,justificativa,dica,evidencia&order=dia.desc&limit=1`);
+  if (window._panelLead?.telefone !== telefone) return;
+  const n = Array.isArray(data) && data[0];
+  if (!n) return;
+  const crit = NOTA_CRITERIOS.filter(([k]) => n.criterios && n.criterios[k] != null)
+    .map(([k, rot]) => `<span style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-right:10px">${rot} <b style="color:var(--text)">${n.criterios[k]}/5</b></span>`).join('');
+  box.innerHTML = `<div class="nota-atendimento" style="padding:10px 12px;border:1px solid var(--bd);margin-bottom:8px;background:rgba(255,255,255,.02)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Nota do atendimento · ${new Date(n.dia + 'T12:00:00').toLocaleDateString('pt-BR')} · ${escHtml(n.vendedor || 'Equipe')}</div>
+        <div class="nota-valor" style="font-family:var(--fD);font-size:20px;font-weight:800;color:${notaCor(Number(n.nota))}">${String(n.nota).replace('.', ',')}</div>
+      </div>
+      <div style="margin-bottom:6px">${crit}</div>
+      ${n.justificativa ? `<div style="font-size:12px;line-height:1.5;color:var(--text);margin-bottom:6px">${escHtml(n.justificativa)}</div>` : ''}
+      ${n.dica ? `<div style="font-size:12px;line-height:1.5;color:var(--neon)">💡 ${escHtml(n.dica)}</div>` : ''}
+      ${n.evidencia ? `<div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px">“${escHtml(n.evidencia)}”</div>` : ''}
+    </div>`;
+}
+
+async function carregarNotasRelatorio(inicio, fim) {
+  const alvo = document.getElementById('rel-conteudo');
+  if (!alvo) return;
+  const dia = d => new Date(d.getTime() - 3 * 3600e3).toISOString().slice(0, 10);
+  let lista = [];
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/crm_notas_vendedores`, { method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_conta: TABLE === 'fm_leads' ? 'fm' : 'epos', p_inicio: dia(inicio), p_fim: dia(new Date(Math.min(fim.getTime(), Date.now()))) }) });
+    lista = r.ok ? await r.json() : [];
+  } catch (e) { lista = []; }
+  document.getElementById('rel-notas')?.remove();
+  const card = document.createElement('div');
+  card.className = 'card'; card.id = 'rel-notas';
+  const v = x => x == null ? '—' : String(x).replace('.', ',');
+  card.innerHTML = `<div class="card-ttl">Nota do atendimento por vendedor</div>
+    <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:10px;line-height:1.6">Nota de 0 a 10 dada pelo Analista ao atendimento humano de cada dia: velocidade 20% · qualificação 25% · objeção 20% · próximo passo 25% · tom 10%. Critérios de 1 a 5.</div>
+    ${lista.length ? `<div style="overflow-x:auto"><table class="tbl" style="min-width:720px;width:100%"><thead><tr><th>Vendedor</th><th style="text-align:center">Atend.</th><th style="text-align:center">Nota</th>${NOTA_CRITERIOS.map(([, r]) => `<th style="text-align:center">${r}</th>`).join('')}<th>Dica mais recente</th></tr></thead><tbody>
+      ${lista.map(x => `<tr><td class="td-hi">${escHtml(x.vendedor)}</td><td style="text-align:center">${x.atendimentos}</td><td style="text-align:center;font-weight:700;color:${notaCor(Number(x.nota_media))}">${v(x.nota_media)}</td>${NOTA_CRITERIOS.map(([k]) => `<td style="text-align:center">${v(x[k])}</td>`).join('')}<td style="font-size:11px;color:var(--muted);white-space:normal">${escHtml(x.dica_mais_recente || '—')}</td></tr>`).join('')}
+    </tbody></table></div>` : '<div class="rel-vazio">Nenhum atendimento humano avaliado no período. O Analista avalia todo dia às 7h o atendimento do dia anterior.</div>'}`;
+  alvo.appendChild(card);
+}
+
 // ═══ CONTRATOS A CONFIRMAR (17/10) ═══
 // A equipe diz quem fechou de verdade: data real + valor (Purchase à Meta só até 7 dias) ou "não fechou" (volta à etapa anterior).
 async function abrirConfirmarContratos() {
@@ -5643,6 +5779,7 @@ async function loadRelatorio() {
     const sub = document.getElementById('rel-sub');
     if (sub) sub.textContent = _relPeriodo === 'tudo' ? 'Todo o histórico' : `${label} · ${dataBR(inicio)} a ${dataBR(new Date(Math.min(fim.getTime(), Date.now())))}`;
     renderRelatorio(_relDados);
+    carregarNotasRelatorio(inicio, fim);
   } catch (e) {
     _relDados = null;
     alvo.innerHTML = `<div class="card"><div class="rel-vazio">Não foi possível carregar o relatório (${escHtml(e.message)}). Toque em Atualizar para tentar de novo.</div></div>`;
@@ -5668,7 +5805,7 @@ function renderRelatorio(d) {
   const avisos = [];
   if (R.fechamentos_sem_valor > 0) avisos.push(`${plural(R.fechamentos_sem_valor, 'fechamento', 'fechamentos')} do período sem valor informado: a receita está incompleta. O valor é pedido ao marcar Fechou desde 16/10.`);
   if (R.fechados_sem_data > 0) avisos.push(`${plural(R.fechados_sem_data, 'fechamento antigo', 'fechamentos antigos')} sem data de fechamento não entram em nenhum período (anteriores ao registro de data).`);
-  if (R.aguardando_confirmacao > 0) avisos.push(`${plural(R.aguardando_confirmacao, 'lead marcado', 'leads marcados')} como Fechou ainda sem contrato confirmado (lista "Pendentes de aprovação" no Dashboard).`);
+  if (R.aguardando_confirmacao > 0) avisos.push(`${plural(R.aguardando_confirmacao, 'lead marcado', 'leads marcados')} como Fechou ainda sem contrato confirmado (link "para confirmar" no card Contratos do Dashboard).`);
 
   // Destaque: a passagem do funil que mais perde gente (com pelo menos 5 leads na etapa anterior)
   const funil = Array.isArray(d.funil) ? d.funil : [];
