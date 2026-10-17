@@ -20,7 +20,7 @@ fbq('track','PageView');
 :root{
   --bg:#0E0E10; --bg2:#121215; --card:#16161A; --tile:#1B1B20;
   --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
-  --text:#F4F3F7; --muted:#CBCAD4; --dim:#A09FAB;
+  --text:#F4F3F7; --muted:#D2D1DA; --dim:#B9B8C4;
   --purple:#9146FF; --purple2:#B58CFF; --purple-soft:rgba(145,70,255,.13);
   --orange:#E06010; --orange2:#FF9A55; --orange-soft:rgba(224,96,16,.13);
   --green:#1FAF5A; --red:#FF5E5B;
@@ -68,7 +68,7 @@ h2 em{font-style:normal;color:var(--orange)}
 h3{font-size:20px;line-height:1.2;letter-spacing:-.01em;font-weight:700;margin-bottom:8px}
 .lead{font-size:18px;color:var(--muted);max-width:60ch}
 .lead b{color:var(--text);font-weight:600}
-.fonte{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6}
+.fonte{font-family:var(--fM);font-size:12px;color:var(--dim);line-height:1.6}
 .fonte a{color:var(--dim)}
 
 /* botões */
@@ -180,7 +180,7 @@ h1 em{font-style:normal;background:linear-gradient(90deg,var(--purple2),var(--or
 .grupo li{position:relative;padding-left:24px;font-size:15px;line-height:1.45}
 .grupo li::before{content:"";position:absolute;left:0;top:5px;width:14px;height:14px;border-radius:4px;border:1.5px solid var(--purple2);
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B58CFF' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center/10px no-repeat}
-.grupo li small{display:block;color:var(--dim);font-size:13px}
+.grupo li small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
 .grupo.largo{grid-column:1/-1}
 .prints-duplos{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
 @media (max-width:860px){.prints-duplos{grid-template-columns:1fr}}
@@ -386,9 +386,9 @@ html.apresentacao .rev{opacity:1;transform:none}
   <div class="wrap">
     <div class="eyebrow"><span class="n">02</span><b>Como é hoje</b></div>
     <div class="alerta-mercado">O que acontece hoje na maioria das empresas que anunciam</div>
-    <h2>Você paga pelo clique. <em>O cliente some na conversa.</em></h2>
+    <h2 style="max-width:none">Você paga pelo clique.<br><em>O cliente some na conversa.</em></h2>
     <div class="pixel-cego rev"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg></div>
-      <p><b>Seu pixel não sabe quem fez uma reunião com você. Não sabe quem fechou.</b> <span>Sem esse dado, a Meta continua tentando adivinhar e entrega o seu anúncio para quem clica, não para quem compra. É assim na maioria das agências e gestores de tráfego.</span></p></div>
+      <p><b>Seu pixel não sabe quem fez uma reunião com você.<br>Não sabe quem fechou.</b><br><span>Sem esse dado, a Meta continua tentando adivinhar e entrega o seu anúncio para quem clica, não para quem compra. É assim na maioria das agências e gestores de tráfego.</span></p></div>
     <p class="lead rev" style="margin-top:34px">O caminho de um lead, num dia comum, na maioria das empresas que anunciam:</p>
     <div class="timeline rev">
       <div class="tl"><time>21h47</time><p>Ele clica no seu anúncio e manda: "Oi, queria saber mais".</p></div>
@@ -458,7 +458,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <section class="bloco" id="ias" data-titulo="As 2 IAs">
   <div class="wrap">
     <div class="eyebrow"><span class="n">05</span><b>Duas inteligências artificiais próprias</b></div>
-    <h2>Uma atende. <em>A outra audita tudo.</em></h2>
+    <h2 style="max-width:none">Uma atende.<br><em>A outra audita tudo.</em></h2>
     <p class="lead rev">As duas são modelos próprios, montados com a base de conhecimento do <b>seu</b> negócio. Não é robô de menu ("digite 1"), e não é uma IA genérica.</p>
     <div class="duas rev">
       <div class="ia atende">
@@ -686,7 +686,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <section class="bloco" id="comparativo" data-titulo="Comparativo">
   <div class="wrap">
     <div class="eyebrow"><span class="n">09</span><b>Quanto custaria montar sozinho</b></div>
-    <h2>Somando as ferramentas, <em>a conta não fecha.</em></h2>
+    <h2 style="max-width:none">Somando as ferramentas,<br><em>a conta não fecha.</em></h2>
     <p class="lead rev">Preços de mercado de cada peça, para uma equipe de 3 pessoas. E mesmo pagando tudo isso, ainda falta o mais importante.</p>
     <div class="tabela rev">
       <table>
@@ -700,15 +700,15 @@ html.apresentacao .rev{opacity:1;transform:none}
           <tr><td class="cat">Formulário</td><td>Typeform</td><td class="preco">R$ 215 a 435</td><td><span class="nao">Não conversa com o lead depois</span></td></tr>
           <tr><td class="cat">Reuniões semanais e expertise de negócio</td><td>Consultoria comercial com acompanhamento</td><td class="preco">R$ 3.000 a 8.000</td><td><span class="nao">Não opera o atendimento nem a mídia</span></td></tr>
           <tr><td class="cat">Melhorias na ferramenta e workshops</td><td>Desenvolvedor de automações · treinamento in company</td><td class="preco">à parte, por projeto</td><td><span class="nao">Cada melhoria vira um orçamento novo</span></td></tr>
-          <tr><td class="cat">Produção de conteúdo e criativos</td><td>Equipe interna, videomaker ou agência</td><td class="preco">R$ 2.500 a 6.000</td><td><span class="nao">Não sabe quais criativos trazem quem fecha</span></td></tr>
-          <tr class="soma"><td class="cat">Total montando sozinho</td><td>9 fornecedores</td><td class="preco">R$ 11.700 a 26.300 / mês</td><td>Fora as melhorias e os workshops. E nada disso conversa entre si</td></tr>
+          <tr><td class="cat">Produção de conteúdo e criativos</td><td>Equipe interna, videomaker ou agência</td><td class="preco">R$ 3.000 a 8.000</td><td><span class="nao">Não sabe quais criativos trazem quem fecha</span></td></tr>
+          <tr class="soma"><td class="cat">Total montando sozinho</td><td>9 fornecedores</td><td class="preco">R$ 12.200 a 28.300 / mês</td><td>Fora as melhorias e os workshops. E nada disso conversa entre si</td></tr>
           <tr class="total"><td class="cat">Quanto custa continuar sem resultado</td><td>A sua conta na calculadora (bloco 3)</td><td class="preco" id="cmpPerda">—</td><td>Receita que vai embora enquanto nada muda: <b id="cmpAno">—</b> por ano</td></tr>
           <tr class="metodo"><td class="cat">Método Venda Inevitável</td><td>1 time</td><td colspan="2">Tudo integrado e operado por nós, com reuniões semanais, expertise de negócio, melhorias contínuas na ferramenta e workshops para os assinantes</td></tr>
         </tbody>
       </table>
     </div>
     <div class="falta rev"><span>✕ IA que audita as conversas</span><span>✕ Garantia de atendimento</span><span>✕ Integração entre as ferramentas</span><span>✕ Operação e treinamento</span><span>✕ Anúncio que aprende com o contrato</span><span>✕ Comunidade de assinantes</span></div>
-    <p class="fonte" style="margin-top:16px">Preços públicos consultados em outubro de 2026, sujeitos a mudança: Kommo US$ 25 a 45 por usuário (kommo.com); Clint R$ 149 a 199 por usuário (useclint.com); Blip Go Essencial R$ 389 (blip.ai); Tintim plano Inicial R$ 197 (tintim.app); Typeform US$ 39 a 79 (typeform.com); gestão de tráfego profissional R$ 3.000 a 7.000 (tabela FreelaSemCrise 2026); SDR R$ 2.000 a 3.500 (Jooble e Indeed, 2026); consultoria comercial com acompanhamento mensal R$ 3.000 a 8.000 (Fullsales, 2026); produção de conteúdo e criativos R$ 2.500 a 6.000 (freelancer experiente ou agência pequena, Filmly 2026); automações a partir de R$ 2.500 por fluxo (Hora de Codar, 2026). Dólar a R$ 5,50.</p>
+    <p class="fonte" style="margin-top:16px">Preços públicos consultados em outubro de 2026, sujeitos a mudança: Kommo US$ 25 a 45 por usuário (kommo.com); Clint R$ 149 a 199 por usuário (useclint.com); Blip Go Essencial R$ 389 (blip.ai); Tintim plano Inicial R$ 197 (tintim.app); Typeform US$ 39 a 79 (typeform.com); gestão de tráfego profissional R$ 3.000 a 7.000 (tabela FreelaSemCrise 2026); SDR R$ 2.000 a 3.500 (Jooble e Indeed, 2026); consultoria comercial com acompanhamento mensal R$ 3.000 a 8.000 (Fullsales, 2026); produção de conteúdo e criativos R$ 3.000 a 8.000 (equipe interna, videomaker ou agência; referência de mercado da Epos, 2026); automações a partir de R$ 2.500 por fluxo (Hora de Codar, 2026). Dólar a R$ 5,50.</p>
   </div>
 </section>
 
