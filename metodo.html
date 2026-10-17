@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Método Venda Inevitável | Epos</title>
+<meta name="robots" content="noindex">   <!-- tirar quando o Thiago aprovar a página -->
+<meta name="description" content="A estrutura de vendas completa, movida por inteligência artificial: do anúncio ao contrato, sem lead esquecido.">
+<!-- Meta Pixel Epos — autoConfig OFF antes do init (REGRA #5) -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('set','autoConfig',false,'130141280708842');
+fbq('init','130141280708842');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=130141280708842&ev=PageView&noscript=1"/></noscript>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E10; --bg2:#121215; --card:#16161A; --tile:#1B1B20;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
+  --text:#F4F3F7; --muted:#A9A8B3; --dim:#72717C;
+  --purple:#9146FF; --purple2:#B58CFF; --purple-soft:rgba(145,70,255,.13);
+  --orange:#E06010; --orange2:#FF9A55; --orange-soft:rgba(224,96,16,.13);
+  --green:#1FAF5A; --red:#FF5E5B;
+  --fD:'DM Sans',system-ui,sans-serif; --fM:'DM Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.16,1,.3,1); --wrap:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--fD);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(50% 40% at 0% 0%, rgba(145,70,255,.18), transparent 70%),radial-gradient(40% 35% at 100% 100%, rgba(224,96,16,.10), transparent 70%)}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 20px}
+
+/* topo */
+.top{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(14,14,16,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--fM);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-decoration:none;min-width:0}
+.brand-mark{width:28px;height:28px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,var(--purple),#5B1FC2);display:grid;place-items:center;font-family:var(--fD);font-weight:800;font-size:15px;color:#fff;letter-spacing:0}
+.brand span.t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-mini{text-decoration:none;font-family:var(--fM);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 12px;cursor:pointer}
+.btn-mini:hover{color:var(--text);border-color:var(--purple)}
+.btn-mini:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+@media (max-width:720px){ #btnApresentar{display:none} .brand span.t{display:none} }
+
+/* índice lateral */
+.indice{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:10px}
+.indice a{display:flex;align-items:center;justify-content:flex-end;gap:10px;text-decoration:none;height:14px}
+.indice a i{width:8px;height:8px;border-radius:50%;background:var(--line2);transition:all .2s ease}
+.indice a span{font-family:var(--fM);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);opacity:0;transform:translateX(6px);transition:all .2s ease;white-space:nowrap;background:rgba(14,14,16,.9);padding:3px 8px;border-radius:6px}
+.indice a:hover span,.indice a.on span{opacity:1;transform:none}
+.indice a.on i{background:var(--orange);box-shadow:0 0 0 4px rgba(224,96,16,.2)}
+@media (max-width:1100px){.indice{display:none}}
+
+/* blocos */
+section.bloco{position:relative;padding:110px 0 90px;border-bottom:1px solid var(--line);scroll-margin-top:60px}
+.eyebrow{font-family:var(--fM);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--purple2);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.eyebrow b{color:var(--dim);font-weight:400}
+h2{font-size:clamp(30px,4.4vw,52px);line-height:1.04;letter-spacing:-.03em;font-weight:800;max-width:20ch;margin-bottom:18px}
+h2 em{font-style:normal;color:var(--orange)}
+h3{font-size:20px;line-height:1.2;letter-spacing:-.01em;font-weight:700;margin-bottom:8px}
+.lead{font-size:18px;color:var(--muted);max-width:60ch}
+.lead b{color:var(--text);font-weight:600}
+.fonte{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6}
+.fonte a{color:var(--dim)}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;border-radius:14px;font-family:var(--fD);font-weight:700;font-size:16px;border:none;cursor:pointer;text-decoration:none;transition:transform .15s ease, box-shadow .25s ease, background .2s ease}
+.btn:active{transform:scale(.985)}
+.btn svg{width:18px;height:18px;flex-shrink:0}
+.btn-primary{background:var(--purple);color:#fff;box-shadow:0 14px 34px -14px rgba(145,70,255,.9)}
+.btn-primary:hover{background:#9C58FF}
+.btn-primary:focus-visible,.btn-ghost:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn-ghost:hover{border-color:var(--purple2)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+@media (max-width:520px){.btn-row .btn{width:100%}}
+
+/* 1 abertura */
+#abertura{padding-top:150px;min-height:92vh;display:flex;align-items:center}
+.vagas{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;border:1px solid rgba(224,96,16,.4);background:var(--orange-soft);color:#FFC29A;font-family:var(--fM);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:26px}
+.vagas[hidden]{display:none}
+.vagas i{width:7px;height:7px;border-radius:50%;background:var(--orange);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,96,16,.5)}50%{box-shadow:0 0 0 7px rgba(224,96,16,0)}}
+h1{font-size:clamp(44px,8vw,104px);line-height:.96;letter-spacing:-.045em;font-weight:800;margin-bottom:26px}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--purple2),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{font-size:clamp(18px,2vw,22px);color:var(--muted);max-width:56ch}
+.hero-sub b{color:var(--text);font-weight:600}
+
+/* 2 como é hoje */
+.timeline{margin-top:40px;display:grid;gap:0;border-left:1px solid var(--line2);margin-left:6px}
+.tl{position:relative;padding:14px 0 14px 28px}
+.tl::before{content:"";position:absolute;left:-5px;top:22px;width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.tl.ruim::before{background:var(--red);box-shadow:0 0 0 4px rgba(255,94,91,.15)}
+.tl time{font-family:var(--fM);font-size:12px;color:var(--dim);letter-spacing:.06em}
+.tl p{font-size:17px}
+.vilao{margin-top:34px;padding:22px 24px;border-radius:16px;border:1px solid rgba(224,96,16,.35);background:linear-gradient(120deg,var(--orange-soft),transparent);font-size:clamp(20px,2.6vw,28px);font-weight:700;letter-spacing:-.015em;max-width:34ch}
+.vilao small{display:block;font-family:var(--fM);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange2);font-weight:400;margin-bottom:8px}
+.dado-rapidez{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.dado-rapidez div{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card)}
+.dado-rapidez b{display:block;font-size:34px;letter-spacing:-.03em}
+.dado-rapidez span{color:var(--muted);font-size:14px}
+
+/* 3 calculadora */
+.calc{margin-top:36px;display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
+@media (max-width:860px){.calc{grid-template-columns:1fr}}
+.calc-in,.calc-out{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:24px}
+.campo{margin-bottom:18px}
+.campo label{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);margin-bottom:8px}
+.campo label output{font-family:var(--fM);color:var(--text)}
+.campo input[type=text]{width:100%;min-height:50px;border-radius:12px;border:1px solid var(--line2);background:var(--tile);color:var(--text);font-family:var(--fM);font-size:17px;padding:0 14px}
+.campo input[type=text]:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(145,70,255,.2)}
+.campo input[type=range]{width:100%;accent-color:var(--purple);height:28px}
+.res{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 0;border-bottom:1px dashed var(--line)}
+.res:last-of-type{border-bottom:none}
+.res span{color:var(--muted);font-size:14.5px}
+.res b{font-family:var(--fD);font-size:22px;letter-spacing:-.02em;white-space:nowrap}
+.res.forte b{font-size:clamp(30px,4vw,42px);color:var(--orange2)}
+.res.ano b{color:var(--text)}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;color:var(--muted);cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--orange)}
+.calc-nota{margin-top:14px}
+
+/* 4 ciclo */
+.ciclo{margin-top:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;counter-reset:passo}
+@media (max-width:860px){.ciclo{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:460px){.ciclo{grid-template-columns:1fr}}
+.passo{position:relative;border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card);counter-increment:passo}
+.passo::before{content:counter(passo,decimal-leading-zero);font-family:var(--fM);font-size:12px;color:var(--purple2);display:block;margin-bottom:10px}
+.passo.volta{border-color:rgba(224,96,16,.45);background:linear-gradient(140deg,var(--orange-soft),var(--card))}
+.passo.volta::before{color:var(--orange2)}
+.passo p{color:var(--muted);font-size:14px}
+
+/* 5 duas IAs */
+.duas{margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:860px){.duas{grid-template-columns:1fr}}
+.ia{border-radius:22px;padding:26px;border:1px solid var(--line);background:var(--card)}
+.ia.atende{border-color:rgba(145,70,255,.35);background:linear-gradient(160deg,rgba(145,70,255,.1),var(--card) 55%)}
+.ia.audita{border-color:rgba(224,96,16,.35);background:linear-gradient(160deg,rgba(224,96,16,.08),var(--card) 55%)}
+.ia .tag{font-family:var(--fM);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ia ul{list-style:none;margin-top:14px;display:grid;gap:9px}
+.ia li{padding-left:22px;position:relative;color:var(--muted);font-size:15px}
+.ia li::before{content:"";position:absolute;left:2px;top:9px;width:8px;height:8px;border-radius:2px;background:var(--purple)}
+.ia.audita li::before{background:var(--orange)}
+.donna-ao-vivo{margin-top:22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:16px;border-radius:16px;background:rgba(255,255,255,.03);border:1px dashed var(--line2)}
+#qrDonna{width:118px;height:118px;padding:8px;background:#fff;border-radius:12px;flex-shrink:0}
+#qrDonna img,#qrDonna canvas{width:102px!important;height:102px!important}
+.donna-ao-vivo p{font-size:14.5px;color:var(--muted);max-width:30ch}
+.donna-ao-vivo p b{color:var(--text)}
+
+/* prints */
+.print{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line2);background:#0B0B0D;box-shadow:0 30px 80px -40px rgba(145,70,255,.45)}
+.print figcaption{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);font-family:var(--fM);font-size:11px;color:var(--dim);letter-spacing:.04em}
+.print figcaption b{color:var(--muted);font-weight:500}
+
+/* 6 formulário */
+.quiz-board{margin-top:34px;display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;align-items:start}
+@media (max-width:900px){.quiz-board{grid-template-columns:1fr}}
+.quiz-board iframe{width:100%;height:660px;border:0;border-radius:18px;background:transparent}
+.quiz-pontos{display:grid;gap:12px}
+.quiz-pontos div{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card)}
+.quiz-pontos b{display:block;margin-bottom:4px}
+.quiz-pontos span{color:var(--muted);font-size:14.5px}
+
+/* 7 funcionalidades */
+.grupos{margin-top:36px;display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media (max-width:860px){.grupos{grid-template-columns:1fr}}
+.grupo{border:1px solid var(--line);border-radius:20px;padding:24px;background:var(--card)}
+.grupo .num{font-family:var(--fM);font-size:12px;color:var(--orange2);letter-spacing:.1em}
+.grupo h3{margin-top:6px}
+.grupo > p{color:var(--muted);font-size:14.5px;margin-bottom:12px}
+.grupo ul{list-style:none;display:grid;gap:8px}
+.grupo li{position:relative;padding-left:24px;font-size:15px;line-height:1.45}
+.grupo li::before{content:"";position:absolute;left:0;top:5px;width:14px;height:14px;border-radius:4px;border:1.5px solid var(--purple2);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B58CFF' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E") center/10px no-repeat}
+.grupo li small{display:block;color:var(--dim);font-size:13px}
+.grupo.largo{grid-column:1/-1}
+.prints-duplos{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:860px){.prints-duplos{grid-template-columns:1fr}}
+
+/* 8 garantias */
+.garantias{margin-top:36px;display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+@media (max-width:860px){.garantias{grid-template-columns:1fr}}
+.gar{border-radius:22px;padding:28px;border:1px solid var(--line);background:var(--card)}
+.gar.torneira{border-color:rgba(145,70,255,.4);background:radial-gradient(80% 90% at 0% 0%, rgba(145,70,255,.16), var(--card) 60%)}
+.gar.noventa{border-color:rgba(224,96,16,.4);background:radial-gradient(80% 90% at 100% 0%, rgba(224,96,16,.14), var(--card) 60%)}
+.gar .selo{font-family:var(--fM);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.gar blockquote{font-size:clamp(22px,2.6vw,30px);line-height:1.18;letter-spacing:-.02em;font-weight:800;margin-bottom:14px}
+.gar p{color:var(--muted);font-size:15px}
+.faixas{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.faixas span{font-family:var(--fM);font-size:11.5px;padding:5px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--muted)}
+
+/* 9 comparativo */
+.tabela{margin-top:34px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--card)}
+.tabela table{width:100%;border-collapse:collapse}
+.tabela th,.tabela td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14.5px}
+.tabela th{font-family:var(--fM);font-weight:400;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);background:rgba(255,255,255,.02)}
+.tabela td.preco{font-family:var(--fM);white-space:nowrap}
+.tabela td .nao{color:var(--muted)}
+.tabela tr.soma td{background:rgba(255,94,91,.06);font-weight:700;font-size:16px}
+.tabela tr.soma td.preco{color:var(--red)}
+.tabela tr.metodo td{background:linear-gradient(90deg,rgba(145,70,255,.16),rgba(224,96,16,.08));font-weight:700;font-size:16px;border-bottom:none}
+@media (max-width:760px){
+  .tabela thead{display:none}
+  .tabela tr{display:block;border-bottom:1px solid var(--line);padding:12px 4px}
+  .tabela td{display:block;border:none;padding:4px 14px}
+  .tabela td.cat{font-family:var(--fM);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+}
+.falta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+.falta span{padding:8px 12px;border-radius:999px;border:1px dashed rgba(255,94,91,.45);color:#FFB4B2;font-size:13.5px}
+
+/* 10 caso */
+.caso{margin-top:34px;display:grid;grid-template-columns:1fr 1.1fr;gap:22px;align-items:start}
+@media (max-width:900px){.caso{grid-template-columns:1fr}}
+.caso-txt{display:grid;gap:14px}
+.caso-txt div{border-left:2px solid var(--purple);padding:4px 0 4px 16px}
+.caso-txt b{display:block;font-family:var(--fM);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--purple2);font-weight:400;margin-bottom:4px}
+.caso-txt p{color:var(--muted)}
+
+/* 11 o que recebe */
+.recebe{margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:900px){.recebe{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.recebe{grid-template-columns:1fr}}
+.item{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card)}
+.item b{display:block;margin-bottom:4px;font-size:16px}
+.item span{color:var(--muted);font-size:14px}
+.item.destaque{border-color:rgba(224,96,16,.45);background:linear-gradient(140deg,var(--orange-soft),var(--card))}
+.bonus{margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:620px){.bonus{grid-template-columns:1fr}}
+.bonus .item{border-style:dashed}
+.bonus .item b::before{content:"BÔNUS · ";font-family:var(--fM);font-size:11px;color:var(--orange2);letter-spacing:.1em;font-weight:400}
+
+/* 12 como começa */
+.etapas{margin-top:34px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:900px){.etapas{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.etapas{grid-template-columns:1fr}}
+.etapa{border:1px solid var(--line);border-radius:18px;padding:20px;background:var(--card)}
+.etapa .n{font-family:var(--fM);font-size:30px;color:var(--purple2);letter-spacing:-.02em}
+.etapa p{color:var(--muted);font-size:14.5px}
+
+/* 13 FAQ */
+.faq{margin-top:30px;display:grid;gap:10px}
+.faq details{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 18px}
+.faq summary{list-style:none;cursor:pointer;padding:18px 32px 18px 0;font-weight:600;font-size:16.5px;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:0;top:14px;font-family:var(--fM);font-size:22px;color:var(--purple2);transition:transform .2s ease}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq summary:focus-visible{outline:2px solid var(--purple);outline-offset:4px;border-radius:6px}
+.faq details p{color:var(--muted);padding:0 0 18px;max-width:75ch}
+
+/* 14 final */
+#proximo{text-align:left;border-bottom:none}
+.final{border-radius:28px;padding:clamp(28px,5vw,60px);border:1px solid rgba(145,70,255,.35);
+  background:radial-gradient(70% 90% at 0% 0%, rgba(145,70,255,.22), transparent 60%),radial-gradient(60% 80% at 100% 100%, rgba(224,96,16,.16), transparent 60%),var(--card)}
+.rodape{padding:28px 0 40px;font-family:var(--fM);font-size:11px;color:var(--dim);letter-spacing:.06em}
+.rodape a{color:var(--dim)}
+
+/* revelar ao rolar */
+.rev{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease), transform .7s var(--ease)}
+.rev.vis{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rev{opacity:1;transform:none;transition:none}.vagas i{animation:none}html{scroll-behavior:auto}}
+
+/* modo apresentação: um bloco por tela, setas do teclado */
+html.apresentacao{scroll-snap-type:y mandatory}
+html.apresentacao section.bloco{min-height:100vh;scroll-snap-align:start;display:flex;align-items:center;padding:90px 0 60px}
+html.apresentacao section.bloco > .wrap{width:100%}
+html.apresentacao .rev{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#abertura"><span class="brand-mark">E</span><span class="t">Epos · Método Venda Inevitável</span></a>
+    <div class="top-actions">
+      <button class="btn-mini" id="btnApresentar" type="button" title="Um bloco por tela; use as setas do teclado">▶ Apresentar</button>
+      <a class="btn-mini cta-wa" href="#proximo" data-origem="topo">Agendar diagnóstico</a>
+    </div>
+  </div>
+</header>
+
+<nav class="indice" id="indice" aria-label="Índice da apresentação"></nav>
+
+<main>
+
+<!-- 1 ABERTURA -->
+<section class="bloco" id="abertura" data-titulo="Abertura">
+  <div class="wrap">
+    <div class="vagas" id="seloVagas" hidden><i></i><span id="txtVagas"></span></div>
+    <h1>Você só não vende<br>se <em>não quiser.</em></h1>
+    <p class="hero-sub">O Método Venda Inevitável é a <b>estrutura de vendas completa, movida por inteligência artificial</b>. O anúncio traz a pessoa certa, uma IA atende em segundos, outra IA audita cada conversa, e o seu time só fala com quem está pronto para comprar.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary cta-wa" href="#proximo" data-origem="abertura">Agendar diagnóstico
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-ghost" href="#hoje">Ver como funciona</a>
+    </div>
+  </div>
+</section>
+
+<!-- 2 COMO É HOJE -->
+<section class="bloco" id="hoje" data-titulo="Como é hoje">
+  <div class="wrap">
+    <div class="eyebrow">02 <b>/ Como é hoje</b></div>
+    <h2>Você paga pelo clique. <em>O cliente some na conversa.</em></h2>
+    <p class="lead rev">O caminho de um lead, num dia comum, na maioria das empresas que anunciam:</p>
+    <div class="timeline rev">
+      <div class="tl"><time>21h47</time><p>Ele clica no seu anúncio e manda: "Oi, queria saber mais".</p></div>
+      <div class="tl ruim"><time>21h47 → 08h30</time><p>Ninguém responde. Ele pergunta para mais dois concorrentes.</p></div>
+      <div class="tl ruim"><time>08h30</time><p>Alguém responde "Oi, tudo bem?", sem saber de qual anúncio ele veio nem o que ele quer.</p></div>
+      <div class="tl ruim"><time>Dia 2</time><p>Ele não responde mais. Ninguém retoma. Ninguém registra o porquê.</p></div>
+      <div class="tl ruim"><time>Fim do mês</time><p>A agência manda um relatório de cliques. Ninguém leu as conversas. Ninguém sabe qual anúncio vendeu.</p></div>
+    </div>
+    <div class="vilao rev"><small>O verdadeiro problema</small>O buraco entre o anúncio e a conversa.</div>
+    <div class="dado-rapidez rev">
+      <div><b>21×</b><span>mais chance de qualificar um lead respondendo em 5 minutos em vez de 30.</span></div>
+      <div><b>7×</b><span>mais chance de uma conversa qualificada respondendo em até 1 hora.</span></div>
+    </div>
+    <p class="fonte" style="margin-top:12px">Fontes: Oldroyd/InsideSales, Lead Response Management Study; Harvard Business Review, "The Short Life of Online Sales Leads" (1,25 milhão de leads). Os dois estudos medem qualificação, não venda.</p>
+  </div>
+</section>
+
+<!-- 3 QUANTO CUSTA -->
+<section class="bloco" id="custo" data-titulo="Quanto custa">
+  <div class="wrap">
+    <div class="eyebrow">03 <b>/ Quanto isso custa</b></div>
+    <h2>Quanto está indo embora <em>todo mês</em> no seu WhatsApp?</h2>
+    <p class="lead rev">Coloque os <b>seus números</b>. A conta é sua, não uma média de mercado.</p>
+    <div class="calc rev">
+      <div class="calc-in">
+        <div class="campo"><label for="cVerba">Quanto você investe em anúncio por mês <output>R$</output></label><input type="text" inputmode="numeric" id="cVerba" value="5.000"></div>
+        <div class="campo"><label for="cLeads">Quantos contatos chegam por mês</label><input type="text" inputmode="numeric" id="cLeads" value="100"></div>
+        <div class="campo"><label for="cEscapa">De cada 10 contatos, quantos ficam sem resposta rápida ou somem <output id="oEscapa">4 de 10</output></label><input type="range" id="cEscapa" min="0" max="10" step="1" value="4"></div>
+        <div class="campo"><label for="cFecha">De cada 10 bem atendidos, quantos fecham <output id="oFecha">1 de 10</output></label><input type="range" id="cFecha" min="0" max="10" step="0.5" value="1"></div>
+        <div class="campo" style="margin-bottom:0"><label for="cTicket">Quanto vale, em média, uma venda sua <output>R$</output></label><input type="text" inputmode="numeric" id="cTicket" value="8.000"></div>
+      </div>
+      <div class="calc-out" aria-live="polite">
+        <div class="res"><span>Custo de cada contato</span><b id="rCusto">—</b></div>
+        <div class="res"><span>Contatos que escapam por mês</span><b id="rEscapam">—</b></div>
+        <div class="res"><span>Verba de anúncio indo para o ralo</span><b id="rRalo">—</b></div>
+        <div class="res"><span>Vendas que deixam de acontecer</span><b id="rVendas">—</b></div>
+        <div class="res forte"><span>Receita indo embora por mês</span><b id="rMes">—</b></div>
+        <div class="res ano"><span>Em um ano</span><b id="rAno">—</b></div>
+        <label class="toggle"><input type="checkbox" id="cConservador"> Modo conservador: só metade desses contatos fecharia mesmo bem atendida</label>
+        <p class="fonte calc-nota">Contas: custo de cada contato = verba ÷ contatos · contatos que escapam = contatos × quantos escapam · verba no ralo = verba × quantos escapam · vendas perdidas = contatos que escapam × quantos fecham · receita = vendas perdidas × valor da venda.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 COMO PODE SER -->
+<section class="bloco" id="metodo" data-titulo="O Método">
+  <div class="wrap">
+    <div class="eyebrow">04 <b>/ Como pode ser</b></div>
+    <h2>Um ciclo fechado, do anúncio <em>ao contrato.</em></h2>
+    <p class="lead rev">Cada etapa conversa com a próxima. E o resultado volta para o anúncio, que fica melhor a cada venda.</p>
+    <div class="ciclo rev">
+      <div class="passo"><h3>Anúncio certo</h3><p>Campanhas otimizadas por quem agenda e fecha, não por clique.</p></div>
+      <div class="passo"><h3>Formulário ou WhatsApp</h3><p>O lead chega já respondendo as perguntas que importam.</p></div>
+      <div class="passo"><h3>IA atende em segundos</h3><p>24 horas, com a base do seu negócio e a ficha do lead.</p></div>
+      <div class="passo"><h3>Agenda sozinha</h3><p>Marca na agenda do especialista e lembra o lead antes.</p></div>
+      <div class="passo"><h3>Seu vendedor entra</h3><p>Recebe a ficha completa e só fala com quem está pronto.</p></div>
+      <div class="passo"><h3>O Analista audita</h3><p>Lê 100% das conversas e diz o próximo passo de cada lead.</p></div>
+      <div class="passo"><h3>Painel ao vivo</h3><p>Você vê o que vende, o que trava e quem está escapando.</p></div>
+      <div class="passo volta"><h3>A Meta aprende</h3><p>Quem fechou volta para o anúncio, que passa a buscar mais gente igual.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 AS 2 IAs -->
+<section class="bloco" id="ias" data-titulo="As 2 IAs">
+  <div class="wrap">
+    <div class="eyebrow">05 <b>/ Duas inteligências artificiais próprias</b></div>
+    <h2>Uma atende. <em>A outra audita tudo.</em></h2>
+    <p class="lead rev">As duas são modelos próprios, montados com a base de conhecimento do <b>seu</b> negócio. Não é robô de menu ("digite 1"), e não é uma IA genérica.</p>
+    <div class="duas rev">
+      <div class="ia atende">
+        <div class="tag">IA de atendimento</div>
+        <h3>Conversa como a sua melhor atendente, às 3 da manhã</h3>
+        <ul>
+          <li>Responde em segundos, 24 horas, 7 dias por semana</li>
+          <li>Chama o lead primeiro, já citando o que ele respondeu no formulário</li>
+          <li>Sabe de qual anúncio e campanha ele veio</li>
+          <li>Entende áudio, foto e documento</li>
+          <li>Responde objeções com os argumentos do seu negócio</li>
+          <li>Agenda na agenda do especialista e confirma com o lead</li>
+          <li>Para de falar na hora em que alguém da equipe assume</li>
+        </ul>
+        <div class="donna-ao-vivo">
+          <div id="qrDonna" aria-label="QR code para falar com a Donna"></div>
+          <p><b>Teste agora:</b> aponte a câmera ou <a class="cta-donna" href="https://wa.me/556190448205" target="_blank" rel="noopener" data-origem="donna-ao-vivo">clique aqui</a> e converse com a Donna, a IA de atendimento da própria Epos.</p>
+        </div>
+      </div>
+      <div class="ia audita">
+        <div class="tag">O Analista · IA de auditoria</div>
+        <h3>Lê cada conversa e diz o que fazer com cada lead</h3>
+        <ul>
+          <li>Lê 100% das conversas, inclusive os áudios</li>
+          <li>Resumo de cada lead, objeção e motivo de perda</li>
+          <li>Próxima ação com a mensagem pronta para enviar</li>
+          <li>Manda a sugestão no WhatsApp do vendedor; ele responde "pode programar"</li>
+          <li>Nota de 0 a 10 para cada atendimento humano, com uma dica de melhoria</li>
+          <li>Percebe quando o lead diz que fechou ou compareceu</li>
+          <li>Junta as objeções que mais aparecem no seu negócio</li>
+        </ul>
+        <figure class="print" style="margin-top:18px">
+          <img src="assets/metodo/analista-objecoes.webp" alt="Quadro das objeções mais frequentes detectadas pelo Analista" loading="lazy" width="1116" height="656">
+          <figcaption><b>Objeções mais frequentes</b><span>tela real · cliente de advocacia</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 FORMULÁRIO -->
+<section class="bloco" id="formulario" data-titulo="O formulário">
+  <div class="wrap">
+    <div class="eyebrow">06 <b>/ O formulário que qualifica</b></div>
+    <h2>Antes da conversa, <em>o raio-X.</em></h2>
+    <p class="lead rev">Um formulário próprio, do seu nicho, que abre em qualquer lugar e mede cada etapa. Experimente: é o mesmo que o seu cliente responde.</p>
+    <div class="quiz-board rev">
+      <div class="quiz-pontos">
+        <div><b>Abre em qualquer lugar</b><span>Instagram, Facebook, Google, link na bio. O formulário nativo da Meta só abre dentro do app.</span></div>
+        <div><b>Pergunta o que importa para vender</b><span>Ticket, verba, volume, quem atende, o que trava. Quem não tem perfil fica de fora.</span></div>
+        <div><b>A IA chama na hora, já sabendo tudo</b><span>Terminou de responder, a IA manda a primeira mensagem com a leitura das respostas.</span></div>
+        <div><b>Cada etapa é medida</b><span>Você vê onde as pessoas desistem e corrige o formulário com dado, não com achismo.</span></div>
+      </div>
+      <iframe id="quizBoard" title="Raio-X do seu comercial" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- 7 TUDO O QUE O SISTEMA FAZ -->
+<section class="bloco" id="funcoes" data-titulo="Tudo o que faz">
+  <div class="wrap">
+    <div class="eyebrow">07 <b>/ Tudo o que o sistema faz</b></div>
+    <h2>Não é uma ferramenta. <em>É a operação inteira.</em></h2>
+    <p class="lead rev">Tudo o que está aqui está rodando hoje, em clientes reais.</p>
+    <div class="grupos">
+
+      <div class="grupo rev"><div class="num">01</div><h3>Inteligência de mercado</h3><p>O que funciona no seu nicho, antes de gastar com anúncio.</p>
+        <ul>
+          <li>Radar de conteúdo: dezenas de canais do mercado monitorados todos os dias<small>A IA pontua o que está performando e sugere como usar no seu conteúdo</small></li>
+          <li>Raio-X dos concorrentes: funis, páginas, ofertas e anúncios ativos</li>
+          <li>Leitura da Biblioteca de Anúncios do seu nicho</li>
+          <li>Criativos comparados pelo que trazem de agendamento e contrato, não só de clique</li>
+          <li>Relatório semanal da própria IA com melhorias para o atendimento</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">02</div><h3>Tráfego e aquisição</h3><p>Gente certa chegando, todo dia.</p>
+        <ul>
+          <li>Gestão de campanhas na Meta (Instagram e Facebook) e no Google</li>
+          <li>Campanhas otimizadas pelo que vira agendamento e contrato</li>
+          <li>Anúncio direto para o WhatsApp, com a origem de cada conversa registrada</li>
+          <li>Formulário próprio (quiz) do seu nicho, rastreado por etapa</li>
+          <li>Formulário nativo da Meta ligado ao WhatsApp: a IA chama quem preencheu</li>
+          <li>Disparos estratégicos para a sua base, só pela API oficial do WhatsApp<small>Com aprovação dos modelos de mensagem pela Meta e consultoria do fluxo</small></li>
+          <li>Verba proporcional ao valor da sua venda, definida no diagnóstico</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">03</div><h3>Atendimento com IA própria</h3><p>Ninguém fica sem resposta, a qualquer hora.</p>
+        <ul>
+          <li>IA treinada com a base do seu negócio: serviços, casos, objeções e regras</li>
+          <li>Resposta em segundos, 24 horas</li>
+          <li>Chama primeiro quem preencheu o formulário, citando as respostas</li>
+          <li>Recebe a ficha do lead a cada mensagem: perfil, etapa, campanha de origem</li>
+          <li>Transcreve áudio e entende foto e documento</li>
+          <li>Agrupa mensagens picadas antes de responder, como uma pessoa faria</li>
+          <li>Agenda no Google Agenda do especialista, com o responsável no evento</li>
+          <li>Lembra o lead antes da reunião</li>
+          <li>Avisa o vendedor com a ficha completa no WhatsApp</li>
+          <li>Humano assume quando quiser: a IA silencia naquele lead</li>
+          <li>Caixa de entrada única com todas as conversas, dentro do painel</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">04</div><h3>O Analista</h3><p>Uma segunda IA que audita todo o comercial.</p>
+        <ul>
+          <li>Lê todas as conversas, inclusive áudio, minutos depois que o lead para de responder</li>
+          <li>Varredura diária de toda a base</li>
+          <li>Resumo, objeção, motivo de perda (por categoria) e nota de engajamento por lead</li>
+          <li>Próxima ação com mensagem pronta, assinada com o nome de quem vai enviar</li>
+          <li>Sugere a etapa do funil; a equipe aceita ou recusa</li>
+          <li>Nota do atendimento de cada vendedor: velocidade, qualificação, objeção, próximo passo e tom</li>
+          <li>Detecta quando o lead diz que fechou ou compareceu e pede a confirmação</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">05</div><h3>Contra objeções</h3><p>As objeções reais do seu negócio, respondidas antes de virarem perda.</p>
+        <ul>
+          <li>Base de objeções do seu negócio dentro da IA de atendimento</li>
+          <li>Objeção detectada e registrada em cada lead</li>
+          <li>Ranking das objeções que mais aparecem</li>
+          <li>Roteiro de respostas para a equipe, com as objeções reais</li>
+          <li>Ajuste semanal do atendimento nas reuniões de alinhamento</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">06</div><h3>CRM e rotina comercial</h3><p>Cada lead com dono, prazo e próximo passo.</p>
+        <ul>
+          <li>Funil em kanban por etapa, com busca e exportação</li>
+          <li>Ficha completa: origem, qualificação, linha do tempo, notas, serviço e valor</li>
+          <li>Responsável por lead, rodízio entre vendedores e plantão</li>
+          <li>Próximo contato com data, lembrete às 8h e 1 hora antes</li>
+          <li>Mensagem programada para a data certa (nunca duas para o mesmo lead)</li>
+          <li>Assistente do vendedor no WhatsApp: ele responde a sugestão em linguagem natural</li>
+          <li>Etiquetas e pastas do chat sincronizadas com o funil</li>
+          <li>Contratos confirmados pela equipe, com data e valor reais</li>
+          <li>Trava de etapa: o que a equipe decidiu, a automação não muda</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">07</div><h3>Torneira Fechada</h3><p>O vigia que não deixa nenhum lead escapar.</p>
+        <ul>
+          <li>Esperando resposta: lead que escreveu e não teve retorno</li>
+          <li>Sem retorno: lead que parou de responder sem próximo passo</li>
+          <li>Aguardando a equipe: o próximo passo está pronto, falta alguém dar o start</li>
+          <li>Avisos de 5 minutos a 30 dias, para o responsável certo</li>
+          <li>Resumo às 8h e às 14h no WhatsApp da equipe</li>
+          <li>Lead sem plano ganha um próximo passo sugerido na hora</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">08</div><h3>Rastreamento</h3><p>Você sabe qual anúncio virou contrato.</p>
+        <ul>
+          <li>Origem de cada lead até o anúncio: campanha, conjunto, criativo e posicionamento</li>
+          <li>Pixel e API de Conversões com deduplicação</li>
+          <li>A Meta recebe quem virou lead, quem participou da reunião e quem fechou, com o valor</li>
+          <li>Cliques no botão de WhatsApp registrados</li>
+          <li>Funil do formulário por etapa: visita, cada pergunta, desistência e envio</li>
+          <li>Dado sensível nunca vai para a Meta</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">09</div><h3>Painéis e relatórios</h3><p>Tudo num lugar, mais fácil que o Gerenciador de Anúncios.</p>
+        <ul>
+          <li>Painel de campanhas sem abrir o Gerenciador: gasto, CTR, leads, agendamentos e fechamentos por criativo</li>
+          <li>Relatório de vendas: receita, fechamentos, ticket médio, funil, origem, motivos de perda, tempo por etapa e resultado por vendedor</li>
+          <li>Visão do sócio: o mês contra o anterior e os marcos do projeto</li>
+          <li>Relatório diário de leads no WhatsApp</li>
+          <li>Uso do painel pela equipe: quem entrou e quanto tempo trabalhou nele</li>
+          <li>Exportação em planilha</li>
+        </ul></div>
+
+      <div class="grupo rev"><div class="num">10</div><h3>Segurança e proteção do número</h3><p>O seu WhatsApp e os seus dados, protegidos.</p>
+        <ul>
+          <li>Fila de envio: nunca duas mensagens ao mesmo tempo, intervalo entre disparos</li>
+          <li>Limite diário de reativações por número</li>
+          <li>IP dedicado por número de WhatsApp</li>
+          <li>Painel com login e permissão por pessoa; banco fechado</li>
+          <li>Consentimento no formulário, páginas de privacidade e de exclusão de dados</li>
+          <li>Alertas de erro e verificação diária do sistema</li>
+        </ul></div>
+
+      <div class="grupo largo rev">
+        <h3>Algumas telas</h3>
+        <div class="prints-duplos">
+          <figure class="print"><img src="assets/metodo/crm-kanban.webp" alt="Funil do CRM em kanban, com avisos de tempo sem retorno" loading="lazy" width="1400" height="869"><figcaption><b>Funil do CRM</b><span>tela real · nomes e telefones com tarja</span></figcaption></figure>
+          <figure class="print"><img src="assets/metodo/socio-marcos.webp" alt="Marcos do projeto na visão do sócio" loading="lazy" width="1400" height="836"><figcaption><b>Visão do sócio · marcos do projeto</b><span>tela real · cliente de advocacia</span></figcaption></figure>
+          <figure class="print"><img src="assets/metodo/ficha-lead.webp" alt="Ficha do lead com nota do Analista e linha do tempo" loading="lazy" width="900" height="1402"><figcaption><b>Ficha do lead</b><span>tela real · lead de exemplo</span></figcaption></figure>
+          <figure class="print"><img src="assets/metodo/ficha-proximo-contato.webp" alt="Sugestão do Analista com mensagem pronta e botão para programar" loading="lazy" width="900" height="1402"><figcaption><b>Sugestão do Analista, pronta para programar</b><span>tela real · lead de exemplo</span></figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 GARANTIAS -->
+<section class="bloco" id="garantias" data-titulo="Garantias">
+  <div class="wrap">
+    <div class="eyebrow">08 <b>/ Garantias</b></div>
+    <h2>O risco <em>fica com a Epos.</em></h2>
+    <div class="garantias rev">
+      <div class="gar torneira">
+        <div class="selo">Garantia Torneira Fechada</div>
+        <blockquote>"Nenhum lead seu ficará sem atendimento e nenhum vendedor vai ter mais desculpas para não vender."</blockquote>
+        <p>O painel mostra ao vivo quem está esperando resposta, quem parou de responder e quem está esperando a equipe. Você confere a garantia sozinho, a qualquer hora.</p>
+        <div class="faixas"><span>5 min</span><span>2 h</span><span>8 h</span><span>1 dia</span><span>3 dias</span><span>7 dias</span><span>15 dias</span><span>30 dias</span></div>
+      </div>
+      <div class="gar noventa">
+        <div class="selo">Garantia de 90 dias</div>
+        <blockquote>"Se você não tiver resultados em 90 dias, você ganha um mês grátis."</blockquote>
+        <p>O resultado é a meta que combinamos por escrito no diagnóstico.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 COMPARATIVO -->
+<section class="bloco" id="comparativo" data-titulo="Comparativo">
+  <div class="wrap">
+    <div class="eyebrow">09 <b>/ Quanto custaria montar sozinho</b></div>
+    <h2>Somando as ferramentas, <em>a conta não fecha.</em></h2>
+    <p class="lead rev">Preços públicos das principais ferramentas do mercado, para uma equipe de 3 pessoas. E mesmo pagando tudo isso, ainda falta o mais importante.</p>
+    <div class="tabela rev">
+      <table>
+        <thead><tr><th>O que você precisaria</th><th>Ferramenta</th><th>Mensalidade</th><th>O que não faz</th></tr></thead>
+        <tbody>
+          <tr><td class="cat">Gestão de tráfego</td><td>Gestor ou agência</td><td class="preco">R$ 800 a 4.000</td><td><span class="nao">Entrega clique; não acompanha a conversa nem o contrato</span></td></tr>
+          <tr><td class="cat">Quem atende o WhatsApp</td><td>Atendente ou SDR</td><td class="preco">R$ 2.000 a 3.500 + encargos</td><td><span class="nao">Horário comercial; esquece de retomar</span></td></tr>
+          <tr><td class="cat">CRM de WhatsApp (3 usuários)</td><td>Kommo, Clint, RD Station</td><td class="preco">R$ 410 a 740</td><td><span class="nao">Alguém precisa montar, alimentar e operar</span></td></tr>
+          <tr><td class="cat">IA de atendimento</td><td>Blip Go</td><td class="preco">R$ 389</td><td><span class="nao">Não traz cliente nem audita conversa</span></td></tr>
+          <tr><td class="cat">Rastreamento de conversas</td><td>Tintim</td><td class="preco">R$ 197</td><td><span class="nao">Não atende nem agenda</span></td></tr>
+          <tr><td class="cat">Formulário</td><td>Typeform</td><td class="preco">R$ 215 a 435</td><td><span class="nao">Não conversa com o lead depois</span></td></tr>
+          <tr class="soma"><td class="cat">Total montando sozinho</td><td>6 fornecedores</td><td class="preco">R$ 4.000 a 9.300 / mês</td><td>E nada disso conversa entre si</td></tr>
+          <tr class="metodo"><td class="cat">Método Venda Inevitável</td><td>1 time</td><td colspan="2">Tudo integrado, operado por nós, com reunião semanal de alinhamento</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="falta rev"><span>✕ IA que audita as conversas</span><span>✕ Garantia de atendimento</span><span>✕ Integração entre as ferramentas</span><span>✕ Operação e treinamento</span><span>✕ Anúncio que aprende com o contrato</span></div>
+    <p class="fonte" style="margin-top:16px">Preços públicos consultados em outubro de 2026, sujeitos a mudança: Kommo US$ 25 a 45 por usuário (kommo.com); Clint R$ 149 a 199 por usuário (useclint.com); Blip Go Essencial R$ 389 (blip.ai); Tintim plano Inicial R$ 197 (tintim.app); Typeform US$ 39 a 79 (typeform.com); gestor de tráfego R$ 800 a 4.000 (pesquisas de mercado 2026); SDR R$ 2.000 a 3.500 (Jooble e Indeed, 2026). Dólar a R$ 5,50.</p>
+  </div>
+</section>
+
+<!-- 10 CASO -->
+<section class="bloco" id="caso" data-titulo="Caso Farias & Moura">
+  <div class="wrap">
+    <div class="eyebrow">10 <b>/ Caso real</b></div>
+    <h2>Farias &amp; Moura <em>Advocacia</em></h2>
+    <div class="caso rev">
+      <div class="caso-txt">
+        <div><b>O desafio</b><p>Escritório de direito previdenciário com anúncios no ar e leads chegando no WhatsApp a qualquer hora, sem estrutura para responder rápido, qualificar e acompanhar cada um até a decisão.</p></div>
+        <div><b>O que fizemos</b><p>Formulário próprio do nicho, IA de atendimento 24h treinada com a base do escritório, agenda automática, CRM com a origem de cada lead, o Analista lendo todas as conversas e a Torneira vigiando quem estava escapando.</p></div>
+        <div><b>Como foi a implantação</b><p>Sistema no ar, equipe treinada e evolução semanal: cada marco ao lado foi uma entrega.</p></div>
+      </div>
+      <figure class="print"><img src="assets/metodo/socio-marcos.webp" alt="Linha do tempo de entregas do projeto Farias e Moura" loading="lazy" width="1400" height="836"><figcaption><b>Marcos do projeto</b><span>tela real</span></figcaption></figure>
+    </div>
+    <!-- Números do FM e depoimento: entram quando o Thiago definir (seção 9.1 do doc) -->
+  </div>
+</section>
+
+<!-- 11 O QUE VOCÊ RECEBE -->
+<section class="bloco" id="recebe" data-titulo="O que você recebe">
+  <div class="wrap">
+    <div class="eyebrow">11 <b>/ O que você recebe</b></div>
+    <h2>Tráfego e sistema, <em>juntos.</em></h2>
+    <p class="lead rev">Só o sistema não adianta se o anúncio traz a pessoa errada. Só o tráfego não adianta se ninguém atende. Por isso entregamos junto, com a sua equipe treinada.</p>
+    <div class="recebe rev">
+      <div class="item"><b>Tráfego com destino</b><span>Campanhas otimizadas pelo que vira agendamento e contrato.</span></div>
+      <div class="item"><b>IA de atendimento própria</b><span>Treinada com a base do seu negócio, 24 horas.</span></div>
+      <div class="item"><b>O Analista</b><span>A segunda IA, que audita cada conversa e cada vendedor.</span></div>
+      <div class="item"><b>Formulário do seu nicho</b><span>O raio-X que qualifica antes da conversa.</span></div>
+      <div class="item"><b>CRM comercial</b><span>Funil, responsável, próximo contato e mensagem programada.</span></div>
+      <div class="item"><b>Torneira Fechada</b><span>Nenhum lead escapa sem alguém saber.</span></div>
+      <div class="item"><b>Painéis e relatórios</b><span>Campanhas, vendas e equipe num lugar só.</span></div>
+      <div class="item"><b>Inteligência de mercado</b><span>O que funciona no seu nicho, antes de gastar.</span></div>
+      <div class="item destaque"><b>Reuniões semanais de alinhamento</b><span>Toda semana: objeções, perdas, criativos que fecham e o que ajustar.</span></div>
+    </div>
+    <div class="bonus rev">
+      <div class="item"><b>Diagnóstico Cliente Oculto</b><span>Antes de começar, testamos o seu atendimento atual e olhamos a sua conta de anúncios.</span></div>
+      <div class="item"><b>Roteiro de objeções do seu negócio</b><span>As objeções reais detectadas, com as respostas, para o seu time.</span></div>
+    </div>
+    <p class="fonte" style="margin-top:14px">Produção de conteúdo e criativos (foto e vídeo) é contratada à parte. A verba dos anúncios é paga direto à Meta.</p>
+  </div>
+</section>
+
+<!-- 12 COMO COMEÇA -->
+<section class="bloco" id="comeca" data-titulo="Como começa">
+  <div class="wrap">
+    <div class="eyebrow">12 <b>/ Como começa</b></div>
+    <h2>Em até 5 dias, <em>rodando.</em></h2>
+    <div class="etapas rev">
+      <div class="etapa"><div class="n">01</div><h3>Diagnóstico</h3><p>20 a 30 minutos com o Thiago. Você vê o sistema funcionando e onde os seus clientes estão escapando.</p></div>
+      <div class="etapa"><div class="n">02</div><h3>Onboarding</h3><p>Uma call para liberar os acessos (número, agenda, conta de anúncios) e o material do seu negócio.</p></div>
+      <div class="etapa"><div class="n">03</div><h3>Implantação em até 5 dias</h3><p>Sistema no ar, IA treinada e a sua equipe treinada para operar.</p></div>
+      <div class="etapa"><div class="n">04</div><h3>Operação</h3><p>Reuniões semanais de alinhamento, com os números e as conversas na mesa.</p></div>
+    </div>
+    <div class="vagas" id="seloVagas2" hidden style="margin-top:28px;margin-bottom:0"><i></i><span id="txtVagas2"></span></div>
+  </div>
+</section>
+
+<!-- 13 FAQ -->
+<section class="bloco" id="perguntas" data-titulo="Perguntas">
+  <div class="wrap">
+    <div class="eyebrow">13 <b>/ Perguntas frequentes</b></div>
+    <h2>O que todo mundo <em>pergunta antes.</em></h2>
+    <div class="faq">
+      <details><summary>Já tenho agência de tráfego. Por que mudar?</summary><p>A agência cuida do clique. O que acontece depois do clique (resposta, qualificação, agenda, retomada e contrato) normalmente fica sem dono. O Método junta os dois no mesmo time e mostra no painel qual anúncio virou contrato.</p></details>
+      <details><summary>Já tenho CRM. Preciso de outro?</summary><p>O CRM organiza, mas não atende às 23h, não agenda e não lê conversa. Aqui o CRM já vem ligado à IA de atendimento, ao Analista, à agenda e à origem de cada lead até o anúncio, sem ninguém precisar alimentar na mão.</p></details>
+      <details><summary>A IA vai parecer um robô ou falar besteira?</summary><p>Não é robô de menu ("digite 1"). É uma IA própria, que conversa em linguagem natural e responde com a base de conhecimento que você aprova. Você vê cada conversa, o Analista lê todas e qualquer pessoa da equipe assume a hora que quiser; nesse momento a IA silencia naquele lead.</p></details>
+      <details><summary>E se o meu WhatsApp for bloqueado?</summary><p>O sistema foi feito para proteger o número: nunca envia duas mensagens ao mesmo tempo, espaça os disparos, limita as reativações por dia e usa IP dedicado por número. Disparos para a base só pela API oficial do WhatsApp.</p></details>
+      <details><summary>Preciso trocar de número?</summary><p>O sistema funciona num número dedicado ao seu negócio, separado do pessoal. No diagnóstico o Thiago explica como configurar o seu caso.</p></details>
+      <details><summary>Em quanto tempo começa a funcionar?</summary><p>Em até 5 dias a partir da call de onboarding, com os acessos liberados e o treinamento da sua equipe incluído.</p></details>
+      <details><summary>Em quanto tempo vejo resultado?</summary><p>A IA começa a responder no primeiro dia. A garantia de 90 dias existe justamente para isso: se você não tiver resultados em 90 dias, você ganha um mês grátis. O resultado é a meta que combinamos por escrito no diagnóstico.</p></details>
+      <details><summary>Tem fidelidade? Como funciona o contrato?</summary><p>O contrato mínimo é de 6 meses, combinado com clareza antes de começar. Para quem fecha o plano anual, há uma condição especial.</p></details>
+      <details><summary>O suporte demora?</summary><p>Você não abre chamado e espera dias. Toda semana há uma reunião de alinhamento com o nosso time, que opera o sistema junto com você.</p></details>
+      <details><summary>A configuração é complicada? Quem faz?</summary><p>Nós fazemos. Você participa de uma call de onboarding e libera os acessos; a implantação e o treinamento da equipe são por nossa conta.</p></details>
+      <details><summary>As conversas podem se misturar ou se perder?</summary><p>Todas as conversas ficam num lugar só, ligadas à ficha do lead. Quando a mesma pessoa aparece com o número escrito de jeitos diferentes (com e sem o 9), o sistema junta os registros sem perder nada.</p></details>
+      <details><summary>Funciona para o meu segmento?</summary><p>Funciona para serviços de ticket médio e alto que vendem pelo WhatsApp e têm alguém para conduzir a reunião ou a venda: advocacia, saúde, odontologia, estética, imobiliária, educação, consultoria. O diagnóstico confirma se faz sentido no seu caso.</p></details>
+      <details><summary>Preciso ter equipe comercial?</summary><p>Precisa ter alguém para conduzir a reunião e fechar. A IA atende, qualifica e agenda; o sistema organiza o resto e mostra o que cada pessoa precisa fazer.</p></details>
+      <details><summary>Quem faz o conteúdo e os criativos?</summary><p>A produção de conteúdo e criativos é contratada à parte. A inteligência de mercado mostra o que está funcionando no seu nicho e o painel mostra quais criativos trazem quem fecha.</p></details>
+      <details><summary>E a LGPD? Os dados dos meus clientes ficam seguros?</summary><p>O formulário pede consentimento, o painel tem login e permissão por pessoa, o banco é fechado e dado sensível (como saúde ou renda) nunca é enviado para a Meta. Há páginas de privacidade e de exclusão de dados.</p></details>
+      <details><summary>Quanto custa?</summary><p>Depende do volume e do valor da sua venda. No diagnóstico mostramos quanto está escapando no seu caso e o investimento.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- 14 PRÓXIMO PASSO -->
+<section class="bloco" id="proximo" data-titulo="Próximo passo">
+  <div class="wrap">
+    <div class="final rev">
+      <div class="eyebrow">14 <b>/ Próximo passo</b></div>
+      <h2 style="max-width:18ch">Descubra onde os seus clientes <em>estão escapando.</em></h2>
+      <p class="lead" id="txtFinal">Um diagnóstico gratuito de 20 a 30 minutos. A Donna faz o raio-X do seu comercial no WhatsApp e marca o horário com o Thiago.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary cta-wa" id="ctaFinal" href="https://wa.me/556190448205" target="_blank" rel="noopener" data-origem="final">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 1.9 1.1.9 2 1.2 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
+          <span id="ctaFinalTxt">Agendar diagnóstico</span></a>
+      </div>
+      <div class="vagas" id="seloVagas3" hidden style="margin-top:22px;margin-bottom:0"><i></i><span id="txtVagas3"></span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="rodape"><div class="wrap">EPOS DESIGN E MARKETING · <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page" target="_blank" rel="noopener">POLÍTICA DE PRIVACIDADE</a></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+  var DONNA = '556190448205';
+  var p = new URLSearchParams(location.search);
+  var UTM = {};
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ UTM[k] = p.get(k) || ''; });
+  var quizFeito = false;
+
+  // ── funil (só no nosso banco; nada vai à Meta) ──
+  var sid; try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
+  if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem('_lp_sid', sid); } catch(e){} }
+  function track(tipo, extra){
+    if (navigator.webdriver) return;
+    var corpo = Object.assign({ lp_slug: 'metodo-venda-inevitavel', event_type: tipo, session_id: sid, referrer: (document.referrer || '').slice(0, 490) }, UTM, extra || {});
+    fetch(SB_URL + '/rest/v1/lp_events', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON }, body: JSON.stringify(corpo) }).catch(function(){});
+  }
+  window._lpTrack = track;
+  track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: innerWidth + 'x' + innerHeight });
+
+  // ── vagas: "Restam X vagas apenas" (nunca "X de 10") ──
+  function textoVagas(n){
+    if (n === 0) return 'Abrimos apenas mais algumas vagas este mês';
+    if (n === 1) return 'Resta 1 vaga apenas';
+    return 'Restam ' + n + ' vagas apenas';
+  }
+  fetch(SB_URL + '/rest/v1/rpc/epos_vagas_restantes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON }, body: '{}' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(n){
+      if (typeof n !== 'number' || n < 0) return;
+      ['', '2', '3'].forEach(function(s){ var el = document.getElementById('seloVagas' + s); if (!el) return; document.getElementById('txtVagas' + s).textContent = textoVagas(n); el.hidden = false; });
+    }).catch(function(){});
+
+  // ── WhatsApp da Donna: sem quiz, ela faz o raio-X em conversa; com quiz, a conversa já começou ──
+  function tagUtm(){
+    var u = { utm_source: UTM.utm_source || 'metodo', utm_medium: UTM.utm_medium || 'pagina', utm_campaign: UTM.utm_campaign || 'metodo' };
+    if (UTM.utm_content) u.utm_content = UTM.utm_content;
+    return '[' + Object.keys(u).map(function(k){ return k + '=' + u[k]; }).join('&') + ']';
+  }
+  function linkDonna(){
+    var texto = quizFeito ? 'Oi, Donna! Já respondi o raio-X do meu comercial. ' : 'Oi, Donna! Quero agendar meu diagnóstico. ';
+    return 'https://wa.me/' + DONNA + '?text=' + encodeURIComponent(texto + tagUtm());
+  }
+  function atualizarCtas(){
+    document.querySelectorAll('.cta-wa').forEach(function(a){ a.href = linkDonna(); a.target = '_blank'; a.rel = 'noopener'; });
+    document.getElementById('ctaFinalTxt').textContent = quizFeito ? 'Abrir a conversa com a Donna' : 'Agendar diagnóstico';
+    document.getElementById('txtFinal').textContent = quizFeito
+      ? 'A Donna já recebeu o seu raio-X e está te chamando no WhatsApp para marcar o diagnóstico com o Thiago.'
+      : 'Um diagnóstico gratuito de 20 a 30 minutos. A Donna faz o raio-X do seu comercial no WhatsApp e marca o horário com o Thiago.';
+  }
+  atualizarCtas();
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('.cta-wa, .cta-donna'); if (!a) return;
+    track('cta_click', { step_name: (a.getAttribute('data-origem') || 'cta').slice(0, 40), answer: quizFeito ? 'quiz_feito' : 'sem_quiz' });
+    if (typeof fbq === 'function') fbq('track', 'Contact');   // sem nenhum dado do visitante
+  });
+  var donnaTeste = 'https://wa.me/' + DONNA + '?text=' + encodeURIComponent('Oi, Donna! Quero ver como você atende. ' + tagUtm());
+  document.querySelectorAll('.cta-donna').forEach(function(a){ a.href = donnaTeste; });
+  try { if (window.QRCode) new QRCode(document.getElementById('qrDonna'), { text: donnaTeste, width: 102, height: 102, colorDark: '#0E0E10', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); } catch(eQ) {}
+
+  // ── quiz em modo board ──
+  var qs = new URLSearchParams({ modo: 'board' });
+  Object.keys(UTM).forEach(function(k){ if (UTM[k]) qs.set(k, UTM[k]); });
+  if (!qs.get('utm_source')) qs.set('utm_source', 'metodo');
+  document.getElementById('quizBoard').src = 'quiz-epos.html?' + qs.toString();
+  addEventListener('message', function(e){
+    if (e.origin !== location.origin || !e.data || e.data.tipo !== 'epos-quiz') return;
+    if (e.data.etapa === 'enviado') { quizFeito = true; atualizarCtas(); }
+  });
+
+  // ── calculadora ──
+  var $ = function(id){ return document.getElementById(id); };
+  var reais = function(v){ return 'R$ ' + Math.round(v).toLocaleString('pt-BR'); };
+  var num = function(id){ var v = parseFloat(String($(id).value).replace(/\./g, '').replace(',', '.')); return isNaN(v) || v < 0 ? 0 : v; };
+  function formatar(id){ var v = num(id); $(id).value = v ? Math.round(v).toLocaleString('pt-BR') : ''; }
+  function calcular(){
+    var verba = num('cVerba'), leads = num('cLeads'), escapa = parseFloat($('cEscapa').value) / 10, fecha = parseFloat($('cFecha').value) / 10, ticket = num('cTicket');
+    var cons = $('cConservador').checked ? 0.5 : 1;
+    $('oEscapa').textContent = String($('cEscapa').value).replace('.', ',') + ' de 10';
+    $('oFecha').textContent = String($('cFecha').value).replace('.', ',') + ' de 10';
+    var custo = leads ? verba / leads : 0, escapam = leads * escapa, ralo = verba * escapa, vendas = escapam * fecha * cons, mes = vendas * ticket;
+    $('rCusto').textContent = leads ? reais(custo) : '—';
+    $('rEscapam').textContent = Math.round(escapam).toLocaleString('pt-BR');
+    $('rRalo').textContent = reais(ralo);
+    $('rVendas').textContent = (Math.round(vendas * 10) / 10).toLocaleString('pt-BR');
+    $('rMes').textContent = reais(mes);
+    $('rAno').textContent = reais(mes * 12);
+  }
+  ['cVerba','cLeads','cTicket'].forEach(function(id){
+    $(id).addEventListener('input', calcular);
+    $(id).addEventListener('blur', function(){ formatar(id); calcular(); });
+  });
+  ['cEscapa','cFecha','cConservador'].forEach(function(id){ $(id).addEventListener('input', calcular); $(id).addEventListener('change', calcular); });
+  calcular();
+
+  // ── índice + revelar + etapa vista ──
+  var blocos = Array.prototype.slice.call(document.querySelectorAll('section.bloco'));
+  var indice = $('indice');
+  blocos.forEach(function(s){
+    var a = document.createElement('a'); a.href = '#' + s.id; a.innerHTML = '<span>' + s.getAttribute('data-titulo') + '</span><i></i>'; a.setAttribute('aria-label', s.getAttribute('data-titulo'));
+    indice.appendChild(a);
+  });
+  var vistos = {};
+  if ('IntersectionObserver' in window) {
+    var ioRev = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) { en.target.classList.add('vis'); ioRev.unobserve(en.target); } }); }, { threshold: .12 });
+    document.querySelectorAll('.rev').forEach(function(el){ ioRev.observe(el); });
+    var ioSec = new IntersectionObserver(function(es){ es.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var id = en.target.id;
+      indice.querySelectorAll('a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === '#' + id); });
+      if (!vistos[id]) { vistos[id] = 1; track('step_view', { step_name: id, step_index: blocos.indexOf(en.target) }); }
+    }); }, { threshold: .45 });
+    blocos.forEach(function(s){ ioSec.observe(s); });
+  } else { document.querySelectorAll('.rev').forEach(function(el){ el.classList.add('vis'); }); }
+
+  // ── modo apresentação: um bloco por tela, setas do teclado ──
+  function atual(){ var y = scrollY + innerHeight * .35, idx = 0; blocos.forEach(function(s, i){ if (s.offsetTop <= y) idx = i; }); return idx; }
+  function irPara(i){ i = Math.max(0, Math.min(blocos.length - 1, i)); blocos[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  $('btnApresentar').addEventListener('click', function(){
+    var on = document.documentElement.classList.toggle('apresentacao');
+    this.textContent = on ? '■ Sair da apresentação' : '▶ Apresentar';
+    if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){});
+    if (!on && document.fullscreenElement) document.exitFullscreen().catch(function(){});
+  });
+  addEventListener('keydown', function(e){
+    if (/input|textarea|select/i.test((e.target.tagName || '')) || e.target.isContentEditable) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') { if (document.documentElement.classList.contains('apresentacao') || e.key === 'ArrowRight') { e.preventDefault(); irPara(atual() + 1); } }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { if (document.documentElement.classList.contains('apresentacao') || e.key === 'ArrowLeft') { e.preventDefault(); irPara(atual() - 1); } }
+  });
+
+  // tempo na página
+  var ini = Date.now(), tot = 0, env = false;
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') { tot += Date.now() - ini; enviar(); } else ini = Date.now(); });
+  function enviar(){ if (env) return; env = true; var d = Math.round(tot / 1000); if (d >= 2) track('time_spent', { duration_s: d }); }
+  addEventListener('pagehide', function(){ if (document.visibilityState === 'visible') tot += Date.now() - ini; enviar(); });
+})();
+</script>
+</body>
+</html>
