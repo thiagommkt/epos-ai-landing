@@ -2243,6 +2243,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   let sess = null;
   try { sess = storedSess ? JSON.parse(storedSess) : null; } catch {}
   if (!sess || !sess.access_token || (sess.expires_at || 0) * 1000 < Date.now()) {
+    try { const telLink = new URLSearchParams(location.search).get('lead'); if (telLink) sessionStorage.setItem('abrir_lead', telLink); } catch (e) {}
     location.replace('login-epos.html');
     throw new Error('auth_required');
   }
@@ -6003,6 +6004,12 @@ async function loadMetaDashboard() {
 }
 
 // ═══ INIT + AUTO-REFRESH + SUPABASE REALTIME ═══
+// Link "Abrir a ficha" dos avisos (Torneira, quiz): ?lead=<telefone> (guardado antes do login, se precisou logar)
+(() => {
+  let telLink = null;
+  try { telLink = new URLSearchParams(location.search).get('lead') || sessionStorage.getItem('abrir_lead'); sessionStorage.removeItem('abrir_lead'); } catch (e) {}
+  if (telLink) setTimeout(() => abrirFichaPorTelefone(telLink), 1800);
+})();
 setTimeout(loadMetaDashboard, 1200);
 loadDashboard();
 loadRoboStatus();
