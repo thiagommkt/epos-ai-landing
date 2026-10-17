@@ -2451,7 +2451,7 @@ async function loadDashboard() {
   // Label dinâmico do período
   const periodoLabels = { this_week:'esta semana', this_month:'este mês', last_month:'mês passado', last_30:'30d', last_60:'60d', last_90:'90d', last_14:'14d', last_7:'7d', all:'histórico' };
   const pLabel = periodoLabels[dbPeriod] || '30d';
-  const kpiLeadsEl = document.querySelector('.kpi-lbl');
+  const kpiLeadsEl = document.getElementById('kpi-leads')?.closest('.kpi')?.querySelector('.kpi-lbl');   // não o 1º card da página (a Torneira fica acima)
   if (kpiLeadsEl) kpiLeadsEl.textContent = `Leads (${pLabel})`;
 
   if (kpiRowEl) kpiRowEl.classList.remove('loading');
