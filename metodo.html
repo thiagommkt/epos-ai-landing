@@ -20,7 +20,7 @@ fbq('track','PageView');
 :root{
   --bg:#0E0E10; --bg2:#121215; --card:#16161A; --tile:#1B1B20;
   --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
-  --text:#F4F3F7; --muted:#A9A8B3; --dim:#72717C;
+  --text:#F4F3F7; --muted:#CBCAD4; --dim:#A09FAB;
   --purple:#9146FF; --purple2:#B58CFF; --purple-soft:rgba(145,70,255,.13);
   --orange:#E06010; --orange2:#FF9A55; --orange-soft:rgba(224,96,16,.13);
   --green:#1FAF5A; --red:#FF5E5B;
@@ -59,9 +59,11 @@ a{color:inherit}
 
 /* blocos */
 section.bloco{position:relative;padding:110px 0 90px;border-bottom:1px solid var(--line);scroll-margin-top:60px}
-.eyebrow{font-family:var(--fM);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--purple2);margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.eyebrow b{color:var(--dim);font-weight:400}
-h2{font-size:clamp(30px,4.4vw,52px);line-height:1.04;letter-spacing:-.03em;font-weight:800;max-width:20ch;margin-bottom:18px}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;margin-bottom:20px;padding:8px 18px 8px 8px;border-radius:999px;border:1px solid rgba(145,70,255,.4);background:rgba(145,70,255,.1);
+  font-family:var(--fD);font-size:clamp(15px,1.5vw,19px);font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--purple2)}
+.eyebrow .n{display:grid;place-items:center;min-width:36px;height:36px;padding:0 8px;border-radius:999px;background:var(--purple);color:#fff;font-family:var(--fM);font-size:14px;letter-spacing:0}
+.eyebrow b{color:var(--text);font-weight:800}
+h2{font-size:clamp(34px,5vw,62px);line-height:1.02;letter-spacing:-.035em;font-weight:800;max-width:20ch;margin-bottom:20px}
 h2 em{font-style:normal;color:var(--orange)}
 h3{font-size:20px;line-height:1.2;letter-spacing:-.01em;font-weight:700;margin-bottom:8px}
 .lead{font-size:18px;color:var(--muted);max-width:60ch}
@@ -306,6 +308,37 @@ h1 em{font-style:normal;background:linear-gradient(90deg,var(--purple2),var(--or
 .prints-tres{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
 @media (max-width:980px){.prints-tres{grid-template-columns:1fr}}
 
+/* v3: "Como é hoje" = o problema do mercado */
+#hoje{background:linear-gradient(180deg, rgba(255,94,91,.12), rgba(255,94,91,.02) 80%);border-top:1px solid rgba(255,94,91,.35)}
+#hoje .eyebrow{border-color:rgba(255,94,91,.5);background:rgba(255,94,91,.12);color:#FF9C9A}
+#hoje .eyebrow .n{background:var(--red)}
+.alerta-mercado{display:inline-block;margin:0 0 14px;font-family:var(--fM);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#FF9C9A}
+.contraste{margin-top:22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:clamp(18px,2vw,22px);font-weight:700}
+.contraste span{padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--orange));color:#fff;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+/* v3: 2 IAs com linhas equilibradas */
+.duas-baixo{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+@media (max-width:860px){.duas-baixo{grid-template-columns:1fr}}
+.duas-baixo .donna-ao-vivo{margin-top:0;height:100%;padding:24px;gap:24px;border-radius:22px}
+.duas-baixo .donna-ao-vivo p{max-width:34ch;font-size:16px}
+.duas-baixo .donna-ao-vivo h3{margin-bottom:6px}
+#qrDonna.grande{width:150px;height:150px}
+#qrDonna.grande img,#qrDonna.grande canvas{width:134px!important;height:134px!important}
+/* v3: formulário cabe na tela, usando a largura toda */
+#formulario > .wrap{max-width:1400px}
+.form-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:36px;align-items:start}
+@media (max-width:980px){.form-grid{grid-template-columns:1fr}}
+.form-grid .quiz-pontos{grid-template-columns:1fr 1fr;margin:26px 0 0}
+@media (max-width:520px){.form-grid .quiz-pontos{grid-template-columns:1fr}}
+.form-grid .quiz-pontos div{padding:14px}
+.form-grid .quiz-moldura{max-width:none;margin:0}
+html.apresentacao #formulario{padding:76px 0 24px}
+html.apresentacao #formulario h2{font-size:clamp(30px,3.6vw,48px)}
+/* v3: comparativo com a sua conta */
+.tabela tr.perda td{background:rgba(224,96,16,.10);font-weight:700}
+.tabela tr.perda td.preco{color:var(--orange2)}
+.tabela tr.total td{background:rgba(255,94,91,.14);font-weight:800;font-size:17px}
+.tabela tr.total td.preco{color:#FF8A88}
+
 /* revelar ao rolar */
 .rev{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease), transform .7s var(--ease)}
 .rev.vis{opacity:1;transform:none}
@@ -351,10 +384,11 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 2 COMO É HOJE -->
 <section class="bloco" id="hoje" data-titulo="Como é hoje">
   <div class="wrap">
-    <div class="eyebrow">02 <b>/ Como é hoje</b></div>
+    <div class="eyebrow"><span class="n">02</span><b>Como é hoje</b></div>
+    <div class="alerta-mercado">O que acontece hoje na maioria das empresas que anunciam</div>
     <h2>Você paga pelo clique. <em>O cliente some na conversa.</em></h2>
     <div class="pixel-cego rev"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg></div>
-      <p><b>Seu pixel não sabe quem fez uma reunião com você. Não sabe quem fechou.</b> <span>E a Meta continua tentando adivinhar, entregando o seu anúncio para quem clica, não para quem compra.</span></p></div>
+      <p><b>Seu pixel não sabe quem fez uma reunião com você. Não sabe quem fechou.</b> <span>Sem esse dado, a Meta continua tentando adivinhar e entrega o seu anúncio para quem clica, não para quem compra. É assim na maioria das agências e gestores de tráfego.</span></p></div>
     <p class="lead rev" style="margin-top:34px">O caminho de um lead, num dia comum, na maioria das empresas que anunciam:</p>
     <div class="timeline rev">
       <div class="tl"><time>21h47</time><p>Ele clica no seu anúncio e manda: "Oi, queria saber mais".</p></div>
@@ -364,6 +398,7 @@ html.apresentacao .rev{opacity:1;transform:none}
       <div class="tl ruim"><time>Fim do mês</time><p>A agência manda um relatório de cliques. Ninguém leu as conversas. Ninguém sabe qual anúncio vendeu.</p></div>
     </div>
     <div class="vilao rev"><small>O verdadeiro problema</small>O buraco entre o anúncio e a conversa.</div>
+    <div class="contraste rev"><span>Com o Método</span>esse buraco fecha: a Meta passa a aprender com quem agendou e fechou.</div>
     <div class="dado-rapidez rev">
       <div><b>21×</b><span>mais chance de qualificar um lead respondendo em 5 minutos em vez de 30.</span></div>
       <div><b>7×</b><span>mais chance de uma conversa qualificada respondendo em até 1 hora.</span></div>
@@ -375,7 +410,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 3 QUANTO CUSTA -->
 <section class="bloco" id="custo" data-titulo="Quanto custa">
   <div class="wrap">
-    <div class="eyebrow">03 <b>/ Quanto isso custa</b></div>
+    <div class="eyebrow"><span class="n">03</span><b>Quanto isso custa</b></div>
     <h2>Quanto está indo embora <em>todo mês</em> no seu WhatsApp?</h2>
     <p class="lead rev">Coloque os <b>seus números</b>. A conta é sua, não uma média de mercado.</p>
     <div class="calc rev">
@@ -403,12 +438,12 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 4 COMO PODE SER -->
 <section class="bloco" id="metodo" data-titulo="O Método">
   <div class="wrap">
-    <div class="eyebrow">04 <b>/ Como pode ser</b></div>
+    <div class="eyebrow"><span class="n">04</span><b>Como pode ser</b></div>
     <h2>Um ciclo fechado, do anúncio <em>ao contrato.</em></h2>
     <p class="lead rev">Cada etapa conversa com a próxima. E o resultado volta para o anúncio, que fica melhor a cada venda.</p>
     <div class="ciclo rev">
       <div class="passo"><h3>Anúncio certo</h3><p>Benchmark de toda a Biblioteca de Anúncios e campanhas otimizadas por quem agenda e fecha, não por clique.</p></div>
-      <div class="passo"><h3>Formulário ou WhatsApp</h3><p>O lead chega já respondendo as perguntas que importam.</p></div>
+      <div class="passo"><h3>Formulário, WhatsApp ou Landing Page</h3><p>O lead chega já respondendo as perguntas que importam.</p></div>
       <div class="passo"><h3>IA atende em segundos</h3><p>24 horas, com a base do seu negócio e a ficha do lead.</p></div>
       <div class="passo"><h3>Agenda sozinha</h3><p>Marca na agenda do especialista e lembra o lead antes.</p></div>
       <div class="passo"><h3>Seu vendedor entra</h3><p>Recebe a ficha completa e só fala com quem está pronto.</p></div>
@@ -422,7 +457,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 5 AS 2 IAs -->
 <section class="bloco" id="ias" data-titulo="As 2 IAs">
   <div class="wrap">
-    <div class="eyebrow">05 <b>/ Duas inteligências artificiais próprias</b></div>
+    <div class="eyebrow"><span class="n">05</span><b>Duas inteligências artificiais próprias</b></div>
     <h2>Uma atende. <em>A outra audita tudo.</em></h2>
     <p class="lead rev">As duas são modelos próprios, montados com a base de conhecimento do <b>seu</b> negócio. Não é robô de menu ("digite 1"), e não é uma IA genérica.</p>
     <div class="duas rev">
@@ -438,10 +473,6 @@ html.apresentacao .rev{opacity:1;transform:none}
           <li>Agenda na agenda do especialista e confirma com o lead</li>
           <li>Para de falar na hora em que alguém da equipe assume</li>
         </ul>
-        <div class="donna-ao-vivo">
-          <div id="qrDonna" aria-label="QR code para falar com a Donna"></div>
-          <p><b>Teste agora:</b> aponte a câmera ou <a class="cta-donna" href="https://wa.me/556190448205" target="_blank" rel="noopener" data-origem="donna-ao-vivo">clique aqui</a> e converse com a Donna, a IA de atendimento da própria Epos.</p>
-        </div>
       </div>
       <div class="ia audita">
         <div class="tag">O Analista · IA de auditoria</div>
@@ -456,11 +487,18 @@ html.apresentacao .rev{opacity:1;transform:none}
           <li>Junta as objeções que mais aparecem no seu negócio</li>
           <li>Você, gestor, vê todas as conversas de todos os vendedores, com a qualificação e a nota da IA</li>
         </ul>
-        <figure class="print" style="margin-top:18px">
+
+      </div>
+    </div>
+    <div class="duas-baixo rev">
+        <div class="donna-ao-vivo">
+          <div id="qrDonna" class="grande" aria-label="QR code para falar com a Donna"></div>
+          <div><h3>Teste a Donna agora</h3><p>Aponte a câmera ou <a class="cta-donna" href="https://wa.me/556190448205" target="_blank" rel="noopener" data-origem="donna-ao-vivo">clique aqui</a> e converse com a IA de atendimento da própria Epos. Faça as perguntas que o seu cliente faria.</p></div>
+        </div>
+        <figure class="print">
           <img src="assets/metodo/analista-objecoes.webp" alt="Quadro das objeções mais frequentes detectadas pelo Analista" loading="lazy" width="1116" height="656">
           <figcaption><b>Objeções mais frequentes</b><span>tela real · cliente de advocacia</span></figcaption>
         </figure>
-      </div>
     </div>
   </div>
 </section>
@@ -468,26 +506,28 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 6 FORMULÁRIO -->
 <section class="bloco" id="formulario" data-titulo="O formulário">
   <div class="wrap">
-    <div class="eyebrow">06 <b>/ O formulário que qualifica</b></div>
-    <h2>Antes da conversa, <em>o raio-X.</em></h2>
-    <p class="lead rev">Um formulário próprio, do seu nicho, que abre em qualquer lugar e mede cada etapa. Experimente: é o mesmo que o seu cliente responde.</p>
-    <div class="quiz-board rev">
-      <div class="quiz-pontos" style="margin-top:34px">
+    <div class="form-grid">
+      <div>
+        <div class="eyebrow"><span class="n">06</span><b>O formulário que qualifica</b></div>
+        <h2>Antes da conversa, <em>o raio-X.</em></h2>
+        <p class="lead">Um formulário próprio, do seu nicho, que abre em qualquer lugar e mede cada etapa. Experimente ao lado: é o mesmo que o seu cliente responde.</p>
+        <div class="quiz-pontos">
         <div><b>Abre em qualquer lugar</b><span>Instagram, Facebook, Google, link na bio. O formulário nativo da Meta só abre dentro do app.</span></div>
         <div><b>Pergunta o que importa para vender</b><span>Ticket, verba, volume, quem atende, o que trava. Quem não tem perfil fica de fora.</span></div>
         <div><b>A IA chama na hora, já sabendo tudo</b><span>Terminou de responder, a IA manda a primeira mensagem com a leitura das respostas.</span></div>
         <div><b>Cada etapa é medida</b><span>Você vê onde as pessoas desistem e corrige o formulário com dado, não com achismo.</span></div>
       </div>
+      </div>
+      <div class="quiz-moldura"><iframe id="quizBoard" title="Raio-X do seu comercial" loading="lazy"></iframe></div>
     </div>
-    <div class="quiz-moldura rev"><iframe id="quizBoard" title="Raio-X do seu comercial" loading="lazy"></iframe></div>
   </div>
 </section>
 
 <!-- 7 TUDO O QUE O SISTEMA FAZ -->
 <section class="bloco" id="funcoes" data-titulo="Tudo o que faz">
   <div class="wrap">
-    <div class="eyebrow">07 <b>/ Tudo o que o sistema faz</b></div>
-    <h2>Não é uma ferramenta. <em>É a operação inteira.</em></h2>
+    <div class="eyebrow"><span class="n">07</span><b>Tudo o que o sistema faz</b></div>
+    <h2 style="max-width:none">Não é uma ferramenta.<br><em>É a operação inteira.</em></h2>
     <p class="lead rev">Tudo o que está aqui está rodando hoje, em clientes reais.</p>
     <div class="grupos">
 
@@ -628,7 +668,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 8 GARANTIAS -->
 <section class="bloco" id="garantias" data-titulo="Garantias">
   <div class="wrap">
-    <div class="eyebrow">08 <b>/ Garantias</b></div>
+    <div class="eyebrow"><span class="n">08</span><b>Garantias</b></div>
     <h2>O risco <em>fica com a Epos.</em></h2>
     <div class="garantias uma rev">
       <div class="gar torneira">
@@ -645,7 +685,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 9 COMPARATIVO -->
 <section class="bloco" id="comparativo" data-titulo="Comparativo">
   <div class="wrap">
-    <div class="eyebrow">09 <b>/ Quanto custaria montar sozinho</b></div>
+    <div class="eyebrow"><span class="n">09</span><b>Quanto custaria montar sozinho</b></div>
     <h2>Somando as ferramentas, <em>a conta não fecha.</em></h2>
     <p class="lead rev">Preços de mercado de cada peça, para uma equipe de 3 pessoas. E mesmo pagando tudo isso, ainda falta o mais importante.</p>
     <div class="tabela rev">
@@ -660,20 +700,22 @@ html.apresentacao .rev{opacity:1;transform:none}
           <tr><td class="cat">Formulário</td><td>Typeform</td><td class="preco">R$ 215 a 435</td><td><span class="nao">Não conversa com o lead depois</span></td></tr>
           <tr><td class="cat">Reuniões semanais e expertise de negócio</td><td>Consultoria comercial com acompanhamento</td><td class="preco">R$ 3.000 a 8.000</td><td><span class="nao">Não opera o atendimento nem a mídia</span></td></tr>
           <tr><td class="cat">Melhorias na ferramenta e workshops</td><td>Desenvolvedor de automações · treinamento in company</td><td class="preco">à parte, por projeto</td><td><span class="nao">Cada melhoria vira um orçamento novo</span></td></tr>
-          <tr class="soma"><td class="cat">Total montando sozinho</td><td>8 fornecedores</td><td class="preco">R$ 9.200 a 20.300 / mês</td><td>Fora as melhorias e os workshops. E nada disso conversa entre si</td></tr>
+          <tr><td class="cat">Produção de conteúdo e criativos</td><td>Equipe interna, videomaker ou agência</td><td class="preco">R$ 2.500 a 6.000</td><td><span class="nao">Não sabe quais criativos trazem quem fecha</span></td></tr>
+          <tr class="soma"><td class="cat">Total montando sozinho</td><td>9 fornecedores</td><td class="preco">R$ 11.700 a 26.300 / mês</td><td>Fora as melhorias e os workshops. E nada disso conversa entre si</td></tr>
+          <tr class="total"><td class="cat">Quanto custa continuar sem resultado</td><td>A sua conta na calculadora (bloco 3)</td><td class="preco" id="cmpPerda">—</td><td>Receita que vai embora enquanto nada muda: <b id="cmpAno">—</b> por ano</td></tr>
           <tr class="metodo"><td class="cat">Método Venda Inevitável</td><td>1 time</td><td colspan="2">Tudo integrado e operado por nós, com reuniões semanais, expertise de negócio, melhorias contínuas na ferramenta e workshops para os assinantes</td></tr>
         </tbody>
       </table>
     </div>
     <div class="falta rev"><span>✕ IA que audita as conversas</span><span>✕ Garantia de atendimento</span><span>✕ Integração entre as ferramentas</span><span>✕ Operação e treinamento</span><span>✕ Anúncio que aprende com o contrato</span><span>✕ Comunidade de assinantes</span></div>
-    <p class="fonte" style="margin-top:16px">Preços públicos consultados em outubro de 2026, sujeitos a mudança: Kommo US$ 25 a 45 por usuário (kommo.com); Clint R$ 149 a 199 por usuário (useclint.com); Blip Go Essencial R$ 389 (blip.ai); Tintim plano Inicial R$ 197 (tintim.app); Typeform US$ 39 a 79 (typeform.com); gestão de tráfego profissional R$ 3.000 a 7.000 (tabela FreelaSemCrise 2026); SDR R$ 2.000 a 3.500 (Jooble e Indeed, 2026); consultoria comercial com acompanhamento mensal R$ 3.000 a 8.000 (Fullsales, 2026); automações a partir de R$ 2.500 por fluxo (Hora de Codar, 2026). Dólar a R$ 5,50.</p>
+    <p class="fonte" style="margin-top:16px">Preços públicos consultados em outubro de 2026, sujeitos a mudança: Kommo US$ 25 a 45 por usuário (kommo.com); Clint R$ 149 a 199 por usuário (useclint.com); Blip Go Essencial R$ 389 (blip.ai); Tintim plano Inicial R$ 197 (tintim.app); Typeform US$ 39 a 79 (typeform.com); gestão de tráfego profissional R$ 3.000 a 7.000 (tabela FreelaSemCrise 2026); SDR R$ 2.000 a 3.500 (Jooble e Indeed, 2026); consultoria comercial com acompanhamento mensal R$ 3.000 a 8.000 (Fullsales, 2026); produção de conteúdo e criativos R$ 2.500 a 6.000 (freelancer experiente ou agência pequena, Filmly 2026); automações a partir de R$ 2.500 por fluxo (Hora de Codar, 2026). Dólar a R$ 5,50.</p>
   </div>
 </section>
 
 <!-- 10 CASO -->
 <section class="bloco" id="caso" data-titulo="Caso Farias & Moura">
   <div class="wrap">
-    <div class="eyebrow">10 <b>/ Caso real</b></div>
+    <div class="eyebrow"><span class="n">10</span><b>Caso real</b></div>
     <h2>Farias &amp; Moura <em>Advocacia</em></h2>
     <div class="caso rev">
       <div class="caso-txt">
@@ -690,7 +732,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 11 O QUE VOCÊ RECEBE -->
 <section class="bloco" id="recebe" data-titulo="O que você recebe">
   <div class="wrap">
-    <div class="eyebrow">11 <b>/ O que você recebe</b></div>
+    <div class="eyebrow"><span class="n">11</span><b>O que você recebe</b></div>
     <h2>Tráfego e sistema, <em>juntos.</em></h2>
     <p class="lead rev">Só o sistema não adianta se o anúncio traz a pessoa errada. Só o tráfego não adianta se ninguém atende. Por isso entregamos junto, com a sua equipe treinada.</p>
     <div class="recebe rev">
@@ -719,7 +761,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 12 COMO COMEÇA -->
 <section class="bloco" id="comeca" data-titulo="Como começa">
   <div class="wrap">
-    <div class="eyebrow">12 <b>/ Como começa</b></div>
+    <div class="eyebrow"><span class="n">12</span><b>Como começa</b></div>
     <h2>Em até 5 dias, <em>rodando.</em></h2>
     <div class="etapas rev">
       <div class="etapa"><div class="n">01</div><h3>Diagnóstico</h3><p>20 a 30 minutos com o Thiago. Você vê o sistema funcionando e onde os seus clientes estão escapando.</p></div>
@@ -734,7 +776,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <!-- 13 FAQ -->
 <section class="bloco" id="perguntas" data-titulo="Perguntas">
   <div class="wrap">
-    <div class="eyebrow">13 <b>/ Perguntas frequentes</b></div>
+    <div class="eyebrow"><span class="n">13</span><b>Perguntas frequentes</b></div>
     <h2>O que todo mundo <em>pergunta antes.</em></h2>
     <div class="faq">
       <details><summary>Já tenho agência de tráfego. Por que mudar?</summary><p>A agência cuida do clique. O que acontece depois do clique (resposta, qualificação, agenda, retomada e contrato) normalmente fica sem dono. O Método junta os dois no mesmo time e mostra no painel qual anúncio virou contrato.</p></details>
@@ -761,7 +803,7 @@ html.apresentacao .rev{opacity:1;transform:none}
 <section class="bloco" id="proximo" data-titulo="Próximo passo">
   <div class="wrap">
     <div class="final rev">
-      <div class="eyebrow">14 <b>/ Próximo passo</b></div>
+      <div class="eyebrow"><span class="n">14</span><b>Próximo passo</b></div>
       <h2 style="max-width:18ch">Descubra onde os seus clientes <em>estão escapando.</em></h2>
       <p class="lead" id="txtFinal">Um diagnóstico gratuito de 20 a 30 minutos. A Donna faz o raio-X do seu comercial no WhatsApp e marca o horário com o Thiago.</p>
       <div class="btn-row">
@@ -884,6 +926,10 @@ html.apresentacao .rev{opacity:1;transform:none}
     $('rVendas').textContent = (Math.round(vendas * 10) / 10).toLocaleString('pt-BR');
     $('rMes').textContent = reais(mes);
     $('rAno').textContent = reais(mes * 12);
+    // comparativo: soma das ferramentas + o que continua escapando (a conta dele)
+    var cP = document.getElementById('cmpPerda'), cA = document.getElementById('cmpAno');
+    if (cP) cP.textContent = reais(mes) + ' / mês';
+    if (cA) cA.textContent = reais(mes * 12);
   }
   ['cVerba','cLeads','cTicket'].forEach(function(id){
     $(id).addEventListener('input', calcular);
