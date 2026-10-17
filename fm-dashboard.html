@@ -5293,26 +5293,27 @@ function renderTorneira() {
   const comFaixa = _torDados.filter(l => l.situacao && l.faixa);
   const sr = comFaixa.filter(l => l.situacao === 'sem_resposta');
   const pa = comFaixa.filter(l => l.situacao === 'parado');
-  const semPasso = _torDados.filter(l => l.sem_proximo_passo);
+  // Aguardando a equipe: o sistema já planejou (sugestão com mensagem e horário), falta aceitar ou programar
+  const semPasso = _torDados.filter(l => l.aguardando_equipe || l.sem_proximo_passo);
   if (!comFaixa.length && !semPasso.length) {
     alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
     return;
   }
   const maisAntigo = g => { const m = g.reduce((x, l) => Math.max(x, l.minutos || 0), 0); return m ? `mais antigo há ${torDuracao(m)}` : 'nenhum agora'; };
-  const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : 'sem_passo');
+  const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : 'aguardando');
   const faixaSel = _torFiltro?.faixa || null;
   const card = (chave, rotulo, n, cor, nota) => `<div class="kpi tor-kpi${sit === chave ? ' ativo' : ''}" data-tor="${chave}" style="--tor-cor:${cor}" onclick="filtrarTorneira('${chave}',null)">
       <div class="kpi-lbl">${rotulo}</div><div class="kpi-val" style="color:${cor}">${n}</div><div class="kpi-note">${nota}</div></div>`;
-  const grupo = sit === 'todos' ? comFaixa : sit === 'sem_passo' ? semPasso : sit === 'sem_resposta' ? sr : pa;
-  const titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', sem_passo: 'Sem próximo passo marcado' }[sit];
-  const chips = sit === 'sem_passo' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
+  const grupo = sit === 'todos' ? comFaixa : sit === 'aguardando' ? semPasso : sit === 'sem_resposta' ? sr : pa;
+  const titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', aguardando: 'Aguardando a equipe: próximo passo pronto' }[sit];
+  const chips = sit === 'aguardando' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
     .map(([fx, n]) => `<button class="tor-chip${faixaSel === fx ? ' ativo' : ''}" data-faixa="${fx}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
   const lista = [...(faixaSel ? grupo.filter(l => l.faixa === faixaSel) : grupo)].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
   const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(x => x.key === k)?.label) || k || 'sem etapa';
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
   const linhas = lista.slice(0, 80).map(l => {
-    const cor = l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
-    const tempo = l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'sem tarefa';
+    const cor = sit === 'aguardando' ? '#9146FF' : l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
+    const tempo = sit === 'aguardando' ? 'aceitar ou programar' : (l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'aceitar ou programar');
     const n = nome(l);
     return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
       <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
@@ -5323,7 +5324,7 @@ function renderTorneira() {
       ${card('todos', 'Leads escapando agora', comFaixa.length, '#FF5E5B', 'esperando resposta ou sem retorno')}
       ${card('sem_resposta', 'Esperando nossa resposta', sr.length, '#FF5E5B', maisAntigo(sr))}
       ${card('parado', 'Sem retorno do lead', pa.length, '#e3b341', maisAntigo(pa))}
-      ${card('sem_passo', 'Sem próximo passo', semPasso.length, '#9146FF', 'sem consulta, tarefa ou mensagem')}
+      ${card('aguardando', 'Aguardando a equipe', semPasso.length, '#9146FF', 'próximo passo pronto, falta aceitar')}
     </div>
     <div class="tor-painel">
       <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${faixaSel ? ' · há ' + TOR_FAIXA[faixaSel] : ''} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
