@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Método: sem degradê × atual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E10; --card:#16161A; --tile:#1D1D22;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+  --text:#F4F3F7; --muted:#D2D1DA; --dim:#A9A8B4;
+  --purple:#9146FF; --purple2:#B58CFF; --orange:#E06010; --orange2:#FF9A55;
+  --fD:'DM Sans',system-ui,sans-serif; --fM:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--fD);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1500px;margin:0 auto;padding:0 20px}
+
+header.capa{padding:44px 0 24px}
+.selo{font-family:var(--fM);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+h1{font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.03em;font-weight:800;text-wrap:balance}
+h1 .a{color:var(--muted)}
+.versoes{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:980px}
+@media (max-width:700px){.versoes{grid-template-columns:1fr}}
+.versoes div{border:1px solid var(--line2);border-radius:14px;padding:14px 16px;background:var(--card)}
+.versoes b{display:flex;align-items:center;gap:8px;font-size:16px;margin-bottom:4px}
+.versoes b i,.rot i{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.v-sem i{background:var(--dim)}
+.v-atual i{background:var(--purple2)}
+.versoes span{font-size:14px;color:var(--muted)}
+
+/* controles */
+.ctrl{position:sticky;top:0;z-index:20;background:rgba(14,14,16,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ctrl .wrap{display:flex;align-items:center;gap:14px 22px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+.grupo{display:flex;align-items:center;gap:10px}
+.grupo > span{font-family:var(--fM);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.seg button{min-height:40px;padding:0 14px;border:0;background:transparent;color:var(--muted);font-family:var(--fD);font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
+.seg button + button{border-left:1px solid var(--line2)}
+.seg button.on{background:var(--tile);color:var(--text)}
+.seg button:focus-visible{outline:2px solid var(--purple);outline-offset:-2px}
+.dica{font-family:var(--fM);font-size:11.5px;color:var(--dim);margin-left:auto}
+@media (max-width:900px){.dica{display:none}}
+@media (max-width:600px){.seg button{padding:0 10px;font-size:13px}.grupo > span{display:none}.zoom .seg{order:3}}
+.blocos{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 10px}
+.blocos a{font-size:12.5px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.blocos a:hover{border-color:var(--purple2);color:var(--text)}
+
+/* telas */
+section.bloco{padding:26px 0 6px;scroll-margin-top:120px}
+section.bloco h2{font-size:20px;letter-spacing:-.01em;margin-bottom:12px;display:flex;align-items:baseline;gap:10px}
+section.bloco h2 small{font-family:var(--fM);font-size:12px;color:var(--purple2);font-weight:400;letter-spacing:.06em}
+.tela{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+body.cel .tela{grid-template-columns:repeat(2,minmax(0,390px));justify-content:center;gap:24px}
+body.so .tela{grid-template-columns:1fr}
+body.cel.so .tela{grid-template-columns:minmax(0,430px)}
+body.so-sem figure.atual, body.so-atual figure.sem{display:none}
+figure{margin:0;border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:#09090B}
+.rot{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-family:var(--fM);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+figure.sem .rot i{background:var(--dim)}
+figure.atual .rot i{background:var(--purple2)}
+figure button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+figure button:focus-visible{outline:2px solid var(--purple);outline-offset:-2px}
+figure img{display:block;width:100%;height:auto}
+@media (max-width:760px){
+  .tela, body.cel .tela{grid-template-columns:1fr 1fr;gap:8px}
+  .rot{font-size:10px;padding:6px 8px;letter-spacing:.04em}
+}
+footer{padding:30px 0 60px;color:var(--dim);font-size:13px}
+
+/* tela cheia */
+.zoom{position:fixed;inset:0;z-index:50;background:rgba(6,6,8,.97);display:none;flex-direction:column}
+.zoom.on{display:flex}
+.zoom .topo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.zoom .titulo{font-weight:700;font-size:15px}
+.zoom .titulo span{font-family:var(--fM);color:var(--purple2);font-weight:400;margin-right:8px}
+.zoom .fechar{width:42px;height:42px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--text);font-size:18px;cursor:pointer}
+.zoom .palco{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:14px;cursor:pointer}
+.zoom .palco img{max-width:100%;height:auto;border-radius:10px;border:1px solid var(--line2)}
+.zoom .ajuda{font-family:var(--fM);font-size:11.5px;color:var(--dim);text-align:center;padding:8px 16px 12px}
+</style>
+</head>
+<body>
+
+<header class="capa">
+  <div class="wrap">
+    <div class="selo">Página do Método · 18/10</div>
+    <h1>100% sem degradê <span class="a">×</span> atual</h1>
+    <div class="versoes">
+      <div class="v-sem"><b><i></i>100% sem degradê</b><span>A versão que ficou no ar às 16h: nenhum degradê nem brilho na página e no quiz.</span></div>
+      <div class="v-atual"><b><i></i>Atual (no ar agora)</b><span>Os textos sem degradê; fundos, brilhos e cartões como eram antes.</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="ctrl">
+  <div class="wrap">
+    <div class="grupo"><span>Aparelho</span>
+      <div class="seg" id="segAparelho"><button type="button" data-v="pc" class="on">Computador</button><button type="button" data-v="cel">Celular</button></div></div>
+    <div class="grupo"><span>Ver</span>
+      <div class="seg" id="segModo"><button type="button" data-v="par" class="on">Lado a lado</button><button type="button" data-v="sem">Sem degradê</button><button type="button" data-v="atual">Atual</button></div></div>
+    <div class="dica">Espaço troca entre as duas no mesmo ponto da página · clique na foto para ampliar</div>
+  </div>
+  <div class="wrap"><nav class="blocos" id="blocos" aria-label="Blocos da página"></nav></div>
+</div>
+
+<main class="wrap" id="lista"></main>
+<footer class="wrap">Fotos tiradas como quem rola a página: computador 1440 × 900, celular 390 × 844. As duas versões estão na mesma posição em cada par.</footer>
+
+<div class="zoom" id="zoom" role="dialog" aria-modal="true" aria-label="Tela ampliada">
+  <div class="topo">
+    <div class="titulo" id="zTitulo"></div>
+    <div class="seg" id="zSeg"><button type="button" data-v="sem">100% sem degradê</button><button type="button" data-v="atual">Atual</button></div>
+    <button class="fechar" type="button" id="zFechar" aria-label="Fechar">✕</button>
+  </div>
+  <div class="palco" id="zPalco"><img id="zImg" alt=""></div>
+  <div class="ajuda">Clique na foto ou aperte espaço para trocar · ← → próxima tela · Esc fecha</div>
+</div>
+
+<script src="comparativo-degrades/manifest.js"></script>
+<script>
+(function(){
+  var DIR = 'comparativo-degrades/';
+  var estado = { aparelho: innerWidth < 700 ? 'cel' : 'pc', modo: 'par' };   // no celular, abre nas fotos de celular
+  try { var g = JSON.parse(localStorage.getItem('comparativo-metodo') || '{}'); if (g.aparelho) estado.aparelho = g.aparelho; if (g.modo) estado.modo = g.modo; } catch (e) {}
+  function salvar(){ try { localStorage.setItem('comparativo-metodo', JSON.stringify(estado)); } catch (e) {} }
+  var lista = document.getElementById('lista'), blocos = document.getElementById('blocos');
+  var telas = [];
+
+  function nomeBloco(t){ return t.bloco === 99 ? 'Quiz aberto pelo link' : t.titulo; }
+  function render(){
+    telas = (window.TELAS && window.TELAS[estado.aparelho]) || [];
+    var html = '', nav = '', atualBloco = null;
+    telas.forEach(function(t, i){
+      if (t.bloco !== atualBloco) {
+        if (atualBloco !== null) html += '</section>';
+        atualBloco = t.bloco;
+        var n = t.bloco === 99 ? 'Quiz' : 'Bloco ' + t.bloco;
+        html += '<section class="bloco" id="b' + t.bloco + '"><h2><small>' + n + '</small>' + nomeBloco(t) + '</h2>';
+        nav += '<a href="#b' + t.bloco + '">' + (t.bloco === 99 ? 'Quiz' : t.bloco + ' · ' + t.titulo) + '</a>';
+      }
+      html += '<div class="tela">' +
+        '<figure class="sem"><div class="rot"><i></i>100% sem degradê</div><button type="button" data-i="' + i + '" data-v="sem" aria-label="Ampliar"><img src="' + DIR + t.sem + '" alt="' + nomeBloco(t) + ', 100% sem degradê" loading="lazy"></button></figure>' +
+        '<figure class="atual"><div class="rot"><i></i>Atual (no ar)</div><button type="button" data-i="' + i + '" data-v="atual" aria-label="Ampliar"><img src="' + DIR + t.atual + '" alt="' + nomeBloco(t) + ', atual" loading="lazy"></button></figure>' +
+        '</div>';
+    });
+    if (atualBloco !== null) html += '</section>';
+    lista.innerHTML = html; blocos.innerHTML = nav;
+    aplicarModo();
+  }
+  function aplicarModo(){
+    document.body.classList.toggle('cel', estado.aparelho === 'cel');
+    document.body.classList.toggle('so', estado.modo !== 'par');
+    document.body.classList.toggle('so-sem', estado.modo === 'sem');
+    document.body.classList.toggle('so-atual', estado.modo === 'atual');
+    marcar('segAparelho', estado.aparelho); marcar('segModo', estado.modo); salvar();
+  }
+  function marcar(id, v){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.classList.toggle('on', b.dataset.v === v); }); }
+
+  // troca de modo mantendo o mesmo ponto da página (âncora = tela visível no meio da janela)
+  function telaNoMeio(){
+    var meio = innerHeight / 2, achada = null;
+    lista.querySelectorAll('.tela').forEach(function(el){ var r = el.getBoundingClientRect(); if (!achada && r.bottom > meio) achada = { el: el, frac: (meio - r.top) / r.height }; });
+    return achada;
+  }
+  function mudar(fn){
+    var a = telaNoMeio(), idx = a ? [].indexOf.call(lista.querySelectorAll('.tela'), a.el) : -1;
+    fn();
+    if (a && idx >= 0) { var el = lista.querySelectorAll('.tela')[idx]; if (el) { var r = el.getBoundingClientRect(); scrollBy(0, r.top + r.height * a.frac - innerHeight / 2); } }
+  }
+  document.getElementById('segModo').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; b.blur(); mudar(function(){ estado.modo = b.dataset.v; aplicarModo(); }); });
+  document.getElementById('segAparelho').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b || b.dataset.v === estado.aparelho) return; estado.aparelho = b.dataset.v; render(); scrollTo(0, 0); });
+
+  // tela cheia
+  var zoom = document.getElementById('zoom'), zImg = document.getElementById('zImg'), zi = 0, zv = 'sem';
+  function mostrar(){
+    var t = telas[zi];
+    document.getElementById('zTitulo').innerHTML = '<span>' + (t.bloco === 99 ? 'Quiz' : 'Bloco ' + t.bloco) + '</span>' + nomeBloco(t) + (t.parte > 1 ? ' · parte ' + t.parte : '');
+    zImg.src = DIR + t[zv]; zImg.alt = nomeBloco(t); marcar('zSeg', zv);
+  }
+  lista.addEventListener('click', function(e){ var b = e.target.closest('button[data-i]'); if (!b) return; zi = +b.dataset.i; zv = b.dataset.v; mostrar(); zoom.classList.add('on'); document.body.style.overflow = 'hidden'; document.getElementById('zFechar').focus(); });
+  function fechar(){ zoom.classList.remove('on'); document.body.style.overflow = ''; }
+  document.getElementById('zFechar').addEventListener('click', fechar);
+  document.getElementById('zPalco').addEventListener('click', function(){ zv = zv === 'sem' ? 'atual' : 'sem'; mostrar(); });
+  document.getElementById('zSeg').addEventListener('click', function(e){ var b = e.target.closest('button'); if (b) { zv = b.dataset.v; mostrar(); } });
+
+  addEventListener('keydown', function(e){
+    if (zoom.classList.contains('on')) {
+      if (e.key === 'Escape') fechar();
+      else if (e.key === ' ') { e.preventDefault(); zv = zv === 'sem' ? 'atual' : 'sem'; mostrar(); }
+      else if (e.key === 'ArrowRight') { zi = Math.min(telas.length - 1, zi + 1); mostrar(); }
+      else if (e.key === 'ArrowLeft') { zi = Math.max(0, zi - 1); mostrar(); }
+      return;
+    }
+    if (e.key === ' ' && !/input|textarea|button/i.test(e.target.tagName)) {
+      e.preventDefault();
+      mudar(function(){ estado.modo = estado.modo === 'sem' ? 'atual' : 'sem'; aplicarModo(); });
+    }
+  });
+  render();
+})();
+</script>
+</body>
+</html>
