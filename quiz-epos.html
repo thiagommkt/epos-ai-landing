@@ -436,10 +436,13 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     Array.prototype.forEach.call(prog.children, function(el, idx){ el.classList.toggle('on', idx < feitos); });
   }
 
+  // Toque duplo (18/10): o 2º toque caía na pergunta seguinte e marcava uma resposta sem a pessoa ver (ex.: doença errada no quiz FM).
+  var armadoEm = 0;   // até quando os toques são ignorados
   function goTo(screen){
     document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
     var target = document.querySelector('[data-screen="' + screen + '"]');
     target.classList.add('active');
+    armadoEm = Date.now() + 400;   // tela nova: ignora o toque que veio da tela anterior
     target.scrollTop = 0;
     if (screen === 'segmento') fecharOutro();
     atualizarTopo(screen);
@@ -458,6 +461,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     var group = list.getAttribute('data-group');
     list.addEventListener('click', function(e){
       var btn = e.target.closest('.opt'); if (!btn) return;
+      if (Date.now() < armadoEm) return;
       if (btn.getAttribute('data-custom') === 'true') { abrirOutro(); return; }
       if (list.hasAttribute('data-multi')) {   // pergunta 7: múltipla escolha
         var on = !btn.classList.contains('selected');
@@ -471,6 +475,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
       btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true');
       answers[group] = btn.getAttribute('data-value');
       trackStep('step_answer', group, answers[group]);
+      armadoEm = Date.now() + 5000;   // já respondeu: novos toques esperam a próxima tela
       setTimeout(function(){
         var prox = PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato';
         goTo(prox);
