@@ -2191,7 +2191,31 @@ async function sb(path) {
   const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0');
   if (!r.ok) return { data: [], count: 0 };
   const data = await r.json();
+  // 19/10: o banco devolve no máximo 1000 linhas por consulta. O cartão do quiz FM contava só as 1000 mais antigas (449 visitas em vez de 578).
+  // Se veio menos do que existe e a consulta não pediu limite, busca tudo em páginas.
+  if (Array.isArray(data) && data.length && count > data.length && !/[?&](limit|offset)=/.test(path)) {
+    const tudo = await sbTodasAsLinhas(path, data.length, count);
+    if (tudo) return { data: tudo, count };
+  }
   return { data, count };
+}
+
+// Páginas em ordem fixa (id) para não repetir nem pular linha entre uma página e outra.
+// Se a tabela não tiver id ou der erro, devolve null e fica a 1ª página, como era antes.
+async function sbTodasAsLinhas(path, passo, total) {
+  const ordenado = /[?&]order=/.test(path) ? path.replace(/([?&]order=[^&]*)/, '$1,id.asc') : path + (path.includes('?') ? '&' : '?') + 'order=id.asc';
+  const linhas = [];
+  for (let off = 0; off < total && off < 50000; off += passo) {
+    const r = await fetch(`${SB_URL}/rest/v1/${ordenado}&limit=${passo}&offset=${off}`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}` }
+    });
+    if (!r.ok) return null;
+    const pagina = await r.json();
+    if (!Array.isArray(pagina)) return null;
+    linhas.push(...pagina);
+    if (pagina.length < passo) break;
+  }
+  return linhas;
 }
 
 async function sbCount(filter) {
@@ -2520,7 +2544,8 @@ async function loadDashboard() {
       const lpDate = periodoISO ? `&created_at=gte.${mesISO}${endClause.replace('&criado_em','&created_at')}` : `&created_at=gte.${new Date(Date.now()-30*864e5).toISOString().slice(0,10)}`;
       const lpEvts = await sb(`lp_events?lp_slug=eq.funil-fm-quiz${lpDate}&select=event_type,session_id,duration_s`).then(r => Array.isArray(r.data) ? r.data : []);
       const views   = new Set(lpEvts.filter(e => e.event_type === 'pageview').map(e => e.session_id)).size;
-      const submits = lpEvts.filter(e => e.event_type === 'quiz_submitted').length;
+      // 19/10: pessoas que enviaram (antes contava cada clique de envio: 28 em vez de 16, com os envios em dobro de antes de 13/10)
+      const submits = new Set(lpEvts.filter(e => e.event_type === 'quiz_submitted').map(e => e.session_id)).size;
       const times   = lpEvts.filter(e => e.event_type === 'time_spent' && e.duration_s > 0).map(e => e.duration_s);
       const avgSec  = times.length ? Math.round(times.reduce((a,b)=>a+b,0)/times.length) : 0;
       const cvr     = views ? Math.round(submits/views*100) : 0;
