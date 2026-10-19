@@ -1596,7 +1596,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
   <!-- Vendas inevitáveis (Torneira, CRM v3): o que está escapando agora — RPC fm_torneira -->
   <style>
-    #torneira-card .tor-kpis{grid-template-columns:repeat(4,1fr);margin-bottom:12px}
+    #torneira-card .tor-kpis{grid-template-columns:repeat(5,1fr);margin-bottom:12px}
+    @media(max-width:1280px){#torneira-card .tor-kpis{grid-template-columns:repeat(3,1fr)}}
     #torneira-card .tor-kpi{cursor:pointer}
     #torneira-card .tor-kpi.ativo{border-color:rgba(249,115,22,.45)}
     #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
@@ -1613,7 +1614,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
     #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
     #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
-    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}}
+    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos]{grid-column:1/-1}}
     @media(max-width:768px){.socio-kpis{grid-template-columns:1fr 1fr!important}}
     .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
     .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
@@ -4429,11 +4430,13 @@ function openConversationInChat(convId) {
 
 // ═══ SCROLL HINT ANALYTICS TABS ═══
 document.addEventListener('DOMContentLoaded', function() {
-  // Chatwoot: cada usuário usa sua própria URL do dashboard (?cw=ID)
-  // Thiago: default (pasta 🔵 em_conversa, id 73 — pastas recriadas na ordem do funil em 17/10) | César: ?cw=15 | Pedro: ?cw=16
-  const CW_VIEW_ID = new URLSearchParams(location.search).get('cw') || '73';
+  // Chatwoot abre na pasta "Caixa de Entrada" (todas as conversas) de quem está logado (pedido do Thiago, 19/10).
+  // As pastas são por usuário no Chatwoot: Thiago 1, César 15, Pedro 16. ?cw=ID na URL ainda vale; quem não está aqui abre todas as conversas.
+  const CW_PASTA = { '4f1bda92-896f-4955-81c2-69676aeab73e': '1', 'c6f3d84c-bee2-458f-9a24-d17f9686bc21': '15', 'd0e93ac4-3ae9-4616-b476-cfbf0f3c5862': '16' };
+  let cwUid = ''; try { cwUid = JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.id || ''; } catch (e) {}
+  const CW_VIEW_ID = new URLSearchParams(location.search).get('cw') || CW_PASTA[cwUid];
   const iframe = document.getElementById('chatwoot-iframe');
-  if (iframe) iframe.src = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/custom_view/' + CW_VIEW_ID;
+  if (iframe) iframe.src = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/' + (CW_VIEW_ID ? 'custom_view/' + CW_VIEW_ID : 'conversations?status=all');
 
   const wrap = document.getElementById('mb-tabs-wrap');
   const hint = document.getElementById('mb-scroll-hint');
@@ -5267,6 +5270,30 @@ async function carregarTorneira() {
   return _torDados;
 }
 
+// Novos leads (19/10): RPC fm_novos_leads — leads criados nos últimos 31 dias, com os períodos no horário de Brasília
+const NOVO_PER = { hoje: 'Hoje', ontem: 'Ontem', semana: 'Essa semana', d7: '7 dias', d15: '15 dias', d30: '30 dias' };
+let _torNovos = [];
+async function carregarNovos() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/fm_novos_leads`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    _torNovos = Array.isArray(d) ? d : [];
+  } catch (e) { _torNovos = []; }
+  return _torNovos;
+}
+// De onde o lead veio: canal + campanha (quando houver)
+function novoOrigem(l) {
+  const c = String(l.canal || '').toLowerCase();
+  const base = /quiz/.test(c) ? 'quiz' : /lead_?ads|formul/.test(c) ? 'formulário da Meta' : c === 'whatsapp' ? 'WhatsApp' : (c || 'origem não registrada');
+  const camp = String(l.utm_campaign || '').trim();
+  return camp ? `${base} · ${/^campanha/i.test(camp) ? camp : 'campanha ' + camp}` : base;
+}
+
 // Selo no card do kanban (ex.: "⏱ 2 h sem resposta")
 function torSelo(tel) {
   const t = window._torMapa && window._torMapa[tel];
@@ -5280,7 +5307,7 @@ async function loadTorneira() {
   const alvo = document.getElementById('torneira-conteudo');
   if (!alvo) return;
   alvo.innerHTML = '<div class="loading"></div>';
-  try { await carregarTorneira(); renderTorneira(); }
+  try { await Promise.all([carregarTorneira(), carregarNovos()]); renderTorneira(); }
   catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
 }
 
@@ -5304,42 +5331,64 @@ function renderTorneira() {
   const pa = comFaixa.filter(l => l.situacao === 'parado');
   // Aguardando a equipe: o sistema já planejou (sugestão com mensagem e horário), falta aceitar ou programar
   const semPasso = _torDados.filter(l => l.aguardando_equipe || l.sem_proximo_passo);
-  if (!comFaixa.length && !semPasso.length) {
+  // Novos leads (19/10): quem chegou, por período (hoje, ontem, essa semana, 7, 15 e 30 dias)
+  const novos = _torNovos;
+  if (!comFaixa.length && !semPasso.length && !novos.length) {
     alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
     return;
   }
   const maisAntigo = g => { const m = g.reduce((x, l) => Math.max(x, l.minutos || 0), 0); return m ? `mais antigo há ${torDuracao(m)}` : 'nenhum agora'; };
-  const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : 'aguardando');
+  const sit = _torFiltro?.situacao || (sr.length ? 'sem_resposta' : pa.length ? 'parado' : semPasso.length ? 'aguardando' : 'novos');
   const faixaSel = _torFiltro?.faixa || null;
   // Número no mesmo estilo dos KPIs de baixo (pedido do Thiago: sem cor própria)
   const card = (chave, rotulo, n, nota) => `<div class="kpi tor-kpi${sit === chave ? ' ativo' : ''}" data-tor="${chave}" onclick="filtrarTorneira('${chave}',null)">
       <div class="kpi-lbl">${rotulo}</div><div class="kpi-val">${n}</div><div class="kpi-note">${nota}</div></div>`;
-  const grupo = sit === 'todos' ? comFaixa : sit === 'aguardando' ? semPasso : sit === 'sem_resposta' ? sr : pa;
-  const titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', aguardando: 'Aguardando a equipe: próximo passo pronto' }[sit];
-  const chips = sit === 'aguardando' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
-    .map(([fx, n]) => `<button class="tor-chip${faixaSel === fx ? ' ativo' : ''}" data-faixa="${fx}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
-  const lista = [...(faixaSel ? grupo.filter(l => l.faixa === faixaSel) : grupo)].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
   const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(x => x.key === k)?.label) || k || 'sem etapa';
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
-  const linhas = lista.slice(0, 80).map(l => {
-    const cor = sit === 'aguardando' ? '#9146FF' : l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
-    const tempo = sit === 'aguardando' ? 'falta dar o start' : (l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'falta dar o start');
-    const n = nome(l);
-    return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
+  let titulo, sufixo, chips, lista, linhas;
+  if (sit === 'novos') {
+    const per = NOVO_PER[faixaSel] ? faixaSel : 'hoje';
+    titulo = 'Novos leads'; sufixo = ' · ' + NOVO_PER[per].toLowerCase();
+    chips = Object.keys(NOVO_PER).map(k => `<button class="tor-chip${per === k ? ' ativo' : ''}" data-faixa="${k}" onclick="filtrarTorneira('novos','${k}')">${NOVO_PER[k]} · <b>${novos.filter(l => l[k]).length}</b></button>`).join('');
+    lista = novos.filter(l => l[per]);
+    linhas = lista.slice(0, 80).map(l => {
+      const n = nome(l);
+      const selo = l.atendido_humano ? '<span style="color:#1FAF5A">atendido por humano</span>' : '<span style="color:#FF9A55">ninguém da equipe falou ainda</span>';
+      return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
+      <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
+      <div style="flex:1;min-width:0"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))} · ${escHtml(etapa(l.crm_stage))} · ${escHtml(novoOrigem(l))} · ${selo}</div></div>
+      <span class="tor-tempo" style="color:#9146FF;background:#9146FF1f">chegou há ${torDuracao(Math.max(0, l.minutos || 0))}</span></div>`;
+    }).join('');
+  } else {
+    const grupo = sit === 'todos' ? comFaixa : sit === 'aguardando' ? semPasso : sit === 'sem_resposta' ? sr : pa;
+    titulo = { todos: 'Leads escapando agora', sem_resposta: 'Esperando nossa resposta', parado: 'Sem retorno do lead', aguardando: 'Aguardando a equipe: próximo passo pronto' }[sit];
+    sufixo = faixaSel ? ' · há ' + TOR_FAIXA[faixaSel] : '';
+    chips = sit === 'aguardando' ? '' : TOR_ORDEM.map(fx => [fx, grupo.filter(l => l.faixa === fx).length]).filter(([, n]) => n)
+      .map(([fx, n]) => `<button class="tor-chip${faixaSel === fx ? ' ativo' : ''}" data-faixa="${fx}" onclick="filtrarTorneira('${sit}','${fx}')">${TOR_FAIXA[fx]} · <b>${n}</b></button>`).join('');
+    lista = [...(faixaSel ? grupo.filter(l => l.faixa === faixaSel) : grupo)].sort((a, b) => (b.minutos || 0) - (a.minutos || 0));
+    linhas = lista.slice(0, 80).map(l => {
+      const cor = sit === 'aguardando' ? '#9146FF' : l.situacao === 'sem_resposta' ? '#FF5E5B' : l.situacao === 'parado' ? '#e3b341' : '#9146FF';
+      const tempo = sit === 'aguardando' ? 'falta dar o start' : (l.faixa ? `há ${TOR_FAIXA[l.faixa]}` : 'falta dar o start');
+      const n = nome(l);
+      return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
       <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
       <div style="flex:1;min-width:0"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))} · ${escHtml(etapa(l.crm_stage))}${sit === 'todos' ? (l.situacao === 'sem_resposta' ? ' · esperando resposta' : ' · sem retorno') : ''}</div></div>
       <span class="tor-tempo" style="color:${cor};background:${cor}1f">${tempo}</span></div>`;
-  }).join('');
+    }).join('');
+  }
+  const novosHoje = novos.filter(l => l.hoje), semHumano = novosHoje.filter(l => !l.atendido_humano).length;
+  const notaNovos = novosHoje.length ? (semHumano ? `${semHumano} ainda sem atendimento humano` : 'todos já atendidos por humano') : `nenhum hoje · ontem: ${novos.filter(l => l.ontem).length}`;
   alvo.innerHTML = `<div class="kpi-row tor-kpis">
+      ${card('novos', 'Novos leads hoje', novosHoje.length, notaNovos)}
       ${card('todos', 'Leads escapando agora', comFaixa.length, 'esperando resposta ou sem retorno')}
       ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
       ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
       ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
     </div>
     <div class="tor-painel">
-      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${faixaSel ? ' · há ' + TOR_FAIXA[faixaSel] : ''} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
+      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
       ${chips ? `<div class="tor-chips">${chips}</div>` : ''}
-      <div id="torneira-lista">${linhas || '<div class="tor-vazio">Nenhum lead aqui. ✅</div>'}</div>
+      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : 'Nenhum lead aqui. ✅'}</div>`}</div>
       ${lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : ''}
     </div>`;
 }
