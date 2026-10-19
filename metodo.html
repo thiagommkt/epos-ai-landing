@@ -844,6 +844,11 @@ html.apresentacao .rev{opacity:1;transform:none}
   var p = new URLSearchParams(location.search);
   var UTM = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ UTM[k] = p.get(k) || ''; });
+  // Link por convidado (19/10): metodo.html?c=nome-da-empresa. O painel mostra se ele abriu, até onde leu, se fez o raio-X e se clicou.
+  // Fica guardado no aparelho: se ele voltar pelo link sem o ?c=, continua contando para o mesmo convidado.
+  var convidado = (p.get('c') || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+  try { if (convidado) localStorage.setItem('_lp_convidado', convidado); else if (!UTM.utm_source) convidado = localStorage.getItem('_lp_convidado') || ''; } catch(e){}
+  if (convidado && !UTM.utm_source) { UTM.utm_source = 'convite'; UTM.utm_medium = UTM.utm_medium || 'parceiro'; UTM.utm_content = UTM.utm_content || convidado; }
   var quizFeito = false;
   var $id = function(id){ return document.getElementById(id); };
 
@@ -856,6 +861,8 @@ html.apresentacao .rev{opacity:1;transform:none}
     fetch(SB_URL + '/rest/v1/lp_events', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON }, body: JSON.stringify(corpo) }).catch(function(){});
   }
   window._lpTrack = track;
+  // Aparelho da equipe ou do parceiro (19/10): metodo.html?equipe=1 marca este aparelho; as visitas dele saem da conta de visitantes
+  if (p.get('equipe') === '1') { track('equipe', { step_name: 'link' }); try { localStorage.setItem('_lp_equipe', '1'); } catch(e){} }
   track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: innerWidth + 'x' + innerHeight });
 
   // ── vagas: "Restam X vagas apenas" (nunca "X de 10") ──
@@ -960,6 +967,7 @@ html.apresentacao .rev{opacity:1;transform:none}
     indice.appendChild(a);
   });
   var vistos = {};
+  function contarBloco(el){ if (!vistos[el.id]) { vistos[el.id] = 1; track('step_view', { step_name: el.id, step_index: blocos.indexOf(el) }); } }
   if ('IntersectionObserver' in window) {
     var ioRev = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) { en.target.classList.add('vis'); ioRev.unobserve(en.target); } }); }, { threshold: .12 });
     document.querySelectorAll('.rev').forEach(function(el){ ioRev.observe(el); });
@@ -967,17 +975,25 @@ html.apresentacao .rev{opacity:1;transform:none}
       if (!en.isIntersecting) return;
       var id = en.target.id;
       indice.querySelectorAll('a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === '#' + id); });
-      if (!vistos[id]) { vistos[id] = 1; track('step_view', { step_name: id, step_index: blocos.indexOf(en.target) }); }
+      contarBloco(en.target);
     }); }, { threshold: .45 });
     blocos.forEach(function(s){ ioSec.observe(s); });
+    // 19/10: bloco mais alto que ~2 telas nunca aparecia 45% de uma vez e não contava no funil ("Tudo o que faz" tinha 0).
+    // Agora também conta quando ele passa pela faixa do meio da tela.
+    var ioMeio = new IntersectionObserver(function(es){ es.forEach(function(en){ if (en.isIntersecting) contarBloco(en.target); }); }, { rootMargin: '-45% 0px -54% 0px' });
+    blocos.forEach(function(s){ ioMeio.observe(s); });
   } else { document.querySelectorAll('.rev').forEach(function(el){ el.classList.add('vis'); }); }
 
   // ── modo apresentação: um bloco por tela, setas do teclado ──
   function atual(){ var y = scrollY + innerHeight * .35, idx = 0; blocos.forEach(function(s, i){ if (s.offsetTop <= y) idx = i; }); return idx; }
   function irPara(i){ i = Math.max(0, Math.min(blocos.length - 1, i)); blocos[i].scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  // Apresentações (19/10): o painel conta quantas vezes a página foi apresentada numa call e quanto tempo durou
+  var apresIni = 0;
+  function fimApresentacao(){ if (!apresIni) return; var d = Math.round((Date.now() - apresIni) / 1000); apresIni = 0; track('apresentacao', { step_name: 'fim', duration_s: d }); }
   $('btnApresentar').addEventListener('click', function(){
     var on = document.documentElement.classList.toggle('apresentacao');
     this.textContent = on ? '■ Sair da apresentação' : '▶ Apresentar';
+    if (on) { apresIni = Date.now(); track('apresentacao', { step_name: 'inicio' }); } else fimApresentacao();
     if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){});
     if (!on && document.fullscreenElement) document.exitFullscreen().catch(function(){});
   });
@@ -991,7 +1007,7 @@ html.apresentacao .rev{opacity:1;transform:none}
   var ini = Date.now(), tot = 0, env = false;
   document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') { tot += Date.now() - ini; enviar(); } else ini = Date.now(); });
   function enviar(){ if (env) return; env = true; var d = Math.round(tot / 1000); if (d >= 2) track('time_spent', { duration_s: d }); }
-  addEventListener('pagehide', function(){ if (document.visibilityState === 'visible') tot += Date.now() - ini; enviar(); });
+  addEventListener('pagehide', function(){ if (document.visibilityState === 'visible') tot += Date.now() - ini; enviar(); fimApresentacao(); });
 })();
 </script>
 </body>

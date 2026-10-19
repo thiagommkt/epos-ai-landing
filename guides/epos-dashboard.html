@@ -1749,6 +1749,12 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </div>
   </div>
 
+  <!-- ── PÁGINA DO MÉTODO — RASTREAMENTO (19/10) ── -->
+  <div class="card" style="margin-top:0;margin-bottom:24px" id="metodo-rastreio-card">
+    <div class="card-ttl">Página do Método — Rastreamento <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— metodo.html · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco</span></div>
+    <div id="metodo-rastreio"><div class="loading"></div></div>
+  </div>
+
   <!-- ── CLIQUES WHATSAPP RASTREADOS (links.html) ── -->
   <div class="card" style="margin-top:0">
     <div class="card-ttl">Cliques WhatsApp Rastreados <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— últimos 30 dias, por fonte (links.html)</span></div>
@@ -2295,6 +2301,19 @@ const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
 const TABLE = 'leads';
 
+// ═══ APARELHO DA EQUIPE (19/10) ═══
+// Quem entra no painel é da equipe: as visitas deste aparelho à página do Método saem da conta de visitantes (cartão "Página do Método" no painel Epos).
+(function marcarAparelhoEquipe() {
+  try {
+    if (navigator.webdriver || localStorage.getItem('_lp_equipe') === '1') return;
+    let sid = localStorage.getItem('_lp_sid');
+    if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('_lp_sid', sid); }
+    fetch(`${SB_URL}/rest/v1/lp_events`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+      body: JSON.stringify({ lp_slug: 'metodo-venda-inevitavel', event_type: 'equipe', session_id: sid, step_name: 'painel-epos' }) })
+      .then(r => { if (r.ok) localStorage.setItem('_lp_equipe', '1'); }).catch(() => {});
+  } catch (e) {}
+})();
+
 async function sb(path) {
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Prefer': 'count=exact' }
@@ -2430,6 +2449,7 @@ async function loadDashboard() {
   // mesISO = filtro do período selecionado (para KPIs e gráfico)
   const mesISO = periodoISO || encodeURIComponent(new Date(0).toISOString()); // 'all' → data zero = sem limite
   const endClause = periodoEndISO ? `&criado_em=lt.${periodoEndISO}` : '';
+  loadMetodoRastreio(periodoISO, periodoEndISO);   // cartão da página do Método (19/10), não segura o resto
   const dia30ISO = encodeURIComponent(new Date(brt.getTime() - 30*24*60*60*1000).toISOString());
 
   document.getElementById('db-date').textContent =
@@ -2685,6 +2705,99 @@ async function loadDashboard() {
   const vals = last14.map(d => dayMap[d] || 0);
   window._lastChartData = { labels, vals };
   drawBar('wk-chart', labels, vals, 'rgba(145,70,255,0.45)', 'rgba(145,70,255,0.06)');
+}
+
+// ═══ PÁGINA DO MÉTODO — RASTREAMENTO (19/10) ═══
+// Mesmo estilo do cartão do quiz no painel FM. Dados: RPC metodo_funil_stats (lp_events) + leads que vieram pela página.
+// Visitante = aparelho. Quem abriu o painel ou o kit do parceiro é equipe e fica fora da conta (linha "Equipe e apresentações").
+const METODO_BLOCOS = [['abertura','Abertura'], ['hoje','Como é hoje'], ['custo','Quanto custa'], ['metodo','O Método'], ['ias','As 2 IAs'], ['formulario','O formulário'], ['funcoes','Tudo o que faz'], ['garantias','Garantias'], ['comparativo','Comparativo'], ['caso','Caso Farias & Moura'], ['recebe','O que você recebe'], ['comeca','Como começa'], ['perguntas','Perguntas'], ['proximo','Próximo passo']];
+const METODO_QUIZ = [['hook','Viu o raio-X'], ['segmento','1 · Segmento'], ['ticket','2 · Valor da venda'], ['investimento','3 · Anúncios/mês'], ['volume','4 · Contatos/mês'], ['atendimento','5 · Quem responde'], ['conteudo','6 · Conteúdo'], ['dor','7 · O que trava'], ['contato','Contato'], ['sucesso','Enviou']];
+async function loadMetodoRastreio(periodoISO, periodoEndISO) {
+  const el = document.getElementById('metodo-rastreio');
+  if (!el) return;
+  try {
+    const sinceISO = periodoISO ? decodeURIComponent(periodoISO) : '2000-01-01T00:00:00Z';
+    const untilISO = periodoEndISO ? decodeURIComponent(periodoEndISO) : new Date(Date.now() + 60000).toISOString();
+    const resp = await fetch(`${SB_URL}/rest/v1/rpc/metodo_funil_stats`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_since: sinceISO, p_until: untilISO })
+    });
+    if (!resp.ok) throw new Error('rpc ' + resp.status);
+    const d = await resp.json();
+    const { data: leadsPag } = await sb(`${TABLE}?or=(utm_source.eq.metodo,utm_source.eq.convite)&criado_em=gte.${encodeURIComponent(sinceISO)}&criado_em=lt.${encodeURIComponent(untilISO)}&select=nome,telefone,perfil,segmento,canal,utm_source,utm_content,crm_stage,score,crm_score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico&order=criado_em.desc&limit=30`);
+
+    const e = escHtml;
+    const pc = (n, t) => t ? Math.round(n / t * 100) : 0;
+    const fmtS = s => (s === null || s === undefined) ? '—' : (s >= 60 ? Math.floor(s / 60) + 'm ' + Math.round(s % 60) + 's' : Math.round(s) + 's');
+    const quando = iso => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }) : '—';
+    const sub = t => `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px">${t}</div>`;
+    const box = (t, inner) => `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px">${sub(t)}${inner}</div>`;
+    const line = (nome, val) => `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--text);overflow-wrap:anywhere">${nome}</span><span style="color:var(--dim);white-space:nowrap">${val}</span></div>`;
+    const vazio = '<span style="color:var(--dim);font-size:11px">—</span>';
+    const kpi = (t, v, cor) => `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em">${t}</div><div style="font-family:var(--fD);font-size:26px;font-weight:700;color:${cor};line-height:1">${v}</div></div>`;
+    const grade = 'display:grid;grid-template-columns:130px 1fr 40px 40px 48px;gap:8px';
+    const cab = rotulo => `<div style="${grade};margin-bottom:6px;font-family:var(--fM);font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em"><div>${rotulo}</div><div></div><div style="text-align:right">Pess.</div><div style="text-align:right">% total</div><div style="text-align:right">Queda</div></div>`;
+    const funil = (passos, S, base) => { let prev = null; return passos.map(([k, nome]) => {
+      const n = S[k] || 0, p = pc(n, base);
+      const queda = (prev === null || !prev || n >= prev) ? '' : '−' + pc(prev - n, prev) + '%';
+      const cor = p >= 50 ? 'var(--neon)' : p >= 20 ? '#FFA500' : 'var(--warn)';
+      prev = n;
+      return `<div style="${grade};align-items:center;margin-bottom:6px;font-family:var(--fM);font-size:10px"><div style="color:var(--text)">${nome}</div><div style="position:relative;height:8px;background:var(--bg3)"><div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(p, 100)}%;background:${cor}"></div></div><div style="color:${cor};text-align:right">${n}</div><div style="color:var(--dim);text-align:right">${p}%</div><div style="color:var(--warn);text-align:right">${queda}</div></div>`;
+    }).join(''); };
+
+    const B = d.blocos || {}, QZ = d.quiz || {}, Q = QZ.steps || {}, tp = d.tempo || {};
+    const vis = d.visitantes || 0, enviaram = QZ.enviaram || 0, agendar = d.clicaram_agendar || 0;
+    const kpis = [
+      kpi('Visitantes', vis, 'var(--neon)'),
+      kpi('Leram até o fim', (B.proximo || 0) + ' · ' + pc(B.proximo || 0, vis) + '%', 'var(--text)'),
+      kpi('Fizeram o raio-X', enviaram + ' · ' + pc(enviaram, vis) + '%', 'var(--purple)'),
+      kpi('Clicaram para agendar', agendar + ' · ' + pc(agendar, vis) + '%', 'var(--neon)'),
+      kpi('Tempo por visita', fmtS(tp.mediana_s), 'var(--text)')
+    ].join('');
+
+    const funilBlocos = cab('Bloco') + funil(METODO_BLOCOS.map(([k, n], i) => [k, (i + 1) + ' · ' + n]), B, vis);
+    const funilQuiz = cab('Etapa') + funil(METODO_QUIZ, Q, Q.hook || vis);
+
+    const respBoxes = METODO_QUIZ.slice(1, 8).map(([et, nome]) => {
+      const rows = (QZ.respostas || []).filter(r => r.etapa === et);
+      const tot = rows.reduce((a, r) => a + r.n, 0);
+      return box('Respostas · ' + nome.replace(/^\d · /, ''), rows.map(r => line(e(r.resposta), r.n + ' · ' + pc(r.n, tot) + '%')).join('') || vazio);
+    }).join('');
+
+    const nomeBotao = { topo: 'Botão do topo', abertura: 'Botão da abertura', final: 'Botão do final', 'donna-ao-vivo': 'Teste a Donna (QR ou link)', cta: 'Outro botão' };
+    const cliquesBox = box('Cliques nos botões', (d.cliques || []).map(c => line(e((nomeBotao[c.origem] || c.origem) + (c.com_quiz ? ' · depois do raio-X' : '')), c.cliques + ' · ' + c.sessoes + ' pess.')).join('') || vazio);
+    const origensBox = box('De onde vieram', (d.origens || []).map(o => line(e(o.origem), o.n + ' · ' + pc(o.n, vis) + '%')).join('') || vazio);
+    const eqp = d.equipe || {}, apres = d.apresentacoes || [];
+    const equipeBox = box('Equipe e apresentações (fora da conta)',
+      line('Aparelhos da equipe e do parceiro', eqp.aparelhos || 0) + line('Visitas da equipe', eqp.visitas || 0) +
+      line('Apresentações (▶ Apresentar)', apres.length) +
+      apres.slice(0, 5).map(a => line(quando(a.em), a.duracao_s ? fmtS(a.duracao_s) : 'em andamento ou sem fim registrado')).join(''));
+
+    const nomeConv = c => e(String(c || '').replace(/-/g, ' '));
+    const convRows = (d.convidados || []).map(c => {
+      const bloco = (METODO_BLOCOS[c.ate_idx] || [])[1] || '—';
+      return `<tr><td class="td-hi" style="text-transform:capitalize">${nomeConv(c.convidado)}</td><td>${quando(c.ultima)}</td><td>${c.visitas}</td><td>${e(bloco)}</td><td>${fmtS(c.tempo_s)}</td><td>${c.raio_x ? 'Sim' : '—'}</td><td>${c.clicou ? 'Sim' : '—'}</td></tr>`;
+    }).join('') || '<tr><td colspan="7" class="empty">Nenhum convidado ainda. O parceiro gera o link no kit (parte 7, "Link do convidado").</td></tr>';
+
+    const leadRows = (leadsPag || []).map(l => {
+      const leadJson = encodeURIComponent(JSON.stringify(l));
+      const como = l.canal === 'quiz_epos' ? 'Raio-X' : 'Botão → WhatsApp';
+      const conv = l.utm_source === 'convite' ? nomeConv(l.utm_content) : '—';
+      return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''"><td class="td-hi">${e(l.nome || '—')}</td><td>${como}</td><td style="text-transform:capitalize">${conv}</td><td>${e(l.crm_stage || '—')}</td><td>${quando(l.criado_em)}</td></tr>`;
+    }).join('') || '<tr><td colspan="5" class="empty">Nenhum lead novo pela página neste período</td></tr>';
+
+    el.innerHTML =
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px">${kpis}</div>` +
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">` +
+        `<div>${sub('Até onde leram — pessoas que chegaram em cada bloco')}${funilBlocos}</div>` +
+        `<div>${sub('Raio-X dentro da página — pessoas em cada etapa')}${funilQuiz}</div>` +
+      `</div>` +
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px">${respBoxes}</div>` +
+      `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">${cliquesBox}${origensBox}${equipeBox}</div>` +
+      `<div style="margin-top:16px">${sub('Convidados do parceiro (link por convidado)')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Convidado</th><th>Última visita</th><th>Visitas</th><th>Até onde leu</th><th>Tempo</th><th>Raio-X</th><th>Clicou</th></tr></thead><tbody>${convRows}</tbody></table></div></div>` +
+      `<div style="margin-top:16px">${sub('Leads que chegaram pela página')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Nome</th><th>Como chegou</th><th>Convidado</th><th>Etapa</th><th>Chegou</th></tr></thead><tbody>${leadRows}</tbody></table></div></div>`;
+  } catch (err) { el.innerHTML = '<span style="color:var(--dim);font-size:11px">Sem dados ainda</span>'; }
 }
 
 // ═══ PENDENTES DE APROVAÇÃO ═══

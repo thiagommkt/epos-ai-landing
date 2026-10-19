@@ -94,6 +94,13 @@ details.obj .resp b{color:var(--text)}
 details.obj .resp .fala{color:var(--text)}
 
 footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5px}
+.gerador{border:1px solid var(--line2);border-radius:14px;background:var(--tile);padding:14px;margin:10px 0 16px}
+.gerador label{display:block;font-family:var(--fM);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.gerador p{font-size:14px;color:var(--dim);margin:0 0 10px}
+.gerador-linha{display:flex;gap:8px}
+.gerador input{flex:1;min-width:0;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--text);font-family:var(--fD);font-size:16px}
+.gerador input:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+.gerador-link{margin-top:10px;font-family:var(--fM);font-size:13px;color:var(--purple2);overflow-wrap:anywhere}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--card);border:1px solid var(--line2);border-radius:10px;padding:10px 14px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:30}
 .toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast{transition:none}}
@@ -311,6 +318,13 @@ footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5
   <h2><small>07</small>Depois da call</h2>
   <p class="sub">Uma mensagem por vez, do seu WhatsApp.</p>
 
+  <div class="gerador">
+    <label for="convNome">Link do convidado</label>
+    <p>Digite o nome da empresa. O link sai pronto e entra sozinho na mensagem com a página. No painel, o Thiago vê se a pessoa abriu, até onde leu, se fez o raio-X e se clicou. Abra este kit uma vez no celular e no computador que você usa nas calls: assim as suas visitas não contam como visita do convidado.</p>
+    <div class="gerador-linha"><input id="convNome" type="text" placeholder="Ex.: Clínica Sorriso" autocomplete="off"><button class="copiar" type="button" id="convCopiar">Copiar link</button></div>
+    <div class="gerador-link" id="convLink">https://lp.eposmktfilmsia.com.br/metodo.html</div>
+  </div>
+
   <div class="msg"><div class="topo"><span>Fechou · para o empresário</span><button class="copiar" type="button">Copiar</button></div>
     <div class="texto">Bem-vindo, [nome]! O Thiago te chama hoje com o contrato e para marcar a call de onboarding. Em até 5 dias depois dela, está tudo rodando.</div></div>
 
@@ -318,7 +332,7 @@ footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5
     <div class="texto">Fechou: [nome], [empresa], [segmento]. WhatsApp de quem opera: [número]. Opção [1 ou 2], [valor] por mês, pagamento [mensal ou anual]. Contrato para [e-mail]. Onboarding sugerido: [dia].</div></div>
 
   <div class="msg"><div class="topo"><span>Não fechou · no mesmo dia</span><button class="copiar" type="button">Copiar</button></div>
-    <div class="texto">[nome], obrigado pela conversa! Aqui está a página que vimos: lp.eposmktfilmsia.com.br/metodo.html
+    <div class="texto">[nome], obrigado pela conversa! Aqui está a página que vimos: [link do convidado]
 Pela sua conta, hoje estão indo embora [valor] por mês. Combinamos de falar [dia e hora] para você me dar o retorno.</div></div>
 
   <div class="msg"><div class="topo"><span>Um dia depois, se não respondeu</span><button class="copiar" type="button">Copiar</button></div>
@@ -352,13 +366,34 @@ Pela sua conta, hoje estão indo embora [valor] por mês. Combinamos de falar [d
 (function(){
   var toast = document.getElementById('toast');
   function aviso(t){ toast.textContent = t; toast.classList.add('on'); setTimeout(function(){ toast.classList.remove('on'); }, 1600); }
+  // Link do convidado (19/10): metodo.html?c=nome-da-empresa; o painel da Epos mostra o que cada convidado fez na página
+  var BASE = 'https://lp.eposmktfilmsia.com.br/metodo.html';
+  var campo = document.getElementById('convNome'), saida = document.getElementById('convLink');
+  function linkConvidado(){
+    var c = (campo.value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+    return c ? BASE + '?c=' + c : BASE;
+  }
+  campo.addEventListener('input', function(){ saida.textContent = linkConvidado(); });
   document.addEventListener('click', function(e){
     var b = e.target.closest('.copiar'); if (!b) return;
-    var texto = b.closest('.msg').querySelector('.texto').innerText.trim();
-    function ok(){ b.textContent = 'Copiado'; b.classList.add('ok'); aviso('Mensagem copiada. Troque o que está entre [ ].'); setTimeout(function(){ b.textContent = 'Copiar'; b.classList.remove('ok'); }, 1800); }
+    var rotulo = b.textContent;
+    var texto = b.id === 'convCopiar' ? linkConvidado() : b.closest('.msg').querySelector('.texto').innerText.trim().replace('[link do convidado]', linkConvidado());
+    function ok(){ b.textContent = 'Copiado'; b.classList.add('ok'); aviso(b.id === 'convCopiar' ? 'Link copiado.' : 'Mensagem copiada. Troque o que está entre [ ].'); setTimeout(function(){ b.textContent = rotulo; b.classList.remove('ok'); }, 1800); }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok, function(){ prompt('Copie a mensagem:', texto); });
     else prompt('Copie a mensagem:', texto);
   });
+
+  // Quem abre o kit é da equipe (19/10): as visitas deste aparelho à página do Método saem da conta de visitantes
+  try {
+    if (!navigator.webdriver && localStorage.getItem('_lp_equipe') !== '1') {
+      var K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+      var sid = localStorage.getItem('_lp_sid');
+      if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('_lp_sid', sid); }
+      fetch('https://phszzzwqkujmmfregtsj.supabase.co/rest/v1/lp_events', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: K, Authorization: 'Bearer ' + K },
+        body: JSON.stringify({ lp_slug: 'metodo-venda-inevitavel', event_type: 'equipe', session_id: sid, step_name: 'kit' }) })
+        .then(function(r){ if (r.ok) localStorage.setItem('_lp_equipe', '1'); }).catch(function(){});
+    }
+  } catch(eK){}
 })();
 </script>
 </body>
