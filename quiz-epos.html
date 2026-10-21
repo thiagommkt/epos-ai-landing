@@ -512,7 +512,10 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
 
   function validPhone(v){ var d = v.replace(/\D/g, ''); return d.length >= 10 && d.length <= 11; }
   document.getElementById('telefone').addEventListener('input', function(e){
-    var v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    // 21/10: com +55 (digitado ou preenchido pelo celular) o corte em 11 dígitos guardava o 55 e perdia os 2 últimos números
+    var v = e.target.value.replace(/\D/g, '');
+    if (v.length >= 12 && v.slice(0, 2) === '55') v = v.slice(2);   // código do país
+    v = v.replace(/^0+/, '').slice(0, 11);                           // 0 de discagem
     e.target.value = v.length > 6 ? '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7) : (v.length > 2 ? '(' + v.slice(0,2) + ') ' + v.slice(2) : v);
   });
 
