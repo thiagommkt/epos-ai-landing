@@ -2601,25 +2601,29 @@ async function loadDashboard() {
         kpi('Desqualificados', totDisq, 'var(--warn)')
       ].join('');
 
-      const flow = [['hook','1 · Abriu a página'], ['perfil','2 · Perfil'], ['doenca','3 · Doença'], ['renda','4 · Renda'], ['contato','5 · Contato'], ['sucesso','6 · Enviou']];
+      // 20/10: pergunta do imposto de renda (2ª do quiz). A linha só aparece quando o período já tem sessões do quiz novo.
+      const flow = [['hook','Abriu a página'], ['perfil','Perfil'], ['ir','Imposto de renda'], ['doenca','Doença'], ['renda','Renda'], ['contato','Contato'], ['sucesso','Enviou']]
+        .filter(([k]) => k !== 'ir' || S.ir)
+        .map(([k, nome], i) => [k, (i + 1) + ' · ' + nome]);
       let prev = null;
       const funnelRows = flow.map(([k, nome]) => {
         const n = S[k] || 0;
         const p = pc(n, base);
-        const queda = prev === null ? '' : (prev ? '−' + pc(prev - n, prev) + '%' : '—');
+        // período misturando quiz antigo e novo: a etapa seguinte pode ter mais sessões que a do IR — aí não há queda a mostrar
+        const queda = prev === null ? '' : (prev && n <= prev ? '−' + pc(prev - n, prev) + '%' : '—');
         const cor = p >= 50 ? 'var(--neon)' : p >= 20 ? '#FFA500' : 'var(--warn)';
         prev = n;
         return `<div style="display:grid;grid-template-columns:130px 1fr 40px 40px 48px;gap:8px;align-items:center;margin-bottom:6px;font-family:var(--fM);font-size:10px"><div style="color:var(--text)">${nome}</div><div style="position:relative;height:8px;background:var(--bg3)"><div style="position:absolute;left:0;top:0;height:100%;width:${p}%;background:${cor}"></div></div><div style="color:${cor};text-align:right">${n}</div><div style="color:var(--dim);text-align:right">${p}%</div><div style="color:var(--warn);text-align:right">${queda}</div></div>`;
       }).join('');
       const funnelHead = `<div style="display:grid;grid-template-columns:130px 1fr 40px 40px 48px;gap:8px;margin-bottom:6px;font-family:var(--fM);font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em"><div>Etapa</div><div></div><div style="text-align:right">Sess.</div><div style="text-align:right">% total</div><div style="text-align:right">Queda</div></div>`;
 
-      const respBoxes = [['perfil','Perfil'], ['doenca','Doença'], ['renda','Renda']].map(([et, nome]) => {
+      const respBoxes = [['perfil','Perfil'], ['ir','Imposto de renda'], ['doenca','Doença'], ['renda','Renda']].map(([et, nome]) => {
         const rows = (d.respostas || []).filter(r => r.etapa === et);
         const tot = rows.reduce((a, r) => a + r.n, 0);
         return box('Respostas · ' + nome, rows.map(r => line(e(r.resposta), r.n + ' · ' + pc(r.n, tot) + '%')).join('') || vazio);
       }).join('');
 
-      const nomeEtapa = { perfil: 'Perfil', doenca: 'Doença', renda: 'Renda' };
+      const nomeEtapa = { perfil: 'Perfil', ir: 'Imposto de renda', doenca: 'Doença', renda: 'Renda' };
       const disqBox = box('Desqualificados (onde e por quê)', (d.desqualificados || []).map(r => line(e((nomeEtapa[r.etapa] || r.etapa) + ' → ' + r.resposta), r.n)).join('') || vazio);
       const motivos = { nome_invalido: 'Nome inválido', telefone_invalido: 'Telefone inválido', sem_consentimento: 'Não marcou o consentimento' };
       const errBox = box('Erros na tela de contato', (d.erros || []).map(r => line(e(motivos[r.motivo] || r.motivo), r.n)).join('') || vazio);

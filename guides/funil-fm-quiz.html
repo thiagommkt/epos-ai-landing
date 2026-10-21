@@ -415,7 +415,7 @@ h1.end-title{
 
     <!-- 1: PERFIL -->
     <section class="screen" data-screen="perfil">
-      <div class="q-eyebrow">Pergunta 1 de 3</div>
+      <div class="q-eyebrow">Pergunta 1 de 4</div>
       <h2 class="q-title">Qual é a sua situação hoje?</h2>
       <p class="q-help">Selecione a opção que melhor descreve você.</p>
       <div class="opt-list" data-group="perfil">
@@ -441,9 +441,25 @@ h1.end-title{
       </div>
     </section>
 
-    <!-- 2: DOENCA -->
+    <!-- 2: IMPOSTO DE RENDA (20/10) -->
+    <section class="screen" data-screen="ir">
+      <div class="q-eyebrow">Pergunta 2 de 4</div>
+      <h2 class="q-title">Você paga imposto de renda?</h2>
+      <p class="q-help">Vale também o desconto que vem direto no contracheque ou no benefício.</p>
+      <div class="opt-list" data-group="ir">
+        <button class="opt" aria-pressed="false" data-value="Sim"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Sim</button>
+        <button class="opt" aria-pressed="false" data-value="Não"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Não</button>
+        <button class="opt" aria-pressed="false" data-value="Já paguei"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Já paguei</button>
+        <button class="opt" aria-pressed="false" data-value="Não sei dizer"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Não sei dizer</button>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="goTo('perfil')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      </div>
+    </section>
+
+    <!-- 3: DOENCA -->
     <section class="screen" data-screen="doenca">
-      <div class="q-eyebrow">Pergunta 2 de 3</div>
+      <div class="q-eyebrow">Pergunta 3 de 4</div>
       <h2 class="q-title">Você tem ou já teve alguma destas condições?</h2>
       <p class="q-help">Mesmo que já esteja curado(a) ou controlado(a).</p>
       <div class="opt-list" data-group="doenca" id="doencaList">
@@ -482,18 +498,19 @@ h1.end-title{
       </div>
 
       <div class="step-nav" id="doencaStepNav">
-        <button class="btn-back" onclick="goTo('perfil')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="btn-back" onclick="goTo('ir')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       </div>
     </section>
 
-    <!-- 3: RENDA -->
+    <!-- 4: RENDA -->
     <section class="screen" data-screen="renda">
-      <div class="q-eyebrow">Pergunta 3 de 3</div>
+      <div class="q-eyebrow">Pergunta 4 de 4</div>
       <h2 class="q-title">Qual sua remuneração bruta mensal?</h2>
       <p class="q-help">Usamos isso apenas para confirmar seu direito.</p>
       <div class="opt-list" data-group="renda">
-        <button class="opt" aria-pressed="false" data-value="Menos de R$3.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Menos de R$ 3.000,00</button>
-        <button class="opt" aria-pressed="false" data-value="De R$3.000,00 até R$5.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 3.000,00 até R$ 5.000,00</button>
+        <!-- 20/10 (Thiago): "Menos de R$ 3.500" só desqualifica se a pessoa respondeu "Não" no imposto de renda (regra no script) -->
+        <button class="opt" aria-pressed="false" data-value="Menos de R$3.500,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Menos de R$ 3.500,00</button>
+        <button class="opt" aria-pressed="false" data-value="De R$3.500,00 até R$5.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 3.500,00 até R$ 5.000,00</button>
         <button class="opt" aria-pressed="false" data-value="De R$5.000,00 até R$7.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 5.000,00 até R$ 7.000,00</button>
         <button class="opt" aria-pressed="false" data-value="De R$7.000,00 até R$10.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>De R$ 7.000,00 até R$ 10.000,00</button>
         <button class="opt" aria-pressed="false" data-value="Acima de R$10.000,00"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Acima de R$ 10.000,00</button>
@@ -503,7 +520,7 @@ h1.end-title{
       </div>
     </section>
 
-    <!-- 4: CONTATO -->
+    <!-- 5: CONTATO -->
     <section class="screen" data-screen="contato">
       <div class="q-eyebrow">Último passo</div>
       <h2 class="q-title">Ótimo! Você pode ter direito.</h2>
@@ -532,7 +549,7 @@ h1.end-title{
       </div>
     </section>
 
-    <!-- 5: SUCESSO -->
+    <!-- 6: SUCESSO -->
     <section class="screen end" data-screen="sucesso">
       <div class="end-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
@@ -544,7 +561,7 @@ h1.end-title{
       </div>
     </section>
 
-    <!-- 6: DESQUALIFICADO -->
+    <!-- 7: DESQUALIFICADO -->
     <section class="screen end" data-screen="desqualificado">
       <div class="end-icon muted">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16h.01M12 2L2 20h20L12 2z"/></svg>
@@ -564,14 +581,17 @@ h1.end-title{
 
 <script>
 (function(){
-  var order = ['hook','perfil','doenca','renda','contato','sucesso','desqualificado'];
-  var progressMap = { hook:8, perfil:28, doenca:50, renda:72, contato:90, sucesso:100, desqualificado:100 };
+  var order = ['hook','perfil','ir','doenca','renda','contato','sucesso','desqualificado'];
+  var progressMap = { hook:8, perfil:24, ir:40, doenca:56, renda:74, contato:90, sucesso:100, desqualificado:100 };
   var answers = {};
+  // 20/10 (Thiago): desqualifica só quem ganha menos de R$ 3.500 E respondeu "Não" no imposto de renda.
+  // Renda baixa com "Sim", "Já paguei" ou "Não sei dizer" segue no fluxo.
+  var RENDA_BAIXA = 'Menos de R$3.500,00';
   // Toque duplo (18/10): o 2º toque caía na pergunta seguinte e marcava uma resposta sem a pessoa ver (ex.: doença errada no quiz FM).
   var armadoEm = 0;   // até quando os toques são ignorados
 
   // Funil: etapa e resposta vão SOMENTE para o nosso banco (lp_events). Nada disso é enviado à Meta.
-  var STEP_INDEX = { hook:0, perfil:1, doenca:2, renda:3, contato:4, sucesso:5, desqualificado:6 };
+  var STEP_INDEX = { hook:0, perfil:1, ir:2, doenca:3, renda:4, contato:5, sucesso:6, desqualificado:7 };
   function trackStep(type, step, answer){
     try {
       if(window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null });
@@ -620,8 +640,10 @@ h1.end-title{
       answers[group] = btn.getAttribute('data-value');
 
       var disqualify = btn.getAttribute('data-disqualify') === 'true';
+      var rendaSemIR = group === 'renda' && answers.renda === RENDA_BAIXA && answers.ir === 'Não';
+      if(rendaSemIR) disqualify = true;
       trackStep('step_answer', group, answers[group]);
-      if(disqualify) trackStep('step_disqualified', group, answers[group]);
+      if(disqualify) trackStep('step_disqualified', group, rendaSemIR ? answers.renda + ' · não paga IR' : answers[group]);
       armadoEm = Date.now() + 5000;   // já respondeu: novos toques esperam a próxima tela
       setTimeout(function(){
         if(disqualify){
@@ -630,7 +652,8 @@ h1.end-title{
           goTo('desqualificado');
           return;
         }
-        if(group === 'perfil') goTo('doenca');
+        if(group === 'perfil') goTo('ir');
+        else if(group === 'ir') goTo('doenca');
         else if(group === 'doenca') goTo('renda');
         else if(group === 'renda') goTo('contato');
       }, 260);
@@ -726,6 +749,7 @@ h1.end-title{
       perfil: answers.perfil || '',
       doenca: answers.doenca || '',
       renda: answers.renda || '',
+      paga_ir: answers.ir || '',
       event_id: eventId,
       utm_source: urlParams.get('utm_source') || 'quiz',
       utm_medium: urlParams.get('utm_medium') || '',
@@ -756,6 +780,7 @@ h1.end-title{
       + 'Nome: ' + answers.nome + '\n'
       + 'Telefone: ' + answers.telefone + '\n'
       + 'Perfil: ' + (answers.perfil || '') + '\n'
+      + 'Paga imposto de renda: ' + (answers.ir || '') + '\n'
       + 'Condição: ' + (answers.doenca || '') + '\n'
       + 'Renda: ' + (answers.renda || '');
     var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
