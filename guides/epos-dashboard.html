@@ -1591,6 +1591,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
         <span class="modo-dono-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
         <span class="modo-dono-label">👤 Modo dono: carregando...</span>
       </button>
+      <button class="modo-dono-btn" id="transcricao-btn" onclick="toggleTranscricao()" style="display:none;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">
+        <span class="transcricao-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
+        <span class="transcricao-label">🎙️ Transcrição: carregando...</span>
+      </button>
       <div class="sec-badge" id="db-live">● LIVE</div>
     </div>
   </div>
@@ -6201,6 +6205,70 @@ async function toggleModoDono() {
   }
 }
 
+// ═══ TRANSCRIÇÃO DE ÁUDIO (system_config.transcricao_audio_ativa, 21/10) — só admin vê; desligada = áudio não vai para a OpenAI e a equipe ouve ═══
+function renderTranscricao(ativa) {
+  const btn = document.getElementById('transcricao-btn');
+  if (!btn) return;
+  const dot = btn.querySelector('.transcricao-dot');
+  const label = btn.querySelector('.transcricao-label');
+  btn.dataset.ativo = ativa === true ? '1' : ativa === false ? '0' : '';
+  if (ativa === true) {
+    dot.style.background = 'var(--neon)'; dot.style.boxShadow = '0 0 6px var(--neon)';
+    label.textContent = '🎙️ Transcrição: Ligada';
+    btn.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--bd-b)';
+    btn.title = 'Ligada: os áudios dos leads são transcritos (OpenAI) e a IA responde ao texto. Clique para desligar.';
+  } else if (ativa === false) {
+    dot.style.background = 'var(--warn)'; dot.style.boxShadow = '0 0 6px var(--warn)';
+    label.textContent = '🎙️ Transcrição: Desligada';
+    btn.style.color = 'var(--warn)'; btn.style.borderColor = 'rgba(255,94,91,0.38)';
+    btn.title = 'Desligada: o áudio não vai para a OpenAI; a IA não responde áudio e a equipe recebe o aviso para ouvir. Clique para ligar.';
+  } else {
+    dot.style.background = 'var(--dim)'; dot.style.boxShadow = 'none';
+    label.textContent = '🎙️ Transcrição: erro ao carregar';
+    btn.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--bd)';
+  }
+}
+async function loadTranscricao() {
+  const btn = document.getElementById('transcricao-btn');
+  if (!btn) return;
+  try {
+    const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json());
+    if (adm !== true) { btn.style.display = 'none'; return; }
+    btn.style.display = 'flex';
+    const r = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.${MODO_DONO_PROJETO}&select=transcricao_audio_ativa&limit=1`, { headers: _modoDonoHeaders() });
+    const data = await r.json();
+    renderTranscricao(Array.isArray(data) && data[0] ? data[0].transcricao_audio_ativa : null);
+  } catch (e) {
+    renderTranscricao(null);
+  }
+}
+async function toggleTranscricao() {
+  const btn = document.getElementById('transcricao-btn');
+  if (!btn || btn.dataset.busy === '1') return;
+  const atual = btn.dataset.ativo;
+  if (atual !== '0' && atual !== '1') return;
+  const novo = atual !== '1';
+  if (!confirm(novo ? 'Ligar a transcrição de áudio?\n\nOs áudios dos leads voltam a ser transcritos pela OpenAI (custo por minuto) e a IA responde ao texto.'
+                    : 'Desligar a transcrição de áudio?\n\nO áudio deixa de ir para a OpenAI: a IA não responde áudio, o lead recebe "Recebi seu áudio! Em breve um de nossos atendentes vai te responder" e a equipe recebe o aviso para ouvir.')) return;
+  btn.dataset.busy = '1'; btn.style.opacity = '0.5';
+  try {
+    const resp = await fetch(`${SB_URL}/rest/v1/rpc/sistema_definir_transcricao_audio`, {
+      method: 'POST', headers: _modoDonoHeaders(),
+      body: JSON.stringify({ p_projeto: MODO_DONO_PROJETO, p_ativa: novo })
+    });
+    if (!resp.ok) {
+      const errBody = await resp.text().catch(() => '');
+      throw new Error(`HTTP ${resp.status} — ${errBody}`);
+    }
+    renderTranscricao(novo);
+  } catch (e) {
+    alert('Erro ao mudar a transcrição de áudio:\n' + e.message);
+    await loadTranscricao();
+  } finally {
+    btn.dataset.busy = '0'; btn.style.opacity = '1';
+  }
+}
+
 // ═══ CLIENTES & VAGAS (Epos) — epos_clientes + epos_vagas_restantes ═══
 const CLI_STATUS = { negociando: ['Negociando', '#e3b341'], ativo: ['Ativo', '#3fb950'], pausado: ['Pausado', '#8b949e'], encerrado: ['Encerrado', '#FF5E5B'] };
 const CLI_SERVICO = { trafego: 'Tráfego', sistema: 'Sistema', metodo: 'Método', audiovisual: 'Audiovisual' };
@@ -6360,6 +6428,7 @@ setTimeout(loadMetaDashboard, 1200);
 loadDashboard();
 loadRoboStatus();
 loadModoDono();
+loadTranscricao();
 loadWaClicks();
 loadNotificacoes();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
