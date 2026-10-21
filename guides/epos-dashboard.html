@@ -3098,6 +3098,8 @@ async function carregarQuemAtende(telefone) {
   } else if (d.estado === 'equipe') {
     html = `<b style="color:var(--purple)">👤 Equipe${d.atendido_por ? ' · ' + escHtml(d.atendido_por) : ''}</b>` + linha(d.fixo
       ? `Atendimento humano fixo: a ${ia} não responde este lead.`
+      : d.pausada_ate
+        ? `A ${ia} está pausada no painel até ${fmtDate(d.pausada_ate)}. Depois disso, se o lead escrever, ela volta.`
       : d.ia_quieta_ate
         ? `Respondeu em ${fmtDate(d.humano_em)}. A ${ia} fica quieta até ${fmtDate(d.ia_quieta_ate)}.`
         : `Última resposta da equipe em ${fmtDate(d.humano_em)}. Se o lead escrever, a ${ia} volta a responder.`);
@@ -4820,13 +4822,15 @@ async function openLeadPanel(lead) {
 
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
       <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Controle do Bot</div>
-      ${(lead.em_atendimento || !lead.dify_ativo)
+      ${(lead.em_atendimento || !lead.dify_ativo || (lead.ia_pausada_ate && new Date(lead.ia_pausada_ate) > new Date()))
         ? `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', true)"
             style="width:100%;padding:12px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
             ✅ Bot pausado — Reativar
           </button>
-          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Bot inativo para este lead.</div>`
-        : `<button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', false)"
+          <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">${(lead.ia_pausada_ate && new Date(lead.ia_pausada_ate) > new Date()) ? 'Pausado até ' + fmtDate(lead.ia_pausada_ate) + '. Depois disso, se o lead escrever, o bot volta a responder.' : 'Bot inativo para este lead.'}</div>`
+        : `<label for="bot-pausa-periodo" style="display:block;font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:6px">Pausar por</label>
+          <select id="bot-pausa-periodo" aria-label="Por quanto tempo pausar o bot" style="width:100%;margin-bottom:8px;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:12px;padding:8px">${PAUSA_OPCOES.map(([v, t]) => `<option value="${v}"${v === PAUSA_PADRAO ? ' selected' : ''}>${t}</option>`).join('')}</select>
+          <button id="bot-toggle-btn" onclick="toggleBot('${lead.telefone}', false)"
             style="width:100%;padding:12px;background:rgba(255,94,91,.06);border:1px solid rgba(255,94,91,.3);color:var(--warn);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
             🚫 Pausar bot para este lead
           </button>
@@ -5078,14 +5082,23 @@ async function criarContato() {
   }
 }
 
+// 21/10: períodos de pausa do bot no modal (sistema); o padrão é de cada conta — Epos 12 h, FM até reativar
+const PAUSA_OPCOES = [['12', '12 horas'], ['24', '24 horas'], ['72', '3 dias'], ['168', '7 dias'], ['fixo', 'Até eu reativar']];
+const PAUSA_PADRAO = '12';
 async function toggleBot(telefone, currentlyDisabled) {
   const btn = document.getElementById('bot-toggle-btn');
   btn.disabled = true;
   btn.textContent = 'Salvando...';
   try {
-    const patch = currentlyDisabled
-      ? { em_atendimento: false, dify_ativo: true }
-      : { em_atendimento: true, dify_ativo: false };
+    // 21/10: pausa com período (ia_pausada_ate) ou até reativar (em_atendimento); reativar limpa os dois
+    let patch;
+    if (currentlyDisabled) patch = { em_atendimento: false, dify_ativo: true, ia_pausada_ate: null };
+    else {
+      const per = (document.getElementById('bot-pausa-periodo') || {}).value || 'fixo';
+      patch = per === 'fixo'
+        ? { em_atendimento: true, dify_ativo: false, ia_pausada_ate: null }
+        : { em_atendimento: false, dify_ativo: false, ia_pausada_ate: new Date(Date.now() + Number(per) * 3600e3).toISOString() };
+    }
 
     const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
       method: 'PATCH',
@@ -5099,15 +5112,16 @@ async function toggleBot(telefone, currentlyDisabled) {
 
     // Atualizar lead no cache local
     const lead = allLeads.find(l => l.telefone === telefone);
-    if (lead) { lead.em_atendimento = patch.em_atendimento; lead.dify_ativo = patch.dify_ativo; }
+    if (lead) { lead.em_atendimento = patch.em_atendimento; lead.dify_ativo = patch.dify_ativo; lead.ia_pausada_ate = patch.ia_pausada_ate; }
 
-    toast(currentlyDisabled ? '✅ Bot reativado para este lead' : '🚫 Bot desativado para este lead',
+    toast(currentlyDisabled ? '✅ Bot reativado para este lead' : (patch.ia_pausada_ate ? '⏸ Bot pausado até ' + fmtDate(patch.ia_pausada_ate) : '🚫 Bot pausado até você reativar'),
           currentlyDisabled ? 'ok' : 'err');
 
     // Reabrir o modal atualizado
     const updatedLead = allLeads.find(l => l.telefone === telefone) || {};
     Object.assign(updatedLead, patch);
-    setTimeout(() => openLeadPanel(updatedLead), 200);
+    // 21/10: reabre buscando o lead completo pelo telefone (o lead pode não estar na lista carregada; abrir só com o patch quebrava a ficha)
+    setTimeout(() => abrirFichaPorTelefone(telefone), 200);
 
   } catch(e) {
     btn.disabled = false;
