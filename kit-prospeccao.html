@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Kit de prospecção | Método Venda Inevitável</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E10; --card:#16161A; --tile:#1B1B20;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+  --text:#F4F3F7; --muted:#D2D1DA; --dim:#B9B8C4;
+  --purple:#9146FF; --purple2:#B58CFF; --orange:#E06010; --orange2:#FF9A55; --green:#1FAF5A; --red:#FF5E5B;
+  --fD:'DM Sans',system-ui,sans-serif; --fM:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:var(--fD);background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+h1,h2,h3{text-wrap:balance}
+p,li{text-wrap:pretty}
+a{color:var(--purple2)}
+
+header.capa{padding:34px 0 18px}
+.marca{display:flex;align-items:center;gap:10px;font-family:var(--fM);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.marca b{width:26px;height:26px;border-radius:8px;background:var(--purple);color:#fff;display:grid;place-items:center;font-family:var(--fD);font-size:14px;letter-spacing:0}
+h1{font-size:clamp(30px,7vw,42px);line-height:1.05;letter-spacing:-.03em;font-weight:800}
+h1 em{font-style:normal;color:var(--orange)}
+.intro{margin-top:12px;color:var(--muted);font-size:16px}
+.aviso{margin-top:14px;display:inline-block;font-family:var(--fM);font-size:11.5px;letter-spacing:.06em;color:#FFC29A;border:1px solid rgba(224,96,16,.45);background:rgba(224,96,16,.1);border-radius:10px;padding:7px 11px}
+
+nav.atalhos{position:sticky;top:0;z-index:10;background:rgba(14,14,16,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+nav.atalhos .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:9px;padding-bottom:9px;scrollbar-width:none}
+nav.atalhos .wrap::-webkit-scrollbar{display:none}
+nav.atalhos a{flex-shrink:0;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;border:1px solid var(--line2);border-radius:999px;padding:6px 12px}
+nav.atalhos a:hover,nav.atalhos a:focus-visible{color:var(--text);border-color:var(--purple2);outline:none}
+
+section{padding:30px 0 6px;scroll-margin-top:58px}
+h2{font-size:24px;letter-spacing:-.02em;font-weight:800;margin-bottom:6px;display:flex;align-items:baseline;gap:10px}
+h2 small{font-family:var(--fM);font-size:12px;color:var(--purple2);font-weight:400;letter-spacing:.06em}
+.sub{color:var(--muted);font-size:15px;margin-bottom:14px}
+h3{font-size:17px;margin:16px 0 6px}
+ul.lista{list-style:none;display:grid;gap:8px;margin:8px 0}
+ul.lista li{position:relative;padding-left:20px;font-size:15.5px}
+ul.lista li::before{content:"";position:absolute;left:2px;top:9px;width:8px;height:8px;border-radius:2px;background:var(--purple)}
+ul.lista.laranja li::before{background:var(--orange)}
+ul.lista.nao li::before{background:var(--red)}
+ul.lista li b{font-weight:700}
+ul.lista li small{display:block;color:var(--muted);font-size:13.5px}
+
+.card{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:16px;margin:10px 0}
+.card.roxo{border-color:rgba(145,70,255,.4);background:rgba(145,70,255,.06)}
+.card.laranja{border-color:rgba(224,96,16,.4);background:rgba(224,96,16,.06)}
+.card .rot{font-family:var(--fM);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.card p + p{margin-top:8px}
+.dica{font-size:14px;color:var(--muted)}
+
+/* ordem dos nichos */
+.ordem{display:grid;gap:8px;margin:10px 0}
+.ordem .item{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px 14px}
+.ordem .n{font-family:var(--fM);font-size:13px;color:var(--purple2)}
+.ordem .q{font-family:var(--fM);font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.ordem .q b{font-family:var(--fD);font-size:20px;color:var(--text)}
+.ordem small{display:block;color:var(--muted);font-size:13.5px}
+
+/* gerador */
+.gerador{border:1px solid rgba(145,70,255,.4);border-radius:14px;background:rgba(145,70,255,.05);padding:14px;margin:10px 0 16px}
+.campos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.campos{grid-template-columns:1fr}}
+.campo label{display:block;font-family:var(--fM);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.campo input,.campo select{width:100%;min-height:42px;padding:0 12px;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--text);font-family:var(--fD);font-size:16px}
+.campo select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 18px,calc(100% - 13px) 18px;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px}
+.campo input:focus-visible,.campo select:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+.campo.cheio{grid-column:1 / -1}
+.gerador-link{margin-top:12px;font-family:var(--fM);font-size:13px;color:var(--purple2);overflow-wrap:anywhere}
+.gerador .dica{margin-top:6px}
+
+/* sequência */
+.passo{display:grid;grid-template-columns:74px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.passo:first-of-type{border-top:none}
+.passo .t{font-family:var(--fM);font-size:12px;color:var(--purple2);padding-top:3px}
+.passo .t b{display:block;font-family:var(--fD);font-size:15px;color:var(--text);font-weight:700}
+.passo h4{font-size:16px;margin-bottom:4px}
+@media (max-width:480px){.passo{grid-template-columns:1fr;gap:4px}}
+.fala{border-left:3px solid var(--purple);padding:6px 0 6px 12px;margin:8px 0;font-size:15.5px;color:var(--text)}
+.fala.laranja{border-left-color:var(--orange)}
+
+/* mensagens */
+.msg{border:1px solid var(--line2);border-radius:14px;background:var(--tile);margin:10px 0;overflow:hidden}
+.msg .topo{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.msg .topo span{font-family:var(--fM);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.msg .texto{padding:12px 14px;font-size:15.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.passo > div{min-width:0}
+.msg .texto .falta{color:#FFC29A}
+.copiar{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--text);font-family:var(--fD);font-weight:700;font-size:13px;cursor:pointer;flex-shrink:0}
+.copiar:hover{border-color:var(--purple2)}
+.copiar.ok{border-color:var(--green);color:var(--green)}
+.copiar:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+
+/* objeções */
+details.obj{border:1px solid var(--line);border-radius:12px;background:var(--card);margin:8px 0;padding:0 14px}
+details.obj summary{list-style:none;cursor:pointer;padding:13px 26px 13px 0;font-weight:700;font-size:15.5px;position:relative}
+details.obj summary::-webkit-details-marker{display:none}
+details.obj summary::after{content:"+";position:absolute;right:0;top:9px;font-family:var(--fM);font-size:20px;color:var(--purple2)}
+details.obj[open] summary::after{content:"−"}
+details.obj summary:focus-visible{outline:2px solid var(--purple);outline-offset:3px;border-radius:6px}
+details.obj .resp{padding:0 0 14px;font-size:15px;color:var(--muted)}
+details.obj .resp b{color:var(--text)}
+details.obj .resp .fala{color:var(--text)}
+
+/* status */
+.status{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.status span{font-family:var(--fM);font-size:12px;border:1px solid var(--line2);border-radius:999px;padding:5px 10px;color:var(--muted)}
+.status span.fim{border-color:rgba(31,175,90,.5);color:#7FE0A6}
+.status span.para{border-color:rgba(255,94,91,.5);color:#FF9C9A}
+
+footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--card);border:1px solid var(--line2);border-radius:10px;padding:10px 14px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:30}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="capa">
+  <div class="wrap">
+    <div class="marca"><b>E</b>Epos · Kit de prospecção</div>
+    <h1>Do Google Maps <em>à call marcada.</em></h1>
+    <p class="intro">O plano para abordar, uma a uma, as empresas do DF que achamos no Google Maps: por onde começar, a mensagem montada com os dados de cada empresa, a sequência de toques, a call e as objeções de quem não te conhece.</p>
+    <div class="aviso">Uso interno. A lista com os contatos fica só na planilha do seu computador.</div>
+  </div>
+</header>
+
+<nav class="atalhos" aria-label="Partes do kit">
+  <div class="wrap">
+    <a href="#comeco">Por onde começar</a><a href="#perfil">Para quem</a><a href="#mensagem">Montar a mensagem</a><a href="#ligacao">Ligação</a><a href="#email">E-mail</a><a href="#sequencia">WhatsApp</a><a href="#call">Call</a><a href="#objecoes">Objeções</a><a href="#controle">Controle</a><a href="#regras">Regras</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section id="comeco">
+  <h2><small>01</small>Por onde começar</h2>
+  <p class="sub">São 809 empresas na planilha. Você está começando pelas <b>143 de prioridade C</b>, as que têm menos presença. Cada faixa pede um canal diferente.</p>
+  <div class="ordem">
+    <div class="item"><span class="n">C</span><div><b>Telefone fixo e poucas avaliações</b><small><b>Todas as 143 têm só telefone fixo</b>: mensagem de WhatsApp quase nunca chega. Canal: ligação e e-mail. 86 têm site, 57 não. Nichos: imobiliárias 45, advocacia 35, odontologia e estética 35, saúde 28.</small></div><span class="q"><b>143</b></span></div>
+    <div class="item"><span class="n">B</span><div><b>Celular, ou fixo com 50+ avaliações</b><small>WhatsApp para quem tem celular; ligação para o fixo.</small></div><span class="q"><b>404</b></span></div>
+    <div class="item"><span class="n">A</span><div><b>Celular e 20+ avaliações</b><small>Nota mediana 5,0 com 66 avaliações: atendem bem e têm movimento. Canal: WhatsApp. Ordem sugerida: advocacia (51, temos o caso), odontologia e estética (127), saúde (51), imobiliárias (33).</small></div><span class="q"><b>262</b></span></div>
+  </div>
+  <div class="card laranja">
+    <div class="rot">Na C, olho em duas coisas</div>
+    <ul class="lista laranja">
+      <li><b>O fixo é o gancho</b><small>Quem acha a empresa no Google e prefere mandar mensagem não tem por onde escrever. É um problema real e fácil de ver, e o pacote resolve (WhatsApp com atendimento 24 horas, mais posicionamento).</small></li>
+      <li><b>Confirme cedo se cabe no bolso</b><small>Poucas avaliações costuma ser empresa menor. Pergunte logo na ligação se já investem em anúncio: se não investem nada, a conversa de R$ 8 a 15 mil por mês fica difícil.</small></li>
+      <li><b>Teste o WhatsApp do fixo antes de ligar</b><small>Algumas empresas usam o WhatsApp Business no número fixo. Clique em "Abrir WhatsApp" na planilha: se abrir a conversa, use a sequência de WhatsApp; se disser que o número não está no WhatsApp, ligue.</small></li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="rot">Ritmo</div>
+    <ul class="lista">
+      <li><b>Até 20 empresas novas por dia</b>, em horário comercial, somando ligação, e-mail e WhatsApp<small>A C inteira leva umas duas semanas.</small></li>
+      <li><b>Responda primeiro quem respondeu</b>: os retornos valem mais que abordagens novas.</li>
+      <li><b>Depois de 50 abordagens numa faixa, compare</b>: se menos de 1 em cada 10 responder, troque o gancho antes de seguir.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="perfil">
+  <h2><small>02</small>Para quem</h2>
+  <p class="sub">O perfil é o mesmo do kit do parceiro. A diferença: aqui você descobre isso na conversa, porque a pessoa não te conhece.</p>
+  <ul class="lista">
+    <li><b>Serviço de ticket médio ou alto</b> que vende pelo WhatsApp</li>
+    <li><b>Tem alguém para fechar a venda</b><small>Dono, secretária comercial, corretor, recepção com meta</small></li>
+    <li><b>Anuncia, ou quer anunciar</b></li>
+    <li><b>Comporta o investimento</b> de R$ 8 a 15 mil por mês, mais a verba dos anúncios</li>
+    <li><b>Quem decide está na call</b><small>Se tem sócio, chame os dois</small></li>
+  </ul>
+  <h3>Sinais da planilha</h3>
+  <ul class="lista laranja">
+    <li><b>Nota alta e muitas avaliações</b><small>Atende bem e tem movimento: o problema provavelmente está no que escapa antes do atendimento.</small></li>
+    <li><b>Só telefone fixo</b><small>Quem prefere mandar mensagem não tem por onde escrever e vai para o próximo resultado da busca.</small></li>
+    <li><b>Sem site</b><small>Quem acha a empresa no Google cai direto no telefone ou no WhatsApp: esse contato é o comercial inteiro dela.</small></li>
+    <li><b>Nota abaixo de 4,5</b><small>Não use a nota como gancho. Fale do nicho.</small></li>
+  </ul>
+</section>
+
+<section id="mensagem">
+  <h2><small>03</small>Montar a mensagem</h2>
+  <p class="sub">Copie da planilha os dados da empresa. As mensagens desta página e o link do convidado se ajustam sozinhos.</p>
+  <div class="gerador" id="gerador">
+    <div class="campos">
+      <div class="campo"><label for="fEmpresa">Empresa</label><input id="fEmpresa" type="text" placeholder="Ex.: Clínica Sorriso" autocomplete="off"></div>
+      <div class="campo"><label for="fNome">Nome de quem decide</label><input id="fNome" type="text" placeholder="Quando souber" autocomplete="off"></div>
+      <div class="campo cheio"><label for="fNicho">Nicho</label>
+        <select id="fNicho">
+          <option value="advocacia">Advocacia</option>
+          <option value="odonto">Odontologia e estética</option>
+          <option value="saude">Clínicas médicas e saúde</option>
+          <option value="imob">Imobiliárias e corretores</option>
+        </select></div>
+      <div class="campo"><label for="fNota">Nota no Google</label><input id="fNota" type="text" inputmode="decimal" placeholder="Ex.: 4,9" autocomplete="off"></div>
+      <div class="campo"><label for="fAval">Avaliações</label><input id="fAval" type="text" inputmode="numeric" placeholder="Ex.: 87" autocomplete="off"></div>
+      <div class="campo"><label for="fSite">Site</label>
+        <select id="fSite"><option value="sim">Tem site</option><option value="nao">Sem site</option></select></div>
+      <div class="campo"><label for="fFone">Telefone no Google</label>
+        <select id="fFone"><option value="fixo">Fixo (prioridade C)</option><option value="celular">Celular</option></select></div>
+      <div class="campo"><label for="fEmail">E-mail da empresa</label><input id="fEmail" type="email" inputmode="email" placeholder="Se tiver" autocomplete="off"></div>
+      <div class="campo"><label for="fMeuZap">Seu WhatsApp (assinatura)</label><input id="fMeuZap" type="text" inputmode="tel" placeholder="Fica salvo neste aparelho" autocomplete="off"></div>
+    </div>
+    <div class="gerador-link" id="linkConvidado">https://lp.eposmktfilmsia.com.br/metodo.html</div>
+    <p class="dica">Esse é o link do convidado: no painel da Epos, na parte do Método, você vê se a empresa abriu a página, até onde leu, se fez o raio-X e se clicou.</p>
+  </div>
+</section>
+
+<section id="ligacao">
+  <h2><small>04</small>Ligação</h2>
+  <p class="sub">Para o telefone fixo. Uma ligação curta, com dois objetivos: chegar em quem decide e sair com o WhatsApp ou o e-mail dessa pessoa e um horário marcado.</p>
+  <div class="passo"><div class="t"><b>10 s</b>Recepção</div><div>
+    <div class="fala">"Bom dia! Aqui é o Thiago, da Epos. Quem cuida do comercial ou do marketing aí? Tenho uma ideia rápida sobre os contatos que chegam pelo Google."</div>
+    <p class="dica">Se a pessoa não estiver: "Qual o melhor horário para falar com ela? E o WhatsApp ou e-mail dela, para eu mandar um resumo?"</p>
+  </div></div>
+  <div class="passo"><div class="t"><b>40 s</b>Quem decide</div><div>
+    <div class="fala" data-modelo="ligacao"></div>
+    <p class="dica">Pare aqui e escute. A resposta sobre anúncio mostra se cabe no bolso.</p>
+  </div></div>
+  <div class="passo"><div class="t"><b>20 s</b>Fechamento</div><div>
+    <div class="fala laranja">"Te mando agora uma página com uma calculadora que mostra quanto escapa por mês, e marcamos 20 minutos para eu fazer a conta com os seus números. Qual o seu WhatsApp ou e-mail? Fica melhor amanhã ou quinta?"</div>
+    <p class="dica">Ao desligar, mande o e-mail (próxima parte) ou a mensagem "Se pedir para ver antes" da sequência de WhatsApp, com o link do convidado.</p>
+  </div></div>
+</section>
+
+<section id="email">
+  <h2><small>05</small>E-mail</h2>
+  <p class="sub">Para quem tem e-mail no site ou passou o e-mail na ligação. Um por vez, da sua conta, em texto simples: e-mail com cara de marketing vai para o spam.</p>
+  <div class="msg"><div class="topo"><span>Assunto</span><button class="copiar" type="button">Copiar</button></div>
+    <div class="texto" data-modelo="emailAssunto"></div></div>
+  <div class="msg"><div class="topo"><span>E-mail · 1º contato</span><button class="copiar" type="button">Copiar</button></div>
+    <div class="texto" data-modelo="emailCorpo"></div></div>
+  <p><a class="copiar" id="abrirEmail" href="#" style="display:inline-flex;align-items:center;text-decoration:none">Abrir no meu e-mail, já preenchido</a></p>
+  <p class="dica" id="abrirEmailDica">Preencha o e-mail da empresa no gerador para o botão abrir o seu programa de e-mail com o destinatário, o assunto e o texto.</p>
+  <h3>Se não responder</h3>
+  <div class="msg"><div class="topo"><span>4 dias depois · responder no mesmo e-mail</span><button class="copiar" type="button">Copiar</button></div>
+    <div class="texto" data-modelo="emailDia4"></div></div>
+  <div class="msg"><div class="topo"><span>9 dias depois · último</span><button class="copiar" type="button">Copiar</button></div>
+    <div class="texto" data-modelo="emailDia9"></div></div>
+  <p class="dica">Responda no mesmo e-mail (Responder, não Novo): a pessoa vê a conversa inteira, e o assunto continua o mesmo.</p>
+</section>
+
+<section id="sequencia">
+  <h2><small>06</small>WhatsApp</h2>
+  <p class="sub">Para quem tem celular (A e B) e para o fixo que tiver WhatsApp. Cinco toques em 10 dias, cada um trazendo algo novo. Parou de responder depois de ler? Siga a sequência. Respondeu? Saia dela e converse.</p>
+
+  <div class="passo"><div class="t"><b>Dia 1</b>Abertura</div><div>
+    <h4>Para quem atender o WhatsApp</h4>
+    <p class="dica">Quase sempre quem lê primeiro é a recepção. O objetivo deste toque é chegar em quem decide.</p>
+    <div class="msg"><div class="topo"><span>Abertura</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="abertura"></div></div>
+    <p class="dica">Anote na planilha <b>quanto tempo levaram para responder</b>. Esse número vira argumento na call.</p>
+  </div></div>
+
+  <div class="passo"><div class="t"><b>Dia 1</b>Quem decide</div><div>
+    <h4>Quando falar com o dono ou com quem cuida do comercial</h4>
+    <div class="msg"><div class="topo"><span>Para quem decide</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="decisor"></div></div>
+    <div class="msg"><div class="topo"><span>Se pedir para ver antes</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="verAntes"></div></div>
+    <div class="msg"><div class="topo"><span>Quando aceitar a call</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="aceitou"></div></div>
+  </div></div>
+
+  <div class="passo"><div class="t"><b>Dia 3</b>Dado novo</div><div>
+    <h4>Se leu e não respondeu</h4>
+    <div class="msg"><div class="topo"><span>2 dias depois</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="dia3"></div></div>
+    <p class="dica">O dado é do estudo "The Short Life of Online Sales Leads", publicado na Harvard Business Review em 2011. Se perguntarem a fonte, é essa.</p>
+  </div></div>
+
+  <div class="passo"><div class="t"><b>Dia 6</b>Valor</div><div>
+    <h4>A calculadora, sem pedir nada</h4>
+    <div class="msg"><div class="topo"><span>5 dias depois</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="dia6"></div></div>
+  </div></div>
+
+  <div class="passo"><div class="t"><b>Dia 10</b>Último toque</div><div>
+    <h4>Fecha a sequência com a porta aberta</h4>
+    <div class="msg"><div class="topo"><span>Último toque</span><button class="copiar" type="button">Copiar</button></div>
+      <div class="texto" data-modelo="dia10"></div></div>
+    <p class="dica">Sem resposta depois disso: Status "Sem resposta" na planilha e volte daqui a 60 dias, com outro gancho.</p>
+  </div></div>
+</section>
+
+<section id="call">
+  <h2><small>07</small>A call</h2>
+  <p class="sub">Use o <a href="kit-parceiro.html#roteiro">roteiro do kit do parceiro</a>: página do Método em modo apresentação, calculadora com os números dele, a Donna ao vivo e o fechamento com duas opções. O que muda quando a abordagem foi fria:</p>
+  <h3>1. Lembre de onde veio</h3>
+  <div class="fala">"Te achei no Google Maps, vi que vocês atendem bem, e quis mostrar o que costuma escapar antes do atendimento. Primeiro eu entendo como está o comercial de vocês, depois te mostro a conta. Se fizer sentido, você já sai com a implantação marcada. Combinado?"</div>
+  <h3>2. Use o tempo de resposta, com leveza</h3>
+  <div class="fala laranja">"Vocês levaram [tempo] para responder a minha primeira mensagem, o que é normal. Só que eu era um contato frio. Um cliente pronto para fechar costuma mandar mensagem para dois ou três ao mesmo tempo. Quanto vale o cliente que vai para quem respondeu primeiro?"</div>
+  <p class="dica">É um dado, não uma crítica. Depois da pergunta, deixe ele fazer a conta em voz alta: é ela que você usa no fechamento.</p>
+  <h3>3. Feche com a opção que cabe</h3>
+  <ul class="lista">
+    <li><b>Comercial completo</b><small>Método Venda Inevitável, tráfego, posicionamento, conteúdo institucional e reuniões semanais. R$ 8 a 15 mil por mês conforme o escopo, contrato mínimo de 6 meses, condição especial no anual.</small></li>
+    <li><b>Urgência real</b><small>As vagas do mês que a página mostra.</small></li>
+    <li><b>Antes de desligar</b><small>Nome ou razão social, e-mail para o contrato, WhatsApp de quem vai operar, forma de pagamento.</small></li>
+  </ul>
+</section>
+
+<section id="objecoes">
+  <h2><small>08</small>Objeções da abordagem fria</h2>
+  <p class="sub">As de preço, agência, CRM e IA estão no <a href="kit-parceiro.html#objecoes">kit do parceiro</a>. Estas aparecem antes da call, porque a pessoa não te conhece.</p>
+
+  <details class="obj"><summary>"Como você conseguiu meu número?"</summary><div class="resp">
+    <div class="fala">"Está no perfil de vocês no Google Maps. Se preferir que eu não chame mais, me diz que eu tiro vocês da minha lista."</div>
+    <p>Responda com a verdade e ofereça a saída. Se ela pedir, marque "Não contatar" na planilha na hora.</p></div></details>
+
+  <details class="obj"><summary>"Sou da recepção, o dono não vê o WhatsApp."</summary><div class="resp">
+    <div class="fala">"Sem problema! Qual o melhor horário ou contato para falar com ele? Se preferir, te mando uma mensagem curta para você encaminhar."</div>
+    <p>Se ela topar encaminhar, mande a mensagem "Para quem decide", com o link do convidado: você vê no painel se o dono abriu.</p></div></details>
+
+  <details class="obj"><summary>"Não tenho interesse."</summary><div class="resp">
+    <div class="fala">"Tranquilo, obrigado pelo retorno. Só por curiosidade: hoje quem responde o WhatsApp de vocês à noite e no fim de semana?"</div>
+    <p>Uma pergunta, uma vez. Se a resposta continuar não, agradeça e marque "Sem interesse". Nada de insistir.</p></div></details>
+
+  <details class="obj"><summary>"Manda uma proposta por aqui."</summary><div class="resp">
+    <div class="fala">"Mando! Só que o valor depende do tamanho da operação de vocês, e isso eu vejo em 20 minutos. Enquanto isso, nesta página tem a calculadora: [link do convidado]. Fica melhor amanhã ou quinta?"</div></div></details>
+
+  <details class="obj"><summary>"Quanto custa?" (antes da call)</summary><div class="resp">
+    <div class="fala">"Fica entre R$ 8 e 15 mil por mês, conforme o escopo, já com o tráfego. Antes de falar em valor, vale ver se o que escapa aí é maior que isso. A calculadora mostra em 2 minutos, e na call eu faço a conta com você."</div>
+    <p>Fale o valor sem rodeio: fugir da pergunta queima a confiança de quem não te conhece.</p></div></details>
+
+  <details class="obj"><summary>"É golpe? Nunca ouvi falar da Epos."</summary><div class="resp">
+    <div class="fala">"Pergunta justa. Aqui está a página do nosso método, com o caso de um escritório que já usa: [link do convidado]. E a call é por vídeo, com a câmera aberta."</div></div></details>
+</section>
+
+<section id="controle">
+  <h2><small>09</small>Controle</h2>
+  <p class="sub">A planilha já tem as colunas. Mantenha cada linha em dia, para nunca chamar duas vezes nem esquecer um retorno.</p>
+  <div class="card">
+    <div class="rot">Coluna Status</div>
+    <div class="status"><span>Enviado</span><span>Respondeu</span><span>Falou com quem decide</span><span>Call marcada</span><span class="fim">Fechou</span><span>Sem resposta</span><span>Sem interesse</span><span class="para">Não contatar</span></div>
+    <ul class="lista">
+      <li><b>Data da abordagem</b>: o dia do 1º toque. É dela que saem os próximos (WhatsApp: dias 3, 6 e 10; e-mail: dias 4 e 9).</li>
+      <li><b>Resposta</b>: o canal, quanto tempo levaram para responder e o resumo em uma linha. Ex.: "ligação · a recepção passou o e-mail da Dra. Ana" ou "WhatsApp · 3 h · quer ver na quinta".</li>
+      <li><b>Não contatar</b>: "sim" para quem pediu. Essa linha nunca mais recebe mensagem.</li>
+    </ul>
+  </div>
+  <div class="card roxo">
+    <div class="rot">Toda sexta, 5 minutos</div>
+    <ul class="lista">
+      <li>Por nicho: quantos receberam, quantos responderam, quantos chegaram em quem decide, quantas calls, quantos fecharam.</li>
+      <li>No painel da Epos, parte do Método: quem abriu o link do convidado e até onde leu. Quem leu até o fim e não respondeu recebe o toque seguinte antes.</li>
+      <li>Me mande os números: ajusto os ganchos e as mensagens desta página pelo que funcionou.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="regras">
+  <h2><small>10</small>Regras de ouro</h2>
+  <ul class="lista">
+    <li><b>Uma conversa por vez, do seu WhatsApp</b><small>Mensagem com o nome da empresa, nunca a mesma colada em sequência. Até 20 novas por dia, em horário comercial. Se o WhatsApp avisar de restrição, pare e me chame.</small></li>
+    <li><b>E-mail um por vez, da sua conta, com a saída no fim</b><small>Nada de lista com vários destinatários ou ferramenta de disparo. Quem responder "sair" vai para "Não contatar".</small></li>
+    <li><b>Nunca se passe por cliente</b> para testar o atendimento<small>O tempo que levaram para responder você já é o teste, e é honesto.</small></li>
+    <li><b>Quem pediu para sair, sai</b><small>"Não contatar" na planilha e nunca mais. É o que a LGPD pede no contato entre empresas.</small></li>
+    <li><b>Esta lista nunca vai para a planilha "contatos" nem para disparo</b><small>Aquela planilha alimenta o disparo automático de WhatsApp.</small></li>
+    <li><b>Prometa só o que controlamos</b><small>Resposta em segundos, nenhum lead sem atendimento, implantação em até 5 dias. Nunca número de vendas ou de faturamento.</small></li>
+    <li><b>Saúde: nada de dado de paciente</b><small>Fale do processo de atendimento, nunca de casos.</small></li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="wrap">Epos · Método Venda Inevitável · kit de prospecção pelo Google Maps · outubro de 2026</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var toast = document.getElementById('toast');
+  function aviso(t){ toast.textContent = t; toast.classList.add('on'); setTimeout(function(){ toast.classList.remove('on'); }, 1800); }
+
+  var BASE = 'https://lp.eposmktfilmsia.com.br/metodo.html';
+  var NICHO = {
+    advocacia: { plural: 'advocacia', gancho: 'Quem procura advogado costuma mandar mensagem para dois ou três escritórios e fica com o primeiro que explica direito.' },
+    odonto: { plural: 'odontologia e estética', gancho: 'Orçamento de implante, alinhador ou harmonização esfria rápido: quem não tem retorno no mesmo dia vai para a clínica do lado.' },
+    saude: { plural: 'saúde', gancho: 'Quem manda mensagem à noite para marcar consulta agenda com quem responde primeiro.' },
+    imob: { plural: 'imóveis', gancho: 'Contato de portal e de anúncio chega à noite e no fim de semana, e quando o corretor responde o cliente já está visitando com outro.' }
+  };
+  var $ = function(id){ return document.getElementById(id); };
+  var campos = ['fEmpresa', 'fNome', 'fNicho', 'fNota', 'fAval', 'fSite', 'fFone', 'fEmail', 'fMeuZap'];
+  // Seu WhatsApp da assinatura fica salvo neste aparelho
+  try { $('fMeuZap').value = localStorage.getItem('kitp_meuzap') || ''; } catch (eLs) {}
+  $('fMeuZap').addEventListener('input', function(){ try { localStorage.setItem('kitp_meuzap', $('fMeuZap').value.trim()); } catch (eLs) {} });
+
+  function slug(t){ return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
+  function dados(){
+    var nota = parseFloat(($('fNota').value || '').replace(',', '.'));
+    var aval = parseInt(($('fAval').value || '').replace(/\D/g, ''), 10);
+    var empresa = $('fEmpresa').value.trim(), nome = $('fNome').value.trim();
+    var n = NICHO[$('fNicho').value];
+    var c = slug(empresa);
+    var fixo = $('fFone').value === 'fixo', semSite = $('fSite').value === 'nao';
+    var ganchoMaps, generico = false;
+    // Ordem dos ganchos: fixo (prioridade C) > sem site > nota alta com avaliações > genérico
+    if (fixo && semSite) ganchoMaps = 'Vi que no Google vocês aparecem só com telefone fixo e sem site: quem prefere mandar mensagem não tem por onde chegar até vocês e vai para o próximo resultado.';
+    else if (fixo) ganchoMaps = 'Vi que no Google o contato de vocês é um telefone fixo. Muita gente hoje prefere mandar mensagem a ligar, e quem não consegue escrever vai para o próximo resultado.';
+    else if (semSite) ganchoMaps = 'Vi que vocês não têm site: quem acha vocês no Google cai direto no WhatsApp. Então o WhatsApp é o comercial inteiro de vocês.';
+    else if (nota >= 4.5 && aval >= 20) ganchoMaps = 'Vi que vocês têm nota ' + String(nota).replace('.', ',') + ' com ' + aval + ' avaliações no Google: quem chega até vocês gosta.';
+    else { ganchoMaps = 'Encontrei vocês no Google Maps pesquisando ' + n.plural + ' aqui no DF.'; generico = true; }
+    return {
+      empresa: empresa || null, nome: nome || null, link: c ? BASE + '?c=' + c : BASE,
+      ganchoMaps: ganchoMaps, generico: generico, ganchoNicho: n.gancho, plural: n.plural,
+      email: $('fEmail').value.trim(), meuZap: $('fMeuZap').value.trim() || null
+    };
+  }
+  // [campo] aparece destacado quando falta o dado; o texto copiado leva o colchete para você completar
+  function v(valor, rotulo){ return valor ? valor : '\u0000' + rotulo + '\u0001'; }
+  var MODELOS = {
+    abertura: function(d){ return 'Oi, tudo bem? Aqui é o Thiago, da Epos. Encontrei a ' + v(d.empresa, '[empresa]') + ' no Google Maps.\nQuem cuida do comercial ou do marketing aí? Tenho uma ideia rápida sobre os contatos que chegam pelo WhatsApp de vocês.'; },
+    decisor: function(d){ return v(d.nome, '[nome]') + ', prazer! Vou direto ao ponto. ' + d.ganchoMaps + '\n' + d.ganchoNicho + '\nNós montamos um sistema que responde o WhatsApp em segundos, 24 horas, qualifica, agenda e avisa a equipe para nenhum contato ficar sem retorno. Hoje ele roda num escritório de advocacia.\nTem 20 minutos esta semana para eu te mostrar com os números de vocês?'; },
+    verAntes: function(d){ return 'Claro! Nesta página tem uma calculadora: em 2 minutos ela mostra quanto escapa por mês entre o anúncio e o WhatsApp.\n' + d.link + '\nSe o número fizer sentido, a gente marca os 20 minutos.'; },
+    aceitou: function(d){ return 'Combinado! ' + '\u0000[dia]\u0001' + ' às ' + '\u0000[hora]\u0001' + '. Para eu te mostrar com os seus números, deixa à mão: quanto vocês investem em anúncios por mês, quantos contatos chegam no WhatsApp e quanto vale, em média, um cliente. Se tiver sócio, chama ele também.'; },
+    dia3: function(d){ return v(d.nome, '[nome]') + ', um dado que me marcou: um estudo publicado na Harvard Business Review mostrou que empresas que respondem o contato em até 1 hora têm quase 7 vezes mais chance de qualificar o cliente do que as que respondem depois. Em ' + d.plural + ', a primeira resposta costuma decidir. Quer ver quanto isso pesa aí?'; },
+    dia6: function(d){ return v(d.nome, '[nome]') + ', deixo aqui a página com a calculadora, caso queira ver com calma:\n' + d.link + '\nLeva 2 minutos. Se o número que sair fizer sentido, me chama.'; },
+    dia10: function(d){ return v(d.nome, '[nome]') + ', último toque para não te encher. Se agora não for o momento, tudo bem: quando quiser fechar esse buraco no WhatsApp de vocês, é só me chamar. E se preferir não receber mais mensagens minhas, me avisa que eu tiro vocês da lista.'; },
+    ligacao: function(d){ return '"' + v(d.nome, '[nome]') + ', vou ser rápido. ' + d.ganchoMaps + ' ' + d.ganchoNicho + ' Nós montamos um atendimento por WhatsApp que responde em segundos, 24 horas, qualifica, agenda e avisa a equipe para nenhum contato ficar sem retorno. Hoje vocês investem em anúncio, ou os clientes vêm mais por indicação?"'; },
+    emailAssunto: function(d){ return 'Pergunta rápida sobre os contatos da ' + v(d.empresa, '[empresa]'); },
+    emailCorpo: function(d){ return saudacao(d) + '\n\nSou o Thiago, da Epos. Encontrei a ' + v(d.empresa, '[empresa]') + ' no Google Maps.\n'
+      + (d.generico ? '' : d.ganchoMaps + '\n') + d.ganchoNicho
+      + '\n\nNós montamos um sistema que responde o WhatsApp da empresa em segundos, 24 horas, qualifica, agenda e avisa a equipe para nenhum contato ficar sem retorno. Hoje ele roda num escritório de advocacia.'
+      + '\n\nNesta página tem uma calculadora que mostra em 2 minutos quanto escapa por mês entre o anúncio e o atendimento:\n' + d.link
+      + '\n\nFaz sentido conversarmos 20 minutos esta semana?\n\n' + assinatura(d)
+      + '\n\nSe preferir não receber mais e-mails meus, é só responder "sair".'; },
+    emailDia4: function(d){ return saudacao(d) + '\n\nUm dado que me marcou: um estudo publicado na Harvard Business Review mostrou que empresas que respondem o contato em até 1 hora têm quase 7 vezes mais chance de qualificar o cliente do que as que respondem depois. Em ' + d.plural + ', a primeira resposta costuma decidir.'
+      + '\n\nSe quiser ver quanto isso pesa na ' + v(d.empresa, '[empresa]') + ', a calculadora está aqui:\n' + d.link + '\n\nThiago'; },
+    emailDia9: function(d){ return saudacao(d) + '\n\nÚltimo e-mail, para não lotar a sua caixa. Se agora não for o momento, tudo bem: quando quiser fechar esse buraco no atendimento da ' + v(d.empresa, '[empresa]') + ', é só responder este e-mail.\n\nThiago'; }
+  };
+  function saudacao(d){ return d.nome ? 'Olá, ' + d.nome + ',' : 'Olá, tudo bem?'; }
+  function assinatura(d){ return 'Thiago Montandon\nEpos\nWhatsApp: ' + v(d.meuZap, '[seu WhatsApp]'); }
+  function esc(t){ return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function render(){
+    var d = dados();
+    $('linkConvidado').textContent = d.link;
+    document.querySelectorAll('[data-modelo]').forEach(function(el){
+      var bruto = MODELOS[el.dataset.modelo](d);
+      el.dataset.copia = bruto.replace(/\u0000|\u0001/g, '');
+      el.innerHTML = esc(bruto).replace(/\u0000/g, '<span class="falta">').replace(/\u0001/g, '</span>');
+    });
+    // Botão do e-mail: abre o programa de e-mail com destinatário, assunto e texto
+    var bt = $('abrirEmail'), limpo = function(t){ return t.replace(/\u0000|\u0001/g, ''); };
+    if (d.email) {
+      bt.href = 'mailto:' + encodeURIComponent(d.email) + '?subject=' + encodeURIComponent(limpo(MODELOS.emailAssunto(d)))
+        + '&body=' + encodeURIComponent(limpo(MODELOS.emailCorpo(d)).replace(/\n/g, '\r\n'));
+      bt.removeAttribute('aria-disabled'); bt.style.opacity = '';
+      $('abrirEmailDica').textContent = 'Abre o seu programa de e-mail para ' + d.email + ', com assunto e texto. Confira antes de enviar.';
+    } else {
+      bt.href = '#'; bt.setAttribute('aria-disabled', 'true'); bt.style.opacity = '.5';
+      $('abrirEmailDica').textContent = 'Preencha o e-mail da empresa no gerador para o botão abrir o seu programa de e-mail com o destinatário, o assunto e o texto.';
+    }
+  }
+  $('abrirEmail').addEventListener('click', function(e){ if (this.getAttribute('aria-disabled') === 'true') { e.preventDefault(); aviso('Preencha o e-mail da empresa no gerador.'); } });
+  campos.forEach(function(id){ $(id).addEventListener('input', render); $(id).addEventListener('change', render); });
+  render();
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('.copiar'); if (!b || !b.closest('.msg')) return;
+    var t = b.closest('.msg').querySelector('.texto');
+    var texto = (t.dataset.copia || t.innerText).trim();
+    var rotulo = b.textContent;
+    function ok(){ b.textContent = 'Copiado'; b.classList.add('ok'); aviso(/\[/.test(texto) ? 'Copiada. Complete o que está entre [ ].' : 'Mensagem copiada.'); setTimeout(function(){ b.textContent = rotulo; b.classList.remove('ok'); }, 1800); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok, function(){ prompt('Copie a mensagem:', texto); });
+    else prompt('Copie a mensagem:', texto);
+  });
+
+  // Quem abre o kit é da equipe: as visitas deste aparelho à página do Método saem da conta de visitantes (igual ao kit do parceiro)
+  try {
+    if (!navigator.webdriver && localStorage.getItem('_lp_equipe') !== '1') {
+      var K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+      var sid = localStorage.getItem('_lp_sid');
+      if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('_lp_sid', sid); }
+      fetch('https://phszzzwqkujmmfregtsj.supabase.co/rest/v1/lp_events', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: K, Authorization: 'Bearer ' + K },
+        body: JSON.stringify({ lp_slug: 'metodo-venda-inevitavel', event_type: 'equipe', session_id: sid, step_name: 'kit-prospeccao' }) })
+        .then(function(r){ if (r.ok) localStorage.setItem('_lp_equipe', '1'); }).catch(function(){});
+    }
+  } catch(eK){}
+})();
+</script>
+</body>
+</html>
