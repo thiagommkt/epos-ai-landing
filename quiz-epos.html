@@ -170,8 +170,6 @@ h2.q-title{font-size:24px;line-height:1.2;letter-spacing:-.015em;font-weight:700
 .field-error{display:none;font-size:12.5px;color:var(--error);margin-top:6px;font-weight:600}
 .field.invalid input{border-color:var(--error)}
 .field.invalid .field-error{display:block}
-.field-hint{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.45}
-.field.invalid .field-hint{display:none}
 .consent{display:flex;align-items:flex-start;gap:10px;margin:4px 0 20px;padding:10px;border-radius:12px;border:1px solid transparent}
 .consent.invalid{border-color:rgba(255,94,91,.5)}
 .consent input{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--purple)}
@@ -367,8 +365,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
         </div>
         <div class="field" id="fieldTelefone">
           <label for="telefone">WhatsApp com DDD</label>
-          <input type="tel" id="telefone" name="telefone" placeholder="(DDD) 00000-0000" autocomplete="tel" inputmode="tel" aria-describedby="telefoneDica">
-          <div class="field-hint" id="telefoneDica">Comece pelo DDD. Não precisa digitar o +55: o código do país nós colocamos.</div>
+          <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="tel">
           <div class="field-error">Digite um WhatsApp válido com DDD.</div>
         </div>
         <div class="consent" id="consentBox">

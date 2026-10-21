@@ -418,8 +418,6 @@
   .feedback-form input::placeholder,
   .feedback-form textarea::placeholder { color: var(--muted); }
 
-  .ff-hint { margin: -4px 0 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
-
   .feedback-form input:focus,
   .feedback-form textarea:focus { border-color: var(--accent); }
 
@@ -844,9 +842,8 @@
     <form class="feedback-form" id="ffForm" novalidate>
       <div class="form-row">
         <input type="text"  id="ffNome"     placeholder="Seu nome"              required autocomplete="name">
-        <input type="tel"   id="ffTelefone" placeholder="WhatsApp (com DDD)"   required autocomplete="tel" aria-describedby="ffTelefoneDica">
+        <input type="tel"   id="ffTelefone" placeholder="WhatsApp (com DDD)"   required autocomplete="tel">
       </div>
-      <p class="ff-hint" id="ffTelefoneDica">No WhatsApp, comece pelo DDD. Não precisa digitar o +55: o código do país nós colocamos.</p>
       <textarea id="ffSugestao" placeholder="Sua sugestão, ideia ou insight..." required></textarea>
       <div class="form-msg" id="ffMsg"></div>
       <button type="submit" class="btn-submit" id="ffBtn">Enviar sugestão</button>
