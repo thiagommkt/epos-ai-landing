@@ -334,6 +334,8 @@ h2.q-title{
 }
 .field.invalid input{border-color:var(--error)}
 .field.invalid .field-error{display:block}
+.field-hint{font-size:12.5px;color:var(--ink-muted);margin-top:6px;line-height:1.45}
+.field.invalid .field-hint{display:none}
 
 .consent{
   display:flex;
@@ -533,7 +535,8 @@ h1.end-title{
         </div>
         <div class="field" id="fieldTelefone">
           <label for="telefone">WhatsApp / Telefone</label>
-          <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="tel">
+          <input type="tel" id="telefone" name="telefone" placeholder="(DDD) 00000-0000" autocomplete="tel" inputmode="tel" aria-describedby="telefoneDica">
+          <div class="field-hint" id="telefoneDica">Comece pelo DDD. Não precisa digitar o +55: o código do país nós colocamos.</div>
           <div class="field-error">Digite um telefone válido com DDD.</div>
         </div>
         <div class="consent">

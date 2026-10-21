@@ -116,6 +116,7 @@ h1 em{
 }
 .field input:focus, .field select:focus{border-color:var(--purple)}
 .field input::placeholder{color:var(--dim)}
+.field-hint{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.45}
 .field select option{background:var(--bg3)}
 .btn-form{
   width:100%;padding:16px;background:var(--purple);color:#fff;border:none;cursor:pointer;
@@ -284,6 +285,7 @@ footer{border-top:1px solid var(--bd);padding:32px;display:flex;justify-content:
       <div class="field">
         <label>WhatsApp</label>
         <input type="tel" placeholder="(61) 9 0000-0000" required>
+        <div class="field-hint">Comece pelo DDD. Não precisa digitar o +55: o código do país nós colocamos.</div>
       </div>
       <div class="field">
         <label>Segmento</label>
