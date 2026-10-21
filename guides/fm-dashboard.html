@@ -1715,17 +1715,17 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div id="atendimento-card" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
     <div style="background:var(--bg2);border:1px solid rgba(0,245,160,.2);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Ana IA — Ativa</div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px" title="Leads em andamento (conversa nos últimos 30 dias) em que a Ana responde: ninguém da equipe respondeu, ou a equipe respondeu há mais de 48 h e o lead voltou a escrever">Com a Ana IA</div>
         <div style="font-family:var(--fD);font-size:34px;font-weight:700;color:var(--neon)" id="cnt-ana">—</div>
-        <div id="cnt-ana-lbl" style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">em atendimento ativo</div>
+        <div id="cnt-ana-lbl" style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">leads em andamento</div>
       </div>
       <div style="font-size:28px;opacity:.4">🤖</div>
     </div>
     <div style="background:var(--bg2);border:1px solid rgba(145,70,255,.2);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Equipe FM — Atendendo</div>
+        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px" title="Leads em andamento em que alguém da equipe já respondeu (Chatwoot ou celular). Depois da resposta humana a Ana fica quieta 48 h">Com a equipe FM</div>
         <div style="font-family:var(--fD);font-size:34px;font-weight:700;color:var(--purple)" id="cnt-humano">—</div>
-        <div id="cnt-humano-lbl" style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">em atendimento</div>
+        <div id="cnt-humano-lbl" style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-top:2px">leads em andamento</div>
       </div>
       <div style="font-size:28px;opacity:.4">👤</div>
     </div>
@@ -1890,7 +1890,6 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="chat-wrap" style="display:flex;flex-direction:column">
     <div style="padding:8px 16px;background:rgba(145,70,255,.06);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-shrink:0;flex-wrap:wrap">
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-        <span style="font-family:var(--fM);font-size:10px;color:var(--muted)">⚠️ Login manual se necessário → <a href="https://chatwoot.eposmktfilmsia.com.br" target="_blank" style="color:var(--purple);text-decoration:none">abrir Chatwoot</a></span>
         <button onclick="window.open('https://chatwoot.eposmktfilmsia.com.br','_blank')" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↗ Abrir</button>
         <button onclick="var f=document.getElementById('chatwoot-iframe');f.src=f.src" style="padding:4px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↻ Recarregar</button>
       </div>
@@ -2369,21 +2368,25 @@ async function loadDashboard() {
     } catch(e) { kpiCpl.textContent = '—'; }
   }
 
-  // Breakdown Ana vs Humano (paralelo, não bloqueia o resto)
-  Promise.all([
-    sbCount('dify_ativo=eq.true'),
-    sbCount('em_atendimento=eq.true')
-  ]).then(([cAna, cHumano]) => {
+  // Quem está com o lead (21/10): mesma regra do modal e do relatório diário — RPC crm_atendimento_resumo
+  // (leads em andamento pelo critério da Torneira; "sem resposta" = lead escreveu por último e ninguém respondeu há 1 h+)
+  fetch(`${SB_URL}/rest/v1/rpc/crm_atendimento_resumo`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_conta: 'fm' })
+  }).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))).then(d => {
     const elAna = document.getElementById('cnt-ana');
     const elHum = document.getElementById('cnt-humano');
     const elNote = document.getElementById('kpi-ana-note');
     const elAnaLbl = document.getElementById('cnt-ana-lbl');
     const elHumLbl = document.getElementById('cnt-humano-lbl');
-    if (elAna) elAna.textContent = cAna;
-    if (elHum) elHum.textContent = cHumano;
-    if (elNote) elNote.textContent = cAna + ' Ana · ' + cHumano + ' humano';
-    if (elAnaLbl) elAnaLbl.textContent = cAna > 0 ? 'em atendimento ativo' : 'sem atendimento ativo';
-    if (elHumLbl) elHumLbl.textContent = cHumano > 0 ? 'em atendimento' : 'sem atendimento';
+    const semResp = n => n > 0 ? ` · <span style="color:var(--warn)">${n} sem resposta há 1 h+</span>` : '';
+    if (elAna) elAna.textContent = d.ia;
+    if (elHum) elHum.textContent = d.equipe;
+    if (elNote) elNote.textContent = d.ia + ' Ana · ' + d.equipe + ' equipe';
+    if (elAnaLbl) elAnaLbl.innerHTML = (d.ia_ligada_no_geral ? 'leads em andamento' : 'Ana desligada no geral')
+      + semResp(d.ia_sem_resposta) + (d.ninguem > 0 ? ` · ${d.ninguem} sem ninguém` : '');
+    if (elHumLbl) elHumLbl.innerHTML = `${d.equipe_48h} com resposta da equipe nas últimas 48 h` + semResp(d.equipe_sem_resposta);
   }).catch(() => {});
 
   const bar1 = document.getElementById('kpi-bar-1');
@@ -2931,6 +2934,45 @@ async function preencherAtendimento(telefone) {
   if (pr) pr.textContent = l.primeiro_atendimento_humano_em ? fmtDate(l.primeiro_atendimento_humano_em) : '—';
   const pc = document.getElementById('panel-consulta');
   if (pc) pc.innerHTML = htmlConsultaRealizada(l);
+}
+
+// Quem está com o lead agora (21/10): mesma regra do painel e do relatório diário — RPC crm_quem_atende
+async function carregarQuemAtende(telefone) {
+  const box = document.getElementById('panel-quem-atende');
+  if (!box) return;
+  let d = null;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/crm_quem_atende`, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_conta: TABLE === 'fm_leads' ? 'fm' : 'epos', p_telefone: telefone })
+    });
+    if (r.ok) d = await r.json();
+  } catch (e) {}
+  if (window._panelLead?.telefone !== telefone) return;
+  if (!d || !d.estado) { box.textContent = '—'; return; }
+  const ia = TABLE === 'fm_leads' ? 'Ana' : 'Donna';
+  const linha = t => `<div style="font-size:11px;line-height:1.45;color:var(--muted);margin-top:2px">${t}</div>`;
+  let html;
+  if (d.estado === 'ia') {
+    html = `<b style="color:var(--neon)">🤖 ${ia} IA</b>` + linha(d.humano_em
+      ? `A equipe respondeu em ${fmtDate(d.humano_em)}; passadas 48 h o lead escreveu e a ${ia} voltou a responder.`
+      : `Ninguém da equipe respondeu ainda. Quando alguém responder, a ${ia} fica quieta 48 h.`);
+  } else if (d.estado === 'equipe') {
+    html = `<b style="color:var(--purple)">👤 Equipe${d.atendido_por ? ' · ' + escHtml(d.atendido_por) : ''}</b>` + linha(d.fixo
+      ? `Atendimento humano fixo: a ${ia} não responde este lead.`
+      : d.ia_quieta_ate
+        ? `Respondeu em ${fmtDate(d.humano_em)}. A ${ia} fica quieta até ${fmtDate(d.ia_quieta_ate)}.`
+        : `Última resposta da equipe em ${fmtDate(d.humano_em)}. Se o lead escrever, a ${ia} volta a responder.`);
+  } else if (d.estado === 'ninguem') {
+    html = `<b style="color:var(--warn)">⏸ Ninguém</b>` + linha(d.ia_ligada_no_geral
+      ? `A ${ia} está desligada para este lead e ninguém da equipe respondeu.`
+      : `A ${ia} está desligada no geral: a equipe precisa responder.`);
+  } else {
+    html = `<b style="color:var(--muted)">Descartado</b>` + linha('Ninguém responde automaticamente.');
+  }
+  if (d.sem_resposta_desde) html += `<div style="font-size:11px;line-height:1.45;color:var(--warn);margin-top:3px">⚠️ O lead escreveu em ${fmtDate(d.sem_resposta_desde)} e ainda não teve resposta.</div>`;
+  box.innerHTML = html;
 }
 
 function renderPlantaoBtn() {
@@ -3837,6 +3879,7 @@ async function openLeadPanel(lead) {
     carregarTarefasLead(lead.telefone);
     carregarAgendadasLead(lead.telefone);
     carregarNotaAtendimento(lead.telefone);
+    carregarQuemAtende(lead.telefone);
   }, 0);
 
   window._panelLead = { telefone: lead.telefone, nome: lead.nome || '', crmPersonId: lead.crm_person_id || null, proximaAcao: lead.auditoria_ia_proxima_acao || '', etapaAtual: getStage(lead), chatwootConvId: lead.chatwoot_conversation_id || null, chatwootAccountId: 2, rmktHistorico: Array.isArray(lead.rmkt_historico) ? lead.rmkt_historico : [], qualificado: !!lead.qualificado, agendou: !!lead.agendou, compareceu: !!lead.compareceu, ultimaInteracao: lead.ultima_msg_lead_em || lead.ultima_interacao_humano || lead.auditoria_ia_em || lead.criado_em, bloqueado: !!lead.crm_stage_bloqueado, sugestaoStage: lead.sugestao_stage || null, stageHistorico: Array.isArray(lead.stage_historico) ? lead.stage_historico : [] };
@@ -3861,6 +3904,7 @@ async function openLeadPanel(lead) {
     ${linhaDoTempoLead(lead)}
     <div class="panel-section">Atendimento</div>
     <div class="panel-row"><div class="panel-key">Responsável</div><div class="panel-val" style="display:flex;gap:6px;align-items:center"><select id="panel-responsavel" onchange="trocarResponsavel('${lead.telefone}', this.value)" aria-label="Responsável pelo lead" style="background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:3px 6px;width:100%;min-width:0">${opcoesResponsavel(lead.responsavel_id)}</select><span id="panel-assumir-wrap">${htmlAssumir(lead.telefone, lead.responsavel_id)}</span></div></div>
+    <div class="panel-row"><div class="panel-key">Quem atende</div><div class="panel-val" id="panel-quem-atende"><span style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</span></div></div>
     <div class="panel-row"><div class="panel-key">Atendido por</div><div class="panel-val" id="panel-atendido-por">${escHtml(lead.atendido_por || '—')}</div></div>
     <div class="panel-row"><div class="panel-key">1º atendimento</div><div class="panel-val" id="panel-primeiro-atend">${lead.primeiro_atendimento_humano_em ? fmtDate(lead.primeiro_atendimento_humano_em) : '—'}</div></div>
 
