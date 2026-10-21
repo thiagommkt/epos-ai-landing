@@ -2973,6 +2973,11 @@ async function carregarQuemAtende(telefone) {
   }
   if (d.sem_resposta_desde) html += `<div style="font-size:11px;line-height:1.45;color:var(--warn);margin-top:3px">⚠️ O lead escreveu em ${fmtDate(d.sem_resposta_desde)} e ainda não teve resposta.</div>`;
   box.innerHTML = html;
+  const bot = document.getElementById('panel-bot-ativo');
+  if (bot) bot.textContent = d.estado === 'ia' ? `✅ ${ia} responde`
+    : d.estado === 'equipe' ? (d.fixo ? 'Pausado (atendimento fixo)' : d.ia_quieta_ate ? `Pausado até ${fmtDate(d.ia_quieta_ate)}` : 'Volta se o lead escrever')
+    : d.estado === 'ninguem' ? (d.ia_ligada_no_geral ? 'Pausado' : 'Desligado no geral')
+    : 'Desligado (descartado)';
 }
 
 function renderPlantaoBtn() {
@@ -3907,6 +3912,7 @@ async function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Quem atende</div><div class="panel-val" id="panel-quem-atende"><span style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</span></div></div>
     <div class="panel-row"><div class="panel-key">Atendido por</div><div class="panel-val" id="panel-atendido-por">${escHtml(lead.atendido_por || '—')}</div></div>
     <div class="panel-row"><div class="panel-key">1º atendimento</div><div class="panel-val" id="panel-primeiro-atend">${lead.primeiro_atendimento_humano_em ? fmtDate(lead.primeiro_atendimento_humano_em) : '—'}</div></div>
+    <div id="panel-nota-atendimento" style="margin-top:8px"></div>
 
     <div class="panel-section">Próximo contato</div>
     <div id="panel-tarefas" style="margin-bottom:8px"><div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</div></div>
@@ -3956,7 +3962,7 @@ async function openLeadPanel(lead) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 12px">
       ${STAGES.map(s => { const ativo = getStage(lead) === s.key; return `<button onclick="mudarEtapa('${s.key}')" data-stage-btn="${s.key}" style="padding:8px 6px;background:${ativo?'var(--purple)':'var(--bg3)'};border:1px solid ${ativo?'var(--purple)':'var(--bd)'};color:${ativo?'#fff':'var(--muted)'};font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center">${s.label}</button>`; }).join('')}
     </div>
-    <div class="panel-row"><div class="panel-key">Bot ativo</div><div class="panel-val">${lead.dify_ativo?'✅ Ana ativa':'Pausado'}</div></div>
+    <div class="panel-row"><div class="panel-key">Bot ativo</div><div class="panel-val" id="panel-bot-ativo">—</div></div>
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
     ${(Array.isArray(lead.stage_historico) && lead.stage_historico.length > 0) ? `
     <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">
@@ -3968,7 +3974,6 @@ async function openLeadPanel(lead) {
     </div>` : ''}
 
     <div class="panel-section">Contexto Evolutivo (IA)</div>
-    <div id="panel-nota-atendimento"></div>
     ${(lead.auditoria_ia_resumo || lead.auditoria_ia_motivo_perda || lead.crm_score) ? `
       ${lead.auditoria_ia_resumo ? `<div style="padding:10px 12px;background:rgba(145,70,255,.04);border:1px solid var(--bd);margin-bottom:8px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">Resumo da conversa (IA)</div>
