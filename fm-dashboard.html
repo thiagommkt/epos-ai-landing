@@ -3811,7 +3811,16 @@ async function confirmarDescarte() {
 }
 
 // ═══ PAINEL DE LEAD ═══
-function openLeadPanel(lead) {
+// 21/10 (Thiago: "a ficha deveria ser universal"): de onde quer que abra (funil, listas, Torneira, link do WhatsApp),
+// a ficha busca o registro completo do lead no banco. Antes, aberta pelo funil, faltavam campos (ex.: renda).
+async function openLeadPanel(lead) {
+  if (lead && lead.telefone && !lead.__completo) {
+    try {
+      const { data } = await sb(`${TABLE}?telefone=eq.${encodeURIComponent(lead.telefone)}&select=*&limit=1`);
+      if (Array.isArray(data) && data[0]) lead = { ...lead, ...data[0] };
+    } catch (eFicha) {}
+    lead.__completo = true;
+  }
   const tel = (lead.telefone||'').replace(/^55/,'');
   const telFmt = tel.length>=10 ? `(${tel.slice(0,2)}) ${tel.slice(2,7)}-${tel.slice(7)}` : tel||'—';
 
@@ -5783,25 +5792,40 @@ const NOTA_CRITERIOS = [['velocidade', 'Velocidade'], ['qualificacao', 'Qualific
 const notaCor = n => n >= 8 ? 'var(--neon)' : n >= 6 ? '#e3b341' : '#FF5E5B';
 
 async function carregarNotaAtendimento(telefone) {
+  // 21/10: a seção aparece sempre — histórico de todos os dias avaliados (o mais recente em destaque) ou o aviso de que ainda não há nota
   const box = document.getElementById('panel-nota-atendimento');
   if (!box) return;
   box.innerHTML = '';
   const conta = TABLE === 'fm_leads' ? 'fm' : 'epos';
-  const { data } = await sb(`atendimento_notas?conta=eq.${conta}&lead_telefone=eq.${encodeURIComponent(telefone)}&select=dia,vendedor,nota,criterios,justificativa,dica,evidencia&order=dia.desc&limit=1`);
+  const { data } = await sb(`atendimento_notas?conta=eq.${conta}&lead_telefone=eq.${encodeURIComponent(telefone)}&select=dia,vendedor,nota,criterios,justificativa,dica,evidencia&order=dia.desc&limit=30`);
   if (window._panelLead?.telefone !== telefone) return;
-  const n = Array.isArray(data) && data[0];
-  if (!n) return;
+  const notas = Array.isArray(data) ? data : [];
+  const qtd = notas.length;
+  const titulo = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Avaliação do atendimento${qtd ? ` · ${qtd} dia${qtd > 1 ? 's' : ''} avaliado${qtd > 1 ? 's' : ''}` : ''}</div>`;
+  if (!qtd) {
+    box.innerHTML = `<div class="nota-atendimento nota-vazia" style="padding:10px 12px;border:1px dashed var(--bd);margin-bottom:8px">${titulo}
+      <div style="font-size:12px;line-height:1.5;color:var(--muted)">Ainda sem avaliação. Todo dia às 7h o Analista dá nota ao atendimento humano do dia anterior: velocidade, qualificação, objeção, próximo passo e tom.</div></div>`;
+    return;
+  }
+  const quando = o => new Date(o.dia + 'T12:00:00').toLocaleDateString('pt-BR');
+  const valor = o => String(o.nota).replace('.', ',');
+  const n = notas[0];
   const crit = NOTA_CRITERIOS.filter(([k]) => n.criterios && n.criterios[k] != null)
     .map(([k, rot]) => `<span style="font-family:var(--fM);font-size:10px;color:var(--muted);margin-right:10px">${rot} <b style="color:var(--text)">${n.criterios[k]}/5</b></span>`).join('');
+  const anteriores = notas.slice(1).map(o => `<div class="nota-anterior" style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;border-top:1px solid var(--bd);font-size:11px;line-height:1.45">
+      <span style="color:var(--muted)">${quando(o)} · ${escHtml(o.vendedor || 'Equipe')}${o.dica ? ` — ${escHtml(o.dica)}` : ''}</span>
+      <b style="font-family:var(--fD);color:${notaCor(Number(o.nota))}">${valor(o)}</b></div>`).join('');
   box.innerHTML = `<div class="nota-atendimento" style="padding:10px 12px;border:1px solid var(--bd);margin-bottom:8px;background:rgba(255,255,255,.02)">
+      ${titulo}
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px">
-        <div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase">Nota do atendimento · ${new Date(n.dia + 'T12:00:00').toLocaleDateString('pt-BR')} · ${escHtml(n.vendedor || 'Equipe')}</div>
-        <div class="nota-valor" style="font-family:var(--fD);font-size:20px;font-weight:800;color:${notaCor(Number(n.nota))}">${String(n.nota).replace('.', ',')}</div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--muted)">${quando(n)} · ${escHtml(n.vendedor || 'Equipe')}</div>
+        <div class="nota-valor" style="font-family:var(--fD);font-size:20px;font-weight:800;color:${notaCor(Number(n.nota))}">${valor(n)}</div>
       </div>
       <div style="margin-bottom:6px">${crit}</div>
       ${n.justificativa ? `<div style="font-size:12px;line-height:1.5;color:var(--text);margin-bottom:6px">${escHtml(n.justificativa)}</div>` : ''}
       ${n.dica ? `<div style="font-size:12px;line-height:1.5;color:var(--neon)">💡 ${escHtml(n.dica)}</div>` : ''}
       ${n.evidencia ? `<div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px">“${escHtml(n.evidencia)}”</div>` : ''}
+      ${anteriores ? `<div style="margin-top:10px"><div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">Dias anteriores</div>${anteriores}</div>` : ''}
     </div>`;
 }
 
