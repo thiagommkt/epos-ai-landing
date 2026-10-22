@@ -2306,7 +2306,7 @@ async function loadDashboard() {
   const dia30ISO = encodeURIComponent(new Date(brt.getTime() - 30*24*60*60*1000).toISOString());
 
   document.getElementById('db-date').textContent =
-    brt.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric', timeZone:'America/Sao_Paulo' }).toUpperCase();
+    now.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric', timeZone:'America/Sao_Paulo' }).toUpperCase();
 
   // Filtros de período para agendou/fechou/compareceu
   const agFilter = periodoISO ? `agendou=eq.true&criado_em=gte.${mesISO}${endClause}` : 'agendou=eq.true';
