@@ -2072,6 +2072,23 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
   <div class="rule"></div>
 
+  <!-- 22/10 (Thiago): empresas do Google Maps. Abordagem à mão; nada é enviado daqui. Só vira lead no CRM quando ele clica em "Virar lead". -->
+  <div class="card" id="pm-card" style="margin-bottom:20px">
+    <div class="cfg-sec-title">Empresas do Google Maps <span id="pm-resumo" style="color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none"></span></div>
+    <div style="font-size:12px;color:var(--muted);margin:6px 0 12px;font-family:var(--fB);line-height:1.5">Abordagem à mão, pelo seu WhatsApp, ligação ou e-mail: nada é enviado daqui. Abra a empresa para ver os dados do Maps, copiar as mensagens e anotar. Ela só entra no CRM quando você clicar em <b>Virar lead</b>.</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <input id="pm-busca" placeholder="Buscar empresa ou telefone" oninput="pmRender()" style="flex:1 1 200px;min-width:0;padding:8px 10px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px">
+      <select id="pm-prio" onchange="pmRender()" style="padding:8px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px"><option value="">Prioridade: todas</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+      <select id="pm-nicho" onchange="pmRender()" style="padding:8px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px"><option value="">Nicho: todos</option></select>
+      <select id="pm-status" onchange="pmRender()" style="padding:8px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px"><option value="">Status: todos</option><option>Não abordada</option><option>Enviado</option><option>Respondeu</option><option>Call marcada</option><option>Sem interesse</option><option value="__lead">Virou lead</option><option value="__nao">Não contatar</option></select>
+    </div>
+    <div id="pm-lista"><div class="loading"></div></div>
+    <div id="pm-mais" style="text-align:center;margin-top:10px"></div>
+  </div>
+  <div id="pm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;overflow:auto;padding:16px" onclick="if(event.target===this)pmFechar()">
+    <div id="pm-modal-corpo" style="max-width:720px;margin:24px auto;background:var(--bg2);border:1px solid var(--bd);padding:20px;font-family:var(--fB);color:var(--text)"></div>
+  </div>
+
   <div style="background:rgba(145,70,255,.06);border:1px solid var(--bd);padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--muted);line-height:1.6;font-family:var(--fB)">
     <strong style="color:var(--text);font-family:var(--fD);font-size:11px;letter-spacing:.08em;text-transform:uppercase">Como funciona:</strong>
     Leads reais captados via Google Maps recebem template WhatsApp aprovado. Quem responde "Faz total sentido" é qualificado pela Donna automaticamente. "Disparar Lote" aciona o próximo lote pendente na planilha — respeita o intervalo de 90–150s entre envios (regra de rate limiting).
@@ -4192,7 +4209,7 @@ function show(id) {
     if(id==='analista') loadAnalista();
     if(id==='relatorio') loadRelatorio();
     if(id==='clientes') loadClientes();
-    if(id==='prospeccao') loadProspeccao();
+    if(id==='prospeccao') { loadProspeccao(); pmLoad(); }
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -5723,6 +5740,148 @@ async function loadCampanhas() {
 
 // ═══ PROSPECÇÃO SWaaS — COLD OUTREACH ═══
 const SEGMENTO_LABEL = { advocacia: 'Advocacia', odontologia: 'Odontologia', estetica: 'Estética', outros: 'Outros' };
+
+// ═══ Prospecção: empresas do Google Maps (22/10, Thiago: "só vai virar lead se eu salvar ... se eu classificar como lead, ele vai pro CRM") ═══
+// Tabela prospeccao_empresas (fora de leads; nenhum fluxo do n8n lê). Mensagens = roteiro do kit de prospecção (abertura, ligação, e-mail).
+// Sem toques automáticos: "Não faremos remarketing, será feito na mão cada contato" (22/10).
+let _pm = [], _pmLimite = 50;
+const PM_NICHO = {
+  advocacia: { segmento: 'o jurídico', empresa: 'o escritório', plural: 'advocacia', de: 'do escritório',
+    dor: 'quem procura advogado costuma mandar mensagem para dois ou três escritórios e fica com o primeiro que explica direito' },
+  odonto: { segmento: 'a odontologia e a estética', empresa: 'a clínica', plural: 'odontologia e estética', de: 'da clínica',
+    dor: 'orçamento de implante, alinhador ou harmonização esfria rápido, e quem não tem retorno no mesmo dia vai para a clínica do lado' },
+  saude: { segmento: 'a área da saúde', empresa: 'a clínica', plural: 'saúde', de: 'da clínica',
+    dor: 'quem manda mensagem à noite para marcar consulta agenda com quem responde primeiro' },
+  imob: { segmento: 'o mercado imobiliário', empresa: 'a imobiliária', plural: 'imóveis', de: 'da imobiliária',
+    dor: 'o contato de portal e de anúncio chega à noite e no fim de semana, e quando o corretor responde o cliente já está visitando com outro' }
+};
+function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('advoc') ? 'advocacia' : n.includes('odonto') || n.includes('estét') ? 'odonto' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
+function pmEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function pmPeriodo() { const h = new Date().getHours(); return h < 12 ? 'bom dia' : h < 18 ? 'boa tarde' : 'boa noite'; }
+function pmSlug(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
+function pmTelFmt(t) { const d = String(t || '').replace(/^55/, ''); return d.length === 11 ? `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}` : d.length === 10 ? `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}` : t; }
+function pmMensagens(e, trat) {
+  const n = PM_NICHO[pmNichoChave(e.nicho)], link = 'https://lp.eposmktfilmsia.com.br/metodo.html?c=' + pmSlug(e.empresa);
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const apres = 'Meu nome é Thiago Montandon, sou publicitário em Brasília e trabalho com marketing, comunicação e audiovisual para empresas de diferentes segmentos, incluindo ' + n.segmento + '.'
+    + '\n\nNão sei se ' + n.empresa + ' já investe nessas áreas, mas gostaria de compartilhar nossa apresentação sobre uma nova ferramenta que desenvolvemos. Aliada às estratégias de tráfego pago, ela tem gerado bons resultados para nossos clientes.';
+  const sistema = 'É uma ferramenta que faz o WhatsApp da empresa responder em segundos, qualificar e agendar, com uma IA que confere cada conversa, além de ajudar em toda a tratativa, com notificações para quem está atendendo, com quebras de objeções e trazendo para o fechamento.'
+    + '\n\nEle é 100% integrado com o Meta, então vai trackear todas as campanhas do tráfego pago, coletando dados e enviando as informações de agendamentos e fechamentos direto pro Meta, com um CRM interno.'
+    + '\n\nE pra finalizar, você tem acesso ao whatsapp de todos os vendedores ou consegue ver quem foi o vendedor responsável por cada conversa, com avaliação de cada atendimento.';
+  return [
+    ['WhatsApp 1 · cumprimento', 'Olá, ' + pmPeriodo()],
+    ['WhatsApp 2 · apresentação', apres + '\n\nVou encaminhar o material para que ' + trat + ' possa conhecer melhor a proposta. Agradeço pela atenção e fico no aguardo.'],
+    ['WhatsApp 3 · material', 'Entre os meus serviços, está o meu sistema:\n\n' + sistema + '\n\n' + link],
+    ['Ligação · recepção', '"' + cap(pmPeriodo()) + '! Meu nome é Thiago Montandon, sou publicitário aqui em Brasília e trabalho com marketing para empresas de ' + n.plural + '. Com quem eu falo sobre o marketing ou o comercial ' + n.de + '?"'],
+    ['Ligação · decisor', '"Vou ser rápido. Desenvolvemos uma ferramenta que, junto com o tráfego pago, faz o WhatsApp da empresa responder em segundos, qualificar e agendar, e avisa a equipe para nenhum contato ficar sem retorno. Em ' + n.plural + ', ' + n.dor + '. Hoje vocês investem em anúncio, ou os clientes vêm mais por indicação?"'],
+    ['E-mail · assunto', 'Apresentação para ' + e.empresa],
+    ['E-mail · texto', 'Olá, ' + pmPeriodo() + ',\n\n' + apres + '\n\nEntre os meus serviços, está o meu sistema:\n\n' + sistema + '\n\nA apresentação completa está aqui:\n' + link
+      + '\n\nSe fizer sentido, te mostro em 20 minutos, por vídeo, como funcionaria com os números de vocês.\n\nThiago Montandon\nEpos\n\nSe preferir não receber mais e-mails meus, é só responder "sair".']
+  ];
+}
+async function pmLoad() {
+  const lista = document.getElementById('pm-lista'); if (!lista) return;
+  try {
+    const { data } = await sb('prospeccao_empresas?select=*&order=prioridade.asc,avaliacoes.desc');
+    _pm = Array.isArray(data) ? data : [];
+    const sel = document.getElementById('pm-nicho');
+    if (sel && sel.options.length <= 1) [...new Set(_pm.map(e => e.nicho).filter(Boolean))].sort().forEach(n => sel.add(new Option(n, n)));
+    pmRender();
+  } catch (e) { lista.innerHTML = `<div style="color:var(--muted);font-size:12px">Não foi possível carregar as empresas (${pmEsc(e.message)}).</div>`; }
+}
+function pmFiltradas() {
+  const q = (document.getElementById('pm-busca')?.value || '').toLowerCase().trim(), qd = q.replace(/\D/g, '');
+  const pr = document.getElementById('pm-prio')?.value, ni = document.getElementById('pm-nicho')?.value, st = document.getElementById('pm-status')?.value;
+  return _pm.filter(e => (!q || (e.empresa || '').toLowerCase().includes(q) || (qd && e.telefone.includes(qd)))
+    && (!pr || e.prioridade === pr) && (!ni || e.nicho === ni)
+    && (!st || (st === '__lead' ? !!e.virou_lead_em : st === '__nao' ? e.nao_contatar : e.status === st)));
+}
+function pmRender() {
+  const lista = document.getElementById('pm-lista'); if (!lista) return;
+  const f = pmFiltradas();
+  const res = document.getElementById('pm-resumo');
+  if (res) res.textContent = `· ${_pm.length} empresas · ${_pm.filter(e => e.status !== 'Não abordada').length} abordadas · ${_pm.filter(e => e.virou_lead_em).length} viraram lead`;
+  if (!f.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:10px 0">Nenhuma empresa com esses filtros.</div>'; document.getElementById('pm-mais').innerHTML = ''; return; }
+  lista.innerHTML = f.slice(0, _pmLimite).map(e => `
+    <div onclick="pmAbrir(${e.id})" style="display:flex;gap:10px;align-items:center;padding:9px 8px;border-bottom:1px solid var(--bd);cursor:pointer" onmouseover="this.style.background='var(--surface-h)'" onmouseout="this.style.background=''">
+      <span style="flex:0 0 22px;text-align:center;font-family:var(--fD);font-weight:700;color:${e.prioridade === 'A' ? 'var(--purple)' : e.prioridade === 'B' ? 'var(--orange)' : 'var(--muted)'}">${pmEsc(e.prioridade || '–')}</span>
+      <span style="flex:1;min-width:0"><span style="display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pmEsc(e.empresa)}</span>
+        <span style="font-size:11px;color:var(--muted)">${pmEsc(e.nicho || '')} · ${pmEsc(e.regiao || '')} · ${pmTelFmt(e.telefone)}${e.whatsapp_provavel ? ' · WhatsApp' : ' · fixo'}${e.nota ? ' · ★ ' + e.nota + ' (' + (e.avaliacoes || 0) + ')' : ''}</span></span>
+      <span style="flex:0 0 auto;font-size:11px;color:${e.virou_lead_em ? 'var(--purple)' : e.nao_contatar ? 'var(--muted)' : e.status === 'Não abordada' ? 'var(--muted)' : 'var(--orange)'}">${e.virou_lead_em ? 'No CRM' : e.nao_contatar ? 'Não contatar' : pmEsc(e.status)}</span>
+    </div>`).join('');
+  document.getElementById('pm-mais').innerHTML = f.length > _pmLimite
+    ? `<button onclick="_pmLimite+=50;pmRender()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Mostrar mais (${f.length - _pmLimite})</button>` : '';
+}
+function pmFechar() { document.getElementById('pm-modal').style.display = 'none'; }
+function pmCopiar(btn, i) { navigator.clipboard.writeText(btn.closest('[data-msg]').querySelector('pre').textContent).then(() => { btn.textContent = 'Copiado'; setTimeout(() => btn.textContent = 'Copiar', 1500); }); }
+function pmAbrir(id) {
+  const e = _pm.find(x => x.id === id); if (!e) return;
+  const trat = localStorage.getItem('pm_trat_' + id) || 'o responsável';
+  const campo = (rot, html) => `<label style="display:block;font-size:11px;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.06em">${rot}</label>${html}`;
+  const inp = 'width:100%;box-sizing:border-box;padding:8px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-family:var(--fB);font-size:13px';
+  const zap = e.whatsapp_provavel ? `<a href="https://wa.me/${e.telefone}" target="_blank" rel="noopener" style="color:var(--purple)">Abrir no WhatsApp</a> · ` : '';
+  document.getElementById('pm-modal-corpo').innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+      <div style="min-width:0"><div style="font-family:var(--fD);font-size:18px;font-weight:700">${pmEsc(e.empresa)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Prioridade ${pmEsc(e.prioridade || '–')} · ${pmEsc(e.nicho || '')} · ${pmEsc(e.regiao || '')}</div></div>
+      <button onclick="pmFechar()" style="background:none;border:1px solid var(--bd);color:var(--muted);padding:4px 10px;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:13px;line-height:1.7;margin-top:12px;overflow-wrap:anywhere">
+      <b>${pmTelFmt(e.telefone)}</b> ${e.whatsapp_provavel ? '(celular)' : '(telefone fixo)'} · ${zap}<a href="tel:+${e.telefone}" style="color:var(--purple)">Ligar</a><br>
+      ${e.nota ? '★ ' + e.nota + ' · ' + (e.avaliacoes || 0) + ' avaliações<br>' : ''}
+      ${e.site ? `Site: <a href="${pmEsc(e.site)}" target="_blank" rel="noopener" style="color:var(--purple)">${pmEsc(e.site)}</a><br>` : 'Sem site<br>'}
+      ${e.endereco ? pmEsc(e.endereco) + '<br>' : ''}
+      ${e.maps_link ? `<a href="${pmEsc(e.maps_link)}" target="_blank" rel="noopener" style="color:var(--purple)">Ver no Google Maps</a>` : ''}
+      ${e.virou_lead_em ? `<div style="margin-top:8px;color:var(--purple)">Já está no CRM (${pmTelFmt(e.lead_telefone)}).</div>` : ''}
+    </div>
+    ${campo('Status', `<select id="pm-f-status" style="${inp}">${['Não abordada', 'Enviado', 'Respondeu', 'Call marcada', 'Sem interesse'].map(s => `<option ${s === e.status ? 'selected' : ''}>${s}</option>`).join('')}</select>`)}
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1 1 160px">${campo('Abordada em', `<input id="pm-f-data" type="date" value="${e.abordado_em || ''}" style="${inp}">`)}</div>
+      <div style="flex:1 1 160px">${campo('Canal', `<select id="pm-f-canal" style="${inp}">${['', 'WhatsApp pessoal', 'Ligação', 'E-mail', 'WhatsApp da Donna'].map(s => `<option ${s === (e.canal_abordagem || '') ? 'selected' : ''} value="${s}">${s || '—'}</option>`).join('')}</select>`)}</div>
+    </div>
+    ${campo('E-mail', `<input id="pm-f-email" type="email" value="${pmEsc(e.email || '')}" placeholder="contato@empresa.com.br" style="${inp}">`)}
+    ${campo('Anotações', `<textarea id="pm-f-notas" rows="3" style="${inp};resize:vertical">${pmEsc(e.notas || '')}</textarea>`)}
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px"><input id="pm-f-nao" type="checkbox" ${e.nao_contatar ? 'checked' : ''}> Não contatar (pediu para sair)</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+      <button onclick="pmSalvar(${e.id})" style="padding:9px 16px;background:transparent;border:1px solid var(--purple);color:var(--text);font-family:var(--fD);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Salvar</button>
+      ${e.virou_lead_em ? '' : `<button onclick="pmVirarLead(${e.id})" style="padding:9px 16px;background:var(--purple);border:1px solid var(--purple);color:#fff;font-family:var(--fD);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Virar lead (vai para o CRM)</button>`}
+      <span id="pm-f-msg" style="font-size:12px;color:var(--muted);align-self:center"></span>
+    </div>
+    <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-family:var(--fD);font-size:13px;letter-spacing:.06em;text-transform:uppercase">Mensagens do kit</b>
+        <select id="pm-f-trat" onchange="localStorage.setItem('pm_trat_${e.id}',this.value);pmAbrir(${e.id})" style="padding:6px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px">${['o responsável', 'o doutor', 'a doutora', 'o sócio'].map(t => `<option ${t === trat ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+      <div style="font-size:11px;color:var(--muted);margin:4px 0 8px">Envie à mão, uma de cada vez. Depois, siga o fluxo do guia do parceiro (convite → call com a página do Método → fechamento).</div>
+      ${pmMensagens(e, trat).map(([rot, txt], i) => `<div data-msg style="border:1px solid var(--bd);padding:10px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">${rot}</span>
+        <button onclick="pmCopiar(this, ${i})" style="padding:3px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Copiar</button></div>
+        <pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--fB);font-size:12.5px;line-height:1.55;margin:6px 0 0">${pmEsc(txt)}</pre></div>`).join('')}
+    </div>`;
+  document.getElementById('pm-modal').style.display = 'block';
+}
+async function pmSalvar(id) {
+  const g = x => document.getElementById(x);
+  const corpo = { status: g('pm-f-status').value, abordado_em: g('pm-f-data').value || null, canal_abordagem: g('pm-f-canal').value || null,
+    email: g('pm-f-email').value.trim() || null, notas: g('pm-f-notas').value.trim() || null, nao_contatar: g('pm-f-nao').checked };
+  if (corpo.status !== 'Não abordada' && !corpo.abordado_em) corpo.abordado_em = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+  const r = await fetch(`${SB_URL}/rest/v1/prospeccao_empresas?id=eq.${id}`, { method: 'PATCH',
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify(corpo) });
+  const msg = g('pm-f-msg');
+  if (!r.ok) { msg.textContent = 'Não salvou (' + r.status + ').'; msg.style.color = 'var(--orange)'; return false; }
+  const [novo] = await r.json(); const i = _pm.findIndex(x => x.id === id); if (i >= 0 && novo) _pm[i] = novo;
+  msg.textContent = 'Salvo.'; msg.style.color = 'var(--muted)'; pmRender(); return true;
+}
+async function pmVirarLead(id) {
+  if (!confirm('Levar esta empresa para o CRM como lead? A Donna fica pausada para ela.')) return;
+  if (!(await pmSalvar(id))) return;
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/prospeccao_virar_lead`, { method: 'POST',
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_id: id }) });
+  const res = r.ok ? await r.json() : null, msg = document.getElementById('pm-f-msg');
+  if (!res || !res.ok) { msg.textContent = 'Não virou lead (' + (res?.motivo || r.status) + ').'; msg.style.color = 'var(--orange)'; return; }
+  await pmLoad(); pmFechar();
+  if (typeof abrirFichaPorTelefone === 'function') abrirFichaPorTelefone(res.telefone);
+}
 
 async function loadProspeccao() {
   const segBox = document.getElementById('prosp-segmentos');
