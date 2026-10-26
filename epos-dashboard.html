@@ -5759,10 +5759,12 @@ const PM_NICHO = {
     dor: 'orçamento de implante, alinhador ou harmonização esfria rápido, e quem não tem retorno no mesmo dia vai para a clínica do lado' },
   saude: { segmento: 'a área da saúde', empresa: 'a clínica', plural: 'saúde', de: 'da clínica',
     dor: 'quem manda mensagem à noite para marcar consulta agenda com quem responde primeiro' },
+  carros: { segmento: 'o mercado automotivo', empresa: 'a loja', plural: 'veículos', de: 'da loja',
+    dor: 'quem pergunta o preço de um carro à noite fecha com a loja que responde primeiro, e o contato do anúncio esfria em poucas horas' },
   imob: { segmento: 'o mercado imobiliário', empresa: 'a imobiliária', plural: 'imóveis', de: 'da imobiliária',
     dor: 'o contato de portal e de anúncio chega à noite e no fim de semana, e quando o corretor responde o cliente já está visitando com outro' }
 };
-function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('advoc') ? 'advocacia' : n.includes('odonto') || n.includes('estét') ? 'odonto' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
+function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('carro') || n.includes('veícul') ? 'carros' : n.includes('advoc') ? 'advocacia' : n.includes('odonto') || n.includes('estét') ? 'odonto' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
 function pmEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function pmPeriodo() { const h = new Date().getHours(); return h < 12 ? 'bom dia' : h < 18 ? 'boa tarde' : 'boa noite'; }
 function pmSlug(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
