@@ -1595,6 +1595,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
         <span class="transcricao-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
         <span class="transcricao-label">🎙️ Transcrição: carregando...</span>
       </button>
+  <style>/* 26/10: opções do seletor de silêncio ilegíveis no tema escuro */ #silencio-sel option{background:#18181c;color:#f2f2f4}</style>
       <select id="silencio-sel" onchange="definirSilencio(this.value)" title="Quanto tempo a IA fica desligada depois que alguém da equipe fala com o lead" style="display:none;padding:7px 10px;border:1px solid var(--bd);background:var(--bg);color:var(--text);color-scheme:dark;font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer"><option value="12">IA após humano: 12 h</option><option value="24">IA após humano: 24 h</option><option value="48">IA após humano: 48 h</option><option value="72">IA após humano: 72 h</option><option value="87600">IA após humano: permanente</option></select>
       <div class="sec-badge" id="db-live">● LIVE</div>
     </div>
@@ -1948,6 +1949,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <section class="section" id="s-crm">
   <div class="sec-head">
     <div><div class="sec-title">PIPELINE <span>CRM</span></div><div class="sec-sub" id="crm-count">Carregando...</div></div>
+      <button id="crm-pausar-todos" onclick="crmPausarTodos()" style="display:none;align-self:center;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer" title="Pausa fixa da IA em todos os leads (até reativar em cada um)">⏸ Marcar todos com bot desligado</button>
     <select class="period-sel-mob" id="crm-period-sel" onchange="setCrmPeriodSel(this)">
       <option value="all" selected>Tudo</option>
       <option value="month">Este mês</option>
@@ -5776,7 +5778,7 @@ function pmMensagens(e, trat) {
   return [
     ['WhatsApp 1 · cumprimento', 'Olá, ' + pmPeriodo()],
     ['WhatsApp 2 · apresentação', apres + '\n\nVou encaminhar o material para que ' + trat + ' possa conhecer melhor a proposta. Agradeço pela atenção e fico no aguardo.'],
-    ['WhatsApp 3 · material', 'Entre os meus serviços, está o meu sistema:\n\n' + sistema + '\n\n' + link],
+    ['WhatsApp 3 · material', sistema + '\n\n' + link],
     ['Ligação · recepção', '"' + cap(pmPeriodo()) + '! Meu nome é Thiago Montandon, sou publicitário aqui em Brasília e trabalho com marketing para empresas de ' + n.plural + '. Com quem eu falo sobre o marketing ou o comercial ' + n.de + '?"'],
     ['Ligação · decisor', '"Vou ser rápido. Desenvolvemos uma ferramenta que, junto com o tráfego pago, faz o WhatsApp da empresa responder em segundos, qualificar e agendar, e avisa a equipe para nenhum contato ficar sem retorno. Em ' + n.plural + ', ' + n.dor + '. Hoje vocês investem em anúncio, ou os clientes vêm mais por indicação?"'],
     ['E-mail · assunto', 'Apresentação para ' + e.empresa],
@@ -6412,6 +6414,21 @@ function silEhPermanente(h) { return Number(h) >= 8760; }
 function silResumo(h) { return silEhPermanente(h) ? 'com a equipe (IA desligada até reativar)' : `com resposta da equipe nas últimas ${h || 48} h`; }
 function silFica(h) { return silEhPermanente(h) ? 'fica desligada até alguém reativar' : `fica quieta ${h || 48} h`; }
 function silAte(t) { return t && (new Date(t).getTime() - Date.now()) > 365 * 864e5; }
+
+// 26/10 (Thiago): "Marcar todos os leads com bot desligado" na aba CRM. Só administrador; pausa fixa (cada lead volta pelo Reativar).
+async function crmPausarTodosMostrar() {
+  const b = document.getElementById('crm-pausar-todos'); if (!b) return;
+  try { const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json()); b.style.display = adm === true ? 'inline-block' : 'none'; } catch (e) {}
+}
+async function crmPausarTodos() {
+  if (!confirm('Desligar o bot em TODOS os leads do CRM?\n\nA IA fica pausada em todos (pausa fixa). Para ela voltar num lead, use "Reativar" na ficha dele.')) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/crm_pausar_todos`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify({ p_conta: MODO_DONO_PROJETO === 'fm' ? 'fm' : 'epos' }) });
+    if (!r.ok) throw new Error(`HTTP ${r.status} — ${await r.text().catch(() => '')}`);
+    const n = await r.json(); alert(`Pronto: bot desligado em ${n} lead(s) que ainda estavam com a IA ligada.`);
+    if (typeof loadCRM === 'function') loadCRM();
+  } catch (e) { alert('Não foi possível pausar todos:\n' + e.message); }
+}
 async function loadSilencio() {
   const sel = document.getElementById('silencio-sel'), cfg = document.getElementById('cfg-silencio');
   try {
@@ -6471,7 +6488,7 @@ async function toggleTranscricao() {
     renderTranscricao(novo);
   } catch (e) {
     alert('Erro ao mudar a transcrição de áudio:\n' + e.message);
-    await loadTranscricao(); loadSilencio();
+    await loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
   } finally {
     btn.dataset.busy = '0'; btn.style.opacity = '1';
   }
@@ -6636,7 +6653,7 @@ setTimeout(loadMetaDashboard, 1200);
 loadDashboard();
 loadRoboStatus();
 loadModoDono();
-loadTranscricao(); loadSilencio();
+loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
 loadWaClicks();
 loadNotificacoes();
 setInterval(loadDashboard, 30000); // fallback polling a cada 30s
