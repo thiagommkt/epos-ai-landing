@@ -5833,13 +5833,16 @@ async function pmConfirmarDisparo() {
   if (!sel.length) return alert('Nenhuma empresa da lista filtrada pode receber agora.' + txtFora);
   const porNicho = {}; sel.forEach(e => porNicho[e.nicho] = (porNicho[e.nicho] || 0) + 1);
   const txt = `DISPARO PELA API OFICIAL (número Epos API oficial)\n\n${sel.length} empresa(s) da lista filtrada:\n` + Object.entries(porNicho).map(([n, q]) => `• ${n}: ${q}`).join('\n') + txtFora
-    + `\n\nRitmo: 1 mensagem a cada 90 a 240 s, seg a sex, 9h30 às 18h, até você pausar. Os envios só saem com o botão "Iniciar envios" ligado.\nCusto: a Meta cobra cada mensagem de marketing entregue.\n\nPrévia da 1ª:\n\n${pmPrevia(sel[0])}\n\nPara colocar na fila, digite DISPARAR:`;
+    + `\n\nRitmo: 1 mensagem a cada 90 a 240 s, seg a sex, 9h30 às 18h, até você pausar. Começa sozinho no próximo horário permitido; para parar, use "Pausar envios".\nCusto: a Meta cobra cada mensagem de marketing entregue.\n\nPrévia da 1ª:\n\n${pmPrevia(sel[0])}\n\nPara colocar na fila, digite DISPARAR:`;
   const ok = prompt(txt);
   if ((ok || '').trim().toUpperCase() !== 'DISPARAR') { if (ok !== null) alert('Nada foi colocado na fila: a confirmação não confere.'); return; }
   const linhas = sel.map(e => ({ empresa_id: e.id, telefone: e.telefone, modelo: PM_MODELOS[e.nicho], status: 'na_fila', criado_por: quemSou() }));
   const r = await fetch(`${SB_URL}/rest/v1/prospeccao_disparos`, { method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify(linhas) });
   if (!r.ok) return alert('Não foi possível colocar na fila (' + r.status + '): ' + (await r.text().catch(() => '')).slice(0, 200));
-  await pmCarregarDisparos(); pmRender(); alert(`${linhas.length} empresa(s) na fila. O envio começa no próximo horário permitido.`);
+  // 27/10 (Thiago: "só quero que precise de ação minha quando eu for fazer"): pôr na fila já liga os envios; "Pausar envios" continua parando
+  if (!_pmDispAtivo) await fetch(`${SB_URL}/rest/v1/rpc/sistema_definir_disparo_oficial`, { method: 'POST', headers: sbJson(), body: JSON.stringify({ p_ativo: true }) }).catch(() => {});
+  await pmCarregarChaveDisparo();
+  await pmCarregarDisparos(); pmRender(); alert(`${linhas.length} empresa(s) na fila. Os envios começam sozinhos no próximo horário (seg a sex, 9h30 às 18h). Para parar, use "Pausar envios".`);
 }
 async function pmCancelarFila() {
   const n = Object.values(_pmDisp).filter(s => s === 'na_fila').length;
