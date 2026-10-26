@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Falar com a Donna · Epos</title>
+<style>:root{color-scheme:dark}body{margin:0;min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#0E0E10;color:#f2f2f4;font-family:system-ui,-apple-system,Segoe UI,sans-serif;text-align:center;padding:16px}
+a{display:inline-block;margin-top:18px;padding:14px 22px;border-radius:12px;background:#9146FF;color:#fff;text-decoration:none;font-weight:700}p{color:#a7a7b0}</style></head>
+<body><main><h1 style="font-size:22px;margin:0">Abrindo o WhatsApp da Donna…</h1><p>Se não abrir sozinho, toque no botão.</p>
+<a id="ir" href="https://wa.me/556190448205?text=Com%20certeza!">Abrir o WhatsApp</a></main>
+<script>
+// 26/10: botão "Com certeza" do disparo pela API oficial (a Meta não aceita link direto para o WhatsApp no botão).
+// Registra o clique com o id da empresa (?e=) e abre a conversa com a Donna com "Com certeza!" já escrito.
+(function(){
+  var e = (new URLSearchParams(location.search).get('e') || '').replace(/[^0-9a-z_-]/gi, '').slice(0, 40);
+  var destino = document.getElementById('ir').href;
+  try {
+    if (!navigator.webdriver) fetch('https://phszzzwqkujmmfregtsj.supabase.co/rest/v1/lp_events', { method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA' },
+      body: JSON.stringify({ lp_slug: 'prospeccao-oficial', event_type: 'cta_click', utm_source: 'api_oficial', utm_content: e || null,
+        user_agent: (navigator.userAgent || '').slice(0, 390), referrer: (document.referrer || '').slice(0, 490) }) }).catch(function(){});
+  } catch (x) {}
+  setTimeout(function(){ location.replace(destino); }, 350);
+})();
+</script></body></html>
