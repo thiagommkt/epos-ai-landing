@@ -2089,6 +2089,15 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <select id="pm-nicho" onchange="pmRender()" style="padding:8px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px"><option value="">Nicho: todos</option></select>
       <select id="pm-status" onchange="pmRender()" style="padding:8px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px"><option value="">Status: todos</option><option>Não abordada</option><option>Enviado</option><option>Respondeu</option><option>Call marcada</option><option>Sem interesse</option><option value="__lead">Virou lead</option><option value="__nao">Não contatar</option></select>
     </div>
+    <div id="pm-disp-barra" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;padding:10px;border:1px solid var(--bd);background:var(--bg)">
+      <b style="font-family:var(--fD);font-size:12px;letter-spacing:.06em;text-transform:uppercase">Disparo pela API oficial</b>
+      <span id="pm-disp-fila" style="font-size:12px;color:var(--muted)"></span>
+      <span style="flex:1"></span>
+      <button onclick="pmSelecionarElegiveis()" style="padding:6px 12px;background:transparent;border:1px solid var(--bd);color:var(--text);font-size:11px;cursor:pointer">Marcar as que podem receber (lista filtrada)</button>
+      <button onclick="_pmSel.clear();pmRender()" style="padding:6px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Limpar</button>
+      <button id="pm-disp-btn" onclick="pmConfirmarDisparo()" style="padding:7px 14px;background:var(--purple);border:1px solid var(--purple);color:#fff;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Disparar (0)</button>
+      <button onclick="pmCancelarFila()" style="padding:6px 12px;background:transparent;border:1px solid #e5484d;color:#ff6b6f;font-size:11px;cursor:pointer">Cancelar fila</button>
+    </div>
     <div id="pm-lista"><div class="loading"></div></div>
     <div id="pm-mais" style="text-align:center;margin-top:10px"></div>
   </div>
@@ -5788,9 +5797,51 @@ function pmMensagens(e, trat) {
       + '\n\nSe fizer sentido, te mostro em 20 minutos, por vídeo, como funcionaria com os números de vocês.\n\nThiago Montandon\nEpos\n\nSe preferir não receber mais e-mails meus, é só responder "sair".']
   ];
 }
+// ═══ 27/10: disparo pela API oficial a partir da aba Prospecção (só põe na fila; o n8n envia com 90 a 240 s entre um e outro) ═══
+const PM_MODELOS = { 'Advocacia': 'advocacia', 'Odontologia e estética': 'estetica', 'Odontologia e estética / Clínicas médicas e saúde': 'estetica',
+  'Imobiliárias e corretores': 'imobiliaria' /* 'Lojas de carros': 'carros' — entra quando a Meta aprovar epos_demo_carros_v1 */ };
+const PM_QUEM = { advocacia: ['o escritório', 'do escritório'], estetica: ['a clínica', 'da clínica'], imobiliaria: ['a imobiliária', 'da imobiliária'], carros: ['a loja', 'da loja'] };
+let _pmSel = new Set(), _pmDisp = {};
+function pmNomeCurto(n) { return String(n || '').split(/\s[|–-]\s/)[0].replace(/[\s|–-]+$/, '').trim().slice(0, 60); }
+function pmPodeDisparar(e) { return e.whatsapp_provavel && !e.nao_contatar && !e.virou_lead_em && PM_MODELOS[e.nicho] && (e.avaliacoes || 0) >= 20 && !['na_fila', 'enviando', 'enviado'].includes(_pmDisp[e.id]); }
+async function pmCarregarDisparos() {
+  const { data } = await sb('prospeccao_disparos?select=empresa_id,status&order=criado_em.asc');
+  _pmDisp = {}; const n = { na_fila: 0, enviado: 0, erro: 0 };
+  for (const d of (data || [])) { _pmDisp[d.empresa_id] = d.status; if (n[d.status] !== undefined) n[d.status]++; }
+  const f = document.getElementById('pm-disp-fila'); if (f) f.textContent = `· na fila ${n.na_fila} · enviadas ${n.enviado}${n.erro ? ' · com erro ' + n.erro : ''}`;
+}
+function pmAtualizarBotaoDisparo() { const b = document.getElementById('pm-disp-btn'); if (b) b.textContent = `Disparar (${_pmSel.size})`; }
+function pmSelecionarElegiveis() { pmFiltradas().filter(pmPodeDisparar).forEach(e => _pmSel.add(e.id)); pmRender(); }
+function pmMarcar(ev, id) { ev.stopPropagation(); if (_pmSel.has(id)) _pmSel.delete(id); else _pmSel.add(id); pmAtualizarBotaoDisparo(); }
+function pmPrevia(e) {
+  const m = PM_MODELOS[e.nicho], q = PM_QUEM[m];
+  return `[vídeo de 20 s]\nOlá, ${pmNomeCurto(e.empresa)}! Vi que vocês têm um Google Meu Negócio com ${e.avaliacoes} avaliações, reputação de quem atende bem.\nUma pergunta: quem chama ${q[0]} às 22h recebe resposta na hora?\nCriamos uma IA que responde em segundos no WhatsApp ${q[1]}, qualifica, agenda e mostra quais anúncios trazem mais clientes que fecham de verdade.\nQuer ver funcionando na prática?\n[Com certeza]  [Agora não]`;
+}
+async function pmConfirmarDisparo() {
+  const sel = _pm.filter(e => _pmSel.has(e.id) && pmPodeDisparar(e));
+  if (!sel.length) return alert('Marque ao menos uma empresa que possa receber (celular, 20+ avaliações, nicho com modelo aprovado, ainda não enviada).');
+  const porNicho = {}; sel.forEach(e => porNicho[e.nicho] = (porNicho[e.nicho] || 0) + 1);
+  const dias = Math.ceil(sel.length / 150);
+  const txt = `DISPARO PELA API OFICIAL (número Epos API oficial)\n\n${sel.length} empresa(s):\n` + Object.entries(porNicho).map(([n, q]) => `• ${n}: ${q}`).join('\n')
+    + `\n\nRitmo: 1 mensagem a cada 90 a 240 s, seg a sáb, 9h às 18h, até 150 por dia (≈ ${dias} dia(s) útil(eis)).\nCusto: a Meta cobra cada mensagem de marketing entregue.\n\nPrévia da 1ª:\n\n${pmPrevia(sel[0])}\n\nPara colocar na fila, digite DISPARAR:`;
+  const ok = prompt(txt);
+  if ((ok || '').trim().toUpperCase() !== 'DISPARAR') { if (ok !== null) alert('Nada foi colocado na fila: a confirmação não confere.'); return; }
+  const linhas = sel.map(e => ({ empresa_id: e.id, telefone: e.telefone, modelo: PM_MODELOS[e.nicho], status: 'na_fila', criado_por: quemSou() }));
+  const r = await fetch(`${SB_URL}/rest/v1/prospeccao_disparos`, { method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify(linhas) });
+  if (!r.ok) return alert('Não foi possível colocar na fila (' + r.status + '): ' + (await r.text().catch(() => '')).slice(0, 200));
+  _pmSel.clear(); await pmCarregarDisparos(); pmRender(); alert(`${linhas.length} empresa(s) na fila. O envio começa no próximo horário permitido.`);
+}
+async function pmCancelarFila() {
+  const n = Object.values(_pmDisp).filter(s => s === 'na_fila').length;
+  if (!n) return alert('Não há nada na fila.');
+  if (!confirm(`Cancelar ${n} envio(s) que ainda estão na fila? Os já enviados não mudam.`)) return;
+  await fetch(`${SB_URL}/rest/v1/prospeccao_disparos?status=eq.na_fila`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'cancelado', erro: 'Cancelado no painel' }) });
+  await pmCarregarDisparos(); pmRender();
+}
 async function pmLoad() {
   const lista = document.getElementById('pm-lista'); if (!lista) return;
   try {
+    await pmCarregarDisparos();
     const { data } = await sb('prospeccao_empresas?select=*&order=prioridade.asc,avaliacoes.desc');
     _pm = Array.isArray(data) ? data : [];
     const sel = document.getElementById('pm-nicho');
@@ -5813,11 +5864,13 @@ function pmRender() {
   if (!f.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:10px 0">Nenhuma empresa com esses filtros.</div>'; document.getElementById('pm-mais').innerHTML = ''; return; }
   lista.innerHTML = f.slice(0, _pmLimite).map(e => `
     <div onclick="pmAbrir(${e.id})" style="display:flex;gap:10px;align-items:center;padding:9px 8px;border-bottom:1px solid var(--bd);cursor:pointer" onmouseover="this.style.background='var(--surface-h)'" onmouseout="this.style.background=''">
+      <span style="flex:0 0 22px;text-align:center" onclick="event.stopPropagation()">${pmPodeDisparar(e) ? `<input type="checkbox" ${_pmSel.has(e.id) ? 'checked' : ''} onclick="pmMarcar(event, ${e.id})" title="Marcar para o disparo pela API oficial">` : ''}</span>
       <span style="flex:0 0 22px;text-align:center;font-family:var(--fD);font-weight:700;color:${e.prioridade === 'A' ? 'var(--purple)' : e.prioridade === 'B' ? 'var(--orange)' : 'var(--muted)'}">${pmEsc(e.prioridade || '–')}</span>
       <span style="flex:1;min-width:0"><span style="display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pmEsc(e.empresa)}</span>
         <span style="font-size:11px;color:var(--muted)">${pmEsc(e.nicho || '')} · ${pmEsc(e.regiao || '')} · ${pmTelFmt(e.telefone)}${e.whatsapp_provavel ? ' · WhatsApp' : ' · fixo'}${e.nota ? ' · ★ ' + e.nota + ' (' + (e.avaliacoes || 0) + ')' : ''}</span></span>
-      <span style="flex:0 0 auto;font-size:11px;color:${e.virou_lead_em ? 'var(--purple)' : e.nao_contatar ? 'var(--muted)' : e.status === 'Não abordada' ? 'var(--muted)' : 'var(--orange)'}">${e.virou_lead_em ? 'No CRM' : e.nao_contatar ? 'Não contatar' : pmEsc(e.status)}</span>
+      <span style="flex:0 0 auto;font-size:11px;color:${e.virou_lead_em ? 'var(--purple)' : e.nao_contatar ? 'var(--muted)' : e.status === 'Não abordada' ? 'var(--muted)' : 'var(--orange)'}">${e.virou_lead_em ? 'No CRM' : e.nao_contatar ? 'Não contatar' : ({ na_fila: 'Na fila (API)', enviando: 'Enviando (API)', enviado: 'Enviado (API)', erro: 'Erro no envio' }[_pmDisp[e.id]] || pmEsc(e.status))}</span>
     </div>`).join('');
+  pmAtualizarBotaoDisparo();
   document.getElementById('pm-mais').innerHTML = f.length > _pmLimite
     ? `<button onclick="_pmLimite+=50;pmRender()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Mostrar mais (${f.length - _pmLimite})</button>` : '';
 }
