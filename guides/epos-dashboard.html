@@ -5764,8 +5764,19 @@ let _pm = [], _pmLimite = 50;
 const PM_NICHO = {
   advocacia: { segmento: 'o jurídico', empresa: 'o escritório', plural: 'advocacia', de: 'do escritório',
     dor: 'quem procura advogado costuma mandar mensagem para dois ou três escritórios e fica com o primeiro que explica direito' },
-  odonto: { segmento: 'a odontologia e a estética', empresa: 'a clínica', plural: 'odontologia e estética', de: 'da clínica',
-    dor: 'orçamento de implante, alinhador ou harmonização esfria rápido, e quem não tem retorno no mesmo dia vai para a clínica do lado' },
+  odonto: { segmento: 'a odontologia', empresa: 'a clínica', plural: 'odontologia', de: 'da clínica',
+    dor: 'orçamento de implante e alinhador esfria rápido, e quem não tem retorno no mesmo dia vai para a clínica do lado' },
+  estetica: { segmento: 'a estética', empresa: 'a clínica', plural: 'estética', de: 'da clínica',
+    dor: 'quem pergunta o valor de um procedimento à noite agenda com a clínica que responde primeiro' },
+  // 27/10: nichos novos da Prospecção
+  planos: { segmento: 'o mercado de planos de saúde', empresa: 'a corretora', plural: 'planos de saúde', de: 'da corretora',
+    dor: 'quem pede cotação de plano manda mensagem para três ou quatro corretoras ao mesmo tempo e fecha com a primeira que manda as opções' },
+  consorcio: { segmento: 'o mercado de consórcios', empresa: 'a empresa', plural: 'consórcios', de: 'da empresa',
+    dor: 'quem pede simulação de consórcio compara várias propostas na mesma noite, e o vendedor que responde no dia seguinte já perdeu' },
+  invest: { segmento: 'o mercado de investimentos', empresa: 'o escritório', plural: 'investimentos', de: 'do escritório',
+    dor: 'quem pede para falar com um assessor quer retorno no mesmo dia; se demora, o dinheiro fica no banco de sempre' },
+  credito: { segmento: 'o mercado de crédito', empresa: 'a empresa', plural: 'crédito', de: 'da empresa',
+    dor: 'quem procura crédito pede simulação em vários lugares ao mesmo tempo e fecha com quem responde primeiro' },
   saude: { segmento: 'a área da saúde', empresa: 'a clínica', plural: 'saúde', de: 'da clínica',
     dor: 'quem manda mensagem à noite para marcar consulta agenda com quem responde primeiro' },
   carros: { segmento: 'o mercado automotivo', empresa: 'a loja', plural: 'veículos', de: 'da loja',
@@ -5773,7 +5784,7 @@ const PM_NICHO = {
   imob: { segmento: 'o mercado imobiliário', empresa: 'a imobiliária', plural: 'imóveis', de: 'da imobiliária',
     dor: 'o contato de portal e de anúncio chega à noite e no fim de semana, e quando o corretor responde o cliente já está visitando com outro' }
 };
-function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('carro') || n.includes('veícul') ? 'carros' : n.includes('advoc') ? 'advocacia' : n.includes('odonto') || n.includes('estét') ? 'odonto' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
+function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('carro') || n.includes('veícul') ? 'carros' : n.includes('advoc') ? 'advocacia' : n.includes('planos de saúde') ? 'planos' : n.includes('consórcio') ? 'consorcio' : n.includes('invest') ? 'invest' : n.includes('crédito') ? 'credito' : n.includes('revisar') ? 'odonto' : n.includes('odonto') ? 'odonto' : n.includes('estét') ? 'estetica' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
 function pmEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function pmPeriodo() { const h = new Date().getHours(); return h < 12 ? 'bom dia' : h < 18 ? 'boa tarde' : 'boa noite'; }
 function pmSlug(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
@@ -5798,14 +5809,14 @@ function pmMensagens(e, trat) {
   ];
 }
 // ═══ 27/10: disparo pela API oficial a partir da aba Prospecção (só põe na fila; o n8n envia com 90 a 240 s entre um e outro) ═══
-// Nicho → modelo. Odontologia e carros entram quando a Meta aprovar os modelos deles; "(revisar)" nunca recebe: classifique no modal.
-const PM_MODELOS = { 'Advocacia': 'advocacia', 'Estética': 'estetica', 'Imobiliárias e corretores': 'imobiliaria'
-  /* , 'Odontologia': 'odontologia', 'Lojas de carros': 'carros' */ };
-const PM_NICHOS = ['Advocacia', 'Odontologia', 'Estética', 'Odontologia e estética (revisar)', 'Clínicas médicas e saúde', 'Imobiliárias e corretores', 'Lojas de carros'];
-const PM_QUEM = { advocacia: ['o escritório', 'do escritório'], estetica: ['a clínica', 'da clínica'], imobiliaria: ['a imobiliária', 'da imobiliária'], carros: ['a loja', 'da loja'] };
+// Nicho → modelo (v2 aprovados pela Meta 27/10). "(revisar)" nunca recebe: classifique no modal. Planos de saúde entra quando a Meta aprovar.
+const PM_MODELOS = { 'Advocacia': 'advocacia', 'Estética': 'estetica', 'Odontologia': 'odontologia', 'Imobiliárias e corretores': 'imobiliaria', 'Lojas de carros': 'carros'
+  /* , 'Corretoras de planos de saúde': 'planos' */ };
+const PM_NICHOS = ['Advocacia', 'Odontologia', 'Estética', 'Odontologia e estética (revisar)', 'Clínicas médicas e saúde', 'Imobiliárias e corretores', 'Lojas de carros', 'Corretoras de planos de saúde', 'Consórcios', 'Investimentos', 'Crédito e financeiras'];
+const PM_QUEM = { advocacia: ['o escritório', 'do escritório'], estetica: ['a clínica', 'da clínica'], odontologia: ['a clínica', 'da clínica'], imobiliaria: ['a imobiliária', 'da imobiliária'], carros: ['a loja', 'da loja'], planos: ['a corretora', 'da corretora'] };
 let _pmDisp = {};
 function pmNomeCurto(n) { return String(n || '').split(/\s[|–-]\s/)[0].replace(/[\s|–-]+$/, '').trim().slice(0, 60); }
-function pmPodeDisparar(e) { return e.whatsapp_provavel && !e.nao_contatar && !e.virou_lead_em && PM_MODELOS[e.nicho] && (e.avaliacoes || 0) >= 20 && !['na_fila', 'enviando', 'enviado'].includes(_pmDisp[e.id]); }
+function pmPodeDisparar(e) { return e.whatsapp_provavel && !e.nao_contatar && !e.virou_lead_em && PM_MODELOS[e.nicho] && !['na_fila', 'enviando', 'enviado'].includes(_pmDisp[e.id]); }
 async function pmCarregarDisparos() {
   const { data } = await sb('prospeccao_disparos?select=empresa_id,status&order=criado_em.asc');
   _pmDisp = {}; const n = { na_fila: 0, enviado: 0, erro: 0 };
@@ -5819,12 +5830,15 @@ function pmMotivoNao(e) {
   if (['na_fila', 'enviando', 'enviado'].includes(_pmDisp[e.id])) return 'já na fila ou já enviadas';
   if (!e.whatsapp_provavel) return 'telefone fixo (sem WhatsApp)';
   if (!PM_MODELOS[e.nicho]) return e.nicho === 'Odontologia e estética (revisar)' ? 'nicho a revisar (classifique no modal)' : `${e.nicho || 'sem nicho'}: modelo ainda não aprovado`;
-  if ((e.avaliacoes || 0) < 20) return 'menos de 20 avaliações no Google (o texto cita as avaliações)';
   return 'outro motivo';
 }
 function pmPrevia(e) {
-  const m = PM_MODELOS[e.nicho], q = PM_QUEM[m];
-  return `[vídeo de 20 s]\nOlá, ${pmNomeCurto(e.empresa)}! Vi que vocês têm um Google Meu Negócio com ${e.avaliacoes} avaliações, reputação de quem atende bem.\nUma pergunta: quem chama ${q[0]} às 22h recebe resposta na hora?\nCriamos uma IA que responde em segundos no WhatsApp ${q[1]}, qualifica, agenda e mostra quais anúncios trazem mais clientes que fecham de verdade.\nQuer ver funcionando na prática?\n[Com certeza]  [Agora não]`;
+  // 27/10: texto dos modelos v2 (20+ avaliações) / v2s (menos)
+  const q = PM_QUEM[PM_MODELOS[e.nicho]], com = (e.avaliacoes || 0) >= 20;
+  return `[vídeo de 20 s]\nOlá, ${pmNomeCurto(e.empresa)}!\n\n` + (com
+    ? `Vi que vocês têm um Google Meu Negócio com ${e.avaliacoes} avaliações, isso gera uma reputação de quem atende bem.\n\nUma pergunta: quem chama ${q[0]} às 23h recebe resposta na hora?\n`
+    : `Vi o perfil de vocês no Google e fiquei com uma dúvida:\n\nQuem chama ${q[0]} às 23h recebe resposta na hora?\n`)
+    + `E essa pessoa realmente vira cliente?\n\nCriamos uma IA que responde em segundos no WhatsApp ${q[1]}, qualifica, agenda, tira dúvidas e mostra quais anúncios trazem mais clientes que fecham de verdade.\n\nConfira agora como ela funciona na prática.\n[Com certeza]  [Agora não]`;
 }
 async function pmConfirmarDisparo() {
   const lista = pmFiltradas(), sel = lista.filter(pmPodeDisparar);
