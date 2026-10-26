@@ -1592,6 +1592,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
         <span class="transcricao-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
         <span class="transcricao-label">🎙️ Transcrição: carregando...</span>
       </button>
+      <select id="silencio-sel" onchange="definirSilencio(this.value)" title="Quanto tempo a IA fica desligada depois que alguém da equipe fala com o lead" style="display:none;padding:7px 10px;border:1px solid var(--bd);background:var(--bg);color:var(--text);color-scheme:dark;font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer"><option value="12">IA após humano: 12 h</option><option value="24">IA após humano: 24 h</option><option value="48">IA após humano: 48 h</option><option value="72">IA após humano: 72 h</option><option value="87600">IA após humano: permanente</option></select>
       <div class="sec-badge" id="db-live">● LIVE</div>
       <button id="theme-desk-btn" onclick="toggleTheme()" title="Alternar tema" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:var(--surface);border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'"><svg width="11" height="11" id="theme-icon-svg" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M11.54 4.46l-1.41 1.41M4.46 11.54l-1.41 1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span id="theme-label">Modo Claro</span></button>
     </div>
@@ -2000,7 +2001,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <div class="cfg-sec">
       <div class="cfg-sec-title">Assistente IA — Ana</div>
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Atendimento automático</div><div class="cfg-val">Ativo 24h</div></div>
-      <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Silêncio após humano</div><div class="cfg-val">48 horas · qualquer plataforma</div></div>
+      <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Silêncio após humano</div><div class="cfg-val" id="cfg-silencio">48 horas · qualquer plataforma</div></div>
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot yellow"></span>Nutrição automática</div><div class="cfg-val">Em pausa · aguardando reconexão WhatsApp</div></div>
       <div class="cfg-row"><div class="cfg-key"><span class="status-dot green"></span>Qualificação via WhatsApp</div><div class="cfg-val">Ana IA — Dify (direto)</div></div>
     </div>
@@ -2390,7 +2391,7 @@ async function loadDashboard() {
     if (elNote) elNote.textContent = d.ia + ' Ana · ' + d.equipe + ' equipe';
     if (elAnaLbl) elAnaLbl.innerHTML = (d.ia_ligada_no_geral ? 'leads em andamento' : 'Ana desligada no geral')
       + semResp(d.ia_sem_resposta) + (d.ninguem > 0 ? ` · ${d.ninguem} sem ninguém` : '');
-    if (elHumLbl) elHumLbl.innerHTML = `${d.equipe_silencio ?? d.equipe_48h} com resposta da equipe nas últimas ${d.silencio_horas || 48} h` + semResp(d.equipe_sem_resposta);
+    if (elHumLbl) elHumLbl.innerHTML = `${d.equipe_silencio ?? d.equipe_48h} ${silResumo(d.silencio_horas)}` + semResp(d.equipe_sem_resposta);
   }).catch(() => {});
 
   const bar1 = document.getElementById('kpi-bar-1');
@@ -2961,14 +2962,14 @@ async function carregarQuemAtende(telefone) {
   if (d.estado === 'ia') {
     html = `<b style="color:var(--neon)">🤖 ${ia} IA</b>` + linha(d.humano_em
       ? `A equipe respondeu em ${fmtDate(d.humano_em)}; passadas ${d.silencio_horas || 48} h o lead escreveu e a ${ia} voltou a responder.`
-      : `Ninguém da equipe respondeu ainda. Quando alguém responder, a ${ia} fica quieta ${d.silencio_horas || 48} h.`);
+      : `Ninguém da equipe respondeu ainda. Quando alguém responder, a ${ia} ${silFica(d.silencio_horas)}.`);
   } else if (d.estado === 'equipe') {
     html = `<b style="color:var(--purple)">👤 Equipe${d.atendido_por ? ' · ' + escHtml(d.atendido_por) : ''}</b>` + linha(d.fixo
       ? `Atendimento humano fixo: a ${ia} não responde este lead.`
       : d.pausada_ate
         ? `A ${ia} está pausada no painel até ${fmtDate(d.pausada_ate)}. Depois disso, se o lead escrever, ela volta.`
       : d.ia_quieta_ate
-        ? `Respondeu em ${fmtDate(d.humano_em)}. A ${ia} fica quieta até ${fmtDate(d.ia_quieta_ate)}.`
+        ? `Respondeu em ${fmtDate(d.humano_em)}. A ${ia} ${silAte(d.ia_quieta_ate) ? 'fica desligada até alguém reativar' : 'fica quieta até ' + fmtDate(d.ia_quieta_ate)}.`
         : `Última resposta da equipe em ${fmtDate(d.humano_em)}. Se o lead escrever, a ${ia} volta a responder.`);
   } else if (d.estado === 'ninguem') {
     html = `<b style="color:var(--warn)">⏸ Ninguém</b>` + linha(d.ia_ligada_no_geral
@@ -2981,7 +2982,7 @@ async function carregarQuemAtende(telefone) {
   box.innerHTML = html;
   const bot = document.getElementById('panel-bot-ativo');
   if (bot) bot.textContent = d.estado === 'ia' ? `✅ ${ia} responde`
-    : d.estado === 'equipe' ? (d.fixo ? 'Pausado (atendimento fixo)' : d.ia_quieta_ate ? `Pausado até ${fmtDate(d.ia_quieta_ate)}` : 'Volta se o lead escrever')
+    : d.estado === 'equipe' ? (d.fixo ? 'Pausado (atendimento fixo)' : d.ia_quieta_ate ? (silAte(d.ia_quieta_ate) ? 'Pausado até reativar' : `Pausado até ${fmtDate(d.ia_quieta_ate)}`) : 'Volta se o lead escrever')
     : d.estado === 'ninguem' ? (d.ia_ligada_no_geral ? 'Pausado' : 'Desligado no geral')
     : 'Desligado (descartado)';
 }
@@ -4497,7 +4498,7 @@ async function toggleBot(telefone, currentlyDisabled) {
   try {
     // 21/10: pausa com período (ia_pausada_ate) ou até reativar (em_atendimento); reativar limpa os dois
     let patch;
-    if (currentlyDisabled) patch = { em_atendimento: false, dify_ativo: true, ia_pausada_ate: null };
+    if (currentlyDisabled) patch = { em_atendimento: false, dify_ativo: true, ia_pausada_ate: null, ultima_interacao_humano: null };  // 26/10: reativar devolve o lead à IA mesmo com silêncio permanente
     else {
       const per = (document.getElementById('bot-pausa-periodo') || {}).value || 'fixo';
       patch = per === 'fixo'
@@ -5731,6 +5732,36 @@ function renderTranscricao(ativa) {
     btn.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--bd)';
   }
 }
+// 26/10 (Thiago): tempo que a IA fica desligada depois que alguém da equipe fala com o lead. 87600 h = permanente (até reativar).
+const SIL_PERMANENTE = 87600;
+function silEhPermanente(h) { return Number(h) >= 8760; }
+function silResumo(h) { return silEhPermanente(h) ? 'com a equipe (IA desligada até reativar)' : `com resposta da equipe nas últimas ${h || 48} h`; }
+function silFica(h) { return silEhPermanente(h) ? 'fica desligada até alguém reativar' : `fica quieta ${h || 48} h`; }
+function silAte(t) { return t && (new Date(t).getTime() - Date.now()) > 365 * 864e5; }
+async function loadSilencio() {
+  const sel = document.getElementById('silencio-sel'), cfg = document.getElementById('cfg-silencio');
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/system_config?projeto=eq.${MODO_DONO_PROJETO}&select=silencio_humano_horas&limit=1`, { headers: _modoDonoHeaders() });
+    const data = await r.json(); const h = Array.isArray(data) && data[0] ? Number(data[0].silencio_humano_horas) : null;
+    if (cfg && h) cfg.textContent = silEhPermanente(h) ? 'Permanente · a IA só volta quando alguém reativar no lead' : `${h} horas · qualquer plataforma`;
+    if (!sel) return;
+    const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(x => x.json());
+    if (adm !== true) { sel.style.display = 'none'; return; }
+    sel.style.display = 'inline-block';
+    if (h) sel.value = silEhPermanente(h) ? String(SIL_PERMANENTE) : String(h);
+    sel.dataset.atual = sel.value;
+  } catch (e) {}
+}
+async function definirSilencio(v) {
+  const sel = document.getElementById('silencio-sel'); const h = Number(v);
+  const txt = h === SIL_PERMANENTE ? 'PERMANENTE: depois que alguém da equipe falar com o lead, a IA só volta quando alguém reativar no lead.' : `${h} horas depois da última mensagem da equipe.`;
+  if (!confirm('Mudar o tempo em que a IA fica desligada depois que um humano fala?\n\n' + txt)) { sel.value = sel.dataset.atual || sel.value; return; }
+  try {
+    const resp = await fetch(`${SB_URL}/rest/v1/rpc/sistema_definir_silencio_humano`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify({ p_projeto: MODO_DONO_PROJETO, p_horas: h }) });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status} — ${await resp.text().catch(() => '')}`);
+    sel.dataset.atual = String(h); await loadSilencio();
+  } catch (e) { alert('Erro ao mudar o tempo de silêncio:\n' + e.message); sel.value = sel.dataset.atual || sel.value; }
+}
 async function loadTranscricao() {
   const btn = document.getElementById('transcricao-btn');
   if (!btn) return;
@@ -5766,7 +5797,7 @@ async function toggleTranscricao() {
     renderTranscricao(novo);
   } catch (e) {
     alert('Erro ao mudar a transcrição de áudio:\n' + e.message);
-    await loadTranscricao();
+    await loadTranscricao(); loadSilencio();
   } finally {
     btn.dataset.busy = '0'; btn.style.opacity = '1';
   }
@@ -6298,7 +6329,7 @@ setInterval(loadTorneira, 60000);
 loadPendentes();
 loadRoboStatus();
 loadModoDono();
-loadTranscricao();
+loadTranscricao(); loadSilencio();
 loadWaClicks();
 loadNotificacoes();
 setTimeout(carregarEquipe, 1500); // espera o token da sessão (equipe só libera usuário logado)
