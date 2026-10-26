@@ -2096,6 +2096,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <button onclick="pmSelecionarElegiveis()" style="padding:6px 12px;background:transparent;border:1px solid var(--bd);color:var(--text);font-size:11px;cursor:pointer">Marcar as que podem receber (lista filtrada)</button>
       <button onclick="_pmSel.clear();pmRender()" style="padding:6px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Limpar</button>
       <button id="pm-disp-btn" onclick="pmConfirmarDisparo()" style="padding:7px 14px;background:var(--purple);border:1px solid var(--purple);color:#fff;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Disparar (0)</button>
+      <button id="pm-disp-onoff" onclick="pmLigarDisparo()" style="padding:7px 14px;border:1px solid var(--bd);background:transparent;color:var(--text);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">…</button>
       <button onclick="pmCancelarFila()" style="padding:6px 12px;background:transparent;border:1px solid #e5484d;color:#ff6b6f;font-size:11px;cursor:pointer">Cancelar fila</button>
     </div>
     <div id="pm-lista"><div class="loading"></div></div>
@@ -5823,7 +5824,7 @@ async function pmConfirmarDisparo() {
   const porNicho = {}; sel.forEach(e => porNicho[e.nicho] = (porNicho[e.nicho] || 0) + 1);
   const dias = Math.ceil(sel.length / 150);
   const txt = `DISPARO PELA API OFICIAL (número Epos API oficial)\n\n${sel.length} empresa(s):\n` + Object.entries(porNicho).map(([n, q]) => `• ${n}: ${q}`).join('\n')
-    + `\n\nRitmo: 1 mensagem a cada 90 a 240 s, seg a sáb, 9h às 18h, até 150 por dia (≈ ${dias} dia(s) útil(eis)).\nCusto: a Meta cobra cada mensagem de marketing entregue.\n\nPrévia da 1ª:\n\n${pmPrevia(sel[0])}\n\nPara colocar na fila, digite DISPARAR:`;
+    + `\n\nRitmo: 1 mensagem a cada 90 a 240 s, seg a sáb, 9h30 às 18h, até você pausar. Os envios só saem com o botão "Iniciar envios" ligado.\nCusto: a Meta cobra cada mensagem de marketing entregue.\n\nPrévia da 1ª:\n\n${pmPrevia(sel[0])}\n\nPara colocar na fila, digite DISPARAR:`;
   const ok = prompt(txt);
   if ((ok || '').trim().toUpperCase() !== 'DISPARAR') { if (ok !== null) alert('Nada foi colocado na fila: a confirmação não confere.'); return; }
   const linhas = sel.map(e => ({ empresa_id: e.id, telefone: e.telefone, modelo: PM_MODELOS[e.nicho], status: 'na_fila', criado_por: quemSou() }));
@@ -5838,10 +5839,26 @@ async function pmCancelarFila() {
   await fetch(`${SB_URL}/rest/v1/prospeccao_disparos?status=eq.na_fila`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'cancelado', erro: 'Cancelado no painel' }) });
   await pmCarregarDisparos(); pmRender();
 }
+// 27/10 (Thiago): iniciar e pausar os envios pelo painel (system_config.disparo_oficial_ativo). Envios seg a sáb, 9h30 às 18h.
+let _pmDispAtivo = null;
+async function pmCarregarChaveDisparo() {
+  try { const { data } = await sb('system_config?projeto=eq.principal&select=disparo_oficial_ativo&limit=1'); _pmDispAtivo = !!(data && data[0] && data[0].disparo_oficial_ativo); } catch (e) { _pmDispAtivo = null; }
+  const b = document.getElementById('pm-disp-onoff'); if (!b) return;
+  b.textContent = _pmDispAtivo ? '⏸ Pausar envios' : '▶ Iniciar envios';
+  b.style.borderColor = _pmDispAtivo ? '#e5484d' : '#3fb950'; b.style.color = _pmDispAtivo ? '#ff6b6f' : '#3fb950';
+  b.title = _pmDispAtivo ? 'Envios ligados: seg a sáb, 9h30 às 18h, 90 a 240 s entre cada um' : 'Envios pausados: a fila fica parada até você iniciar';
+}
+async function pmLigarDisparo() {
+  const ligar = !_pmDispAtivo;
+  if (!confirm(ligar ? 'Iniciar os envios pela API oficial?\n\nA fila começa a sair (seg a sáb, 9h30 às 18h, 90 a 240 s entre cada mensagem) e só para quando você pausar.' : 'Pausar os envios? O que está na fila fica parado até você iniciar de novo.')) return;
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/sistema_definir_disparo_oficial`, { method: 'POST', headers: sbJson(), body: JSON.stringify({ p_ativo: ligar }) });
+  if (!r.ok) return alert('Não foi possível mudar (' + r.status + '): ' + (await r.text().catch(() => '')).slice(0, 200));
+  await pmCarregarChaveDisparo();
+}
 async function pmLoad() {
   const lista = document.getElementById('pm-lista'); if (!lista) return;
   try {
-    await pmCarregarDisparos();
+    await pmCarregarDisparos(); pmCarregarChaveDisparo();
     const { data } = await sb('prospeccao_empresas?select=*&order=prioridade.asc,avaliacoes.desc');
     _pm = Array.isArray(data) ? data : [];
     const sel = document.getElementById('pm-nicho');
