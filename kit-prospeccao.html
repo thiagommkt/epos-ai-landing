@@ -403,7 +403,7 @@ footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5
   var MODELOS = {
     ola: function(){ return 'Olá, ' + periodo(); },
     apresentacao: function(d){ return apresentacao(d) + '\n\nVou encaminhar o material para que ' + d.trat + ' possa conhecer melhor a proposta. Agradeço pela atenção e fico no aguardo.'; },
-    material: function(d){ return 'Entre os meus serviços, está o meu sistema:\n\n' + sistema() + '\n\n' + d.link; },
+    material: function(d){ return sistema() + '\n\n' + d.link; },
     dia3: function(d){ return cap(periodo()) + '! Conseguiram passar o material para ' + d.trat + '? Se ficar mais fácil, posso mostrar em 20 minutos, por vídeo, como funcionaria com os números de vocês.'; },
     dia6: function(d){ return cap(periodo()) + '! Um dado que me marcou: um estudo publicado na Harvard Business Review mostrou que empresas que respondem o contato em até 1 hora têm quase 7 vezes mais chance de qualificar o cliente do que as que respondem depois. Em ' + d.n.plural + ', ' + d.n.dor + '. É isso que a ferramenta resolve. Faz sentido uma conversa rápida?'; },
     dia10: function(d){ return cap(periodo()) + '! Último contato, para não incomodar. Se agora não for o momento, tudo bem: quando quiserem conhecer, é só me chamar. E se preferirem não receber mais mensagens, me avisem que eu tiro vocês da lista.'; },
@@ -411,7 +411,7 @@ footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5
     ligRecepcao: function(d){ return '"' + cap(periodo()) + '! Meu nome é Thiago Montandon, sou publicitário aqui em Brasília e trabalho com marketing para empresas de ' + d.n.plural + '. Com quem eu falo sobre o marketing ou o comercial ' + (d.n.empresa === 'o escritório' ? 'do escritório' : d.n.empresa === 'a imobiliária' ? 'da imobiliária' : 'da clínica') + '?"'; },
     ligDecisor: function(d){ return '"' + v(d.nome, '[nome]') + ', vou ser rápido. Desenvolvemos uma ferramenta que, junto com o tráfego pago, faz o WhatsApp da empresa responder em segundos, qualificar e agendar, e avisa a equipe para nenhum contato ficar sem retorno. Em ' + d.n.plural + ', ' + d.n.dor + '. Hoje vocês investem em anúncio, ou os clientes vêm mais por indicação?"'; },
     emailAssunto: function(d){ return 'Apresentação para ' + v(d.empresa, '[empresa]'); },
-    emailCorpo: function(d){ return saudacaoEmail(d) + '\n\n' + apresentacao(d) + '\n\nEntre os meus serviços, está o meu sistema:\n\n' + sistema()
+    emailCorpo: function(d){ return saudacaoEmail(d) + '\n\n' + apresentacao(d) + '\n\n' + sistema()
       + '\n\nA apresentação completa está aqui:\n' + d.link + '\n\nSe fizer sentido, te mostro em 20 minutos, por vídeo, como funcionaria com os números de vocês.\n\n' + assinatura(d)
       + '\n\nSe preferir não receber mais e-mails meus, é só responder "sair".'; },
     emailDia4: function(d){ return saudacaoEmail(d) + '\n\nVolto rapidinho ao e-mail abaixo. Em ' + d.n.plural + ', ' + d.n.dor + '. É exatamente isso que a ferramenta resolve.'
