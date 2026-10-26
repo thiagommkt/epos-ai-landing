@@ -5857,6 +5857,24 @@ function pmAbrir(id) {
       <span id="pm-f-msg" style="font-size:12px;color:var(--muted);align-self:center"></span>
     </div>
     <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:12px">
+      <b style="font-family:var(--fD);font-size:13px;letter-spacing:.06em;text-transform:uppercase">Programar mensagem</b>
+      <div style="font-size:11px;color:var(--muted);margin:4px 0 8px">Sai pelo WhatsApp da Donna na hora marcada (fila de envio). O "bom dia/tarde/noite" segue o horário do envio. Se a empresa responder, a conversa entra no CRM.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="pm-ag-modelo" onchange="pmUsarModelo(${e.id})" style="${inp};flex:1 1 200px"><option value="">Escrever a mensagem…</option><option value="0">Kit · cumprimento</option><option value="1">Kit · apresentação</option><option value="2">Kit · material</option></select>
+        <input id="pm-ag-quando" type="datetime-local" onchange="pmUsarModelo(${e.id})" style="${inp};flex:1 1 200px">
+      </div>
+      <textarea id="pm-ag-texto" rows="4" placeholder="Texto da mensagem" style="${inp};margin-top:8px;resize:vertical"></textarea>
+      <button onclick="pmProgramar(${e.id})" style="margin-top:8px;padding:9px 16px;background:transparent;border:1px solid var(--purple);color:var(--text);font-family:var(--fD);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Programar envio</button>
+      <div id="pm-ag-lista" style="margin-top:10px;font-size:12px"></div>
+      <b style="display:block;margin-top:16px;font-family:var(--fD);font-size:13px;letter-spacing:.06em;text-transform:uppercase">Próximo contato</b>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <input id="pm-tf-acao" placeholder="Ex.: ligar para o responsável" style="${inp};flex:2 1 220px">
+        <input id="pm-tf-quando" type="datetime-local" style="${inp};flex:1 1 180px">
+        <button onclick="pmTarefa(${e.id})" style="padding:8px 14px;background:transparent;border:1px solid var(--bd);color:var(--text);font-size:12px;cursor:pointer">Salvar lembrete</button>
+      </div>
+      <div id="pm-tf-msg" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+    </div>
+    <div style="margin-top:20px;border-top:1px solid var(--bd);padding-top:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-family:var(--fD);font-size:13px;letter-spacing:.06em;text-transform:uppercase">Mensagens do kit</b>
         <select id="pm-f-trat" onchange="localStorage.setItem('pm_trat_${e.id}',this.value);pmAbrir(${e.id})" style="padding:6px;background:var(--bg);border:1px solid var(--bd);color:var(--text);font-size:12px">${['o responsável', 'o doutor', 'a doutora', 'o sócio'].map(t => `<option ${t === trat ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
       <div style="font-size:11px;color:var(--muted);margin:4px 0 8px">Envie à mão, uma de cada vez. Depois, siga o fluxo do guia do parceiro (convite → call com a página do Método → fechamento).</div>
@@ -5866,6 +5884,53 @@ function pmAbrir(id) {
         <pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--fB);font-size:12.5px;line-height:1.55;margin:6px 0 0">${pmEsc(txt)}</pre></div>`).join('')}
     </div>`;
   document.getElementById('pm-modal').style.display = 'block';
+  pmCarregarAgendadas(e.telefone);
+}
+// 26/10: mensagem programada e próximo contato no modal da prospecção (mesmos recursos do CRM; sai pelo WhatsApp da Donna)
+function pmPeriodoDe(d) { const h = Number(new Date(d).toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false })) % 24; return h < 12 ? 'bom dia' : h < 18 ? 'boa tarde' : 'boa noite'; }
+function pmUsarModelo(id) {
+  const e = _pm.find(x => x.id === id); const sel = document.getElementById('pm-ag-modelo'); if (!e || !sel || sel.value === '') return;
+  const trat = localStorage.getItem('pm_trat_' + id) || 'o responsável';
+  let txt = pmMensagens(e, trat)[Number(sel.value)][1];
+  const q = document.getElementById('pm-ag-quando').value;
+  if (q && sel.value === '0') txt = 'Olá, ' + pmPeriodoDe(q);
+  document.getElementById('pm-ag-texto').value = txt;
+}
+async function pmCarregarAgendadas(tel) {
+  const box = document.getElementById('pm-ag-lista'); if (!box) return;
+  const { data } = await sb(`mensagens_agendadas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(tel)}&order=agendada_para.desc&limit=5&select=id,texto,agendada_para,status,criada_por`);
+  box.innerHTML = (data || []).map(m => `<div style="border:1px solid var(--bd);padding:8px;margin-bottom:6px">
+    <b>${pmEsc(m.status === 'pendente' ? 'Programada' : m.status === 'enviada' ? 'Enviada' : m.status)}</b> · ${dataHoraBRT(m.agendada_para)} · ${pmEsc(m.criada_por || '')}
+    ${m.status === 'pendente' ? `<button onclick="pmCancelarAgendada('${m.id}','${tel}')" style="float:right;background:none;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Cancelar</button>` : ''}
+    <div style="color:var(--muted);margin-top:4px;white-space:pre-wrap">${pmEsc(String(m.texto).slice(0, 160))}${String(m.texto).length > 160 ? '…' : ''}</div></div>`).join('');
+}
+async function pmProgramar(id) {
+  const e = _pm.find(x => x.id === id); if (!e) return;
+  const txt = document.getElementById('pm-ag-texto').value.trim(), q = document.getElementById('pm-ag-quando').value;
+  if (!txt) return alert('Escreva a mensagem (ou escolha uma do kit).');
+  if (!q || new Date(q).getTime() < Date.now() + 60000) return alert('Escolha um dia e hora no futuro.');
+  const { data: ja } = await sb(`mensagens_agendadas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(e.telefone)}&status=eq.pendente&select=id,agendada_para&limit=1`);
+  if ((ja || []).length && !confirm(`Já existe uma mensagem programada para ${dataHoraBRT(ja[0].agendada_para)}. Programar outra mesmo assim?`)) return;
+  if (!confirm(`Programar o envio para ${dataHoraBRT(new Date(q).toISOString())}, pelo WhatsApp da Donna?`)) return;
+  const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, { method: 'POST', headers: sbJson({ 'Prefer': 'return=representation' }),
+    body: JSON.stringify({ conta: 'epos', lead_telefone: e.telefone, texto: txt, agendada_para: new Date(q).toISOString(), criada_por: quemSou() }) });
+  if (!r.ok) return alert('Não foi possível programar (' + r.status + ').');
+  if (e.status === 'Não abordada') { document.getElementById('pm-f-status').value = 'Enviado'; document.getElementById('pm-f-canal').value = 'WhatsApp da Donna'; await pmSalvar(id); }
+  document.getElementById('pm-ag-texto').value = ''; pmCarregarAgendadas(e.telefone);
+}
+async function pmCancelarAgendada(aid, tel) {
+  if (!confirm('Cancelar esta mensagem programada?')) return;
+  await fetch(`${SB_URL}/rest/v1/mensagens_agendadas?id=eq.${aid}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'cancelada', erro: 'Cancelada no painel (prospecção)' }) });
+  pmCarregarAgendadas(tel);
+}
+async function pmTarefa(id) {
+  const e = _pm.find(x => x.id === id); const acao = document.getElementById('pm-tf-acao').value.trim(), q = document.getElementById('pm-tf-quando').value;
+  const msg = document.getElementById('pm-tf-msg');
+  if (!acao || !q) { msg.textContent = 'Preencha o que fazer e quando.'; return; }
+  const r = await fetch(`${SB_URL}/rest/v1/tarefas`, { method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }),
+    body: JSON.stringify({ conta: 'epos', lead_telefone: e.telefone, acao: acao + ' — ' + e.empresa, quando: new Date(q).toISOString(), origem: 'prospeccao', criada_por: quemSou() }) });
+  msg.textContent = r.ok ? `Lembrete salvo para ${dataHoraBRT(new Date(q).toISOString())}.` : 'Não salvou (' + r.status + ').';
+  if (r.ok) document.getElementById('pm-tf-acao').value = '';
 }
 async function pmSalvar(id) {
   const g = x => document.getElementById(x);
