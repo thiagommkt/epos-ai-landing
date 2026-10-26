@@ -1875,7 +1875,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="sec-head">
     <div><div class="sec-title">PIPELINE <span>CRM</span></div><div class="sec-sub" id="crm-count">Carregando...</div></div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-      <button id="crm-pausar-todos" onclick="crmPausarTodos()" style="display:none;padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer" title="Pausa fixa da IA em todos os leads (até reativar em cada um)">⏸ Marcar todos com bot desligado</button>
+      <button id="crm-pausar-todos" onclick="crmPausarTodos()" style="display:none;align-self:center;padding:9px 16px;border:2px solid #e5484d;background:rgba(229,72,77,.12);color:#ff6b6f;font-family:var(--fD);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:6px" title="Pausa fixa da IA em todos os leads (até reativar em cada um)">⛔ Desligar o bot em TODOS os leads</button>
       <button class="crm-period-btn active" onclick="setCrmPeriod(this,'all')" style="padding:4px 10px;border:1px solid var(--bd-b);background:var(--pur-l);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Tudo</button>
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'month')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">Este m&ecirc;s</button>
       <button class="crm-period-btn" onclick="setCrmPeriod(this,'60')" style="padding:4px 10px;border:1px solid var(--bd);background:transparent;color:var(--muted);font-family:var(--fM);font-size:9px;letter-spacing:.06em;cursor:pointer">60d</button>
@@ -5747,7 +5747,8 @@ async function crmPausarTodosMostrar() {
   try { const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json()); b.style.display = adm === true ? 'inline-block' : 'none'; } catch (e) {}
 }
 async function crmPausarTodos() {
-  if (!confirm('Desligar o bot em TODOS os leads do CRM?\n\nA IA fica pausada em todos (pausa fixa). Para ela voltar num lead, use "Reativar" na ficha dele.')) return;
+  const _ok = prompt('ATENÇÃO: isto desliga a IA em TODOS os leads do CRM desta conta (pausa fixa).\n\nPara ela voltar, será preciso reativar lead por lead.\n\nPara confirmar, digite PAUSAR:');
+  if ((_ok || '').trim().toUpperCase() !== 'PAUSAR') { if (_ok !== null) alert('Nada foi alterado: a confirmação não confere.'); return; }
   try {
     const r = await fetch(`${SB_URL}/rest/v1/rpc/crm_pausar_todos`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify({ p_conta: MODO_DONO_PROJETO === 'fm' ? 'fm' : 'epos' }) });
     if (!r.ok) throw new Error(`HTTP ${r.status} — ${await r.text().catch(() => '')}`);
