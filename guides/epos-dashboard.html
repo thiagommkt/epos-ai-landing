@@ -5809,9 +5809,9 @@ function pmMensagens(e, trat) {
   ];
 }
 // ═══ 27/10: disparo pela API oficial a partir da aba Prospecção (só põe na fila; o n8n envia com 90 a 240 s entre um e outro) ═══
-// Nicho → modelo (v2 aprovados pela Meta 27/10). "(revisar)" nunca recebe: classifique no modal. Planos de saúde entra quando a Meta aprovar.
-const PM_MODELOS = { 'Advocacia': 'advocacia', 'Estética': 'estetica', 'Odontologia': 'odontologia', 'Imobiliárias e corretores': 'imobiliaria', 'Lojas de carros': 'carros'
-  /* , 'Corretoras de planos de saúde': 'planos' */ };
+// Nicho → modelo (v2 aprovados pela Meta 27/10). "(revisar)" nunca recebe: classifique no modal. Planos de saúde aprovado 27/10.
+const PM_MODELOS = { 'Advocacia': 'advocacia', 'Estética': 'estetica', 'Odontologia': 'odontologia', 'Imobiliárias e corretores': 'imobiliaria', 'Lojas de carros': 'carros',
+  'Corretoras de planos de saúde': 'planos' };
 const PM_NICHOS = ['Advocacia', 'Odontologia', 'Estética', 'Odontologia e estética (revisar)', 'Clínicas médicas e saúde', 'Imobiliárias e corretores', 'Lojas de carros', 'Corretoras de planos de saúde', 'Consórcios', 'Investimentos', 'Crédito e financeiras'];
 const PM_QUEM = { advocacia: ['o escritório', 'do escritório'], estetica: ['a clínica', 'da clínica'], odontologia: ['a clínica', 'da clínica'], imobiliaria: ['a imobiliária', 'da imobiliária'], carros: ['a loja', 'da loja'], planos: ['a corretora', 'da corretora'] };
 let _pmDisp = {};
