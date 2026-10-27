@@ -2070,7 +2070,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <section class="section" id="s-laboratorio">
   <div class="sec-head">
     <div>
-      <div class="sec-title">LABORATÓRIO <span>TESTES DA DONNA</span></div>
+      <div class="sec-title">LABORATÓRIO <span>TESTES DA DONNA E DA ANA</span></div>
       <div class="sec-sub">NÚMERO DE TESTE · NADA SAI NO WHATSAPP · AGENDA E PIXEL BLOQUEADOS</div>
     </div>
     <div style="display:flex;gap:8px">
@@ -2114,7 +2114,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     }
   </style>
   <div style="font-size:12px;color:var(--muted);margin:0 0 14px;font-family:var(--fB);line-height:1.55">
-    Cada teste usa um número falso (começa com 5500000000): a Donna responde de verdade, mas nada sai pelo WhatsApp, a agenda não cria evento e o pixel não recebe nada. Os dados do teste são apagados no fim; fica só o registro aqui.
+    Cada teste usa um número falso (começa com 5500000000): a Donna (ou a Ana, no FM) responde de verdade, mas nada sai pelo WhatsApp, a agenda não cria evento e o pixel não recebe nada. Os dados do teste são apagados no fim; fica só o registro aqui.
   </div>
   <div id="lab-grade">
     <div id="lab-lista"><div class="loading"></div></div>
@@ -6904,7 +6904,7 @@ async function labLoad() {
   const lista = document.getElementById('lab-lista');
   if (!lista) return;
   lista.innerHTML = '<div class="loading"></div>';
-  const { data } = await sb('laboratorio_testes?select=id,criado_em,titulo,demo_nicho,resultado,falhas,duracao_s,conversa,lead_final&order=criado_em.desc&limit=200');
+  const { data } = await sb('laboratorio_testes?select=id,criado_em,titulo,conta,demo_nicho,resultado,falhas,duracao_s,conversa,lead_final&order=criado_em.desc&limit=200');
   _lab = Array.isArray(data) ? data : [];
   labRender();
   if (_labSel && _lab.some(t => t.id === _labSel)) labAbrir(_labSel, true);
@@ -6917,7 +6917,7 @@ function labRender() {
   }
   lista.innerHTML = _lab.map(t => `
     <button class="lab-item${t.id === _labSel ? ' ativo' : ''}" onclick="labAbrir(${t.id})">
-      <div class="lab-item-meta"><span class="lab-selo ${t.resultado === 'ok' ? 'ok' : 'falhou'}">${t.resultado === 'ok' ? 'Certo' : 'Falhou'}</span>${labData(t.criado_em)}${t.demo_nicho ? ' · ' + labEsc(t.demo_nicho) : ''}</div>
+      <div class="lab-item-meta"><span class="lab-selo ${t.resultado === 'ok' ? 'ok' : 'falhou'}">${t.resultado === 'ok' ? 'Certo' : 'Falhou'}</span>${t.conta === 'fm' ? '<span class="lab-selo" style="color:var(--orange);border-color:var(--orange)">FM</span>' : ''}${labData(t.criado_em)}${t.demo_nicho ? ' · ' + labEsc(t.demo_nicho) : ''}</div>
       <div class="lab-item-tit">${labEsc(t.titulo)}</div>
       <div class="lab-item-meta">${(n => n + (n === 1 ? ' mensagem' : ' mensagens'))((t.conversa || []).filter(m => m.de === 'cliente').length)} · ${labDur(t.duracao_s)}</div>
     </button>`).join('');
@@ -6928,8 +6928,9 @@ function labAbrir(id, semRolar) {
   _labSel = id;
   document.querySelectorAll('.lab-item').forEach(b => b.classList.toggle('ativo', b.getAttribute('onclick') === `labAbrir(${id})`));
   const lf = t.lead_final || {};
+  const ia = t.conta === 'fm' ? 'Ana' : 'Donna';
   const ficha = [
-    t.demo_nicho ? 'Demonstração: ' + labEsc(t.demo_nicho) : 'Lead comum',
+    (t.conta === 'fm' ? 'FM · ' : 'Epos · ') + (t.demo_nicho ? 'Demonstração: ' + labEsc(t.demo_nicho) : 'Lead comum'),
     lf.agendou ? 'Marcou (teste): ' + labData(lf.dia_agendamento) : 'Sem marcação',
     t.falhas ? t.falhas + (t.falhas === 1 ? ' falha' : ' falhas') : 'Nenhuma falha',
     labDur(t.duracao_s)
@@ -6937,7 +6938,7 @@ function labAbrir(id, semRolar) {
   const msgs = (t.conversa || []).map(m => {
     const txt = labEsc(m.texto);
     if (m.de === 'cliente') return `<div class="lab-bolha lab-cliente">${txt}<small>Cliente de teste · ${labHora(m.quando)}</small></div>`;
-    if (m.de === 'donna') return `<div class="lab-bolha lab-donna">${txt}<small>Donna · ${labHora(m.quando)}</small></div>`;
+    if (m.de === 'donna') return `<div class="lab-bolha lab-donna">${txt}<small>${ia} · ${labHora(m.quando)}</small></div>`;
     if (m.de === 'aviso') return `<div class="lab-nota aviso"><b>Aviso que iria para ${labEsc(m.para)}</b> (não enviado)<br>${txt}</div>`;
     if (m.de === 'agenda') return `<div class="lab-nota agenda"><b>Agenda de teste:</b> marcaria ${labData(m.data_inicio)} (nenhum evento criado no Google)</div>`;
     return `<div class="lab-nota${m.erro ? ' erro' : ''}">${txt}</div>`;
