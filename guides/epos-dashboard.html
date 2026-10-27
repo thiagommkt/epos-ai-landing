@@ -5976,11 +5976,36 @@ function pmRender() {
       <span style="flex:0 0 22px;text-align:center;font-family:var(--fD);font-weight:700;color:${e.prioridade === 'A' ? 'var(--purple)' : e.prioridade === 'B' ? 'var(--orange)' : 'var(--muted)'}">${pmEsc(e.prioridade || '–')}</span>
       <span style="flex:1;min-width:0"><span style="display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${pmEsc(e.empresa)}</span>
         <span style="font-size:11px;color:var(--muted)">${pmEsc(e.nicho || '')} · ${pmEsc(e.regiao || '')} · ${pmTelFmt(e.telefone)}${e.whatsapp_provavel ? ' · WhatsApp' : ' · fixo'}${e.nota ? ' · ★ ' + e.nota + ' (' + (e.avaliacoes || 0) + ')' : ''}</span></span>
+      ${pmDonnaBotao(e)}
       <span style="flex:0 0 auto;font-size:11px;color:${e.virou_lead_em ? 'var(--purple)' : e.nao_contatar ? 'var(--muted)' : e.status === 'Não abordada' ? 'var(--muted)' : 'var(--orange)'}">${e.virou_lead_em ? 'No CRM' : e.nao_contatar ? 'Não contatar' : ({ na_fila: 'Na fila (API)', enviando: 'Enviando (API)', enviado: 'Enviado (API)', erro: 'Erro no envio' }[_pmDisp[e.id]] || pmEsc(e.status))}</span>
     </div>`).join('');
   pmAtualizarBotaoDisparo();
   document.getElementById('pm-mais').innerHTML = f.length > _pmLimite
     ? `<button onclick="_pmLimite+=50;pmRender()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">Mostrar mais (${f.length - _pmLimite})</button>` : '';
+}
+// 27/10 (Thiago: botão para parar a Donna nos leads do disparo — "parar automaticamente sem eu ter respondido" não): pausa/religa a Donna
+// para a empresa. Vale para o número oficial (ponte) e para o WhatsApp da Donna; se a empresa já virou lead, pausa o lead também.
+function pmDonnaVisivel(e) { return !!(e.virou_lead_em || e.donna_pausada || e.status === 'Respondeu' || ['enviado', 'enviando'].includes(_pmDisp[e.id])); }
+function pmDonnaBotao(e, grande) {
+  if (!pmDonnaVisivel(e)) return '';
+  const st = grande ? 'padding:9px 16px;font-size:12px' : 'padding:4px 9px;font-size:10px';
+  return `<button onclick="event.stopPropagation();pmDonna(${e.id}, ${!e.donna_pausada})" title="${e.donna_pausada ? 'A Donna está pausada para esta empresa: só a equipe responde. Clique para religar.' : 'A Donna responde esta empresa (número oficial e WhatsApp dela). Clique para pausar e responder você.'}"
+    style="${st};flex:0 0 auto;background:transparent;border:1px solid ${e.donna_pausada ? 'var(--orange)' : 'var(--bd-b)'};color:${e.donna_pausada ? 'var(--orange)' : 'var(--text)'};font-family:var(--fD);font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">${e.donna_pausada ? '▶ Religar Donna' : '⏸ Pausar Donna'}</button>`;
+}
+async function pmDonna(id, pausar) {
+  const e = _pm.find(x => x.id === id); if (!e) return;
+  const H = { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', Prefer: 'return=representation' };
+  const r = await fetch(`${SB_URL}/rest/v1/prospeccao_empresas?id=eq.${id}`, { method: 'PATCH', headers: H, body: JSON.stringify({ donna_pausada: pausar }) });
+  if (!r.ok) { toast('Não salvou (' + r.status + ')', 'err'); return; }
+  const [novo] = await r.json(); const i = _pm.findIndex(x => x.id === id); if (i >= 0 && novo) _pm[i] = { ..._pm[i], ...novo };
+  if (e.lead_telefone) {   // já é lead: mesma pausa do modal do lead ("até eu reativar") / religar devolve à IA
+    const patch = pausar ? { em_atendimento: true, dify_ativo: false, ia_pausada_ate: null }
+                         : { em_atendimento: false, dify_ativo: true, ia_pausada_ate: null, ultima_interacao_humano: null };
+    await fetch(`${SB_URL}/rest/v1/leads?telefone=eq.${encodeURIComponent(e.lead_telefone)}`, { method: 'PATCH', headers: H, body: JSON.stringify(patch) }).catch(() => {});
+  }
+  toast(pausar ? '⏸ Donna pausada para ' + e.empresa : '▶ Donna religada para ' + e.empresa, pausar ? 'err' : 'ok');
+  pmRender();
+  if (document.getElementById('pm-modal').style.display !== 'none') pmAbrir(id);
 }
 function pmFechar() { document.getElementById('pm-modal').style.display = 'none'; }
 function pmCopiar(btn, i) { navigator.clipboard.writeText(btn.closest('[data-msg]').querySelector('pre').textContent).then(() => { btn.textContent = 'Copiado'; setTimeout(() => btn.textContent = 'Copiar', 1500); }); }
@@ -6004,6 +6029,10 @@ function pmAbrir(id) {
       ${e.maps_link ? `<a href="${pmEsc(e.maps_link)}" target="_blank" rel="noopener" style="color:var(--purple)">Ver no Google Maps</a>` : ''}
       ${e.virou_lead_em ? `<div style="margin-top:8px;color:var(--purple)">Já está no CRM (${pmTelFmt(e.lead_telefone)}).</div>` : ''}
     </div>
+    ${pmDonnaVisivel(e) ? `<div style="margin-top:12px;padding:10px 12px;border:1px solid ${e.donna_pausada ? 'var(--orange)' : 'var(--bd)'};display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1 1 220px;font-size:12px;line-height:1.5"><b style="font-family:var(--fD);letter-spacing:.06em;text-transform:uppercase;font-size:11px">Donna nesta conversa: ${e.donna_pausada ? 'pausada' : 'ligada'}</b><br>
+        <span style="color:var(--muted)">${e.donna_pausada ? 'Só a equipe responde (número oficial e WhatsApp da Donna).' : 'Ela responde quando a empresa escreve, no número oficial e no WhatsApp dela. Também para quando alguém da equipe responde.'}</span></div>
+      ${pmDonnaBotao(e, true)}</div>` : ''}
     ${campo('Nicho', `<select id="pm-f-nicho" style="${inp}">${[...new Set([...PM_NICHOS, e.nicho].filter(Boolean))].map(s => `<option ${s === e.nicho ? 'selected' : ''}>${pmEsc(s)}</option>`).join('')}</select>`)}
     ${campo('Status', `<select id="pm-f-status" style="${inp}">${['Não abordada', 'Enviado', 'Respondeu', 'Call marcada', 'Sem interesse'].map(s => `<option ${s === e.status ? 'selected' : ''}>${s}</option>`).join('')}</select>`)}
     <div style="display:flex;gap:10px;flex-wrap:wrap">
