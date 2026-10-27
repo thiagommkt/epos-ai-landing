@@ -5762,6 +5762,9 @@ const SEGMENTO_LABEL = { advocacia: 'Advocacia', odontologia: 'Odontologia', est
 // Sem toques automáticos: "Não faremos remarketing, será feito na mão cada contato" (22/10).
 let _pm = [], _pmLimite = 50;
 const PM_NICHO = {
+  // 27/10: advocacia criminal (vídeo e modelo próprios: advogado de plantão acionado na hora)
+  criminal: { segmento: 'a advocacia criminal', empresa: 'o escritório', plural: 'advocacia criminal', de: 'do escritório',
+    dor: 'quem tem um familiar preso de madrugada chama o primeiro criminalista que atende, e o escritório que demora a responder perde o caso' },
   advocacia: { segmento: 'o jurídico', empresa: 'o escritório', plural: 'advocacia', de: 'do escritório',
     dor: 'quem procura advogado costuma mandar mensagem para dois ou três escritórios e fica com o primeiro que explica direito' },
   odonto: { segmento: 'a odontologia', empresa: 'a clínica', plural: 'odontologia', de: 'da clínica',
@@ -5784,7 +5787,7 @@ const PM_NICHO = {
   imob: { segmento: 'o mercado imobiliário', empresa: 'a imobiliária', plural: 'imóveis', de: 'da imobiliária',
     dor: 'o contato de portal e de anúncio chega à noite e no fim de semana, e quando o corretor responde o cliente já está visitando com outro' }
 };
-function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('carro') || n.includes('veícul') ? 'carros' : n.includes('advoc') ? 'advocacia' : n.includes('planos de saúde') ? 'planos' : n.includes('consórcio') ? 'consorcio' : n.includes('invest') ? 'invest' : n.includes('crédito') ? 'credito' : n.includes('revisar') ? 'odonto' : n.includes('odonto') ? 'odonto' : n.includes('estét') ? 'estetica' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
+function pmNichoChave(n) { n = (n || '').toLowerCase(); return n.includes('carro') || n.includes('veícul') ? 'carros' : n.includes('crimin') ? 'criminal' : n.includes('advoc') ? 'advocacia' : n.includes('planos de saúde') ? 'planos' : n.includes('consórcio') ? 'consorcio' : n.includes('invest') ? 'invest' : n.includes('crédito') ? 'credito' : n.includes('revisar') ? 'odonto' : n.includes('odonto') ? 'odonto' : n.includes('estét') ? 'estetica' : n.includes('imob') || n.includes('corret') ? 'imob' : 'saude'; }
 function pmEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 function pmPeriodo() { const h = new Date().getHours(); return h < 12 ? 'bom dia' : h < 18 ? 'boa tarde' : 'boa noite'; }
 function pmSlug(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
@@ -5811,9 +5814,10 @@ function pmMensagens(e, trat) {
 // ═══ 27/10: disparo pela API oficial a partir da aba Prospecção (só põe na fila; o n8n envia com 90 a 240 s entre um e outro) ═══
 // Nicho → modelo (v2 aprovados pela Meta 27/10). "(revisar)" nunca recebe: classifique no modal. Planos de saúde aprovado 27/10.
 const PM_MODELOS = { 'Advocacia': 'advocacia', 'Estética': 'estetica', 'Odontologia': 'odontologia', 'Imobiliárias e corretores': 'imobiliaria', 'Lojas de carros': 'carros',
-  'Corretoras de planos de saúde': 'planos' };
-const PM_NICHOS = ['Advocacia', 'Odontologia', 'Estética', 'Odontologia e estética (revisar)', 'Clínicas médicas e saúde', 'Imobiliárias e corretores', 'Lojas de carros', 'Corretoras de planos de saúde', 'Consórcios', 'Investimentos', 'Crédito e financeiras'];
-const PM_QUEM = { advocacia: ['o escritório', 'do escritório'], estetica: ['a clínica', 'da clínica'], odontologia: ['a clínica', 'da clínica'], imobiliaria: ['a imobiliária', 'da imobiliária'], carros: ['a loja', 'da loja'], planos: ['a corretora', 'da corretora'] };
+  'Corretoras de planos de saúde': 'planos'
+  /* , 'Advocacia criminal': 'criminal' */ };   // criminal entra quando a Meta aprovar
+const PM_NICHOS = ['Advocacia', 'Advocacia criminal', 'Odontologia', 'Estética', 'Odontologia e estética (revisar)', 'Clínicas médicas e saúde', 'Imobiliárias e corretores', 'Lojas de carros', 'Corretoras de planos de saúde', 'Consórcios', 'Investimentos', 'Crédito e financeiras'];
+const PM_QUEM = { advocacia: ['o escritório', 'do escritório'], criminal: ['o escritório', 'do escritório'], estetica: ['a clínica', 'da clínica'], odontologia: ['a clínica', 'da clínica'], imobiliaria: ['a imobiliária', 'da imobiliária'], carros: ['a loja', 'da loja'], planos: ['a corretora', 'da corretora'] };
 let _pmDisp = {};
 function pmNomeCurto(n) { return String(n || '').split(/\s[|–-]\s/)[0].replace(/[\s|–-]+$/, '').trim().slice(0, 60); }
 function pmPodeDisparar(e) { return e.whatsapp_provavel && !e.nao_contatar && !e.virou_lead_em && PM_MODELOS[e.nicho] && !['na_fila', 'enviando', 'enviado'].includes(_pmDisp[e.id]); }
