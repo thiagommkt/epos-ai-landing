@@ -1563,6 +1563,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2"/></svg>
       Status
     </a>
+    <a data-sec="laboratorio" id="nav-laboratorio" style="display:none" onclick="navTo('laboratorio')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1h4M7 1v5L2.5 13.2A1.2 1.2 0 0 0 3.5 15h9a1.2 1.2 0 0 0 1-1.8L9 6V1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M4.3 11h7.4" stroke="currentColor" stroke-width="1.2"/></svg>
+      Laboratório
+    </a>
   </nav>
   <div class="sb-footer">
     <div class="sb-c-name">Epos Marketing</div>
@@ -2062,6 +2066,62 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 </section>
 
 <!-- ══ PROSPECÇÃO SWaaS ══ -->
+<!-- 27/10 (Thiago: "Vamos abrir esta aba laboratório"): testes da Donna com número falso (scripts/simular_whatsapp.py). Só administrador. -->
+<section class="section" id="s-laboratorio">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">LABORATÓRIO <span>TESTES DA DONNA</span></div>
+      <div class="sec-sub">NÚMERO DE TESTE · NADA SAI NO WHATSAPP · AGENDA E PIXEL BLOQUEADOS</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="labLoad()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer">Atualizar</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <style>
+    #lab-grade { display:grid; grid-template-columns:minmax(260px, 340px) 1fr; gap:16px; align-items:start; }
+    #lab-lista { display:flex; flex-direction:column; gap:6px; max-height:calc(100dvh - 230px); overflow:auto; }
+    .lab-item { text-align:left; padding:10px 12px; background:var(--bg2); border:1px solid var(--bd); color:var(--text); cursor:pointer; font-family:var(--fB); transition:border-color .2s, background .2s; }
+    .lab-item:hover { border-color:var(--bd-b); }
+    .lab-item.ativo { border-color:var(--purple); background:var(--pur-l); }
+    .lab-item-tit { font-size:13px; font-weight:600; line-height:1.35; margin:4px 0 2px; }
+    .lab-item-meta { font-size:11px; color:var(--muted); display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .lab-selo { font-family:var(--fD); font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border:1px solid; }
+    .lab-selo.ok { color:var(--neon); border-color:var(--neon); background:var(--neon-l); }
+    .lab-selo.falhou { color:var(--warn); border-color:var(--warn); background:rgba(255,94,91,.1); }
+    #lab-conversa { background:var(--bg2); border:1px solid var(--bd); padding:16px; min-height:300px; }
+    .lab-topo { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--bd); }
+    .lab-topo h3 { flex:1 1 220px; margin:0; font-family:var(--fB); font-size:15px; font-weight:600; color:var(--text); }
+    .lab-ficha { font-size:11px; color:var(--muted); font-family:var(--fB); }
+    .lab-msgs { display:flex; flex-direction:column; gap:8px; }
+    .lab-bolha { max-width:78%; padding:9px 12px; font-family:var(--fB); font-size:13px; line-height:1.5; white-space:pre-wrap; word-wrap:break-word; border-radius:10px; }
+    .lab-bolha small { display:block; font-size:10px; opacity:.6; margin-top:4px; }
+    .lab-cliente { align-self:flex-end; background:var(--purple); color:#fff; border-bottom-right-radius:3px; }
+    .lab-donna { align-self:flex-start; background:var(--bg3); color:var(--text); border:1px solid var(--bd); border-bottom-left-radius:3px; }
+    .lab-nota { align-self:center; max-width:92%; font-size:12px; padding:7px 12px; border:1px dashed var(--bd-b); color:var(--muted); background:transparent; border-radius:6px; text-align:center; }
+    .lab-nota.aviso { border-style:solid; border-color:var(--orange); color:var(--text); background:rgba(224,96,16,.08); text-align:left; }
+    .lab-nota.agenda { border-style:solid; border-color:var(--neon); color:var(--text); background:var(--neon-l); }
+    .lab-nota.erro { border-style:solid; border-color:var(--warn); color:var(--warn); background:rgba(255,94,91,.08); }
+    .lab-vazio { padding:28px 16px; text-align:center; color:var(--muted); font-family:var(--fB); font-size:13px; line-height:1.6; }
+    #lab-voltar { display:none; }
+    @media (max-width: 860px) {
+      #lab-grade { grid-template-columns:1fr; }
+      #lab-lista { max-height:none; }
+      #lab-grade.aberto #lab-lista { display:none; }
+      #lab-grade:not(.aberto) #lab-conversa { display:none; }
+      #lab-voltar { display:inline-block; }
+      .lab-bolha { max-width:88%; }
+    }
+  </style>
+  <div style="font-size:12px;color:var(--muted);margin:0 0 14px;font-family:var(--fB);line-height:1.55">
+    Cada teste usa um número falso (começa com 5500000000): a Donna responde de verdade, mas nada sai pelo WhatsApp, a agenda não cria evento e o pixel não recebe nada. Os dados do teste são apagados no fim; fica só o registro aqui.
+  </div>
+  <div id="lab-grade">
+    <div id="lab-lista"><div class="loading"></div></div>
+    <div id="lab-conversa"><div class="lab-vazio">Escolha um teste na lista para ver a conversa.</div></div>
+  </div>
+</section>
+
 <section class="section" id="s-prospeccao">
   <div class="sec-head">
     <div>
@@ -4226,6 +4286,7 @@ function show(id) {
     if(id==='relatorio') loadRelatorio();
     if(id==='clientes') loadClientes();
     if(id==='prospeccao') { loadProspeccao(); pmLoad(); }
+    if(id==='laboratorio') labLoad();
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -6823,6 +6884,77 @@ setTimeout(loadMetaDashboard, 1200);
 loadDashboard();
 loadRoboStatus();
 loadModoDono();
+// ═══ LABORATÓRIO (27/10) — testes da Donna com número falso (scripts/simular_whatsapp.py grava em laboratorio_testes). Só administrador. ═══
+let _lab = [], _labSel = null;
+function labEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function labData(iso, comAno) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', ...(comAno ? { year: 'numeric' } : {}), hour: '2-digit', minute: '2-digit' });
+}
+function labHora(iso) { return iso ? new Date(iso).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }) : ''; }
+function labDur(s) { if (!s && s !== 0) return ''; return s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') + ' s'; }
+async function labPodeVer() {
+  try {
+    const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json());
+    const a = document.getElementById('nav-laboratorio');
+    if (a) a.style.display = adm === true ? '' : 'none';
+  } catch (e) {}
+}
+async function labLoad() {
+  const lista = document.getElementById('lab-lista');
+  if (!lista) return;
+  lista.innerHTML = '<div class="loading"></div>';
+  const { data } = await sb('laboratorio_testes?select=id,criado_em,titulo,demo_nicho,resultado,falhas,duracao_s,conversa,lead_final&order=criado_em.desc&limit=200');
+  _lab = Array.isArray(data) ? data : [];
+  labRender();
+  if (_labSel && _lab.some(t => t.id === _labSel)) labAbrir(_labSel, true);
+}
+function labRender() {
+  const lista = document.getElementById('lab-lista');
+  if (!_lab.length) {
+    lista.innerHTML = '<div class="lab-vazio">Nenhum teste ainda.<br>Os testes aparecem aqui quando o Claude roda o simulador da Donna.</div>';
+    return;
+  }
+  lista.innerHTML = _lab.map(t => `
+    <button class="lab-item${t.id === _labSel ? ' ativo' : ''}" onclick="labAbrir(${t.id})">
+      <div class="lab-item-meta"><span class="lab-selo ${t.resultado === 'ok' ? 'ok' : 'falhou'}">${t.resultado === 'ok' ? 'Certo' : 'Falhou'}</span>${labData(t.criado_em)}${t.demo_nicho ? ' · ' + labEsc(t.demo_nicho) : ''}</div>
+      <div class="lab-item-tit">${labEsc(t.titulo)}</div>
+      <div class="lab-item-meta">${(n => n + (n === 1 ? ' mensagem' : ' mensagens'))((t.conversa || []).filter(m => m.de === 'cliente').length)} · ${labDur(t.duracao_s)}</div>
+    </button>`).join('');
+}
+function labAbrir(id, semRolar) {
+  const t = _lab.find(x => x.id === id);
+  if (!t) return;
+  _labSel = id;
+  document.querySelectorAll('.lab-item').forEach(b => b.classList.toggle('ativo', b.getAttribute('onclick') === `labAbrir(${id})`));
+  const lf = t.lead_final || {};
+  const ficha = [
+    t.demo_nicho ? 'Demonstração: ' + labEsc(t.demo_nicho) : 'Lead comum',
+    lf.agendou ? 'Marcou (teste): ' + labData(lf.dia_agendamento) : 'Sem marcação',
+    t.falhas ? t.falhas + (t.falhas === 1 ? ' falha' : ' falhas') : 'Nenhuma falha',
+    labDur(t.duracao_s)
+  ].join(' · ');
+  const msgs = (t.conversa || []).map(m => {
+    const txt = labEsc(m.texto);
+    if (m.de === 'cliente') return `<div class="lab-bolha lab-cliente">${txt}<small>Cliente de teste · ${labHora(m.quando)}</small></div>`;
+    if (m.de === 'donna') return `<div class="lab-bolha lab-donna">${txt}<small>Donna · ${labHora(m.quando)}</small></div>`;
+    if (m.de === 'aviso') return `<div class="lab-nota aviso"><b>Aviso que iria para ${labEsc(m.para)}</b> (não enviado)<br>${txt}</div>`;
+    if (m.de === 'agenda') return `<div class="lab-nota agenda"><b>Agenda de teste:</b> marcaria ${labData(m.data_inicio)} (nenhum evento criado no Google)</div>`;
+    return `<div class="lab-nota${m.erro ? ' erro' : ''}">${txt}</div>`;
+  }).join('');
+  document.getElementById('lab-conversa').innerHTML = `
+    <div class="lab-topo">
+      <button id="lab-voltar" onclick="labVoltar()" style="padding:5px 10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-size:11px;cursor:pointer">← Testes</button>
+      <h3>${labEsc(t.titulo)}</h3>
+      <span class="lab-selo ${t.resultado === 'ok' ? 'ok' : 'falhou'}">${t.resultado === 'ok' ? 'Certo' : 'Falhou'}</span>
+      <div class="lab-ficha" style="flex-basis:100%">${labData(t.criado_em, true)} · ${ficha}</div>
+    </div>
+    <div class="lab-msgs">${msgs || '<div class="lab-vazio">Teste sem mensagens.</div>'}</div>`;
+  document.getElementById('lab-grade').classList.add('aberto');
+  if (!semRolar && window.innerWidth <= 860) { const m = document.querySelector('main'); if (m) m.scrollTop = 0; }
+}
+function labVoltar() { document.getElementById('lab-grade').classList.remove('aberto'); }
+labPodeVer();
 loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
 loadWaClicks();
 loadNotificacoes();
