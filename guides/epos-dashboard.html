@@ -1554,6 +1554,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
       Campanhas
     </a>
+    <a data-sec="remarketing" id="nav-remarketing" style="display:none" onclick="navTo('remarketing')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M13 3.5A6 6 0 1 0 14 8"/><path d="M14 2v3h-3"/><path d="M6 8h4M8 6v4" stroke-width="1.2"/></svg>
+      Remarketing
+    </a>
     <a data-sec="prospeccao" onclick="navTo('prospeccao')">
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l4 4" stroke="currentColor" stroke-width="1.5"/></svg>
       Prospecção
@@ -1611,8 +1615,13 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
   <!-- Vendas inevitáveis (Torneira, CRM v3): o que está escapando agora — RPC epos_torneira -->
   <style>
-    #torneira-card .tor-kpis{grid-template-columns:repeat(5,1fr);margin-bottom:12px}
+    #torneira-card .tor-kpis{grid-template-columns:repeat(6,1fr);margin-bottom:12px}
     @media(max-width:1280px){#torneira-card .tor-kpis{grid-template-columns:repeat(3,1fr)}}
+    #torneira-card .tor-lig-acoes{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+    #torneira-card .tor-lig-acoes a,#torneira-card .tor-lig-acoes select{font-family:var(--fM);font-size:10.5px;padding:5px 9px;border-radius:8px;border:1px solid var(--g-bd);background:transparent;color:var(--text);text-decoration:none;cursor:pointer}
+    #torneira-card .tor-lig-acoes a{border-color:rgba(31,175,90,.5);color:#1FAF5A}
+    #torneira-card .tor-lig-acoes select option{background:#18181c;color:#f2f2f4}
+    @media(max-width:768px){#torneira-card .tor-linha.lig{flex-wrap:wrap}#torneira-card .tor-lig-acoes{width:100%;justify-content:flex-start;padding-left:44px}}
     #torneira-card .tor-kpi{cursor:pointer}
     #torneira-card .tor-kpi.ativo{border-color:rgba(249,115,22,.45)}
     #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
@@ -1629,7 +1638,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
     #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
     #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
-    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos]{grid-column:1/-1}}
+    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos],#torneira-card .tor-kpi[data-tor=ligacao]{grid-column:1/-1}}
     @media(max-width:768px){.socio-kpis{grid-template-columns:1fr 1fr!important}}
     .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
     .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
@@ -2120,6 +2129,58 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <div id="lab-lista"><div class="loading"></div></div>
     <div id="lab-conversa"><div class="lab-vazio">Escolha um teste na lista para ver a conversa.</div></div>
   </div>
+</section>
+
+<!-- 28/10 (Thiago: "As IAs decidem, mas só enviam depois de autorizadas… aprovamos por lá"): remarketing com contexto. Só administrador. -->
+<section class="section" id="s-remarketing">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">REMARKETING <span>O ANALISTA PLANEJA · VOCÊ APROVA</span></div>
+      <div class="sec-sub">PLANO DA AUDITORIA · RITMO DA TORNEIRA · 1 ENVIO POR VEZ · 10 MIN OU MAIS ENTRE ELES · DIAS ÚTEIS 9H30–18H</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="rm-btn" onclick="rmLoad()">Atualizar</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <style>
+    .rm-btn { padding:6px 14px; background:transparent; border:1px solid var(--bd); color:var(--muted); font-family:var(--fD); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:border-color .2s, color .2s; }
+    .rm-btn:hover { border-color:var(--bd-b); color:var(--text); }
+    .rm-btn.forte { background:var(--purple); border-color:var(--purple); color:#fff; }
+    .rm-btn.forte:hover { filter:brightness(1.08); }
+    .rm-btn:disabled { opacity:.5; cursor:default; }
+    .rm-abas { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 14px; }
+    .rm-aba { padding:7px 12px; background:var(--bg2); border:1px solid var(--bd); color:var(--muted); font-family:var(--fB); font-size:12px; cursor:pointer; }
+    .rm-aba.ativo { border-color:var(--purple); color:var(--text); background:var(--pur-l); }
+    .rm-aba b { font-family:var(--fD); margin-left:4px; }
+    .rm-barra { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 12px; font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-lista { display:flex; flex-direction:column; gap:12px; }
+    .rm-card { background:var(--bg2); border:1px solid var(--bd); padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+    .rm-card.sel { border-color:var(--purple); }
+    .rm-topo { display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+    .rm-topo h3 { flex:1 1 220px; margin:0; font-family:var(--fB); font-size:15px; font-weight:600; color:var(--text); line-height:1.35; }
+    .rm-chips { display:flex; gap:6px; flex-wrap:wrap; }
+    .rm-chip { font-family:var(--fD); font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border:1px solid var(--bd-b); color:var(--muted); }
+    .rm-chip.alto { color:var(--neon); border-color:var(--neon); }
+    .rm-chip.donna { color:var(--orange); border-color:var(--orange); }
+    .rm-txt { font-family:var(--fB); font-size:13px; line-height:1.55; color:var(--text); }
+    .rm-txt small { display:block; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; font-family:var(--fD); }
+    .rm-card textarea { width:100%; min-height:84px; resize:vertical; background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-family:var(--fB); font-size:14px; line-height:1.5; padding:10px 12px; box-sizing:border-box; }
+    .rm-card textarea:focus { outline:none; border-color:var(--purple); }
+    .rm-acoes { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .rm-acoes a { font-family:var(--fB); font-size:12px; color:var(--muted); margin-left:auto; }
+    .rm-status { font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-status.erro { color:var(--warn); }
+    .rm-vazio { padding:28px 16px; text-align:center; color:var(--muted); font-family:var(--fB); font-size:13px; line-height:1.6; background:var(--bg2); border:1px solid var(--bd); }
+    .rm-marca { display:flex; gap:6px; align-items:center; font-family:var(--fB); font-size:12px; color:var(--muted); cursor:pointer; }
+    @media (max-width: 860px) { .rm-acoes a { margin-left:0; flex-basis:100%; } .rm-btn { padding:8px 12px; } }
+  </style>
+  <div style="font-size:12px;color:var(--muted);margin:0 0 14px;font-family:var(--fB);line-height:1.55;max-width:760px">
+    Quando a conversa de um lead esfria, o Analista audita a conversa inteira (canal de aquisição, quem procurou quem, etapa, sinais de interesse) e monta o plano do próximo contato: a mensagem já escrita, uma ligação (vai para o card "Precisam de ligação") ou nada (sem chance de fechamento: vai como sugestão para Perdido). O ritmo é o da Torneira: 1, 3, 7, 15 e 30 dias. Aprove aqui em lote ou na ficha do lead. A mensagem entra na fila com 10 minutos ou mais depois da anterior e é cancelada sozinha se a pessoa escrever antes ou a equipe assumir. Quando a conversa foi pelo número de disparos, sai pelo número da Donna, que se apresenta e explica que aquele é o número usado só para disparos.
+  </div>
+  <div class="rm-abas" id="rm-abas"></div>
+  <div class="rm-barra" id="rm-barra"></div>
+  <div class="rm-lista" id="rm-lista"><div class="loading"></div></div>
 </section>
 
 <section class="section" id="s-prospeccao">
@@ -3558,6 +3619,27 @@ async function carregarTorneira() {
 // Novos leads (19/10): RPC epos_novos_leads — leads criados nos últimos 31 dias, com os períodos no horário de Brasília
 const NOVO_PER = { hoje: 'Hoje', ontem: 'Ontem', semana: 'Essa semana', d7: '7 dias', d15: '15 dias', d30: '30 dias' };
 let _torNovos = [];
+// 28/10: quem só respondeu com robô (a IA leu a conversa) ou tem tarefa de ligação → card "Precisam de ligação"
+let _torLig = [];
+const LIG_RES = { falou_decisor: 'Falei com quem decide', marcou_reuniao: 'Marcou reunião', pegou_contato: 'Peguei o contato certo',
+  ligar_de_novo: 'Ligar de novo', nao_atendeu: 'Não atendeu', sem_interesse: 'Sem interesse', numero_errado: 'Número errado' };
+async function carregarLigacoes() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_precisa_ligacao`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' });
+    const d = await r.json();
+    _torLig = r.ok && Array.isArray(d) ? d : [];
+  } catch (e) { _torLig = []; }
+}
+async function registrarLigacao(tel, resultado) {
+  if (!resultado) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_ligacao_registrar`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify({ p_telefone: tel, p_resultado: resultado }) });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || ('erro ' + r.status)); }
+    toast(['ligar_de_novo', 'nao_atendeu'].includes(resultado) ? 'Registrado: continua na lista' : 'Registrado: saiu da lista');
+    await carregarLigacoes(); _torFiltro = { situacao: 'ligacao', faixa: null }; renderTorneira();
+    if (window._panelLead?.telefone === tel) carregarTarefasLead(tel);
+  } catch (e) { toast('Não registrou: ' + e.message, 'err'); }
+}
 async function carregarNovos() {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_novos_leads`, {
@@ -3592,7 +3674,7 @@ async function loadTorneira() {
   const alvo = document.getElementById('torneira-conteudo');
   if (!alvo) return;
   alvo.innerHTML = '<div class="loading"></div>';
-  try { await Promise.all([carregarTorneira(), carregarNovos()]); renderTorneira(); }
+  try { await Promise.all([carregarTorneira(), carregarNovos(), carregarLigacoes()]); renderTorneira(); }
   catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
 }
 
@@ -3618,7 +3700,7 @@ function renderTorneira() {
   const semPasso = _torDados.filter(l => l.aguardando_equipe || l.sem_proximo_passo);
   // Novos leads (19/10): quem chegou, por período (hoje, ontem, essa semana, 7, 15 e 30 dias)
   const novos = _torNovos;
-  if (!comFaixa.length && !semPasso.length && !novos.length) {
+  if (!comFaixa.length && !semPasso.length && !novos.length && !_torLig.length) {
     alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
     return;
   }
@@ -3631,7 +3713,20 @@ function renderTorneira() {
   const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(x => x.key === k)?.label) || k || 'sem etapa';
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
   let titulo, sufixo, chips, lista, linhas;
-  if (sit === 'novos') {
+  if (sit === 'ligacao') {
+    titulo = 'Precisam de ligação'; sufixo = ' · só o robô respondeu no WhatsApp'; chips = ''; lista = _torLig;
+    linhas = lista.slice(0, 80).map(l => {
+      const n = nome(l);
+      const tel = String(l.telefone || '').replace(/\D/g, '');
+      const tent = l.tentativas ? ` · ${l.tentativas} tentativa${l.tentativas === 1 ? '' : 's'} (última: ${escHtml(LIG_RES[l.ultimo_resultado] || l.ultimo_resultado || '')})` : '';
+      return `<div class="tor-linha lig" data-tel="${escHtml(l.telefone)}">
+      <div class="tor-avatar" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
+      <div style="flex:1;min-width:0" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))}${l.nicho ? ' · ' + escHtml(l.nicho) : ''}${tent}</div></div>
+      <div class="tor-lig-acoes"><a href="tel:+${escHtml(tel)}" onclick="event.stopPropagation()">📞 Ligar</a>
+        <select onclick="event.stopPropagation()" onchange="registrarLigacao('${escHtml(l.telefone)}', this.value)" aria-label="Resultado da ligação">
+          <option value="">Resultado…</option>${Object.entries(LIG_RES).map(([k, t]) => `<option value="${k}">${t}</option>`).join('')}</select></div></div>`;
+    }).join('');
+  } else if (sit === 'novos') {
     const per = NOVO_PER[faixaSel] ? faixaSel : 'hoje';
     titulo = 'Novos leads'; sufixo = ' · ' + NOVO_PER[per].toLowerCase();
     chips = Object.keys(NOVO_PER).map(k => `<button class="tor-chip${per === k ? ' ativo' : ''}" data-faixa="${k}" onclick="filtrarTorneira('novos','${k}')">${NOVO_PER[k]} · <b>${novos.filter(l => l[k]).length}</b></button>`).join('');
@@ -3669,11 +3764,12 @@ function renderTorneira() {
       ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
       ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
       ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
+      ${card('ligacao', 'Precisam de ligação', _torLig.length, _torLig.length ? 'só o robô respondeu: ligar para achar quem decide' : 'nenhuma ligação pendente')}
     </div>
     <div class="tor-painel">
-      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
+      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">${sit === 'ligacao' ? 'Ligue e registre o resultado · clique no nome para abrir a ficha' : 'Clique no lead para abrir a ficha'}</span></div>
       ${chips ? `<div class="tor-chips">${chips}</div>` : ''}
-      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : 'Nenhum lead aqui. ✅'}</div>`}</div>
+      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : sit === 'ligacao' ? 'Nenhuma ligação pendente. ✅' : 'Nenhum lead aqui. ✅'}</div>`}</div>
       ${lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : ''}
     </div>`;
 }
@@ -3805,11 +3901,47 @@ function seloProximoContato(telefone) {
 async function carregarTarefasLead(telefone) {
   const box = document.getElementById('panel-tarefas');
   if (!box) return;
-  const { data } = await sb(`tarefas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(telefone)}&status=in.(pendente,sugerida)&select=id,acao,quando,tipo,responsavel_id,status,mensagem_sugerida&order=quando.asc`);
+  const { data } = await sb(`tarefas?conta=eq.epos&lead_telefone=eq.${encodeURIComponent(telefone)}&status=in.(pendente,sugerida)&select=id,acao,quando,tipo,responsavel_id,status,mensagem_sugerida,plano,remarketing_id&order=quando.asc`);
   if (window._panelLead?.telefone !== telefone) return;
   const ts = data || [];
   if (!ts.length) { box.innerHTML = '<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Nenhum contato agendado.</div>'; return; }
+  const _filaIds = ts.filter(t => t.remarketing_id).map(t => t.remarketing_id);
+  const _fila = {};
+  if (_filaIds.length) { const { data: fr } = await sb(`remarketing_sugestoes?id=in.(${_filaIds.join(',')})&select=id,status,agendada_para`); (fr || []).forEach(x => _fila[x.id] = x); }
   box.innerHTML = ts.map(t => {
+    // 28/10: plano do Analista — ligação
+    if (t.tipo === 'ligacao' && t.status === 'sugerida') {
+      const tel = String(telefone).replace(/\D/g, '');
+      return `<div class="tarefa-item" style="padding:8px;border:1px dashed rgba(31,175,90,.55);margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:#1FAF5A;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">📞 Precisa de ligação (plano do Analista)</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:6px">${escHtml(t.acao)}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <a href="tel:+${tel}" style="${_BTN_MINI};border:1px solid rgba(31,175,90,.5);color:#1FAF5A;text-decoration:none">📞 Ligar</a>
+          <select onchange="registrarLigacao('${telefone}', this.value)" aria-label="Resultado da ligação" style="${_INPUT_MINI}"><option value="">Resultado…</option>${Object.entries(LIG_RES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
+          <button onclick="descartarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Descartar</button>
+        </div></div>`;
+    }
+    // 28/10: plano do Analista — mensagem pronta (aprovar → fila de envio com cadência)
+    if (t.status === 'sugerida' && t.plano && t.mensagem_sugerida) {
+      const pl = t.plano;
+      return `<div class="tarefa-item tarefa-sugerida" style="padding:8px;border:1px dashed rgba(145,70,255,.5);margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--purple);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">✉️ Plano do Analista · ${pl.retomada || 1}ª retomada · ${pl.numero === 'oficial' ? 'número de disparos' : 'número da Donna'}</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:4px">${escHtml(t.acao)}</div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-bottom:6px">planejada para ${dataHoraBRT(t.quando)}</div>
+        <textarea id="plano-txt-${t.id}" maxlength="1000" style="width:100%;min-height:70px;box-sizing:border-box;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-size:12px;padding:6px 8px;margin-bottom:6px">${escHtml(t.mensagem_sugerida)}</textarea>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="aprovarPlanoFicha('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">Aprovar envio</button>
+          <button onclick="descartarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Descartar</button>
+        </div></div>`;
+    }
+    // 28/10: mensagem aprovada na fila de envio
+    if (t.status === 'pendente' && t.remarketing_id) {
+      const f = _fila[t.remarketing_id] || {};
+      return `<div class="tarefa-item" style="padding:8px;border:1px solid var(--bd);margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--purple);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">✉️ Na fila de envio · sai às ${dataHoraBRT(f.agendada_para || t.quando)}</div>
+        <div style="font-size:11px;color:var(--muted);white-space:pre-wrap;margin-bottom:6px">${escHtml(t.mensagem_sugerida || '')}</div>
+        <button onclick="cancelarEnvioFicha('${t.remarketing_id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Cancelar envio</button></div>`;
+    }
     if (t.status === 'sugerida') {
       // Sugestão do Analista ainda não confirmada pelo vendedor (ele também pode responder pelo WhatsApp)
       return `<div class="tarefa-item tarefa-sugerida" style="padding:8px;border:1px dashed rgba(227,179,65,.5);margin-bottom:6px">
@@ -3835,6 +3967,17 @@ async function carregarTarefasLead(telefone) {
       </div>
     </div>`;
   }).join('');
+}
+
+async function aprovarPlanoFicha(id, telefone) {
+  const txt = (document.getElementById('plano-txt-' + id)?.value || '').trim();
+  if (!txt) { toast('Escreva a mensagem antes de aprovar', 'err'); return; }
+  try { const q = await aprovarMensagemPlano(id, txt); toast('Aprovada. Sai às ' + dataHoraBRT(q)); carregarTarefasLead(telefone); }
+  catch (e) { toast('Não aprovou: ' + e.message, 'err'); }
+}
+async function cancelarEnvioFicha(id, telefone) {
+  try { await rmRpc('remarketing_descartar', { p_id: id }); toast('Envio cancelado'); carregarTarefasLead(telefone); }
+  catch (e) { toast('Não cancelou: ' + e.message, 'err'); }
 }
 
 async function criarTarefa(telefone) {
@@ -4287,6 +4430,7 @@ function show(id) {
     if(id==='clientes') loadClientes();
     if(id==='prospeccao') { loadProspeccao(); pmLoad(); }
     if(id==='laboratorio') labLoad();
+    if(id==='remarketing') rmLoad();
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -6984,6 +7128,126 @@ function labAbrir(id, semRolar) {
 }
 function labVoltar() { document.getElementById('lab-grade').classList.remove('aberto'); }
 labPodeVer();
+
+// ═══ REMARKETING (28/10) — o plano do Analista (tarefas de próximo contato com mensagem pronta) aprovado em lote; envio: [Epos] Remarketing — Enviar aprovadas ═══
+let _rmPlanos = [], _rmFila = [], _rmLeads = {}, _rmAba = 'aprovar', _rmSel = new Set();
+const RM_CANAL = { prospeccao_disparo_oficial: 'Prospecção · disparo', prospeccao_antiga: 'Prospecção antiga', stories: 'Stories', quiz_metodo: 'Quiz do Método',
+  lead_ads: 'Formulário de anúncio', anuncio: 'Anúncio', contato_existente: 'Contato antigo', whatsapp: 'WhatsApp' };
+const RM_ETAPA = { em_conversa: 'Em conversa', qualificado: 'Qualificado', agendou: 'Agendou', agendado: 'Agendado', compareceu: 'Compareceu', perdido: 'Perdido' };
+const RM_STATUS = { aprovada: 'Na fila', enviando: 'Enviando agora', enviada: 'Enviada', cancelada: 'Cancelada', falhou: 'Falhou', descartada: 'Cancelada por você' };
+async function rmPodeVer() {
+  try {
+    const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json());
+    const a = document.getElementById('nav-remarketing');
+    if (a) a.style.display = adm === true ? '' : 'none';
+  } catch (e) {}
+}
+async function rmLoad() {
+  const lista = document.getElementById('rm-lista');
+  if (!lista) return;
+  lista.innerHTML = '<div class="loading"></div>';
+  const desde = new Date(Date.now() - 7 * 864e5).toISOString();
+  const [p, f] = await Promise.all([
+    sb('tarefas?conta=eq.epos&status=eq.sugerida&tipo=eq.contato&mensagem_sugerida=not.is.null&plano=not.is.null&select=id,lead_telefone,acao,quando,mensagem_sugerida,plano,criada_em&order=quando.asc&limit=300'),
+    sb(`remarketing_sugestoes?conta=eq.epos&or=(status.in.(aprovada,enviando),criada_em.gte.${desde})&status=neq.sugerida&status=neq.nao_enviar&order=agendada_para.asc&limit=300`)]);
+  _rmPlanos = Array.isArray(p.data) ? p.data : []; _rmFila = Array.isArray(f.data) ? f.data : [];
+  const tels = [...new Set(_rmPlanos.map(t => t.lead_telefone))];
+  _rmLeads = {};
+  if (tels.length) { const { data } = await sb(`leads?telefone=in.(${tels.join(',')})&select=telefone,nome,crm_stage`); (data || []).forEach(l => _rmLeads[l.telefone] = l); }
+  _rmSel = new Set([..._rmSel].filter(id => _rmPlanos.some(t => t.id === id)));
+  rmRender();
+}
+function rmGrupo(aba) {
+  if (aba === 'aprovar') return _rmPlanos;
+  if (aba === 'fila') return _rmFila.filter(s => ['aprovada', 'enviando'].includes(s.status));
+  return _rmFila.filter(s => !['aprovada', 'enviando'].includes(s.status)).sort((a, b) => (b.enviada_em || b.aprovada_em || b.criada_em).localeCompare(a.enviada_em || a.aprovada_em || a.criada_em));
+}
+function rmRender() {
+  const abas = [['aprovar', 'Para aprovar'], ['fila', 'Na fila'], ['historico', 'Histórico (7 dias)']];
+  document.getElementById('rm-abas').innerHTML = abas.map(([k, t]) => `<button class="rm-aba${_rmAba === k ? ' ativo' : ''}" onclick="_rmAba='${k}';rmRender()">${t}<b>${rmGrupo(k).length}</b></button>`).join('');
+  const itens = rmGrupo(_rmAba);
+  document.getElementById('rm-barra').innerHTML = _rmAba === 'aprovar' && itens.length
+    ? `<label class="rm-marca"><input type="checkbox" onchange="rmMarcarTodos(this.checked)" ${itens.every(t => _rmSel.has(t.id)) ? 'checked' : ''}> Marcar todas</label>
+       <button class="rm-btn forte" onclick="rmAprovarSelecionadas()" ${_rmSel.size ? '' : 'disabled'}>Aprovar selecionadas (${_rmSel.size})</button>
+       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 20 por dia.</span>` : '';
+  const lista = document.getElementById('rm-lista');
+  if (!itens.length) {
+    lista.innerHTML = `<div class="rm-vazio">${{ aprovar: 'Nenhuma mensagem planejada esperando aprovação.<br>O Analista planeja quando a conversa de um lead esfria; ligações aparecem no card "Precisam de ligação" do Painel.', fila: 'Nada na fila de envio.', historico: 'Nenhum envio nos últimos 7 dias.' }[_rmAba]}</div>`;
+    return;
+  }
+  lista.innerHTML = itens.map(_rmAba === 'aprovar' ? rmCardPlano : rmCardFila).join('');
+}
+function rmChips(canal, etapa, sinais, numero, extra) {
+  const sin = sinais || {};
+  return [RM_CANAL[canal] || canal, RM_ETAPA[etapa] || etapa || 'Sem etapa'].filter(Boolean).map(t => `<span class="rm-chip">${labEsc(t)}</span>`).join('')
+    + (sin.interesse ? `<span class="rm-chip${sin.interesse === 'alto' ? ' alto' : ''}">Interesse ${labEsc(sin.interesse)}</span>` : '')
+    + (extra || '') + `<span class="rm-chip${numero === 'donna' ? ' donna' : ''}">${numero === 'oficial' ? 'Número de disparos' : 'Número da Donna'}</span>`;
+}
+function rmLinkConversa(id) { return id ? `<a href="https://chatwoot.eposmktfilmsia.com.br/app/accounts/1/conversations/${id}" target="_blank" rel="noopener">Ver a conversa no Chatwoot ↗</a>` : ''; }
+function rmCardPlano(t) {
+  const pl = t.plano || {}, l = _rmLeads[t.lead_telefone] || {};
+  const nome = pl.nome || l.nome || t.lead_telefone;
+  return `<div class="rm-card${_rmSel.has(t.id) ? ' sel' : ''}" id="rm-${t.id}">
+    <div class="rm-topo"><h3><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(t.lead_telefone)}')" style="color:inherit;text-decoration:none">${labEsc(nome)}</a></h3>
+      <div class="rm-chips">${rmChips(pl.canal, l.crm_stage, pl.sinais, pl.numero, pl.retomada ? `<span class="rm-chip">${pl.retomada}ª retomada</span>` : '')}</div></div>
+    ${pl.resumo ? `<div class="rm-txt"><small>O que aconteceu (auditoria do Analista)</small>${labEsc(pl.resumo)}</div>` : ''}
+    ${t.acao ? `<div class="rm-txt"><small>Por que retomar</small>${labEsc(t.acao)}</div>` : ''}
+    <div class="rm-txt"><small>Mensagem (pode editar antes de aprovar) · planejada para ${labData(t.quando)}</small></div>
+    <textarea id="rm-t-${t.id}" maxlength="1000">${labEsc(t.mensagem_sugerida || '')}</textarea>
+    <div class="rm-acoes"><label class="rm-marca"><input type="checkbox" ${_rmSel.has(t.id) ? 'checked' : ''} onchange="rmMarcar('${t.id}',this.checked)"> Selecionar</label>
+      <button class="rm-btn forte" onclick="rmAprovar('${t.id}')">Aprovar</button><button class="rm-btn" onclick="rmDescartarPlano('${t.id}')">Descartar</button>${rmLinkConversa(pl.conversa_id)}</div>
+  </div>`;
+}
+function rmCardFila(s) {
+  const st = s.status === 'aprovada' ? `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn" onclick="rmCancelarEnvio('${s.id}')">Cancelar envio</button>`
+    : `<span class="rm-status${['falhou', 'cancelada'].includes(s.status) ? ' erro' : ''}">${RM_STATUS[s.status] || s.status}${s.enviada_em ? ' em ' + labData(s.enviada_em) : s.aprovada_em ? ' em ' + labData(s.aprovada_em) : ''}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span>`;
+  return `<div class="rm-card" id="rm-${s.id}">
+    <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${rmChips(s.canal_aquisicao, s.stage, s.sinais, s.numero)}</div></div>
+    ${s.mensagem_final || s.mensagem ? `<div class="rm-txt"><small>Mensagem</small>${labEsc(s.mensagem_final || s.mensagem)}</div>` : ''}
+    <div class="rm-acoes">${st}${rmLinkConversa(s.conversa_id)}</div>
+  </div>`;
+}
+function rmMarcar(id, on) { on ? _rmSel.add(id) : _rmSel.delete(id); rmRender(); }
+function rmMarcarTodos(on) { _rmPlanos.forEach(t => on ? _rmSel.add(t.id) : _rmSel.delete(t.id)); rmRender(); }
+async function rmRpc(nome, corpo) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${nome}`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify(corpo) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && (j.message || j.hint)) || ('erro ' + r.status));
+  return j;
+}
+// Aprovar a mensagem do plano (lista ou ficha): entra na fila de envio com cadência
+async function aprovarMensagemPlano(id, texto) {
+  return rmRpc('epos_aprovar_mensagem', { p_tarefa_id: id, p_texto: texto });
+}
+async function rmAprovar(id, semRecarregar) {
+  const t = (document.getElementById('rm-t-' + id)?.value || '').trim();
+  if (!t) { toast('Escreva a mensagem antes de aprovar', 'err'); return false; }
+  try {
+    const quando = await aprovarMensagemPlano(id, t);
+    if (!semRecarregar) { toast('Aprovada. Sai às ' + labData(quando)); _rmSel.delete(id); await rmLoad(); }
+    return true;
+  } catch (e) { toast('Não aprovou: ' + e.message, 'err'); return false; }
+}
+async function rmAprovarSelecionadas() {
+  const ids = _rmPlanos.filter(t => _rmSel.has(t.id)).map(t => t.id);
+  if (!ids.length) return;
+  let ok = 0;
+  for (const id of ids) { if (await rmAprovar(id, true)) { ok++; _rmSel.delete(id); } }
+  toast(ok + (ok === 1 ? ' aprovada' : ' aprovadas') + '. Veja os horários na aba Na fila.');
+  _rmAba = 'fila'; await rmLoad();
+}
+async function rmDescartarPlano(id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.sugerida`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'descartada', concluida_em: new Date().toISOString() }) });
+    if (!r.ok) throw new Error('erro ' + r.status);
+    _rmSel.delete(id); toast('Descartada'); await rmLoad();
+  } catch (e) { toast('Não descartou: ' + e.message, 'err'); }
+}
+async function rmCancelarEnvio(id) {
+  try { await rmRpc('remarketing_descartar', { p_id: id }); toast('Envio cancelado'); await rmLoad(); }
+  catch (e) { toast('Não cancelou: ' + e.message, 'err'); }
+}
+rmPodeVer();
 loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
 loadWaClicks();
 loadNotificacoes();
