@@ -1615,8 +1615,13 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
   <!-- Vendas inevitáveis (Torneira, CRM v3): o que está escapando agora — RPC epos_torneira -->
   <style>
-    #torneira-card .tor-kpis{grid-template-columns:repeat(5,1fr);margin-bottom:12px}
+    #torneira-card .tor-kpis{grid-template-columns:repeat(6,1fr);margin-bottom:12px}
     @media(max-width:1280px){#torneira-card .tor-kpis{grid-template-columns:repeat(3,1fr)}}
+    #torneira-card .tor-lig-acoes{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+    #torneira-card .tor-lig-acoes a,#torneira-card .tor-lig-acoes select{font-family:var(--fM);font-size:10.5px;padding:5px 9px;border-radius:8px;border:1px solid var(--g-bd);background:transparent;color:var(--text);text-decoration:none;cursor:pointer}
+    #torneira-card .tor-lig-acoes a{border-color:rgba(31,175,90,.5);color:#1FAF5A}
+    #torneira-card .tor-lig-acoes select option{background:#18181c;color:#f2f2f4}
+    @media(max-width:768px){#torneira-card .tor-linha.lig{flex-wrap:wrap}#torneira-card .tor-lig-acoes{width:100%;justify-content:flex-start;padding-left:44px}}
     #torneira-card .tor-kpi{cursor:pointer}
     #torneira-card .tor-kpi.ativo{border-color:rgba(249,115,22,.45)}
     #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
@@ -1633,7 +1638,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
     #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
     #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
-    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos]{grid-column:1/-1}}
+    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos],#torneira-card .tor-kpi[data-tor=ligacao]{grid-column:1/-1}}
     @media(max-width:768px){.socio-kpis{grid-template-columns:1fr 1fr!important}}
     .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
     .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
@@ -3615,6 +3620,26 @@ async function carregarTorneira() {
 // Novos leads (19/10): RPC epos_novos_leads — leads criados nos últimos 31 dias, com os períodos no horário de Brasília
 const NOVO_PER = { hoje: 'Hoje', ontem: 'Ontem', semana: 'Essa semana', d7: '7 dias', d15: '15 dias', d30: '30 dias' };
 let _torNovos = [];
+// 28/10: quem só respondeu com robô (a IA leu a conversa) ou tem tarefa de ligação → card "Precisam de ligação"
+let _torLig = [];
+const LIG_RES = { falou_decisor: 'Falei com quem decide', marcou_reuniao: 'Marcou reunião', pegou_contato: 'Peguei o contato certo',
+  ligar_de_novo: 'Ligar de novo', nao_atendeu: 'Não atendeu', sem_interesse: 'Sem interesse', numero_errado: 'Número errado' };
+async function carregarLigacoes() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_precisa_ligacao`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' });
+    const d = await r.json();
+    _torLig = r.ok && Array.isArray(d) ? d : [];
+  } catch (e) { _torLig = []; }
+}
+async function registrarLigacao(tel, resultado) {
+  if (!resultado) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_ligacao_registrar`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify({ p_telefone: tel, p_resultado: resultado }) });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || ('erro ' + r.status)); }
+    toast(['ligar_de_novo', 'nao_atendeu'].includes(resultado) ? 'Registrado: continua na lista' : 'Registrado: saiu da lista');
+    await carregarLigacoes(); _torFiltro = { situacao: 'ligacao', faixa: null }; renderTorneira();
+  } catch (e) { toast('Não registrou: ' + e.message, 'err'); }
+}
 async function carregarNovos() {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_novos_leads`, {
@@ -3649,7 +3674,7 @@ async function loadTorneira() {
   const alvo = document.getElementById('torneira-conteudo');
   if (!alvo) return;
   alvo.innerHTML = '<div class="loading"></div>';
-  try { await Promise.all([carregarTorneira(), carregarNovos()]); renderTorneira(); }
+  try { await Promise.all([carregarTorneira(), carregarNovos(), carregarLigacoes()]); renderTorneira(); }
   catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
 }
 
@@ -3675,7 +3700,7 @@ function renderTorneira() {
   const semPasso = _torDados.filter(l => l.aguardando_equipe || l.sem_proximo_passo);
   // Novos leads (19/10): quem chegou, por período (hoje, ontem, essa semana, 7, 15 e 30 dias)
   const novos = _torNovos;
-  if (!comFaixa.length && !semPasso.length && !novos.length) {
+  if (!comFaixa.length && !semPasso.length && !novos.length && !_torLig.length) {
     alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
     return;
   }
@@ -3688,7 +3713,20 @@ function renderTorneira() {
   const etapa = k => (typeof STAGES !== 'undefined' && STAGES.find(x => x.key === k)?.label) || k || 'sem etapa';
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
   let titulo, sufixo, chips, lista, linhas;
-  if (sit === 'novos') {
+  if (sit === 'ligacao') {
+    titulo = 'Precisam de ligação'; sufixo = ' · só o robô respondeu no WhatsApp'; chips = ''; lista = _torLig;
+    linhas = lista.slice(0, 80).map(l => {
+      const n = nome(l);
+      const tel = String(l.telefone || '').replace(/\D/g, '');
+      const tent = l.tentativas ? ` · ${l.tentativas} tentativa${l.tentativas === 1 ? '' : 's'} (última: ${escHtml(LIG_RES[l.ultimo_resultado] || l.ultimo_resultado || '')})` : '';
+      return `<div class="tor-linha lig" data-tel="${escHtml(l.telefone)}">
+      <div class="tor-avatar" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
+      <div style="flex:1;min-width:0" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))}${l.nicho ? ' · ' + escHtml(l.nicho) : ''}${tent}</div></div>
+      <div class="tor-lig-acoes"><a href="tel:+${escHtml(tel)}" onclick="event.stopPropagation()">📞 Ligar</a>
+        <select onclick="event.stopPropagation()" onchange="registrarLigacao('${escHtml(l.telefone)}', this.value)" aria-label="Resultado da ligação">
+          <option value="">Resultado…</option>${Object.entries(LIG_RES).map(([k, t]) => `<option value="${k}">${t}</option>`).join('')}</select></div></div>`;
+    }).join('');
+  } else if (sit === 'novos') {
     const per = NOVO_PER[faixaSel] ? faixaSel : 'hoje';
     titulo = 'Novos leads'; sufixo = ' · ' + NOVO_PER[per].toLowerCase();
     chips = Object.keys(NOVO_PER).map(k => `<button class="tor-chip${per === k ? ' ativo' : ''}" data-faixa="${k}" onclick="filtrarTorneira('novos','${k}')">${NOVO_PER[k]} · <b>${novos.filter(l => l[k]).length}</b></button>`).join('');
@@ -3726,11 +3764,12 @@ function renderTorneira() {
       ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
       ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
       ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
+      ${card('ligacao', 'Precisam de ligação', _torLig.length, _torLig.length ? 'só o robô respondeu: ligar para achar quem decide' : 'nenhuma ligação pendente')}
     </div>
     <div class="tor-painel">
-      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">Clique no lead para abrir a ficha</span></div>
+      <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">${sit === 'ligacao' ? 'Ligue e registre o resultado · clique no nome para abrir a ficha' : 'Clique no lead para abrir a ficha'}</span></div>
       ${chips ? `<div class="tor-chips">${chips}</div>` : ''}
-      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : 'Nenhum lead aqui. ✅'}</div>`}</div>
+      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : sit === 'ligacao' ? 'Nenhuma ligação pendente. ✅' : 'Nenhum lead aqui. ✅'}</div>`}</div>
       ${lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : ''}
     </div>`;
 }
