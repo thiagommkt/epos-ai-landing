@@ -1554,6 +1554,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
       Campanhas
     </a>
+    <a data-sec="remarketing" id="nav-remarketing" style="display:none" onclick="navTo('remarketing')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M13 3.5A6 6 0 1 0 14 8"/><path d="M14 2v3h-3"/><path d="M6 8h4M8 6v4" stroke-width="1.2"/></svg>
+      Remarketing
+    </a>
     <a data-sec="prospeccao" onclick="navTo('prospeccao')">
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l4 4" stroke="currentColor" stroke-width="1.5"/></svg>
       Prospecção
@@ -2120,6 +2124,59 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     <div id="lab-lista"><div class="loading"></div></div>
     <div id="lab-conversa"><div class="lab-vazio">Escolha um teste na lista para ver a conversa.</div></div>
   </div>
+</section>
+
+<!-- 28/10 (Thiago: "As IAs decidem, mas só enviam depois de autorizadas… aprovamos por lá"): remarketing com contexto. Só administrador. -->
+<section class="section" id="s-remarketing">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">REMARKETING <span>A IA SUGERE · VOCÊ APROVA</span></div>
+      <div class="sec-sub">LÊ A CONVERSA INTEIRA · 1 ENVIO POR VEZ · 10 MIN OU MAIS ENTRE ELES · DIAS ÚTEIS 9H30–18H</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="rm-btn" onclick="rmGerar()" id="rm-gerar">Gerar sugestões agora</button>
+      <button class="rm-btn" onclick="rmLoad()">Atualizar</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <style>
+    .rm-btn { padding:6px 14px; background:transparent; border:1px solid var(--bd); color:var(--muted); font-family:var(--fD); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:border-color .2s, color .2s; }
+    .rm-btn:hover { border-color:var(--bd-b); color:var(--text); }
+    .rm-btn.forte { background:var(--purple); border-color:var(--purple); color:#fff; }
+    .rm-btn.forte:hover { filter:brightness(1.08); }
+    .rm-btn:disabled { opacity:.5; cursor:default; }
+    .rm-abas { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 14px; }
+    .rm-aba { padding:7px 12px; background:var(--bg2); border:1px solid var(--bd); color:var(--muted); font-family:var(--fB); font-size:12px; cursor:pointer; }
+    .rm-aba.ativo { border-color:var(--purple); color:var(--text); background:var(--pur-l); }
+    .rm-aba b { font-family:var(--fD); margin-left:4px; }
+    .rm-barra { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 12px; font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-lista { display:flex; flex-direction:column; gap:12px; }
+    .rm-card { background:var(--bg2); border:1px solid var(--bd); padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+    .rm-card.sel { border-color:var(--purple); }
+    .rm-topo { display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+    .rm-topo h3 { flex:1 1 220px; margin:0; font-family:var(--fB); font-size:15px; font-weight:600; color:var(--text); line-height:1.35; }
+    .rm-chips { display:flex; gap:6px; flex-wrap:wrap; }
+    .rm-chip { font-family:var(--fD); font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border:1px solid var(--bd-b); color:var(--muted); }
+    .rm-chip.alto { color:var(--neon); border-color:var(--neon); }
+    .rm-chip.donna { color:var(--orange); border-color:var(--orange); }
+    .rm-txt { font-family:var(--fB); font-size:13px; line-height:1.55; color:var(--text); }
+    .rm-txt small { display:block; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; font-family:var(--fD); }
+    .rm-card textarea { width:100%; min-height:84px; resize:vertical; background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-family:var(--fB); font-size:14px; line-height:1.5; padding:10px 12px; box-sizing:border-box; }
+    .rm-card textarea:focus { outline:none; border-color:var(--purple); }
+    .rm-acoes { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .rm-acoes a { font-family:var(--fB); font-size:12px; color:var(--muted); margin-left:auto; }
+    .rm-status { font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-status.erro { color:var(--warn); }
+    .rm-vazio { padding:28px 16px; text-align:center; color:var(--muted); font-family:var(--fB); font-size:13px; line-height:1.6; background:var(--bg2); border:1px solid var(--bd); }
+    .rm-marca { display:flex; gap:6px; align-items:center; font-family:var(--fB); font-size:12px; color:var(--muted); cursor:pointer; }
+    @media (max-width: 860px) { .rm-acoes a { margin-left:0; flex-basis:100%; } .rm-btn { padding:8px 12px; } }
+  </style>
+  <div style="font-size:12px;color:var(--muted);margin:0 0 14px;font-family:var(--fB);line-height:1.55;max-width:760px">
+    Todo dia útil às 8h a IA lê a conversa inteira de cada contato parado (canal de aquisição, etapa, o que foi dito, sinais de interesse) e escreve uma retomada própria para cada um, ou diz por que não mandar. Nada sai sem a sua aprovação. Ao aprovar, a mensagem entra na fila com 10 minutos ou mais depois da anterior e é cancelada sozinha se a pessoa escrever antes ou se a equipe assumir. Quando a conversa foi pelo número oficial e já passaram 24 horas, sai pelo número da Donna, que se apresenta.
+  </div>
+  <div class="rm-abas" id="rm-abas"></div>
+  <div class="rm-barra" id="rm-barra"></div>
+  <div class="rm-lista" id="rm-lista"><div class="loading"></div></div>
 </section>
 
 <section class="section" id="s-prospeccao">
@@ -4287,6 +4344,7 @@ function show(id) {
     if(id==='clientes') loadClientes();
     if(id==='prospeccao') { loadProspeccao(); pmLoad(); }
     if(id==='laboratorio') labLoad();
+    if(id==='remarketing') rmLoad();
   }
   if(id==='dashboard') {
     setTimeout(() => {
@@ -6984,6 +7042,120 @@ function labAbrir(id, semRolar) {
 }
 function labVoltar() { document.getElementById('lab-grade').classList.remove('aberto'); }
 labPodeVer();
+
+// ═══ REMARKETING (28/10) — a IA lê a conversa e sugere; o administrador aprova, edita ou descarta. Envio: [Epos] Remarketing — Enviar aprovadas ═══
+let _rm = [], _rmAba = 'sugerida', _rmSel = new Set();
+const RM_CANAL = { prospeccao_disparo_oficial: 'Prospecção · disparo oficial', prospeccao_antiga: 'Prospecção antiga', stories: 'Stories', quiz_metodo: 'Quiz do Método',
+  lead_ads: 'Formulário de anúncio', anuncio: 'Anúncio', contato_existente: 'Contato antigo', whatsapp: 'WhatsApp' };
+const RM_ETAPA = { em_conversa: 'Em conversa', qualificado: 'Qualificado', agendou: 'Agendou', agendado: 'Agendado', compareceu: 'Compareceu', perdido: 'Perdido' };
+const RM_STATUS = { aprovada: 'Na fila', enviando: 'Enviando agora', enviada: 'Enviada', cancelada: 'Cancelada', falhou: 'Falhou', descartada: 'Descartada' };
+async function rmPodeVer() {
+  try {
+    const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json());
+    const a = document.getElementById('nav-remarketing');
+    if (a) a.style.display = adm === true ? '' : 'none';
+  } catch (e) {}
+}
+async function rmLoad() {
+  const lista = document.getElementById('rm-lista');
+  if (!lista) return;
+  lista.innerHTML = '<div class="loading"></div>';
+  const desde = new Date(Date.now() - 7 * 864e5).toISOString();
+  const { data } = await sb(`remarketing_sugestoes?conta=eq.epos&or=(status.in.(sugerida,nao_enviar,aprovada,enviando),criada_em.gte.${desde})&order=criada_em.desc&limit=300`);
+  _rm = Array.isArray(data) ? data : [];
+  _rmSel = new Set([..._rmSel].filter(id => _rm.some(s => s.id === id && s.status === 'sugerida')));
+  rmRender();
+}
+function rmGrupo(aba) {
+  if (aba === 'sugerida') return _rm.filter(s => s.status === 'sugerida');
+  if (aba === 'nao_enviar') return _rm.filter(s => s.status === 'nao_enviar');
+  if (aba === 'fila') return _rm.filter(s => ['aprovada', 'enviando'].includes(s.status)).sort((a, b) => (a.agendada_para || '').localeCompare(b.agendada_para || ''));
+  return _rm.filter(s => ['enviada', 'cancelada', 'falhou', 'descartada'].includes(s.status)).sort((a, b) => (b.enviada_em || b.aprovada_em || b.criada_em).localeCompare(a.enviada_em || a.aprovada_em || a.criada_em));
+}
+function rmRender() {
+  const abas = [['sugerida', 'Para aprovar'], ['nao_enviar', 'A IA não mandaria'], ['fila', 'Na fila'], ['historico', 'Histórico (7 dias)']];
+  document.getElementById('rm-abas').innerHTML = abas.map(([k, t]) => `<button class="rm-aba${_rmAba === k ? ' ativo' : ''}" onclick="_rmAba='${k}';rmRender()">${t}<b>${rmGrupo(k).length}</b></button>`).join('');
+  const itens = rmGrupo(_rmAba);
+  const barra = document.getElementById('rm-barra');
+  barra.innerHTML = _rmAba === 'sugerida' && itens.length
+    ? `<label class="rm-marca"><input type="checkbox" onchange="rmMarcarTodos(this.checked)" ${itens.length && itens.every(s => _rmSel.has(s.id)) ? 'checked' : ''}> Marcar todas</label>
+       <button class="rm-btn forte" onclick="rmAprovarSelecionadas()" ${_rmSel.size ? '' : 'disabled'}>Aprovar selecionadas (${_rmSel.size})</button>
+       <span>Cada uma sai com 10 a 15 min de distância da anterior, no máximo 20 por dia.</span>`
+    : _rmAba === 'nao_enviar' && itens.length ? '<span>A IA segurou estas e explica o motivo. Se discordar, escreva ou ajuste a mensagem e mande mesmo assim.</span>' : '';
+  const lista = document.getElementById('rm-lista');
+  if (!itens.length) {
+    const vazio = { sugerida: 'Nenhuma sugestão esperando aprovação.<br>A IA prepara a lista todo dia útil às 8h, ou agora pelo botão "Gerar sugestões agora".',
+      nao_enviar: 'Nenhum contato segurado pela IA.', fila: 'Nada na fila de envio.', historico: 'Nenhum envio nos últimos 7 dias.' }[_rmAba];
+    lista.innerHTML = `<div class="rm-vazio">${vazio}</div>`;
+    return;
+  }
+  lista.innerHTML = itens.map(rmCard).join('');
+}
+function rmCard(s) {
+  const sin = s.sinais || {};
+  const chips = [RM_CANAL[s.canal_aquisicao] || s.canal_aquisicao, RM_ETAPA[s.stage] || s.stage || 'Sem etapa'].filter(Boolean).map(t => `<span class="rm-chip">${labEsc(t)}</span>`).join('')
+    + (sin.interesse ? `<span class="rm-chip${sin.interesse === 'alto' ? ' alto' : ''}">Interesse ${labEsc(sin.interesse)}</span>` : '')
+    + (sin.so_robo ? '<span class="rm-chip">Só robô</span>' : '') + (sin.recusou ? '<span class="rm-chip">Recusou</span>' : '')
+    + `<span class="rm-chip${s.numero === 'donna' ? ' donna' : ''}">${s.numero === 'oficial' ? 'Número oficial' : 'Número da Donna'}</span>`;
+  const conversa = s.conversa_id ? `<a href="https://chatwoot.eposmktfilmsia.com.br/app/accounts/1/conversations/${s.conversa_id}" target="_blank" rel="noopener">Ver a conversa no Chatwoot ↗</a>` : '';
+  const editavel = ['sugerida', 'nao_enviar'].includes(s.status);
+  const texto = s.mensagem_final || s.mensagem || '';
+  let rodape = '';
+  if (s.status === 'sugerida') rodape = `<label class="rm-marca"><input type="checkbox" ${_rmSel.has(s.id) ? 'checked' : ''} onchange="rmMarcar('${s.id}',this.checked)"> Selecionar</label>
+      <button class="rm-btn forte" onclick="rmAprovar('${s.id}')">Aprovar</button><button class="rm-btn" onclick="rmDescartar('${s.id}')">Descartar</button>${conversa}`;
+  else if (s.status === 'nao_enviar') rodape = `<button class="rm-btn" onclick="rmAprovar('${s.id}')">Mandar mesmo assim</button><button class="rm-btn" onclick="rmDescartar('${s.id}')">Descartar</button>${conversa}`;
+  else if (s.status === 'aprovada') rodape = `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn" onclick="rmDescartar('${s.id}')">Cancelar envio</button>${conversa}`;
+  else rodape = `<span class="rm-status${['falhou', 'cancelada'].includes(s.status) ? ' erro' : ''}">${RM_STATUS[s.status] || s.status}${s.enviada_em ? ' em ' + labData(s.enviada_em) : s.aprovada_em ? ' em ' + labData(s.aprovada_em) : ''}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span>${conversa}`;
+  return `<div class="rm-card${_rmSel.has(s.id) ? ' sel' : ''}" id="rm-${s.id}">
+    <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${chips}</div></div>
+    ${s.resumo ? `<div class="rm-txt"><small>O que aconteceu</small>${labEsc(s.resumo)}</div>` : ''}
+    ${s.motivo ? `<div class="rm-txt"><small>${s.decisao === 'enviar' ? 'Por que retomar' : 'Por que a IA não mandaria'}</small>${labEsc(s.motivo)}</div>` : ''}
+    ${editavel ? `<div class="rm-txt"><small>Mensagem${s.status === 'nao_enviar' && !texto ? ' (escreva se quiser mandar)' : ' (pode editar antes de aprovar)'}</small></div><textarea id="rm-t-${s.id}" maxlength="1000">${labEsc(texto)}</textarea>`
+      : texto ? `<div class="rm-txt"><small>Mensagem</small>${labEsc(texto)}</div>` : ''}
+    <div class="rm-acoes">${rodape}</div>
+  </div>`;
+}
+function rmMarcar(id, on) { on ? _rmSel.add(id) : _rmSel.delete(id); rmRender(); }
+function rmMarcarTodos(on) { rmGrupo('sugerida').forEach(s => on ? _rmSel.add(s.id) : _rmSel.delete(s.id)); rmRender(); }
+async function rmRpc(nome, corpo) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${nome}`, { method: 'POST', headers: _modoDonoHeaders(), body: JSON.stringify(corpo) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && (j.message || j.hint)) || ('erro ' + r.status));
+  return j;
+}
+async function rmAprovar(id, semRecarregar) {
+  const s = _rm.find(x => x.id === id); if (!s) return;
+  const t = (document.getElementById('rm-t-' + id)?.value || '').trim();
+  if (!t) { toast('Escreva a mensagem antes de aprovar', 'err'); return false; }
+  try {
+    const r = await rmRpc('remarketing_aprovar', { p_id: id, p_texto: t });
+    const quando = Array.isArray(r) && r[0] ? r[0].agendada_para : null;
+    if (!semRecarregar) { toast('Aprovada. Sai às ' + labData(quando)); _rmSel.delete(id); await rmLoad(); }
+    return true;
+  } catch (e) { toast('Não aprovou: ' + e.message, 'err'); return false; }
+}
+async function rmAprovarSelecionadas() {
+  const ids = rmGrupo('sugerida').filter(s => _rmSel.has(s.id)).map(s => s.id);
+  if (!ids.length) return;
+  let ok = 0;
+  for (const id of ids) { if (await rmAprovar(id, true)) { ok++; _rmSel.delete(id); } }
+  toast(ok + (ok === 1 ? ' aprovada' : ' aprovadas') + '. Veja os horários na aba Na fila.');
+  _rmAba = 'fila'; await rmLoad();
+}
+async function rmDescartar(id) {
+  try { await rmRpc('remarketing_descartar', { p_id: id }); _rmSel.delete(id); toast('Descartada'); await rmLoad(); }
+  catch (e) { toast('Não descartou: ' + e.message, 'err'); }
+}
+async function rmGerar() {
+  const b = document.getElementById('rm-gerar'); b.disabled = true; b.textContent = 'IA lendo as conversas…';
+  toast('A IA está lendo as conversas. Leva alguns minutos; as sugestões aparecem aqui.');
+  try {
+    await fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-remarketing-sugestoes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: 'fm-dash-2026-x9k2', modo: 'gravar' }) });
+  } catch (e) {}
+  b.disabled = false; b.textContent = 'Gerar sugestões agora';
+  await rmLoad();
+}
+rmPodeVer();
 loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
 loadWaClicks();
 loadNotificacoes();
