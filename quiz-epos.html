@@ -78,6 +78,16 @@ html.board .footer-note{display:none}
 html.board .app{min-height:0}
 html.board .screens,html.board .screen{overflow:visible}
 
+/* modo site (?modo=site): igual ao board, com o roxo escuro do site institucional */
+html.site{--purple:#5B34B8;--purple-soft:rgba(91,52,184,.2)}
+html.site .brand-mark{background:linear-gradient(135deg,var(--purple),#3F2290);box-shadow:0 6px 18px -6px rgba(91,52,184,.7)}
+html.site .progress span::after{background:linear-gradient(90deg,var(--purple),#8A66E0)}
+html.site .btn-primary{box-shadow:0 14px 34px -14px rgba(91,52,184,.9)}
+html.site .btn-primary:hover{background:#6B44CC;box-shadow:0 18px 40px -12px rgba(91,52,184,1)}
+html.site .opt.selected{background:linear-gradient(90deg,var(--purple-soft),rgba(91,52,184,.05))}
+html.site .field input:focus{box-shadow:0 0 0 3px rgba(91,52,184,.3)}
+html.site .end-badge{border-color:rgba(91,52,184,.45)}
+
 /* topo: marca + leitura do progresso */
 .top{display:flex;align-items:center;justify-content:space-between;padding:20px 26px 0;flex-shrink:0}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--fM);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
@@ -198,7 +208,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   .top,.progress{padding-left:18px;padding-right:18px}
 }
 </style>
-<script>if(/[?&]modo=board\b/.test(location.search))document.documentElement.classList.add('board');</script>
+<script>if(/[?&]modo=(board|site)\b/.test(location.search))document.documentElement.classList.add('board');if(/[?&]modo=site\b/.test(location.search))document.documentElement.classList.add('site');</script>
 </head>
 <body>
 
@@ -415,6 +425,9 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   var DONNA_WA = '556190448205';
   var answers = {};
   var BOARD = document.documentElement.classList.contains('board');
+  // página que embute o quiz: só recebe altura/aviso de envio se for o Método (mesma origem) ou o site institucional
+  var ORIGENS_PAI = [location.origin, 'https://eposmktfilmsia.com.br', 'https://www.eposmktfilmsia.com.br', 'http://localhost:8765'];
+  var ORIGEM_PAI = (function(){ try { var o = new URL(document.referrer).origin; return ORIGENS_PAI.indexOf(o) > -1 ? o : location.origin; } catch(eO){ return location.origin; } })();
 
   // barra de progresso: 7 perguntas + contato
   var prog = document.getElementById('progress');
@@ -574,7 +587,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
       + PERGUNTAS.map(function(k){ return ROTULOS_WA[k] + ': ' + (answers[k] || '—'); }).join('\n');
     document.getElementById('btnWa').href = 'https://wa.me/' + DONNA_WA + '?text=' + encodeURIComponent(waTexto);
     // modo board: avisa a página do Método que o formulário já foi preenchido (o botão "Agendar diagnóstico" muda de texto)
-    if (BOARD && window.parent !== window) { try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'enviado', primeiro_nome: primeiro }, location.origin); } catch(e3){} }
+    if (BOARD && window.parent !== window) { try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'enviado', primeiro_nome: primeiro }, ORIGEM_PAI); } catch(e3){} }
     goTo('sucesso');
   });
 
@@ -582,7 +595,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
 
   // modo board: informa a altura para a página do Método (o quadro aparece inteiro, sem rolagem interna)
   if (BOARD && window.parent !== window) {
-    var postarAltura = function(){ try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'altura', h: document.querySelector('.app').getBoundingClientRect().height }, location.origin); } catch(eA){} };
+    var postarAltura = function(){ try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'altura', h: document.querySelector('.app').getBoundingClientRect().height }, ORIGEM_PAI); } catch(eA){} };
     if (window.ResizeObserver) new ResizeObserver(postarAltura).observe(document.querySelector('.app'));
     window.addEventListener('load', postarAltura); setTimeout(postarAltura, 300);
   }
