@@ -1622,6 +1622,12 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     #torneira-card .tor-lig-acoes a{border-color:rgba(31,175,90,.5);color:#1FAF5A}
     #torneira-card .tor-lig-acoes select option{background:#18181c;color:#f2f2f4}
     @media(max-width:768px){#torneira-card .tor-linha.lig{flex-wrap:wrap}#torneira-card .tor-lig-acoes{width:100%;justify-content:flex-start;padding-left:44px}}
+    #torneira-card .tor-lig-grupo{font-family:var(--fM);font-size:10.5px;letter-spacing:.04em;color:var(--dim);margin:14px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--g-bd)}
+    #torneira-card .tor-lig-ctx{font-size:11.5px;color:var(--text);opacity:.85;margin-top:4px;line-height:1.45;overflow-wrap:anywhere}
+    #torneira-card .tor-roteiro{border:1px solid var(--g-bd);border-radius:10px;padding:8px 12px;margin:4px 0 6px;font-size:12px;line-height:1.5}
+    #torneira-card .tor-roteiro summary{cursor:pointer;font-family:var(--fM);font-size:10.5px;color:var(--dim)}
+    #torneira-card .tor-roteiro ol{margin:8px 0 2px;padding-left:18px}
+    #torneira-card .tor-roteiro li{margin-bottom:6px}
     #torneira-card .tor-kpi{cursor:pointer}
     #torneira-card .tor-kpi.ativo{border-color:rgba(249,115,22,.45)}
     #torneira-card .tor-painel{background:var(--g-bg);backdrop-filter:var(--g-blur-sm);-webkit-backdrop-filter:var(--g-blur-sm);border:1px solid var(--g-bd);border-radius:18px;padding:14px}
@@ -3623,6 +3629,14 @@ let _torNovos = [];
 let _torLig = [];
 const LIG_RES = { falou_decisor: 'Falei com quem decide', marcou_reuniao: 'Marcou reunião', pegou_contato: 'Peguei o contato certo',
   ligar_de_novo: 'Ligar de novo', nao_atendeu: 'Não atendeu', sem_interesse: 'Sem interesse', numero_errado: 'Número errado' };
+// 28/10: plano de ligações — prioridade vem da RPC (1 quentes, 2 pessoa atendeu, 3 foco só com robô, 4 demais)
+const LIG_PRIO = { 1: 'Quentes', 2: 'Uma pessoa atendeu no WhatsApp', 3: 'Nichos de foco · só o robô respondeu', 4: 'Outros nichos e prospecção antiga' };
+const LIG_ROTEIRO = `<details class="tor-roteiro"><summary>Roteiro da ligação (abrir)</summary><ol>
+  <li><b>Abertura:</b> "Oi, tudo bem? Aqui é o Thiago, da Epos. Mandei no WhatsApp de vocês um vídeo de 20 segundos de uma IA atendendo um cliente às 23h. Quem cuida do atendimento ou do marketing aí?"</li>
+  <li><b>Se for a recepção:</b> pegue o nome de quem decide e o melhor horário ou número dessa pessoa. Registre "Peguei o contato certo".</li>
+  <li><b>Com quem decide:</b> "Hoje, quando um cliente chama vocês no WhatsApp à noite ou no fim de semana, quem responde?" Deixe a pessoa falar.</li>
+  <li><b>Próximo passo:</b> "Te mostro em 20 minutos como ficaria aí, com as perguntas reais dos seus clientes. Amanhã ou sexta, qual horário fica melhor?"</li>
+  <li><b>Na hora:</b> registre o resultado no campo ao lado do nome.</li></ol></details>`;
 async function carregarLigacoes() {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_precisa_ligacao`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' });
@@ -3714,14 +3728,29 @@ function renderTorneira() {
   const nome = l => { const n = String(l.nome || '').trim(); return !n || /^[\d\s()+-]+$/.test(n) ? 'Sem nome' : n; };
   let titulo, sufixo, chips, lista, linhas;
   if (sit === 'ligacao') {
-    titulo = 'Precisam de ligação'; sufixo = ' · só o robô respondeu no WhatsApp'; chips = ''; lista = _torLig;
-    linhas = lista.slice(0, 80).map(l => {
+    // 28/10 (Thiago: "Monte o plano de ligações lá no dashboard"): plano do dia por prioridade (RPC epos_precisa_ligacao),
+    // com quem falar, o contexto e o número certo para ligar (pode ser outro, ex.: a recepção passou o da dona)
+    const prioSel = LIG_PRIO[faixaSel] ? Number(faixaSel) : null;
+    titulo = 'Plano de ligações'; sufixo = prioSel ? ' · ' + LIG_PRIO[prioSel].toLowerCase() : ' · em ordem de prioridade';
+    chips = Object.keys(LIG_PRIO).map(k => [k, _torLig.filter(l => String(l.prioridade || 4) === k).length]).filter(([, q]) => q)
+      .map(([k, q]) => `<button class="tor-chip${String(prioSel) === k ? ' ativo' : ''}" data-faixa="${k}" onclick="filtrarTorneira('ligacao','${k}')">${k}. ${LIG_PRIO[k]} · <b>${q}</b></button>`).join('');
+    lista = prioSel ? _torLig.filter(l => (l.prioridade || 4) === prioSel) : _torLig;
+    let prioAtual = null;
+    const dataCurta = iso => new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' });
+    linhas = (lista.length ? LIG_ROTEIRO : '') + lista.slice(0, 80).map(l => {
+      const p = l.prioridade || 4;
+      const cab = p !== prioAtual ? `<div class="tor-lig-grupo">${p}. ${LIG_PRIO[p] || ''}</div>` : '';
+      prioAtual = p;
       const n = nome(l);
-      const tel = String(l.telefone || '').replace(/\D/g, '');
+      const tel = String(l.ligar_para || l.telefone || '').replace(/\D/g, '');
+      const outroNum = tel !== String(l.telefone || '').replace(/\D/g, '');
       const tent = l.tentativas ? ` · ${l.tentativas} tentativa${l.tentativas === 1 ? '' : 's'} (última: ${escHtml(LIG_RES[l.ultimo_resultado] || l.ultimo_resultado || '')})` : '';
-      return `<div class="tor-linha lig" data-tel="${escHtml(l.telefone)}">
+      const video = l.video_em ? ` · vídeo em ${dataCurta(l.video_em)}` : '';
+      const quem = l.falar_com || outroNum ? `<div class="tor-lig-ctx">${l.falar_com ? '<b>Falar com:</b> ' + escHtml(l.falar_com) : ''}${outroNum ? `${l.falar_com ? ' · ' : ''}<b>ligar no ${escHtml(maskPhone(tel))}</b>` : ''}</div>` : '';
+      const ctx = l.contexto || l.motivo;
+      return cab + `<div class="tor-linha lig" data-tel="${escHtml(l.telefone)}">
       <div class="tor-avatar" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
-      <div style="flex:1;min-width:0" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))}${l.nicho ? ' · ' + escHtml(l.nicho) : ''}${tent}</div></div>
+      <div style="flex:1;min-width:0" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')"><div class="tor-nome">${escHtml(n)}</div><div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))}${l.nicho ? ' · ' + escHtml(l.nicho) : ''}${video}${tent}</div>${quem}${ctx ? `<div class="tor-lig-ctx">${escHtml(ctx)}</div>` : ''}</div>
       <div class="tor-lig-acoes"><a href="tel:+${escHtml(tel)}" onclick="event.stopPropagation()">📞 Ligar</a>
         <select onclick="event.stopPropagation()" onchange="registrarLigacao('${escHtml(l.telefone)}', this.value)" aria-label="Resultado da ligação">
           <option value="">Resultado…</option>${Object.entries(LIG_RES).map(([k, t]) => `<option value="${k}">${t}</option>`).join('')}</select></div></div>`;
@@ -3764,7 +3793,7 @@ function renderTorneira() {
       ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
       ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
       ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
-      ${card('ligacao', 'Precisam de ligação', _torLig.length, _torLig.length ? 'só o robô respondeu: ligar para achar quem decide' : 'nenhuma ligação pendente')}
+      ${card('ligacao', 'Precisam de ligação', _torLig.length, _torLig.length ? (() => { const q = _torLig.filter(l => (l.prioridade || 4) <= 2).length; return q ? `${q} quente${q === 1 ? '' : 's'} primeiro · plano em ordem` : 'plano em ordem de prioridade'; })() : 'nenhuma ligação pendente')}
     </div>
     <div class="tor-painel">
       <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">${sit === 'ligacao' ? 'Ligue e registre o resultado · clique no nome para abrir a ficha' : 'Clique no lead para abrir a ficha'}</span></div>
@@ -3911,10 +3940,15 @@ async function carregarTarefasLead(telefone) {
   box.innerHTML = ts.map(t => {
     // 28/10: plano do Analista — ligação
     if (t.tipo === 'ligacao' && t.status === 'sugerida') {
-      const tel = String(telefone).replace(/\D/g, '');
+      // 28/10: plano de ligações — pode ser outro número (ex.: a recepção passou o da dona) e ter com quem falar e o contexto
+      const lg = (t.plano && t.plano.ligacao) || {};
+      const tel = String(lg.ligar_para || telefone).replace(/\D/g, '');
+      const outroNum = tel !== String(telefone).replace(/\D/g, '');
       return `<div class="tarefa-item" style="padding:8px;border:1px dashed rgba(31,175,90,.55);margin-bottom:6px">
-        <div style="font-family:var(--fM);font-size:9px;color:#1FAF5A;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">📞 Precisa de ligação (plano do Analista)</div>
+        <div style="font-family:var(--fM);font-size:9px;color:#1FAF5A;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">📞 Precisa de ligação${lg.prioridade ? ' · prioridade ' + escHtml(lg.prioridade) : ''}</div>
         <div style="font-size:12px;color:var(--text);margin-bottom:6px">${escHtml(t.acao)}</div>
+        ${lg.falar_com || outroNum ? `<div style="font-size:12px;color:var(--text);margin-bottom:6px">${lg.falar_com ? '<b>Falar com:</b> ' + escHtml(lg.falar_com) : ''}${outroNum ? `${lg.falar_com ? ' · ' : ''}<b>ligar no ${escHtml(maskPhone(tel))}</b>` : ''}</div>` : ''}
+        ${lg.contexto ? `<div style="font-size:11.5px;color:var(--muted);margin-bottom:6px;overflow-wrap:anywhere">${escHtml(lg.contexto)}</div>` : ''}
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
           <a href="tel:+${tel}" style="${_BTN_MINI};border:1px solid rgba(31,175,90,.5);color:#1FAF5A;text-decoration:none">📞 Ligar</a>
           <select onchange="registrarLigacao('${telefone}', this.value)" aria-label="Resultado da ligação" style="${_INPUT_MINI}"><option value="">Resultado…</option>${Object.entries(LIG_RES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
