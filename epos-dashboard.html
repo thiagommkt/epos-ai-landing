@@ -6550,6 +6550,13 @@ async function loadProspeccao() {
 }
 
 async function dispararLote() {
+  // 04/11 (Thiago: "1 lote por vez pela api oficial"): o fluxo recusa se a fila da Prospecção estiver ligada ou outro lote estiver rodando; aqui o painel mostra o motivo antes
+  try {
+    const { data } = await sb('system_config?projeto=eq.principal&select=disparo_oficial_ativo,lote_oficial_em,lote_oficial_origem&limit=1');
+    const c = data && data[0];
+    if (c && c.disparo_oficial_ativo) return alert('A fila de envios da Prospecção está ligada (API oficial).\n\n1 lote por vez: pause a fila antes de disparar o lote da planilha.');
+    if (c && c.lote_oficial_em && Date.now() - new Date(c.lote_oficial_em).getTime() < 600000) return alert('Já tem um lote rodando (' + (c.lote_oficial_origem || '?') + '). Espere terminar.');
+  } catch (e) {}
   if (!confirm('Disparar o próximo lote pendente da planilha de prospecção?\n\nO envio respeita o intervalo de 90–150s entre mensagens e pode levar bastante tempo para concluir.')) return;
   const btn = document.getElementById('btn-disparar-lote');
   const orig = btn.textContent;
