@@ -2213,7 +2213,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </div>
     <div style="display:flex;gap:8px">
       <button onclick="loadProspeccao()" style="padding:6px 14px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--muted)'">↻ Atualizar</button>
-      <button id="btn-disparar-lote" onclick="dispararLote()" style="padding:6px 16px;background:var(--purple);border:1px solid var(--purple);color:#fff;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s">▶ Disparar Lote</button>
+      <!-- 04/11 (Thiago: "o botão disparar lote seguia os que eu marcasse na aba prospecção"): o topo agora dispara a lista filtrada (prioridade, nicho, status, região) pela fila da API oficial. O lote da planilha antiga (dispararLote) saiu do painel; o fluxo dele fica intacto no n8n. -->
+      <button id="btn-disparar-lote" onclick="pmDisparoTopo()" title="Dispara para as empresas da lista filtrada abaixo (prioridade, nicho, status, região)" style="padding:6px 16px;background:var(--purple);border:1px solid var(--purple);color:#fff;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s">▶ Disparar lote (lista filtrada)</button>
     </div>
   </div>
   <div class="rule"></div>
@@ -6261,6 +6262,11 @@ function pmPrevia(e) {
     ? `Vi que vocês têm um Google Meu Negócio com ${e.avaliacoes} avaliações, isso gera uma reputação de quem atende bem.\n\nUma pergunta: quem chama ${q[0]} às 23h recebe resposta na hora?\n`
     : `Vi o perfil de vocês no Google e fiquei com uma dúvida:\n\nQuem chama ${q[0]} às 23h recebe resposta na hora?\n`)
     + `E essa pessoa realmente vira cliente?\n\nCriamos uma IA que responde em segundos no WhatsApp ${q[1]}, qualifica, agenda, tira dúvidas e mostra quais anúncios trazem mais clientes que fecham de verdade.\n\nConfira agora como ela funciona na prática.\n[Com certeza]  [Agora não]`;
+}
+// 04/11: botão do topo da Prospecção = mesmo envio da lista filtrada (leva até a lista e abre a confirmação)
+function pmDisparoTopo() {
+  const c = document.getElementById('pm-card'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(pmConfirmarDisparo, 350);
 }
 async function pmConfirmarDisparo() {
   const lista = pmFiltradas(), sel = lista.filter(pmPodeDisparar);
