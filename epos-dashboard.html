@@ -1792,7 +1792,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <button type="button" data-fonte="quiz" aria-pressed="false" onclick="setRastreioFonte('quiz')">Quiz</button>
       <button type="button" data-fonte="site" aria-pressed="false" onclick="setRastreioFonte('site')">Site</button>
     </div>
-    <div class="card-ttl" id="rastreio-ttl">Página do Método — Rastreamento <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— metodo.html · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco</span></div>
+    <div class="card-ttl" id="rastreio-ttl">Página do Método — Rastreamento <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— eposmktfilmsia.com.br/metodo · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco</span></div>
     <div id="metodo-rastreio"><div class="loading"></div></div>
   </div>
 
@@ -2925,7 +2925,7 @@ const METODO_QUIZ = [['hook','Viu o raio-X'], ['segmento','1 · Segmento'], ['ti
 // Seletor do cartão (03/11): Método (metodo.html) · Quiz (quiz-epos.html aberto sozinho) · Site (eposmktfilmsia.com.br).
 // Cada visão tem a sua RPC; os números não se repetem (o quiz dentro do Método fica no Método, o de dentro do site fica no Site).
 const RASTREIO_FONTES = {
-  metodo: { titulo: 'Página do Método — Rastreamento', sub: 'metodo.html · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco' },
+  metodo: { titulo: 'Página do Método — Rastreamento', sub: 'eposmktfilmsia.com.br/metodo · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco' },
   quiz: { titulo: 'Quiz da Epos — Rastreamento', sub: 'quiz-epos.html aberto sozinho (anúncios, Instagram, link direto) · o quiz dentro do Método e do site fica nas outras abas · sem equipe e sem robôs' },
   site: { titulo: 'Site institucional — Rastreamento', sub: 'eposmktfilmsia.com.br · grava desde 03/11 · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco' }
 };
@@ -6213,7 +6213,7 @@ function pmPeriodo() { const h = new Date().getHours(); return h < 12 ? 'bom dia
 function pmSlug(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
 function pmTelFmt(t) { const d = String(t || '').replace(/^55/, ''); return d.length === 11 ? `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}` : d.length === 10 ? `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}` : t; }
 function pmMensagens(e, trat) {
-  const n = PM_NICHO[pmNichoChave(e.nicho)], link = 'https://lp.eposmktfilmsia.com.br/metodo.html?c=' + pmSlug(e.empresa);
+  const n = PM_NICHO[pmNichoChave(e.nicho)], link = 'https://eposmktfilmsia.com.br/metodo/?c=' + pmSlug(e.empresa);
   const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
   const apres = 'Meu nome é Thiago Montandon, sou publicitário em Brasília e trabalho com marketing, comunicação e audiovisual para empresas de diferentes segmentos, incluindo ' + n.segmento + '.'
     + '\n\nNão sei se ' + n.empresa + ' já investe nessas áreas, mas gostaria de compartilhar nossa apresentação sobre uma nova ferramenta que desenvolvemos. Aliada às estratégias de tráfego pago, ela tem gerado bons resultados para nossos clientes.';

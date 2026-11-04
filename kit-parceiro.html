@@ -188,7 +188,7 @@ footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5
 
 <section id="roteiro">
   <h2><small>04</small>Roteiro da call</h2>
-  <p class="sub">Uns 30 minutos. Abra <b>lp.eposmktfilmsia.com.br/metodo.html</b> no computador e clique em <b>▶ Apresentar</b>: cada bloco ocupa a tela e as setas ← → passam de um para outro. Deixe o celular à mão para a Donna ao vivo.</p>
+  <p class="sub">Uns 30 minutos. Abra <b>eposmktfilmsia.com.br/metodo</b> no computador e clique em <b>▶ Apresentar</b>: cada bloco ocupa a tela e as setas ← → passam de um para outro. Deixe o celular à mão para a Donna ao vivo.</p>
 
   <div class="passo"><div class="t"><b>2 min</b>Abertura</div><div>
     <h4>Combine o fim da call no começo</h4>
@@ -322,7 +322,7 @@ footer{padding:34px 0 50px;color:var(--dim);font-family:var(--fM);font-size:11.5
     <label for="convNome">Link do convidado</label>
     <p>Digite o nome da empresa. O link sai pronto e entra sozinho na mensagem com a página. No painel, o Thiago vê se a pessoa abriu, até onde leu, se fez o raio-X e se clicou. Abra este kit uma vez no celular e no computador que você usa nas calls: assim as suas visitas não contam como visita do convidado.</p>
     <div class="gerador-linha"><input id="convNome" type="text" placeholder="Ex.: Clínica Sorriso" autocomplete="off"><button class="copiar" type="button" id="convCopiar">Copiar link</button></div>
-    <div class="gerador-link" id="convLink">https://lp.eposmktfilmsia.com.br/metodo.html</div>
+    <div class="gerador-link" id="convLink">https://eposmktfilmsia.com.br/metodo/</div>
   </div>
 
   <div class="msg"><div class="topo"><span>Fechou · para o empresário</span><button class="copiar" type="button">Copiar</button></div>
@@ -366,8 +366,8 @@ Pela sua conta, hoje estão indo embora [valor] por mês. Combinamos de falar [d
 (function(){
   var toast = document.getElementById('toast');
   function aviso(t){ toast.textContent = t; toast.classList.add('on'); setTimeout(function(){ toast.classList.remove('on'); }, 1600); }
-  // Link do convidado (19/10): metodo.html?c=nome-da-empresa; o painel da Epos mostra o que cada convidado fez na página
-  var BASE = 'https://lp.eposmktfilmsia.com.br/metodo.html';
+  // Link do convidado (19/10; site desde 04/11): eposmktfilmsia.com.br/metodo/?c=nome-da-empresa; o painel da Epos mostra o que cada convidado fez na página
+  var BASE = 'https://eposmktfilmsia.com.br/metodo/';
   var campo = document.getElementById('convNome'), saida = document.getElementById('convLink');
   function linkConvidado(){
     var c = (campo.value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
