@@ -608,10 +608,12 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
   var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
   var LP_SLUG = 'quiz-epos';
-  var sid;
-  try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
-  if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem('_lp_sid', sid); } catch(e){} }
   var p = new URLSearchParams(location.search);
+  // ?sid= vem do site institucional (quadro da home e botões): a visita ao site e o raio-X ficam na mesma pessoa (03/11). Não substitui o _lp_sid guardado.
+  var sid = /^[A-Za-z0-9-]{8,64}$/.test(p.get('sid') || '') ? p.get('sid') : null;
+  if (p.get('sid')) { try { var semSid = new URLSearchParams(location.search); semSid.delete('sid'); history.replaceState(null, '', location.pathname + (semSid.toString() ? '?' + semSid.toString() : '') + location.hash); } catch(e){} }
+  if (!sid) { try { sid = localStorage.getItem('_lp_sid'); } catch(e){} }
+  if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem('_lp_sid', sid); } catch(e){} }
   var utms = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ utms[k] = p.get(k) || ''; });
   if (/[?&]modo=board\b/.test(location.search) && !utms.utm_content) utms.utm_content = 'metodo-board';
