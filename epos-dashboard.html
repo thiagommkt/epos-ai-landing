@@ -5400,19 +5400,24 @@ async function enviarMensagem(telefone) {
 
 // ═══ MARCAR COMPARECEU ═══
 async function marcarCompareceu(telefone) {
+  // 04/11 (regra do FM espelhada): único caminho que envia o Schedule (reunião realizada) para a Meta — o gatilho do banco reage a consulta_realizada_em
+  if (!confirm('Confirmar que a reunião aconteceu?\n\nIsso envia o evento "reunião realizada" para a Meta.')) return;
   const btn = document.getElementById('compareceu-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
   try {
+    const agora = new Date().toISOString();
+    const lead0 = allLeads.find(l => l.telefone === telefone);
+    const corpo = (lead0 && lead0.consulta_realizada_em) ? { compareceu: true } : { compareceu: true, consulta_realizada_em: agora, consulta_confirmada_por: quemSou() };
     const r = await fetch(`${SB_URL}/rest/v1/${TABLE}?telefone=eq.${encodeURIComponent(telefone)}`, {
       method: 'PATCH',
       headers: { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({ compareceu: true })
+      body: JSON.stringify(corpo)
     });
     if (!r.ok) throw new Error('Erro ' + r.status);
     toast('✅ Presença confirmada', 'ok');
     // Atualiza o lead localmente e reabre o painel
     const lead = allLeads.find(l => l.telefone === telefone);
-    if (lead) { lead.compareceu = true; setTimeout(() => openLeadPanel(lead), 200); }
+    if (lead) { Object.assign(lead, corpo); setTimeout(() => openLeadPanel(lead), 200); }
   } catch(e) {
     toast('Erro ao marcar compareceu: ' + e.message, 'err');
     if (btn) { btn.disabled = false; btn.textContent = '✅ Confirmar presença na consulta'; }
