@@ -1774,9 +1774,25 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </div>
   </div>
 
-  <!-- ── PÁGINA DO MÉTODO — RASTREAMENTO (19/10) ── -->
+  <!-- ── RASTREAMENTO: MÉTODO (19/10) · QUIZ · SITE (03/11) — o seletor escolhe o que o cartão mostra ── -->
   <div class="card" style="margin-top:0;margin-bottom:24px" id="metodo-rastreio-card">
-    <div class="card-ttl">Página do Método — Rastreamento <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— metodo.html · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco</span></div>
+    <style>
+      #metodo-rastreio-card .rz-sel{display:flex;gap:0;margin:0 0 14px;flex-wrap:wrap}
+      #metodo-rastreio-card .rz-sel button{padding:8px 16px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+      #metodo-rastreio-card .rz-sel button+button{border-left:none}
+      #metodo-rastreio-card .rz-sel button:first-child{border-radius:8px 0 0 8px}
+      #metodo-rastreio-card .rz-sel button:last-child{border-radius:0 8px 8px 0}
+      #metodo-rastreio-card .rz-sel button[aria-pressed=true]{background:var(--pur-l);border-color:var(--bd-b);color:var(--purple)}
+      #metodo-rastreio-card .rz-sel button[aria-pressed=true]+button{border-left:1px solid var(--bd-b)}
+      #metodo-rastreio-card .rz-sel button:not([aria-pressed=true]):hover{color:var(--text)}
+      @media(max-width:768px){#metodo-rastreio-card .rz-sel button{flex:1;padding:9px 6px}}
+    </style>
+    <div class="rz-sel" role="group" aria-label="O que este cartão mostra">
+      <button type="button" data-fonte="metodo" aria-pressed="true" onclick="setRastreioFonte('metodo')">Método</button>
+      <button type="button" data-fonte="quiz" aria-pressed="false" onclick="setRastreioFonte('quiz')">Quiz</button>
+      <button type="button" data-fonte="site" aria-pressed="false" onclick="setRastreioFonte('site')">Site</button>
+    </div>
+    <div class="card-ttl" id="rastreio-ttl">Página do Método — Rastreamento <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— metodo.html · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco</span></div>
     <div id="metodo-rastreio"><div class="loading"></div></div>
   </div>
 
@@ -2904,39 +2920,91 @@ async function loadDashboard() {
 // Visitante = aparelho. Quem abriu o painel ou o kit do parceiro é equipe e fica fora da conta (linha "Equipe e apresentações").
 const METODO_BLOCOS = [['abertura','Abertura'], ['hoje','Como é hoje'], ['custo','Quanto custa'], ['metodo','O Método'], ['ias','As 2 IAs'], ['formulario','O formulário'], ['funcoes','Tudo o que faz'], ['garantias','Garantias'], ['comparativo','Comparativo'], ['caso','Caso Farias & Moura'], ['recebe','O que você recebe'], ['comeca','Como começa'], ['perguntas','Perguntas'], ['proximo','Próximo passo']];
 const METODO_QUIZ = [['hook','Viu o raio-X'], ['segmento','1 · Segmento'], ['ticket','2 · Valor da venda'], ['investimento','3 · Anúncios/mês'], ['volume','4 · Contatos/mês'], ['atendimento','5 · Quem responde'], ['conteudo','6 · Conteúdo'], ['dor','7 · O que trava'], ['contato','Contato'], ['sucesso','Enviou']];
+
+// Seletor do cartão (03/11): Método (metodo.html) · Quiz (quiz-epos.html aberto sozinho) · Site (eposmktfilmsia.com.br).
+// Cada visão tem a sua RPC; os números não se repetem (o quiz dentro do Método fica no Método, o de dentro do site fica no Site).
+const RASTREIO_FONTES = {
+  metodo: { titulo: 'Página do Método — Rastreamento', sub: 'metodo.html · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco' },
+  quiz: { titulo: 'Quiz da Epos — Rastreamento', sub: 'quiz-epos.html aberto sozinho (anúncios, Instagram, link direto) · o quiz dentro do Método e do site fica nas outras abas · sem equipe e sem robôs' },
+  site: { titulo: 'Site institucional — Rastreamento', sub: 'eposmktfilmsia.com.br · grava desde 03/11 · segue o período do painel · sem equipe e sem robôs · tudo fica só no nosso banco' }
+};
+let _rastreioFonte = 'metodo';
+try { const f = localStorage.getItem('epos_rastreio_fonte'); if (RASTREIO_FONTES[f]) _rastreioFonte = f; } catch (e) {}
+let _rastreioPeriodo = [null, null], _rastreioVez = 0;
+function setRastreioFonte(f) {
+  if (!RASTREIO_FONTES[f] || f === _rastreioFonte) return;
+  _rastreioFonte = f;
+  try { localStorage.setItem('epos_rastreio_fonte', f); } catch (e) {}
+  loadMetodoRastreio(_rastreioPeriodo[0], _rastreioPeriodo[1]);
+}
+const LEAD_CAMPOS_RZ = 'nome,telefone,perfil,segmento,canal,utm_source,utm_medium,utm_content,crm_stage,score,crm_score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico';
+// UTM que chega "Criativo+3" ou "%5BEpos%5D+Advocacia…" (codificada uma ou duas vezes) vira texto legível
+const decUtm = s => { let t = String(s || '').replace(/\+/g, ' '); for (let i = 0; i < 2; i++) { try { const u = decodeURIComponent(t); if (u === t) break; t = u.replace(/\+/g, ' '); } catch (err) { break; } } return t.trim(); };
+async function rpcRastreio(nome, sinceISO, untilISO) {
+  const resp = await fetch(`${SB_URL}/rest/v1/rpc/${nome}`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_since: sinceISO, p_until: untilISO })
+  });
+  if (!resp.ok) throw new Error('rpc ' + resp.status);
+  return resp.json();
+}
+function _rzHelpers() {
+  const e = escHtml;
+  const pc = (n, t) => t ? Math.round(n / t * 100) : 0;
+  const fmtS = s => (s === null || s === undefined) ? '—' : (s >= 60 ? Math.floor(s / 60) + 'm ' + Math.round(s % 60) + 's' : Math.round(s) + 's');
+  const quando = iso => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }) : '—';
+  const sub = t => `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px">${t}</div>`;
+  const box = (t, inner) => `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px">${sub(t)}${inner}</div>`;
+  const line = (nome, val) => `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--text);overflow-wrap:anywhere">${nome}</span><span style="color:var(--dim);white-space:nowrap">${val}</span></div>`;
+  const vazio = '<span style="color:var(--dim);font-size:11px">—</span>';
+  const kpi = (t, v, cor) => `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em">${t}</div><div style="font-family:var(--fD);font-size:26px;font-weight:700;color:${cor};line-height:1">${v}</div></div>`;
+  const grade = 'display:grid;grid-template-columns:130px 1fr 40px 40px 48px;gap:8px';
+  const cab = rotulo => `<div style="${grade};margin-bottom:6px;font-family:var(--fM);font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em"><div>${rotulo}</div><div></div><div style="text-align:right">Pess.</div><div style="text-align:right">% total</div><div style="text-align:right">Queda</div></div>`;
+  const funil = (passos, S, base) => { let prev = null; return passos.map(([k, nome]) => {
+    const n = S[k] || 0, p = pc(n, base);
+    const queda = (prev === null || !prev || n >= prev) ? '' : '−' + pc(prev - n, prev) + '%';
+    const cor = p >= 50 ? 'var(--neon)' : p >= 20 ? '#FFA500' : 'var(--warn)';
+    prev = n;
+    return `<div style="${grade};align-items:center;margin-bottom:6px;font-family:var(--fM);font-size:10px"><div style="color:var(--text)">${nome}</div><div style="position:relative;height:8px;background:var(--bg3)"><div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(p, 100)}%;background:${cor}"></div></div><div style="color:${cor};text-align:right">${n}</div><div style="color:var(--dim);text-align:right">${p}%</div><div style="color:var(--warn);text-align:right">${queda}</div></div>`;
+  }).join(''); };
+  // respostas do raio-X por pergunta (etapas 1 a 7)
+  const respBoxes = respostas => METODO_QUIZ.slice(1, 8).map(([et, nome]) => {
+    const rows = (respostas || []).filter(r => r.etapa === et);
+    const tot = rows.reduce((a, r) => a + r.n, 0);
+    return box('Respostas · ' + nome.replace(/^\d · /, ''), rows.map(r => line(e(r.resposta), r.n + ' · ' + pc(r.n, tot) + '%')).join('') || vazio);
+  }).join('');
+  const linhaLead = (l, cols) => {
+    const leadJson = encodeURIComponent(JSON.stringify(l));
+    return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">${cols.map((c, i) => `<td${i === 0 ? ' class="td-hi"' : ''}>${c}</td>`).join('')}</tr>`;
+  };
+  const tabela = (cabs, linhas, vazioTxt) => `<div style="overflow-x:auto"><table class="tbl"><thead><tr>${cabs.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${linhas || `<tr><td colspan="${cabs.length}" class="empty">${vazioTxt}</td></tr>`}</tbody></table></div>`;
+  return { e, pc, fmtS, quando, sub, box, line, vazio, kpi, cab, funil, respBoxes, linhaLead, tabela };
+}
+
 async function loadMetodoRastreio(periodoISO, periodoEndISO) {
   const el = document.getElementById('metodo-rastreio');
   if (!el) return;
+  _rastreioPeriodo = [periodoISO, periodoEndISO];
+  const vez = ++_rastreioVez, fonte = _rastreioFonte, F = RASTREIO_FONTES[fonte];
+  document.querySelectorAll('#metodo-rastreio-card .rz-sel button').forEach(b => b.setAttribute('aria-pressed', b.dataset.fonte === fonte ? 'true' : 'false'));
+  const ttl = document.getElementById('rastreio-ttl');
+  if (ttl) ttl.innerHTML = `${F.titulo} <span style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:none;letter-spacing:0">— ${F.sub}</span>`;
+  el.innerHTML = '<div class="loading"></div>';
+  const sinceISO = periodoISO ? decodeURIComponent(periodoISO) : '2000-01-01T00:00:00Z';
+  const untilISO = periodoEndISO ? decodeURIComponent(periodoEndISO) : new Date(Date.now() + 60000).toISOString();
   try {
-    const sinceISO = periodoISO ? decodeURIComponent(periodoISO) : '2000-01-01T00:00:00Z';
-    const untilISO = periodoEndISO ? decodeURIComponent(periodoEndISO) : new Date(Date.now() + 60000).toISOString();
-    const resp = await fetch(`${SB_URL}/rest/v1/rpc/metodo_funil_stats`, {
-      method: 'POST',
-      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${window._ACCESS_TOKEN || SB_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_since: sinceISO, p_until: untilISO })
-    });
-    if (!resp.ok) throw new Error('rpc ' + resp.status);
-    const d = await resp.json();
+    const html = await ({ metodo: rastreioMetodoHTML, quiz: rastreioQuizHTML, site: rastreioSiteHTML })[fonte](sinceISO, untilISO);
+    if (vez === _rastreioVez) el.innerHTML = html;   // troca rápida de aba: só a última resposta aparece
+  } catch (err) { if (vez === _rastreioVez) el.innerHTML = '<span style="color:var(--dim);font-size:11px">Sem dados ainda</span>'; }
+}
+
+async function rastreioMetodoHTML(sinceISO, untilISO) {
+  {
+    const d = await rpcRastreio('metodo_funil_stats', sinceISO, untilISO);
     const { data: leadsPag } = await sb(`${TABLE}?or=(utm_source.eq.metodo,utm_source.eq.convite)&criado_em=gte.${encodeURIComponent(sinceISO)}&criado_em=lt.${encodeURIComponent(untilISO)}&select=nome,telefone,perfil,segmento,canal,utm_source,utm_content,crm_stage,score,crm_score,criado_em,agendou,fechou,qualificado,dify_ativo,dify_conversation_id,em_atendimento,compareceu,chatwoot_conversation_id,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico&order=criado_em.desc&limit=30`);
 
-    const e = escHtml;
-    const pc = (n, t) => t ? Math.round(n / t * 100) : 0;
-    const fmtS = s => (s === null || s === undefined) ? '—' : (s >= 60 ? Math.floor(s / 60) + 'm ' + Math.round(s % 60) + 's' : Math.round(s) + 's');
-    const quando = iso => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }) : '—';
-    const sub = t => `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px">${t}</div>`;
-    const box = (t, inner) => `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px">${sub(t)}${inner}</div>`;
-    const line = (nome, val) => `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:3px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--text);overflow-wrap:anywhere">${nome}</span><span style="color:var(--dim);white-space:nowrap">${val}</span></div>`;
-    const vazio = '<span style="color:var(--dim);font-size:11px">—</span>';
-    const kpi = (t, v, cor) => `<div style="background:var(--bg3);border:1px solid var(--bd);padding:12px 14px;display:flex;flex-direction:column;gap:6px"><div style="font-family:var(--fM);font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em">${t}</div><div style="font-family:var(--fD);font-size:26px;font-weight:700;color:${cor};line-height:1">${v}</div></div>`;
-    const grade = 'display:grid;grid-template-columns:130px 1fr 40px 40px 48px;gap:8px';
-    const cab = rotulo => `<div style="${grade};margin-bottom:6px;font-family:var(--fM);font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em"><div>${rotulo}</div><div></div><div style="text-align:right">Pess.</div><div style="text-align:right">% total</div><div style="text-align:right">Queda</div></div>`;
-    const funil = (passos, S, base) => { let prev = null; return passos.map(([k, nome]) => {
-      const n = S[k] || 0, p = pc(n, base);
-      const queda = (prev === null || !prev || n >= prev) ? '' : '−' + pc(prev - n, prev) + '%';
-      const cor = p >= 50 ? 'var(--neon)' : p >= 20 ? '#FFA500' : 'var(--warn)';
-      prev = n;
-      return `<div style="${grade};align-items:center;margin-bottom:6px;font-family:var(--fM);font-size:10px"><div style="color:var(--text)">${nome}</div><div style="position:relative;height:8px;background:var(--bg3)"><div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(p, 100)}%;background:${cor}"></div></div><div style="color:${cor};text-align:right">${n}</div><div style="color:var(--dim);text-align:right">${p}%</div><div style="color:var(--warn);text-align:right">${queda}</div></div>`;
-    }).join(''); };
+    const { e, pc, fmtS, quando, sub, box, line, vazio, kpi, cab, funil } = _rzHelpers();
 
     const B = d.blocos || {}, QZ = d.quiz || {}, Q = QZ.steps || {}, tp = d.tempo || {};
     const vis = d.visitantes || 0, enviaram = QZ.enviaram || 0, agendar = d.clicaram_agendar || 0;
@@ -2979,7 +3047,7 @@ async function loadMetodoRastreio(periodoISO, periodoEndISO) {
       return `<tr style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''"><td class="td-hi">${e(l.nome || '—')}</td><td>${como}</td><td style="text-transform:capitalize">${conv}</td><td>${e(l.crm_stage || '—')}</td><td>${quando(l.criado_em)}</td></tr>`;
     }).join('') || '<tr><td colspan="5" class="empty">Nenhum lead novo pela página neste período</td></tr>';
 
-    el.innerHTML =
+    return (
       `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px">${kpis}</div>` +
       `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">` +
         `<div>${sub('Até onde leram — pessoas que chegaram em cada bloco')}${funilBlocos}</div>` +
@@ -2988,8 +3056,115 @@ async function loadMetodoRastreio(periodoISO, periodoEndISO) {
       `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px">${respBoxes}</div>` +
       `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">${cliquesBox}${origensBox}${equipeBox}</div>` +
       `<div style="margin-top:16px">${sub('Convidados do parceiro (link por convidado)')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Convidado</th><th>Última visita</th><th>Visitas</th><th>Até onde leu</th><th>Tempo</th><th>Raio-X</th><th>Clicou</th></tr></thead><tbody>${convRows}</tbody></table></div></div>` +
-      `<div style="margin-top:16px">${sub('Leads que chegaram pela página')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Nome</th><th>Como chegou</th><th>Convidado</th><th>Etapa</th><th>Chegou</th></tr></thead><tbody>${leadRows}</tbody></table></div></div>`;
-  } catch (err) { el.innerHTML = '<span style="color:var(--dim);font-size:11px">Sem dados ainda</span>'; }
+      `<div style="margin-top:16px">${sub('Leads que chegaram pela página')}<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Nome</th><th>Como chegou</th><th>Convidado</th><th>Etapa</th><th>Chegou</th></tr></thead><tbody>${leadRows}</tbody></table></div></div>`);
+  }
+}
+
+// Quiz aberto sozinho: RPC quiz_funil_stats + leads do quiz que não vieram do Método nem do site
+async function rastreioQuizHTML(sinceISO, untilISO) {
+  const d = await rpcRastreio('quiz_funil_stats', sinceISO, untilISO);
+  // lead novo pelo quiz ou lead antigo que fez o raio-X no período (quiz_respostas.enviado_em)
+  const ini = encodeURIComponent('"' + sinceISO + '"'), fim = encodeURIComponent('"' + untilISO + '"');
+  const { data: leadsQ } = await sb(`${TABLE}?or=(and(canal.eq.quiz_epos,criado_em.gte.${ini},criado_em.lt.${fim}),and(quiz_respostas->>enviado_em.gte.${ini},quiz_respostas->>enviado_em.lt.${fim}))&select=${LEAD_CAMPOS_RZ},quiz_enviado:quiz_respostas->>enviado_em&order=criado_em.desc&limit=60`);
+  const { e, pc, fmtS, quando, sub, box, line, vazio, kpi, cab, funil, respBoxes, linhaLead, tabela } = _rzHelpers();
+  const S = d.steps || {}, vis = d.visitantes || 0, comecaram = S.segmento || 0, enviaram = d.enviaram || 0;
+
+  const kpis = [
+    kpi('Visitantes', vis, 'var(--neon)'),
+    kpi('Começaram', comecaram + ' · ' + pc(comecaram, vis) + '%', 'var(--text)'),
+    kpi('Fizeram o raio-X', enviaram + ' · ' + pc(enviaram, vis) + '%', 'var(--purple)'),
+    kpi('Disseram "agora não"', (S.sair || 0) + ' · ' + pc(S.sair || 0, vis) + '%', 'var(--warn)'),
+    kpi('Tempo por visita', fmtS((d.tempo || {}).mediana_s), 'var(--text)')
+  ].join('');
+
+  // origem: fb/facebook e ig/instagram juntos; nome do criativo legível
+  const canal = (src, ref) => {
+    const s = String(src || '').toLowerCase();
+    if (s === 'fb' || s === 'facebook') return 'Facebook';
+    if (s === 'ig' || s === 'instagram') return 'Instagram';
+    if (s) return decUtm(src);
+    if (/facebook/i.test(ref)) return 'Facebook (sem UTM)';
+    if (/instagram/i.test(ref)) return 'Instagram (sem UTM)';
+    if (/google/i.test(ref)) return 'Google';
+    if (/eposmktfilmsia\.com\.br/i.test(ref)) return 'Páginas da Epos (sem UTM)';
+    return ref ? ref : 'Direto (link no WhatsApp, digitado ou salvo)';
+  };
+  const grupos = {};
+  (d.origens || []).forEach(o => {
+    const nome = canal(o.src, o.ref) + (o.cont ? ' · ' + decUtm(o.cont) : '');
+    const g = grupos[nome] || (grupos[nome] = { n: 0, comecaram: 0, enviaram: 0 });
+    g.n += o.n; g.comecaram += o.comecaram; g.enviaram += o.enviaram;
+  });
+  const origemRows = Object.entries(grupos).sort((a, b) => b[1].n - a[1].n)
+    .map(([nome, g]) => `<tr><td class="td-hi">${e(nome)}</td><td>${g.n}</td><td>${g.comecaram}</td><td>${g.enviaram}</td><td>${pc(g.enviaram, g.n)}%</td></tr>`).join('');
+
+  const erros = (d.erros || []);
+  const foraBox = box('Fora da conta', line('Robôs (pré-visualização de link, rastreadores)', d.robos || 0) + line('Aparelhos da equipe', d.equipe || 0) +
+    (erros.length ? erros.map(x => line('Erro no formulário · ' + e(x.motivo), x.n)).join('') : line('Erros no formulário', 0)));
+
+  const doQuiz = (leadsQ || []).filter(l => !['metodo', 'site', 'convite'].includes(String(l.utm_source || '').toLowerCase()));
+  const leadRows = doQuiz.slice(0, 30).map(l => linhaLead(l, [e(l.nome || '—'), e(canal(l.utm_source, '') + (l.utm_content ? ' · ' + decUtm(l.utm_content) : '')), e(l.crm_stage || '—'), quando(l.quiz_enviado || l.criado_em)])).join('');
+
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px">${kpis}</div>` +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">` +
+      `<div>${sub('Raio-X — pessoas em cada etapa')}${cab('Etapa')}${funil(METODO_QUIZ, S, S.hook || vis)}</div>` +
+      `<div>${sub('De onde vieram — por anúncio ou link')}${tabela(['Origem', 'Pess.', 'Começaram', 'Raio-X', 'Conv.'], origemRows, 'Nenhuma visita neste período')}</div>` +
+    `</div>` +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px">${respBoxes(d.respostas)}${foraBox}</div>` +
+    `<div style="margin-top:16px">${sub('Leads que fizeram o raio-X')}${tabela(['Nome', 'Origem', 'Etapa', 'Raio-X em'], leadRows, 'Nenhum raio-X enviado pelo quiz neste período')}</div>`;
+}
+
+// Site institucional: RPC site_funil_stats (lp_slug 'site', gravando desde 03/11) + raio-X feito a partir do site + leads com utm_source site
+const SITE_SECOES = { abertura: 'Abertura', ferramentas: 'Ferramentas soltas', agencias: 'Agências comuns', sistema: 'O sistema', clientes: 'Quem já confiou', 'como-trabalhamos': 'Diagnóstico primeiro', historia: 'Desde 2012', regioes: 'Onde atendemos', diagnostico: 'Diagnóstico (quiz)' };
+const SITE_CLIQUES = { diagnostico: 'Fazer o diagnóstico', whatsapp: 'WhatsApp', telefone: 'Telefone', email: 'E-mail', instagram: 'Instagram', youtube: 'YouTube', metodo: 'Página do Método', behance: 'Behance', 'link-externo': 'Outro link externo' };
+const sitePagina = (caminho, titulo) => {
+  if (caminho === '/') return 'Home';
+  const t = String(titulo || '').split(/\s[|·—-]\s/)[0].trim();
+  return t || caminho;
+};
+async function rastreioSiteHTML(sinceISO, untilISO) {
+  const d = await rpcRastreio('site_funil_stats', sinceISO, untilISO);
+  const { data: leadsS } = await sb(`${TABLE}?utm_source=eq.site&criado_em=gte.${encodeURIComponent(sinceISO)}&criado_em=lt.${encodeURIComponent(untilISO)}&select=${LEAD_CAMPOS_RZ}&order=criado_em.desc&limit=30`);
+  const { e, pc, fmtS, quando, sub, box, line, vazio, kpi, cab, funil, respBoxes, linhaLead, tabela } = _rzHelpers();
+  const vis = d.visitantes || 0, Q = d.quiz || {}, QS = Q.steps || {}, H = d.home || {};
+
+  const kpis = [
+    kpi('Visitantes', vis, 'var(--neon)'),
+    kpi('Páginas por pessoa', d.paginas_por_pessoa ? String(d.paginas_por_pessoa).replace('.', ',') : '—', 'var(--text)'),
+    kpi('Clicaram no diagnóstico', (d.clicaram_diagnostico || 0) + ' · ' + pc(d.clicaram_diagnostico || 0, vis) + '%', 'var(--purple)'),
+    kpi('Clicaram no WhatsApp', (d.clicaram_whatsapp || 0) + ' · ' + pc(d.clicaram_whatsapp || 0, vis) + '%', 'var(--neon)'),
+    kpi('Fizeram o raio-X', (Q.enviaram || 0), 'var(--purple)'),
+    kpi('Tempo por visita', fmtS((d.tempo || {}).mediana_s), 'var(--text)')
+  ].join('');
+
+  const secoes = H.secoes || [];
+  const passosHome = secoes.map(s => [s.nome, (s.idx + 1) + ' · ' + (SITE_SECOES[s.nome] || s.nome)]);
+  const SH = {}; secoes.forEach(s => { SH[s.nome] = s.n; });
+  const funilHome = secoes.length ? cab('Seção') + funil(passosHome, SH, H.visitantes || 0)
+    : '<span style="color:var(--dim);font-size:11px">Ainda sem visitas à home neste período.</span>';
+  const funilQuiz = cab('Etapa') + funil(METODO_QUIZ, QS, QS.hook || Q.abriram || 0);
+
+  const pagRows = (d.paginas || []).map(pg => `<tr><td class="td-hi">${e(sitePagina(pg.caminho, pg.titulo))}<div style="font-family:var(--fM);font-size:9px;color:var(--dim)">${e(pg.caminho)}</div></td><td>${pg.visitas}</td><td>${pg.pessoas}</td><td>${pg.fim} · ${pc(pg.fim, pg.pessoas)}%</td><td>${fmtS(pg.mediana_s)}</td></tr>`).join('');
+  const cliquesBox = box('Cliques nos botões', (d.cliques || []).map(c => line(e((SITE_CLIQUES[c.tipo] || c.tipo) + ' · ' + (c.caminho === '/' ? 'Home' : c.caminho)), c.cliques + ' · ' + c.pessoas + ' pess.')).join('') || vazio);
+  const origensBox = box('De onde vieram', (d.origens || []).map(o => line(e(decUtm(o.origem)), o.n + ' · ' + pc(o.n, vis) + '%')).join('') || vazio);
+  const ondeBox = box('Raio-X por lugar do site', (Q.onde || []).map(o => line(e((o.pagina === 'home' ? 'Home' : o.pagina) + (o.meio === 'embed' ? ' · quadro na página' : o.meio === 'cta' ? ' · botão' : '')), o.abriram + ' abriram · ' + o.enviaram + ' enviaram')).join('') || vazio);
+  const foraBox = box('Fora da conta', line('Robôs (pré-visualização de link, rastreadores)', d.robos || 0) + line('Aparelhos da equipe', d.equipe || 0) +
+    `<button type="button" onclick="window.open('https://eposmktfilmsia.com.br/?equipe=1','_blank','noopener')" style="margin-top:10px;width:100%;padding:8px 10px;background:transparent;border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fM);font-size:9px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:8px">Marcar este aparelho como equipe no site</button>` +
+    `<div style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.4">Abre o site uma vez neste aparelho. Faça em cada celular e computador da equipe.</div>`);
+
+  const leadRows = (leadsS || []).map(l => linhaLead(l, [e(l.nome || '—'), e(l.utm_content ? decUtm(l.utm_content) : '—'), e(l.crm_stage || '—'), quando(l.criado_em)])).join('');
+  const aviso = vis ? '' : `<div style="font-size:11px;color:var(--dim);margin:0 0 14px;line-height:1.5">O site começou a gravar no nosso banco em 03/11. Visitantes, páginas e cliques aparecem a partir das próximas visitas. O raio-X feito a partir do site já tem histórico.</div>`;
+
+  return aviso +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px">${kpis}</div>` +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">` +
+      `<div>${sub('Até onde leram a home — pessoas que chegaram em cada seção')}${funilHome}</div>` +
+      `<div>${sub('Raio-X a partir do site — pessoas em cada etapa')}${funilQuiz}</div>` +
+    `</div>` +
+    `<div style="margin-top:16px">${sub('Páginas mais vistas')}${tabela(['Página', 'Visitas', 'Pess.', 'Chegaram ao fim', 'Tempo'], pagRows, 'Nenhuma visita neste período')}</div>` +
+    `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px">${cliquesBox}${origensBox}${ondeBox}${foraBox}</div>` +
+    ((Q.respostas || []).length ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">${respBoxes(Q.respostas)}</div>` : '') +
+    `<div style="margin-top:16px">${sub('Leads que chegaram pelo site')}${tabela(['Nome', 'Página', 'Etapa', 'Chegou'], leadRows, 'Nenhum lead novo pelo site neste período')}</div>`;
 }
 
 // ═══ PENDENTES DE APROVAÇÃO ═══
