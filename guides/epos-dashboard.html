@@ -4657,7 +4657,9 @@ document.querySelectorAll('nav a[data-sec]').forEach(a => {
 
 // ═══ CRM PROXY (API key nunca exposta no browser) ═══
 const PROXY_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-dashboard-crm';
-const PROXY_TOKEN = 'epos-dash-2026-x9k2';
+// 05/11/2026 (segurança): os botões mandam o login de quem está no painel (sessão Supabase, renovada sozinha),
+// não mais uma senha fixa escrita aqui. O n8n confere o login e se a pessoa está na equipe da conta.
+Object.defineProperty(window, 'PROXY_TOKEN', { get: () => window._ACCESS_TOKEN || '', configurable: true });
 
 async function updateCRMStage(crm_person_id, newStage, telefone) {
   if (!telefone) return;
@@ -6518,8 +6520,9 @@ async function loadProspeccao() {
   if (segBox) segBox.innerHTML = '<div class="loading"></div>';
   if (recBox) recBox.innerHTML = '<div class="loading"></div>';
   try {
-    const r = await fetch(SWAAS_METRICS_URL);
+    const r = await fetch(SWAAS_METRICS_URL + '?token=' + encodeURIComponent(PROXY_TOKEN));
     const d = await r.json();
+    if (d.erro) throw new Error(d.erro);
 
     document.getElementById('prosp-total').textContent = d.total_contatos ?? '—';
     document.getElementById('prosp-enviado').textContent = d.total_enviado ?? '—';
@@ -6574,7 +6577,7 @@ async function dispararLote() {
   btn.disabled = true;
   btn.textContent = 'Iniciando…';
   try {
-    const r = await fetch(SWAAS_DISPARAR_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const r = await fetch(SWAAS_DISPARAR_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: PROXY_TOKEN }) });
     const d = await r.json().catch(() => ({}));
     toast('✅ Disparo iniciado — acompanhe as respostas nesta aba', 'ok');
     btn.textContent = '✅ Disparo iniciado';
