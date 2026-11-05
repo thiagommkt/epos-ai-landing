@@ -387,7 +387,7 @@ canvas{display:block;width:100%!important}
 .notif-wrap{position:relative}
 .notif-fixed{position:fixed;top:14px;right:28px;z-index:300}
 @media(max-width:900px){.notif-fixed{display:none}}
-@media(max-width:900px){#theme-desk-btn{display:none!important}}
+@media(max-width:768px){#theme-desk-btn{display:none!important}} /* 05/11: era 900 px — entre 769 e 900 nenhum botão de tema aparecia (o do celular só surge até 768) */
 .notif-bell{background:transparent;border:1px solid var(--bd);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);font-size:15px;flex-shrink:0;position:relative;transition:border-color .15s;border-radius:50%}
 .notif-bell:hover{border-color:var(--purple)}
 .notif-badge{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#FF5E5B;color:#fff;font-family:var(--fM);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;display:none}
