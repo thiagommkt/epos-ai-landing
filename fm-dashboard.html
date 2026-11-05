@@ -3575,7 +3575,9 @@ document.querySelectorAll('nav a[data-sec]').forEach(a => {
 
 // ═══ CRM PROXY (API key nunca exposta no browser) ═══
 const PROXY_URL = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-dashboard-crm';
-const PROXY_TOKEN = 'fm-dash-2026-x9k2';
+// 05/11/2026 (segurança): os botões mandam o login de quem está no painel (sessão Supabase, renovada sozinha),
+// não mais uma senha fixa escrita aqui. O n8n confere o login e se a pessoa está na equipe da conta.
+Object.defineProperty(window, 'PROXY_TOKEN', { get: () => window._ACCESS_TOKEN || '', configurable: true });
 
 async function updateCRMStage(crm_person_id, newStage, telefone) {
   const r = await fetch(PROXY_URL, {
