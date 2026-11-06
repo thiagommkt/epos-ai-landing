@@ -552,9 +552,16 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     if (nome.value.trim().length < 2) { fN.classList.add('invalid'); erros.push('nome_invalido'); } else fN.classList.remove('invalid');
     if (!validPhone(tel.value)) { fT.classList.add('invalid'); erros.push('telefone_invalido'); } else fT.classList.remove('invalid');
     if (!consent.checked) { cB.classList.add('invalid'); erros.push('sem_consentimento'); } else cB.classList.remove('invalid');
-    if (erros.length) { trackStep('step_error', 'contato', erros.join(',')); return; }
+    if (erros.length) {
+      // 06/11: a tentativa e o que a pessoa digitou ficam no histórico (telefone recusado mostra o que entrou no campo)
+      if (window._histContato) window._histContato.tentativa(erros);
+      var _rc = window._histContato ? window._histContato.resumo() : null;
+      trackStep('step_error', 'contato', erros.join(',') + (_rc && erros.indexOf('telefone_invalido') >= 0 ? ' | digitou: ' + _rc.telefone_digitado + ' | na tela: ' + _rc.telefone_na_tela : ''));
+      return;
+    }
 
     enviado = true;
+    if (window._histContato) window._histContato.enviado = true;
     answers.nome = nome.value.trim();
     answers.telefone = tel.value.replace(/\D/g, '');
 
@@ -577,7 +584,9 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
       ad_id: p.get('ad_id') || '', adset_id: p.get('adset_id') || '', placement: p.get('placement') || '',
       test_event_code: p.get('test_event_code') || '',
       fbclid: fbclid, fbc: fbclid ? ('fb.1.' + Math.floor(Date.now() / 1000) + '.' + fbclid) : ck('_fbc'), fbp: ck('_fbp'),
-      user_agent: navigator.userAgent, page_url: location.href, modo: BOARD ? 'board' : 'pagina'
+      user_agent: navigator.userAgent, page_url: location.href, modo: BOARD ? 'board' : 'pagina',
+      // 06/11: liga o lead à visita (lp_events) e leva o que a pessoa digitou no contato
+      session_id: window._lpSid || '', historico_site: window._histContato ? window._histContato.dados() : null
     };
     fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-quiz-lead', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true
@@ -611,6 +620,75 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
 </script>
 
 <script>
+// Histórico do contato — cópia própria do quiz da Epos (06/11/2026). Nada aqui é compartilhado com outro quiz:
+// o que a pessoa digitou vai só no envio deste formulário (webhook epos-quiz-lead) e no lp_events deste quiz.
+// Guarda cada mudança no telefone (digitou, colou, o celular preencheu), o que ficou na tela, as tentativas
+// de envio com erro, e quem digitou e saiu sem enviar (evento contato_abandonado).
+(function () {
+  var T0 = Date.now(), LIMITE = 80;
+  var log = [], tentativas = [], bruto = '', ultimoAbandono = '';
+  function seg() { return Math.round((Date.now() - T0) / 100) / 10; }
+  function el(id) { return document.getElementById(id); }
+  function curto(v) { return String(v == null ? '' : v).slice(0, 40); }
+
+  // Fase de captura: roda ANTES da máscara da página, então vê exatamente o que entrou no campo
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'telefone') return;
+    bruto = e.target.value;
+    log.push({ s: seg(), tipo: e.inputType || 'preenchimento', entrou: curto(e.data), bruto: curto(bruto) });
+  }, true);
+  // Fase de bolha: roda DEPOIS da máscara, então vê o que ficou na tela
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'telefone' || !log.length) return;
+    log[log.length - 1].tela = curto(e.target.value);
+    if (log.length > LIMITE) log.splice(5, log.length - LIMITE);   // guarda o começo e o fim
+  }, false);
+  // Preenchimento automático que não dispara "input" em alguns navegadores
+  document.addEventListener('change', function (e) {
+    if (!e.target || e.target.id !== 'telefone') return;
+    var ult = log.length ? log[log.length - 1].tela : '';
+    if (e.target.value !== ult) log.push({ s: seg(), tipo: 'change', bruto: curto(e.target.value), tela: curto(e.target.value) });
+  }, true);
+
+  window._histContato = {
+    enviado: false,
+    tentativa: function (erros) {
+      var t = el('telefone');
+      tentativas.push({ s: seg(), erros: erros, telefone_na_tela: curto(t ? t.value : '') });
+    },
+    resumo: function () {
+      var n = el('nome'), t = el('telefone');
+      return { nome_digitado: n ? String(n.value).slice(0, 80) : '', telefone_digitado: curto(bruto), telefone_na_tela: curto(t ? t.value : '') };
+    },
+    dados: function () {
+      var r = this.resumo();
+      r.campo_telefone = log;
+      r.tentativas_envio = tentativas;
+      r.sessao = window._lpSid || '';
+      r.tempo_na_pagina_s = seg();
+      r.tela = (window.innerWidth || 0) + 'x' + (window.innerHeight || 0);
+      return r;
+    }
+  };
+
+  // Saiu da página (ou trocou de app) com o contato preenchido e sem enviar: grava o que digitou
+  function abandono() {
+    try {
+      var h = window._histContato;
+      if (h.enviado || typeof window._lpTrack !== 'function') return;
+      var r = h.resumo();
+      if (!r.telefone_digitado && !r.nome_digitado) return;
+      var txt = 'nome: ' + r.nome_digitado + ' | digitou: ' + r.telefone_digitado + ' | na tela: ' + r.telefone_na_tela;
+      if (txt === ultimoAbandono) return;
+      ultimoAbandono = txt;
+      window._lpTrack('contato_abandonado', { step_name: 'contato', answer: txt.slice(0, 290) });
+    } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') abandono(); });
+  window.addEventListener('pagehide', abandono);
+})();
+</script>
+<script>
 // Rastreamento do funil: vai SOMENTE para o nosso banco (lp_events, RLS: só INSERT anônimo com lista fixa). Nada vai à Meta.
 (function(){
   var SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
@@ -622,6 +700,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   if (p.get('sid')) { try { var semSid = new URLSearchParams(location.search); semSid.delete('sid'); history.replaceState(null, '', location.pathname + (semSid.toString() ? '?' + semSid.toString() : '') + location.hash); } catch(e){} }
   if (!sid) { try { sid = localStorage.getItem('_lp_sid'); } catch(e){} }
   if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem('_lp_sid', sid); } catch(e){} }
+  window._lpSid = sid;   // 06/11: vai junto do lead (liga o cadastro à visita)
   var utms = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ utms[k] = p.get(k) || ''; });
   if (/[?&]modo=board\b/.test(location.search) && !utms.utm_content) utms.utm_content = 'metodo-board';

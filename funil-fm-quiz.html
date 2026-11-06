@@ -723,7 +723,10 @@ h1.end-title{
       if(fieldNome.classList.contains('invalid')) errs.push('nome_invalido');
       if(fieldTelefone.classList.contains('invalid')) errs.push('telefone_invalido');
       if(!consentBox.checked) errs.push('sem_consentimento');
-      trackStep('step_error', 'contato', errs.join(','));
+      // 06/11: a tentativa e o que a pessoa digitou ficam no histórico (telefone recusado mostra o que entrou no campo)
+      if(window._histContato) window._histContato.tentativa(errs);
+      var _rc = window._histContato ? window._histContato.resumo() : null;
+      trackStep('step_error', 'contato', errs.join(',') + (_rc && errs.indexOf('telefone_invalido') >= 0 ? ' | digitou: ' + _rc.telefone_digitado + ' | na tela: ' + _rc.telefone_na_tela : ''));
       return;
     }
 
@@ -768,10 +771,14 @@ h1.end-title{
       fbc: fbc,
       fbp: fbp,
       user_agent: navigator.userAgent,
-      page_url: window.location.href
+      page_url: window.location.href,
+      // 06/11: liga o lead à visita (lp_events) e leva o que a pessoa digitou no contato
+      session_id: window._lpSid || '',
+      historico_site: window._histContato ? window._histContato.dados() : null
     };
 
     _quizSubmitted = true;
+    if(window._histContato) window._histContato.enviado = true;
     fetch('https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-lead', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -812,6 +819,75 @@ h1.end-title{
 </script>
 
 <script>
+// Histórico do contato — cópia própria do quiz do FM (06/11/2026). Nada aqui é compartilhado com outro quiz:
+// o que a pessoa digitou vai só no envio deste formulário (webhook fm-quiz-lead) e no lp_events deste quiz.
+// Guarda cada mudança no telefone (digitou, colou, o celular preencheu), o que ficou na tela, as tentativas
+// de envio com erro, e quem digitou e saiu sem enviar (evento contato_abandonado).
+(function () {
+  var T0 = Date.now(), LIMITE = 80;
+  var log = [], tentativas = [], bruto = '', ultimoAbandono = '';
+  function seg() { return Math.round((Date.now() - T0) / 100) / 10; }
+  function el(id) { return document.getElementById(id); }
+  function curto(v) { return String(v == null ? '' : v).slice(0, 40); }
+
+  // Fase de captura: roda ANTES da máscara da página, então vê exatamente o que entrou no campo
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'telefone') return;
+    bruto = e.target.value;
+    log.push({ s: seg(), tipo: e.inputType || 'preenchimento', entrou: curto(e.data), bruto: curto(bruto) });
+  }, true);
+  // Fase de bolha: roda DEPOIS da máscara, então vê o que ficou na tela
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'telefone' || !log.length) return;
+    log[log.length - 1].tela = curto(e.target.value);
+    if (log.length > LIMITE) log.splice(5, log.length - LIMITE);   // guarda o começo e o fim
+  }, false);
+  // Preenchimento automático que não dispara "input" em alguns navegadores
+  document.addEventListener('change', function (e) {
+    if (!e.target || e.target.id !== 'telefone') return;
+    var ult = log.length ? log[log.length - 1].tela : '';
+    if (e.target.value !== ult) log.push({ s: seg(), tipo: 'change', bruto: curto(e.target.value), tela: curto(e.target.value) });
+  }, true);
+
+  window._histContato = {
+    enviado: false,
+    tentativa: function (erros) {
+      var t = el('telefone');
+      tentativas.push({ s: seg(), erros: erros, telefone_na_tela: curto(t ? t.value : '') });
+    },
+    resumo: function () {
+      var n = el('nome'), t = el('telefone');
+      return { nome_digitado: n ? String(n.value).slice(0, 80) : '', telefone_digitado: curto(bruto), telefone_na_tela: curto(t ? t.value : '') };
+    },
+    dados: function () {
+      var r = this.resumo();
+      r.campo_telefone = log;
+      r.tentativas_envio = tentativas;
+      r.sessao = window._lpSid || '';
+      r.tempo_na_pagina_s = seg();
+      r.tela = (window.innerWidth || 0) + 'x' + (window.innerHeight || 0);
+      return r;
+    }
+  };
+
+  // Saiu da página (ou trocou de app) com o contato preenchido e sem enviar: grava o que digitou
+  function abandono() {
+    try {
+      var h = window._histContato;
+      if (h.enviado || typeof window._lpTrack !== 'function') return;
+      var r = h.resumo();
+      if (!r.telefone_digitado && !r.nome_digitado) return;
+      var txt = 'nome: ' + r.nome_digitado + ' | digitou: ' + r.telefone_digitado + ' | na tela: ' + r.telefone_na_tela;
+      if (txt === ultimoAbandono) return;
+      ultimoAbandono = txt;
+      window._lpTrack('contato_abandonado', { step_name: 'contato', answer: txt.slice(0, 290) });
+    } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') abandono(); });
+  window.addEventListener('pagehide', abandono);
+})();
+</script>
+<script>
 // Rastreamento do funil (restaurado em 16/10 — tinha sumido no commit 8c0dc5a de 10/10).
 // Vai SOMENTE para o nosso banco (lp_events, RLS: só INSERT anônimo com lista fixa de eventos). Nada vai à Meta.
 (function(){
@@ -820,13 +896,15 @@ h1.end-title{
   var LP_SLUG = 'funil-fm-quiz';
 
   var sid;
-  try { sid = localStorage.getItem('_lp_sid'); } catch(e){}
+  // 06/11: chave só do FM. Antes era a mesma do quiz da Epos (_lp_sid), e quem abria os dois no mesmo celular ficava com a mesma sessão nos dois.
+  try { sid = localStorage.getItem('_lp_sid_fm'); } catch(e){}
   if(!sid){
     sid = (typeof crypto !== 'undefined' && crypto.randomUUID)
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2) + Date.now().toString(36);
-    try { localStorage.setItem('_lp_sid', sid); } catch(e){}
+    try { localStorage.setItem('_lp_sid_fm', sid); } catch(e){}
   }
+  window._lpSid = sid;   // 06/11: vai junto do lead (liga o cadastro à visita)
 
   var p = new URLSearchParams(location.search);
   var utms = {
