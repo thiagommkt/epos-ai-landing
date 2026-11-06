@@ -532,10 +532,12 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   }
   document.getElementById('telefone').addEventListener('input', function(e){
     // 21/10: com +55 (digitado ou preenchido pelo celular) o corte em 11 dígitos guardava o 55 e perdia os 2 últimos números
-    var v = e.target.value.replace(/\D/g, '');
-    if (v.length >= 12 && v.slice(0, 2) === '55') v = v.slice(2);   // código do país
-    v = v.replace(/^0+/, '').slice(0, 11);                           // 0 de discagem
-    e.target.value = v.length > 6 ? '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7) : (v.length > 2 ? '(' + v.slice(0,2) + ') ' + v.slice(2) : v);
+    // 06/11: "0055 61 99976-0607" (00 internacional) ainda virava "(55) 61999-7606": o 0 saía depois de olhar o 55 e o
+    // corte em 11 jogava fora o fim. Agora os zeros saem antes, e nada é cortado em silêncio: número com dígito a mais
+    // fica à mostra sem máscara e a validação deixa o campo vermelho.
+    var v = e.target.value.replace(/\D/g, '').replace(/^0+/, '');                        // 0 de discagem e 00 internacional
+    if (v.length >= 12 && v.slice(0, 2) === '55') v = v.slice(2).replace(/^0+/, '');   // código do país (+55, 0055, +55 0xx)
+    e.target.value = v.length > 11 ? v : (v.length > 6 ? '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7) : (v.length > 2 ? '(' + v.slice(0,2) + ') ' + v.slice(2) : v));
   });
 
   function esc(s){ return String(s || '').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
