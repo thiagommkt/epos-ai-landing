@@ -682,9 +682,12 @@ h1.end-title{
     goTo('renda');
   });
 
+  // 06/11: celular com 11 dígitos tem 9 logo depois do DDD. "(55) 61999-7606" passava como DDD 55: era o +55 do país
+  // com os 2 últimos números cortados (caso real no quiz da Epos). Agora o campo fica vermelho e a pessoa completa.
   function validPhone(v){
-    var digits = v.replace(/\D/g,'');
-    return digits.length >= 10 && digits.length <= 11;
+    var d = v.replace(/\D/g, '');
+    if (d.length === 11) return d[0] !== '0' && d[1] !== '0' && d[2] === '9';
+    return d.length === 10 && d[0] !== '0' && d[1] !== '0';
   }
 
   var _quizSubmitted = false;
