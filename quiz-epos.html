@@ -523,7 +523,13 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     goTo('ticket');
   });
 
-  function validPhone(v){ var d = v.replace(/\D/g, ''); return d.length >= 10 && d.length <= 11; }
+  // 06/11: celular com 11 dígitos tem 9 logo depois do DDD. "(55) 61999-7606" passava como DDD 55: era o +55 do país
+  // com os 2 últimos números cortados, e o lead ficou sem a mensagem da Donna. Agora o campo fica vermelho e a pessoa completa.
+  function validPhone(v){
+    var d = v.replace(/\D/g, '');
+    if (d.length === 11) return d[0] !== '0' && d[1] !== '0' && d[2] === '9';
+    return d.length === 10 && d[0] !== '0' && d[1] !== '0';
+  }
   document.getElementById('telefone').addEventListener('input', function(e){
     // 21/10: com +55 (digitado ou preenchido pelo celular) o corte em 11 dígitos guardava o 55 e perdia os 2 últimos números
     var v = e.target.value.replace(/\D/g, '');
