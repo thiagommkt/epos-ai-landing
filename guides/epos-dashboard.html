@@ -5129,6 +5129,43 @@ async function rejeitarSugestao(telefone) {
 // ═══ PAINEL DE LEAD ═══
 // 21/10 (Thiago: "a ficha deveria ser universal"): de onde quer que abra (funil, listas, Torneira, link do WhatsApp),
 // a ficha busca o registro completo do lead no banco. Antes, aberta pelo funil, faltavam campos (ex.: renda).
+// ═══ HISTÓRICO DO SITE (06/11) — o que o lead fez no formulário: o que digitou no telefone, as tentativas recusadas e a visita ═══
+// Cópia própria deste painel (Epos). Só lê eventos do(s) formulário(s) desta conta.
+const HIST_SLUGS = 'quiz-epos,site,metodo-venda-inevitavel';
+const HIST_EVENTOS = { pageview: 'Abriu a página', step_view: 'Viu', step_answer: 'Respondeu', step_error: 'Tentou enviar com erro', step_disqualified: 'Desqualificado', quiz_submitted: 'Enviou o formulário', time_spent: 'Tempo na página', cta_click: 'Clicou', contato_abandonado: 'Saiu sem enviar', apresentacao: 'Apresentação', equipe: 'Equipe' };
+const HIST_ERROS = { telefone_invalido: 'telefone recusado', sem_consentimento: 'não marcou a autorização', nome_invalido: 'nome em branco' };
+const HIST_TIPOS = { insertText: 'digitou', insertFromPaste: 'colou', insertReplacementText: 'preenchimento do celular', deleteContentBackward: 'apagou', deleteContentForward: 'apagou', deleteByCut: 'recortou', preenchimento: 'preenchido', change: 'preenchido', insertFromDrop: 'arrastou' };
+async function carregarHistoricoSite(lead) {
+  const box = document.getElementById('panel-historico-site');
+  if (!box || !lead) return;
+  const h = (lead.historico_site && typeof lead.historico_site === 'object') ? lead.historico_site : null;
+  const sid = lead.lp_session_id || (h && h.sessao) || '';
+  if (!h && !sid) { box.innerHTML = '<div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Sem registro do site (chegou pelo WhatsApp ou antes de 06/11).</div>'; return; }
+  const linha = (k, v, alerta) => `<div class="panel-row"><div class="panel-key">${k}</div><div class="panel-val"${alerta ? ' style="color:#e3b341"' : ''}>${v}</div></div>`;
+  let html = '';
+  if (h) {
+    html += linha('Digitou no telefone', escHtml(h.telefone_digitado || '—'))
+         + linha('Ficou na tela', escHtml(h.telefone_na_tela || '—'))
+         + linha('Gravamos', escHtml(String(h.telefone_gravado || '—')))
+         + (h.nome_digitado ? linha('Nome digitado', escHtml(h.nome_digitado)) : '');
+    const tent = Array.isArray(h.tentativas_envio) ? h.tentativas_envio : [];
+    if (tent.length) html += linha('Tentativas recusadas', tent.map(t => `${escHtml((t.erros || []).map(e => HIST_ERROS[e] || e).join(', '))}${t.telefone_na_tela ? ' (telefone: ' + escHtml(t.telefone_na_tela) + ')' : ''}`).join('<br>'), true);
+    const campo = Array.isArray(h.campo_telefone) ? h.campo_telefone : [];
+    if (campo.length) html += `<details style="margin:6px 0"><summary style="cursor:pointer;font-family:var(--fM);font-size:10px;color:var(--muted)">Campo do telefone, passo a passo (${campo.length})</summary><div style="font-family:var(--fM);font-size:10px;color:var(--muted);line-height:1.7;margin-top:4px">${campo.map(c => `${String(c.s).replace('.', ',')} s · ${escHtml(HIST_TIPOS[c.tipo] || c.tipo || '')}${c.entrou ? ' "' + escHtml(c.entrou) + '"' : ''} → ${escHtml(c.tela || c.bruto || '')}`).join('<br>')}</div></details>`;
+  }
+  box.innerHTML = html + `<div id="panel-historico-visita" style="font-family:var(--fM);font-size:10px;color:var(--dim)">${sid ? 'Carregando a visita...' : ''}</div>`;
+  if (!sid) return;
+  try {
+    const { data } = await sb(`lp_events?session_id=eq.${encodeURIComponent(sid)}&lp_slug=in.(${HIST_SLUGS})&select=created_at,event_type,step_name,answer,duration_s&order=created_at.asc&limit=300`);
+    const ev = Array.isArray(data) ? data : [];
+    const alvo = document.getElementById('panel-historico-visita'); if (!alvo) return;
+    if (!ev.length) { alvo.textContent = 'Visita sem passos registrados.'; return; }
+    const hora = iso => new Date(iso).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const dia = new Date(ev[0].created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    alvo.innerHTML = `<details style="margin:6px 0"><summary style="cursor:pointer;color:var(--muted)">Visita no site em ${dia} (${ev.length} passos)</summary><div style="line-height:1.7;margin-top:4px;color:var(--muted)">${ev.map(e => `${hora(e.created_at)} · ${escHtml(HIST_EVENTOS[e.event_type] || e.event_type)}${e.step_name ? ' · ' + escHtml(e.step_name) : ''}${e.answer ? ': ' + escHtml(String(e.answer).replace(/telefone_invalido|sem_consentimento|nome_invalido/g, k => HIST_ERROS[k])) : ''}${e.duration_s ? ' (' + e.duration_s + ' s)' : ''}`).join('<br>')}</div></details>`;
+  } catch (e) { const alvo = document.getElementById('panel-historico-visita'); if (alvo) alvo.textContent = 'Não foi possível carregar a visita.'; }
+}
+
 async function openLeadPanel(lead) {
   if (lead && lead.telefone && !lead.__completo) {
     try {
@@ -5166,6 +5203,8 @@ async function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Cidade</div><div class="panel-val">${lead.cidade||'—'}</div></div>
     <div class="panel-row"><div class="panel-key">Chegou em</div><div class="panel-val">${fmtDate(lead.criado_em)}</div></div>
     <div class="panel-row"><div class="panel-key">Canal</div><div class="panel-val">${lead.canal||'whatsapp'}</div></div>
+    <div class="panel-section">No site</div>
+    <div id="panel-historico-site" style="margin-bottom:8px"><div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</div></div>
     <div class="panel-row"><div class="panel-key">Quem atende</div><div class="panel-val" id="panel-quem-atende"><span style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</span></div></div>
 
     <div class="panel-section">Qualificação</div>
@@ -5321,7 +5360,7 @@ async function openLeadPanel(lead) {
   document.getElementById('lead-panel').classList.add('open');
   document.getElementById('lead-overlay').classList.add('show');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => { carregarNotaAtendimento(lead.telefone); carregarTarefasLead(lead.telefone); carregarAgendadasLead(lead.telefone); carregarQuemAtende(lead.telefone); }, 0);
+  setTimeout(() => { carregarNotaAtendimento(lead.telefone); carregarTarefasLead(lead.telefone); carregarAgendadasLead(lead.telefone); carregarQuemAtende(lead.telefone); carregarHistoricoSite(lead); }, 0);
 }
 
 function closeLeadPanel() {
