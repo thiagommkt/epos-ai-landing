@@ -2438,6 +2438,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   try { sess = storedSess ? JSON.parse(storedSess) : null; } catch {}
   if (!sess || !sess.access_token || (sess.expires_at || 0) * 1000 < Date.now()) {
     try { const telLink = new URLSearchParams(location.search).get('lead'); if (telLink) sessionStorage.setItem('abrir_lead', telLink); } catch (e) {}
+    try { const abaLink = new URLSearchParams(location.search).get('aba'); if (abaLink) sessionStorage.setItem('abrir_aba', abaLink); } catch (e) {}
     location.replace('login-epos.html');
     throw new Error('auth_required');
   }
@@ -7323,6 +7324,10 @@ async function loadMetaDashboard() {
   let telLink = null;
   try { telLink = new URLSearchParams(location.search).get('lead') || sessionStorage.getItem('abrir_lead'); sessionStorage.removeItem('abrir_lead'); } catch (e) {}
   if (telLink) setTimeout(() => abrirFichaPorTelefone(telLink), 1800);
+  // 06/11: ?aba=<seção> abre a aba direto (o lembrete de aprovação manda ?aba=remarketing)
+  let abaLink = null;
+  try { abaLink = new URLSearchParams(location.search).get('aba') || sessionStorage.getItem('abrir_aba'); sessionStorage.removeItem('abrir_aba'); } catch (e) {}
+  if (abaLink && /^[a-z]{3,20}$/.test(abaLink) && document.querySelector(`[data-sec="${abaLink}"]`)) setTimeout(() => navTo(abaLink), 900);
 })();
 setTimeout(loadMetaDashboard, 1200);
 loadDashboard();
