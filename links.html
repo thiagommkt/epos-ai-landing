@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Links UTM — WhatsApp</title>
+<title>Links UTM — Site e WhatsApp</title>
 <style>
   :root {
     --bg: #0a0a0a;
@@ -191,9 +191,78 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Links de rastreamento — WhatsApp</h1>
+    <h1>Links de rastreamento — Site, diagnóstico e WhatsApp</h1>
     <p>Clique em "copiar" e cole onde for divulgar. Cada link já dispara o pixel certo e identifica a origem.</p>
   </header>
+
+  <div class="gen" id="siteGen">
+    <div class="gen-title">Links para o site e o diagnóstico (UTM)</div>
+    <p style="color:var(--muted);font-size:12.5px;margin:0 0 14px;line-height:1.5">Use estes links em tudo que aponta para <b>eposmktfilmsia.com.br</b> ou para o quiz. O site grava a visita com a UTM e o quiz grava a UTM no contato, então dá para saber de onde veio cada pessoa. Letras maiúsculas, acentos e espaços são ajustados sozinhos.</p>
+    <div class="gen-grid">
+      <div class="gen-field full">
+        <label>Para onde o link leva</label>
+        <select id="sgDest">
+          <option value="https://eposmktfilmsia.com.br/">Site: página inicial</option>
+          <option value="https://eposmktfilmsia.com.br/metodo/">Site: Método Venda Inevitável</option>
+          <option value="https://eposmktfilmsia.com.br/thiago-montandon/">Site: Thiago Montandon</option>
+          <option value="https://eposmktfilmsia.com.br/portfolio/">Site: Portfólio</option>
+          <option value="https://eposmktfilmsia.com.br/servicos/">Site: Serviços</option>
+          <option value="https://eposmktfilmsia.com.br/sobre/">Site: Sobre</option>
+          <option value="https://lp.eposmktfilmsia.com.br/quiz-epos.html">Diagnóstico (quiz), direto</option>
+          <option value="__outra">Outra página do site (digitar o caminho)</option>
+        </select>
+        <input id="sgPath" placeholder="/atendimento/aguas-claras/" style="display:none;margin-top:4px;">
+      </div>
+      <div class="gen-field">
+        <label>Fonte (de onde vem)</label>
+        <select id="sgSrc">
+          <option value="instagram">instagram</option>
+          <option value="facebook">facebook</option>
+          <option value="youtube">youtube</option>
+          <option value="whatsapp">whatsapp</option>
+          <option value="linkedin">linkedin</option>
+          <option value="google">google</option>
+          <option value="email">e-mail</option>
+          <option value="behance">behance</option>
+          <option value="meta">meta (anúncio pago)</option>
+          <option value="__outra">outra (digitar)</option>
+        </select>
+        <input id="sgSrcOutra" placeholder="ex: tiktok" style="display:none;margin-top:4px;">
+      </div>
+      <div class="gen-field">
+        <label>Mídia (onde exatamente)</label>
+        <input id="sgMedia" list="sgMediaOpts" placeholder="bio, stories, reels, descricao, assinatura, cpc">
+        <datalist id="sgMediaOpts"><option value="bio"><option value="stories"><option value="feed"><option value="reels"><option value="comentario"><option value="descricao"><option value="assinatura"><option value="gbp"><option value="cpc"><option value="conversa"></datalist>
+      </div>
+      <div class="gen-field">
+        <label>Campanha</label>
+        <input id="sgCamp" placeholder="ex: organico, lancamento-metodo">
+      </div>
+      <div class="gen-field">
+        <label>Conteúdo (qual post ou criativo)</label>
+        <input id="sgCont" placeholder="ex: reel-1898, bio-thiago">
+      </div>
+      <div class="gen-field full">
+        <label>Termo (opcional, só para anúncio de busca)</label>
+        <input id="sgTerm" placeholder="ex: agencia-de-marketing-brasilia">
+      </div>
+    </div>
+    <div class="gen-output">
+      <div id="sgUrl">https://eposmktfilmsia.com.br/?utm_source=...</div>
+      <button class="copy" id="sgCopy">copiar</button>
+    </div>
+    <p id="sgAviso" style="color:#e0a050;font-size:12px;margin:8px 0 0"></p>
+
+    <div class="gen-title" style="margin-top:26px">Já prontos</div>
+    <div id="sgProntos"></div>
+
+    <div class="gen-title" style="margin-top:26px">Anúncios da Meta: campo "Parâmetros de URL"</div>
+    <p style="color:var(--muted);font-size:12.5px;margin:0 0 10px;line-height:1.5">No anúncio, o link de destino vai <b>limpo</b> (sem UTM). Cole este texto no campo <b>Rastreamento → Parâmetros de URL</b> de cada anúncio. A Meta troca os trechos entre chaves pelo nome real da campanha, do conjunto e do anúncio. Por isso os nomes dos anúncios não podem se repetir.</p>
+    <div class="gen-output">
+      <div id="sgMeta">utm_source=facebook&amp;utm_medium=paid&amp;utm_campaign={{campaign.name}}&amp;utm_content={{ad.name}}&amp;utm_term={{adset.name}}&amp;utm_id={{campaign.id}}&amp;ad_id={{ad.id}}&amp;adset_id={{adset.id}}&amp;placement={{placement}}</div>
+      <button class="copy" id="sgMetaCopy">copiar</button>
+    </div>
+  </div>
 
   <div class="guide">
     <h2>Como usar isso — guia rápido</h2>
@@ -491,6 +560,82 @@ genSrc.addEventListener('change', function(){
 genCopyBtn.addEventListener('click', function(){ copyText(buildGenUrl(), genCopyBtn); });
 
 buildGenUrl();
+
+// ---------- Links para o site e o quiz ----------
+(function(){
+  var SITE = 'https://eposmktfilmsia.com.br';
+  var QUIZ = 'https://lp.eposmktfilmsia.com.br/quiz-epos.html';
+  function norm(s){
+    return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9_.-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 100);
+  }
+  function montar(dest, src, media, camp, cont, term){
+    var u;
+    try { u = new URL(dest); } catch(e) { return ''; }
+    var p = u.searchParams;
+    if (src) p.set('utm_source', src);
+    if (media) p.set('utm_medium', media);
+    if (camp) p.set('utm_campaign', camp);
+    if (cont) p.set('utm_content', cont);
+    if (term) p.set('utm_term', term);
+    return u.toString();
+  }
+  var el = function(id){ return document.getElementById(id); };
+  var dest = el('sgDest'), path = el('sgPath'), src = el('sgSrc'), srcOutra = el('sgSrcOutra'),
+      media = el('sgMedia'), camp = el('sgCamp'), cont = el('sgCont'), term = el('sgTerm'),
+      out = el('sgUrl'), aviso = el('sgAviso');
+
+  function atual(){
+    var d = dest.value;
+    if (d === '__outra') {
+      var c = path.value.trim();
+      if (c && c.charAt(0) !== '/') c = '/' + c;
+      d = SITE + (c || '/');
+    }
+    var s = src.value === '__outra' ? norm(srcOutra.value) : src.value;
+    s = s === 'meta' ? 'facebook' : s;
+    var m = norm(media.value) || (src.value === 'meta' ? 'paid' : '');
+    var url = montar(d, s, m, norm(camp.value), norm(cont.value), norm(term.value));
+    var faltam = [];
+    if (!s) faltam.push('fonte');
+    if (!m) faltam.push('mídia');
+    if (!norm(camp.value)) faltam.push('campanha');
+    aviso.textContent = faltam.length ? 'Falta preencher: ' + faltam.join(', ') + '.' : '';
+    out.textContent = url;
+    return url;
+  }
+  dest.addEventListener('change', function(){ path.style.display = dest.value === '__outra' ? 'block' : 'none'; atual(); });
+  src.addEventListener('change', function(){ srcOutra.style.display = src.value === '__outra' ? 'block' : 'none'; atual(); });
+  [path, srcOutra, media, camp, cont, term].forEach(function(i){ i.addEventListener('input', atual); });
+  el('sgCopy').addEventListener('click', function(){ copyText(atual(), el('sgCopy')); });
+
+  var meta = el('sgMeta'), metaBtn = el('sgMetaCopy');
+  metaBtn.addEventListener('click', function(){ copyText(meta.textContent.trim(), metaBtn); });
+
+  var prontos = [
+    ['Instagram: bio do perfil → site',                 SITE + '/',                       'instagram', 'bio',        'organico', 'bio-thiago'],
+    ['Instagram: bio do perfil → página do Thiago',     SITE + '/thiago-montandon/',      'instagram', 'bio',        'organico', 'bio-pagina-thiago'],
+    ['Instagram: stories → site',                       SITE + '/',                       'instagram', 'stories',    'organico', 'stories'],
+    ['Instagram: legenda ou comentário fixado → Método', SITE + '/metodo/',               'instagram', 'feed',       'organico', 'legenda-metodo'],
+    ['YouTube: descrição dos vídeos → site',            SITE + '/',                       'youtube',   'descricao',  'organico', 'canal'],
+    ['Google Meu Negócio → site',                       SITE + '/',                       'google',    'gbp',        'perfil-empresa', 'perfil'],
+    ['Behance → site',                                  SITE + '/',                       'behance',   'projeto',    'organico', 'portfolio'],
+    ['Assinatura de e-mail → site',                     SITE + '/',                       'email',     'assinatura', 'organico', 'assinatura'],
+    ['WhatsApp: conversa ou status → diagnóstico',      QUIZ,                             'whatsapp',  'conversa',   'organico', 'diagnostico']
+  ];
+  var lista = el('sgProntos');
+  prontos.forEach(function(r){
+    var url = montar(r[1], r[2], r[3], r[4], r[5]);
+    var row = document.createElement('div'); row.className = 'row';
+    row.innerHTML = '<div class="row-left"><div class="row-label"></div><div class="row-url"></div></div><button class="copy">copiar</button>';
+    row.querySelector('.row-label').textContent = r[0];
+    row.querySelector('.row-url').textContent = url;
+    var b = row.querySelector('button');
+    b.addEventListener('click', function(){ copyText(url, b); });
+    lista.appendChild(row);
+  });
+  atual();
+})();
 </script>
 </body>
 </html>
