@@ -2206,6 +2206,11 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .cw-modal-topo { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--bd); }
     .cw-modal-topo b { flex:1; min-width:0; font-family:var(--fB); font-size:14px; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .cw-modal-topo a.rm-btn { text-decoration:none; }
+    /* 09/11: pedidos que o Analista mandou para o Thiago responder (proposta, preço, reunião, ligação) */
+    .rm-avisos { margin:0 0 18px; display:flex; flex-direction:column; gap:10px; }
+    .rm-avisos h4 { margin:0; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--orange); }
+    .rm-card.aviso { border-color:var(--orange); }
+    .rm-card.aviso .rm-rascunho { white-space:pre-wrap; background:var(--bg3); border:1px solid var(--bd); padding:10px 12px; font-family:var(--fB); font-size:13px; line-height:1.5; color:var(--text); }
     .cw-modal-aviso { padding:6px 14px; font-family:var(--fB); font-size:11px; color:var(--muted); border-bottom:1px solid var(--bd); }
     .cw-modal iframe { flex:1; width:100%; border:0; background:#fff; }
     @media (max-width: 860px) { .cw-modal { padding:0; } .cw-modal-caixa { width:100%; height:100%; border:0; } .cw-modal-topo a.rm-btn { display:none; } }
@@ -2213,6 +2218,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div style="font-size:12px;color:var(--muted);margin:0 0 14px;font-family:var(--fB);line-height:1.55;max-width:760px">
     Quando a conversa de um lead esfria, o Analista audita a conversa inteira (canal de aquisição, quem procurou quem, etapa, sinais de interesse) e monta o plano do próximo contato: a mensagem já escrita, uma ligação (vai para o card "Precisam de ligação") ou nada (sem chance de fechamento: vai como sugestão para Perdido). O ritmo é o da Torneira: 1, 3, 7, 15 e 30 dias. Aprove aqui em lote ou na ficha do lead. A mensagem entra na fila com 10 minutos ou mais depois da anterior e é cancelada sozinha se a pessoa escrever antes ou a equipe assumir. Quando a conversa foi pelo número de disparos, sai pelo número da Donna, que se apresenta e explica que aquele é o número usado só para disparos.
   </div>
+  <div id="rm-avisos"></div>
   <div class="rm-abas" id="rm-abas"></div>
   <div class="rm-barra" id="rm-barra"></div>
   <div class="rm-lista" id="rm-lista"><div class="loading"></div></div>
@@ -4128,6 +4134,16 @@ async function carregarTarefasLead(telefone) {
   const _fila = {};
   if (_filaIds.length) { const { data: fr } = await sb(`remarketing_sugestoes?id=in.(${_filaIds.join(',')})&select=id,status,agendada_para`); (fr || []).forEach(x => _fila[x.id] = x); }
   box.innerHTML = ts.map(t => {
+    // 09/11: aviso do Analista — o lead pediu proposta, preço, reunião ou ligação; o Thiago responde
+    if (t.tipo === 'aviso') {
+      return `<div class="tarefa-item" style="padding:8px;border:1px solid var(--orange);margin-bottom:6px">
+        <div style="font-family:var(--fM);font-size:9px;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">📌 Pedido para você responder</div>
+        <div style="font-size:12px;color:var(--text);margin-bottom:6px">${escHtml(t.acao)}</div>
+        ${t.mensagem_sugerida ? `<div style="font-size:11.5px;color:var(--muted);white-space:pre-wrap;padding:6px 8px;border-left:2px solid var(--orange);margin-bottom:6px">✍️ ${escHtml(t.mensagem_sugerida)}</div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="concluirTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)">✓ Respondi</button>
+        </div></div>`;
+    }
     // 28/10: plano do Analista — ligação
     if (t.tipo === 'ligacao' && t.status === 'sugerida') {
       // 28/10: plano de ligações — pode ser outro número (ex.: a recepção passou o da dona) e ter com quem falar e o contexto
@@ -7439,6 +7455,7 @@ async function rmLoad() {
     sb('tarefas?conta=eq.epos&status=eq.sugerida&tipo=eq.contato&mensagem_sugerida=not.is.null&plano=not.is.null&select=id,lead_telefone,acao,quando,mensagem_sugerida,plano,criada_em&order=quando.asc&limit=300'),
     sb(`remarketing_sugestoes?conta=eq.epos&or=(status.in.(aprovada,enviando),criada_em.gte.${desde})&status=neq.sugerida&status=neq.nao_enviar&order=agendada_para.asc&limit=300`)]);
   _rmPlanos = Array.isArray(p.data) ? p.data : []; _rmFila = Array.isArray(f.data) ? f.data : [];
+  rmCarregarAvisos();
   const tels = [...new Set(_rmPlanos.map(t => t.lead_telefone))];
   _rmLeads = {};
   if (tels.length) { const { data } = await sb(`leads?telefone=in.(${tels.join(',')})&select=telefone,nome,crm_stage`); (data || []).forEach(l => _rmLeads[l.telefone] = l); }
@@ -7522,6 +7539,43 @@ function rmCardFila(s) {
     ${s.mensagem_final || s.mensagem ? `<div class="rm-txt"><small>Mensagem</small>${labEsc(s.mensagem_final || s.mensagem)}</div>` : ''}
     <div class="rm-acoes">${st}${rmLinkConversa(s.conversa_id, s.lead_nome || s.lead_telefone)}</div>
   </div>`;
+}
+// 09/11 (Analista v2, Marco 2): pedidos concretos (proposta, preço, reunião, ligação) viram tarefa 'aviso' do Thiago.
+// Ficam no topo da aba até ele marcar "Respondi"; o rascunho é do Analista e ele revisa antes de mandar.
+let _rmAvisos = {};
+async function rmCarregarAvisos() {
+  const box = document.getElementById('rm-avisos');
+  if (!box) return;
+  const { data } = await sb('tarefas?conta=eq.epos&status=eq.pendente&tipo=eq.aviso&select=id,lead_telefone,acao,quando,mensagem_sugerida,plano&order=quando.asc&limit=100');
+  const av = Array.isArray(data) ? data : [];
+  _rmAvisos = {}; av.forEach(t => _rmAvisos[t.id] = t);
+  if (!av.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div class="rm-avisos"><h4>📌 Pedidos para você responder (${av.length})</h4>` + av.map(t => {
+    const pl = t.plano || {}, nome = pl.nome || t.lead_telefone, sm = pl.sinal_mais_forte || {};
+    return `<div class="rm-card aviso" id="rm-av-${t.id}">
+      <div class="rm-topo"><h3><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(t.lead_telefone)}')" style="color:inherit;text-decoration:none">${labEsc(nome)}</a></h3>
+        <div class="rm-chips"><span class="rm-chip alto">Nota ${labEsc(pl.nota || 10)}</span>${sm.data ? `<span class="rm-chip">${labEsc(sm.data)} · ${sm.onde === 'disparo' ? 'número de disparo' : 'conversa com a Donna'}</span>` : ''}</div></div>
+      <div class="rm-txt"><small>O que a pessoa pediu</small>${labEsc(t.acao)}</div>
+      ${t.mensagem_sugerida ? `<div class="rm-txt"><small>Rascunho da sua resposta (revise antes de mandar)</small></div><div class="rm-rascunho">${labEsc(t.mensagem_sugerida)}</div>` : ''}
+      ${Array.isArray((pl.aviso || {}).dados_faltando) && pl.aviso.dados_faltando.length ? `<div class="rm-txt"><small>Falta saber</small>${labEsc(pl.aviso.dados_faltando.join('; '))}</div>` : ''}
+      <div class="rm-acoes">${t.mensagem_sugerida ? `<button class="rm-btn" onclick="rmCopiarRascunho('${t.id}')">Copiar rascunho</button>` : ''}
+        <button class="rm-btn forte" onclick="rmAvisoRespondido('${t.id}')">✓ Respondi</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
+    </div>`;
+  }).join('') + '</div>';
+}
+function rmCopiarRascunho(id) {
+  const txt = (_rmAvisos[id] || {}).mensagem_sugerida || '';
+  const ok = () => toast('Rascunho copiado', 'ok');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => prompt('Copie o rascunho:', txt));
+  else prompt('Copie o rascunho:', txt);
+}
+async function rmAvisoRespondido(id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'feita', concluida_em: new Date().toISOString() }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast('✅ Pedido marcado como respondido', 'ok');
+    rmCarregarAvisos();
+  } catch (e) { toast('Não marcou: ' + e.message, 'err'); }
 }
 function rmMarcar(id, on) { on ? _rmSel.add(id) : _rmSel.delete(id); rmRender(); }
 function rmMarcarTodos(on) { _rmPlanos.forEach(t => on ? _rmSel.add(t.id) : _rmSel.delete(t.id)); rmRender(); }
