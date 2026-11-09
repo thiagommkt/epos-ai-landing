@@ -13,7 +13,7 @@ html:root[data-theme="light"] aside nav a.active{background:rgba(255,255,255,0.1
 .mobile-logo{display:flex;align-items:center;gap:8px;text-transform:none!important}
 .mobile-logo img{width:28px;height:28px;border-radius:8px}
 /* só da operação interna da Epos: fora da demonstração */
-[data-sec="clientes"],[data-sec="prospeccao"],#db-meta-clientes,#metodo-rastreio-card{display:none!important}
+[data-sec="clientes"],[data-sec="prospeccao"],[data-sec="status"],[data-sec="laboratorio"],#nav-laboratorio,#db-meta-clientes,#metodo-rastreio-card{display:none!important}
 .demo-faixa{position:fixed;right:14px;bottom:14px;z-index:9999;background:#061030;color:#fff;font:600 11px/1 'DM Sans',sans-serif;letter-spacing:.04em;
   padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(6,16,48,.25);pointer-events:none;opacity:.92}
 @media(max-width:768px){.demo-faixa{bottom:74px;right:10px}}

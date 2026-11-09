@@ -87,7 +87,7 @@ function htmlCaixa(selecionada) {
 
 /* ── agenda da clínica (aba Agenda) ── */
 function htmlAgenda() {
-  var ev = D.LEADS.filter(function (l) { return l._consulta; }).map(function (l) { return { t: l._consulta, nome: l.nome, proc: PROC_NOME[l._proc], seg: l.segmento, ok: l.compareceu, fechou: l.fechou }; });
+  var ev = D.LEADS.filter(function (l) { return l._consulta; }).map(function (l) { var g = D.PROC.filter(function (p) { return p.k === l._proc; })[0]; return { t: l._consulta, nome: l.nome, proc: PROC_NOME[l._proc], seg: g ? g.grp : '', ok: l.compareceu, fechou: l.fechou }; });
   var hoje = new Date(Date.now() - 3 * U.HORA), dw = hoje.getUTCDay(), seg0 = Date.UTC(hoje.getUTCFullYear(), hoje.getUTCMonth(), hoje.getUTCDate() - (dw === 0 ? 6 : dw - 1)) + 3 * U.HORA;
   return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' + CSS_BASE + '<style>' +
     'body{overflow:auto}.top{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:3}' +
@@ -98,13 +98,13 @@ function htmlAgenda() {
     '.cel{height:56px;border-top:1px solid #E9EEF5;border-left:1px solid #E9EEF5;position:relative}.ev{position:absolute;left:3px;right:3px;top:3px;bottom:3px;border-radius:8px;padding:4px 7px;font-size:11px;line-height:1.3;color:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(6,16,48,.15)}' +
     '.ev.o{background:linear-gradient(135deg,#16305E,#315181)}.ev.e{background:linear-gradient(135deg,#2B4B7B,#5B7DB0)}.ev.f{opacity:.55}.ev b{display:block;font-size:11.5px}' +
     '</style></head><body><div class="top"><button onclick="sem(-1)">‹</button><button onclick="sem(0)">Hoje</button><button onclick="sem(1)">›</button><b id="tit"></b>' +
-    '<div class="leg"><span><i style="background:#16305E"></i>Odontologia</span><span><i style="background:#5B7DB0"></i>Estética</span><span><i style="background:#9AA9C0"></i>Já atendido</span></div></div><div class="grade" id="g"></div>' +
+    '<div class="leg"><span><i style="background:#16305E"></i>Injetáveis</span><span><i style="background:#5B7DB0"></i>Pele e laser</span><span><i style="background:#9AA9C0"></i>Já atendido</span></div></div><div class="grade" id="g"></div>' +
     '<script>var E=' + JSON.stringify(ev).replace(/<\//g, '<\\/') + ',S0=' + seg0 + ',H=36e5,DIA=864e5,off=0,DS=["seg","ter","qua","qui","sex","sáb"];' +
     'function br(t){return new Date(t-3*H)}function dd(t){var d=br(t);return String(d.getUTCDate()).padStart(2,"0")+"/"+String(d.getUTCMonth()+1).padStart(2,"0")}' +
     'function sem(n){off=n===0?0:off+n;var ini=S0+off*7*DIA,hj=dd(Date.now()),h="<div></div>";document.getElementById("tit").textContent="Semana de "+dd(ini)+" a "+dd(ini+5*DIA);' +
     'for(var d=0;d<6;d++)h+=\'<div class="cab\'+(dd(ini+d*DIA)===hj?" hj":"")+\'">\'+DS[d]+" "+dd(ini+d*DIA)+"</div>";' +
     'for(var hr=8;hr<19;hr++){h+=\'<div class="hr">\'+hr+"h</div>";for(var d2=0;d2<6;d2++){var a=ini+d2*DIA+(hr-0)*H,ev=E.filter(function(e){var x=br(e.t);return dd(e.t)===dd(a)&&x.getUTCHours()===hr});' +
-    'h+=\'<div class="cel">\'+ev.map(function(e){var x=br(e.t);return \'<div class="ev \'+(e.seg==="Estética"?"e":"o")+(e.t<Date.now()?" f":"")+\'"><b>\'+String(x.getUTCHours()).padStart(2,"0")+":"+String(x.getUTCMinutes()).padStart(2,"0")+" · "+e.nome.split(" ")[0]+" "+e.nome.split(" ").slice(-1)+"</b>"+e.proc+(e.fechou?" · fechou":"")+"</div>"}).join("")+"</div>"}}' +
+    'h+=\'<div class="cel">\'+ev.map(function(e){var x=br(e.t);return \'<div class="ev \'+(e.seg==="Pele e laser"?"e":"o")+(e.t<Date.now()?" f":"")+\'"><b>\'+String(x.getUTCHours()).padStart(2,"0")+":"+String(x.getUTCMinutes()).padStart(2,"0")+" · "+e.nome.split(" ")[0]+" "+e.nome.split(" ").slice(-1)+"</b>"+e.proc+(e.fechou?" · fechou":"")+"</div>"}).join("")+"</div>"}}' +
     'document.getElementById("g").innerHTML=h}sem(0);<\/script></body></html>';
 }
 

@@ -1569,7 +1569,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 11l4 4" stroke="currentColor" stroke-width="1.5"/></svg>
       Prospecção
     </a>
-    <div class="nav-section">Sistema</div>
+    
     <a data-sec="status" onclick="navTo('status')">
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2"/></svg>
       Status
@@ -7387,6 +7387,9 @@ labPodeVer();
 
 // ═══ REMARKETING (28/10) — o plano do Analista (tarefas de próximo contato com mensagem pronta) aprovado em lote; envio: [Epos] Remarketing — Enviar aprovadas ═══
 let _rmPlanos = [], _rmFila = [], _rmLeads = {}, _rmAba = 'aprovar', _rmSel = new Set();
+// 09/11 (Thiago: "não estou conseguindo editar as respostas do remarketing"): marcar "Selecionar" ou aprovar outra remontava a lista
+// com o texto original e a edição sumia (e o lote aprovava o texto original). O que é digitado fica aqui até aprovar/descartar.
+let _rmEdits = {};
 const RM_CANAL = { prospeccao_disparo_oficial: 'Prospecção · disparo', prospeccao_antiga: 'Prospecção antiga', stories: 'Stories', quiz_metodo: 'Quiz do Método',
   lead_ads: 'Formulário de anúncio', anuncio: 'Anúncio', contato_existente: 'Contato antigo', whatsapp: 'WhatsApp' };
 const RM_ETAPA = { em_conversa: 'Em conversa', qualificado: 'Qualificado', agendou: 'Agendou', agendado: 'Agendado', compareceu: 'Compareceu', perdido: 'Perdido' };
@@ -7426,7 +7429,7 @@ function rmRender() {
   document.getElementById('rm-barra').innerHTML = _rmAba === 'aprovar' && itens.length
     ? `<label class="rm-marca"><input type="checkbox" onchange="rmMarcarTodos(this.checked)" ${itens.every(t => _rmSel.has(t.id)) ? 'checked' : ''}> Marcar todas</label>
        <button class="rm-btn forte" onclick="rmAprovarSelecionadas()" ${_rmSel.size ? '' : 'disabled'}>Aprovar selecionadas (${_rmSel.size})</button>
-       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 35 por dia. Interesse alto sai primeiro.</span>` : '';
+       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 35 por dia, sempre pela Lia. O mais quente (nota do Analista) sai primeiro.</span>` : '';
   const lista = document.getElementById('rm-lista');
   if (!itens.length) {
     lista.innerHTML = `<div class="rm-vazio">${{ aprovar: 'Nenhuma mensagem planejada esperando aprovação.<br>O Analista planeja quando a conversa de um lead esfria; ligações aparecem no card "Precisam de ligação" do Painel.', fila: 'Nada na fila de envio.', historico: 'Nenhum envio nos últimos 7 dias.' }[_rmAba]}</div>`;
@@ -7478,17 +7481,17 @@ function rmCardPlano(t) {
     ${pl.resumo ? `<div class="rm-txt"><small>O que aconteceu (auditoria do Analista)</small>${labEsc(pl.resumo)}</div>` : ''}
     ${t.acao ? `<div class="rm-txt"><small>Por que retomar</small>${labEsc(t.acao)}</div>` : ''}
     <div class="rm-txt"><small>Mensagem (pode editar antes de aprovar) · planejada para ${labData(t.quando)}</small></div>
-    <textarea id="rm-t-${t.id}" maxlength="1000">${labEsc(t.mensagem_sugerida || '')}</textarea>
+    <textarea id="rm-t-${t.id}" maxlength="1000" oninput="_rmEdits['${t.id}']=this.value">${labEsc(_rmEdits[t.id] ?? t.mensagem_sugerida ?? '')}</textarea>
     <div class="rm-acoes"><label class="rm-marca"><input type="checkbox" ${_rmSel.has(t.id) ? 'checked' : ''} onchange="rmMarcar('${t.id}',this.checked)"> Selecionar</label>
       <button class="rm-btn forte" onclick="rmAprovar('${t.id}')">Aprovar</button><button class="rm-btn" onclick="rmDescartarPlano('${t.id}')">Descartar</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
   </div>`;
 }
 function rmCardFila(s) {
-  const st = s.status === 'aprovada' ? `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn" onclick="rmCancelarEnvio('${s.id}')">Cancelar envio</button>`
+  const st = s.status === 'aprovada' ? `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn" onclick="rmEditarFila('${s.id}')">Editar</button><button class="rm-btn" onclick="rmCancelarEnvio('${s.id}')">Cancelar envio</button>`
     : `<span class="rm-status${['falhou', 'cancelada'].includes(s.status) ? ' erro' : ''}">${RM_STATUS[s.status] || s.status}${s.enviada_em ? ' em ' + labData(s.enviada_em) : s.aprovada_em ? ' em ' + labData(s.aprovada_em) : ''}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span>`;
   return `<div class="rm-card" id="rm-${s.id}">
     <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${rmChips(s.canal_aquisicao, s.stage, s.sinais, s.numero)}</div></div>
-    ${s.mensagem_final || s.mensagem ? `<div class="rm-txt"><small>Mensagem</small>${labEsc(s.mensagem_final || s.mensagem)}</div>` : ''}
+    ${s.mensagem_final || s.mensagem ? `<div class="rm-txt" id="rm-fm-${s.id}"><small>Mensagem</small>${labEsc(s.mensagem_final || s.mensagem)}</div>` : ''}
     <div class="rm-acoes">${st}${rmLinkConversa(s.conversa_id, s.lead_nome || s.lead_telefone)}</div>
   </div>`;
 }
@@ -7508,7 +7511,7 @@ async function rmCarregarAvisos() {
       <div class="rm-topo"><h3><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(t.lead_telefone)}')" style="color:inherit;text-decoration:none">${labEsc(nome)}</a></h3>
         <div class="rm-chips"><span class="rm-chip alto">Nota ${labEsc(pl.nota || 10)}</span>${sm.data ? `<span class="rm-chip">${labEsc(sm.data)} · ${sm.onde === 'disparo' ? 'número de disparo' : 'conversa com a Lia'}</span>` : ''}</div></div>
       <div class="rm-txt"><small>O que a pessoa pediu</small>${labEsc(t.acao)}</div>
-      ${t.mensagem_sugerida ? `<div class="rm-txt"><small>Rascunho da sua resposta (revise antes de mandar)</small></div><div class="rm-rascunho">${labEsc(t.mensagem_sugerida)}</div>` : ''}
+      ${t.mensagem_sugerida ? `<div class="rm-txt"><small>Rascunho da sua resposta (pode editar antes de copiar)</small></div><textarea class="rm-rascunho" id="rm-av-t-${t.id}" maxlength="2000" oninput="_rmEdits['av-${t.id}']=this.value">${labEsc(_rmEdits['av-' + t.id] ?? t.mensagem_sugerida)}</textarea>` : ''}
       ${Array.isArray((pl.aviso || {}).dados_faltando) && pl.aviso.dados_faltando.length ? `<div class="rm-txt"><small>Falta saber</small>${labEsc(pl.aviso.dados_faltando.join('; '))}</div>` : ''}
       <div class="rm-acoes">${t.mensagem_sugerida ? `<button class="rm-btn" onclick="rmCopiarRascunho('${t.id}')">Copiar rascunho</button>` : ''}
         <button class="rm-btn forte" onclick="rmAvisoRespondido('${t.id}')">✓ Respondi</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
@@ -7516,7 +7519,7 @@ async function rmCarregarAvisos() {
   }).join('') + '</div>';
 }
 function rmCopiarRascunho(id) {
-  const txt = (_rmAvisos[id] || {}).mensagem_sugerida || '';
+  const txt = String(document.getElementById('rm-av-t-' + id)?.value ?? _rmEdits['av-' + id] ?? (_rmAvisos[id] || {}).mensagem_sugerida ?? '');
   const ok = () => toast('Rascunho copiado', 'ok');
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => prompt('Copie o rascunho:', txt));
   else prompt('Copie o rascunho:', txt);
@@ -7525,7 +7528,7 @@ async function rmAvisoRespondido(id) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'feita', concluida_em: new Date().toISOString() }) });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    toast('✅ Pedido marcado como respondido', 'ok');
+    delete _rmEdits['av-' + id]; toast('✅ Pedido marcado como respondido', 'ok');
     rmCarregarAvisos();
   } catch (e) { toast('Não marcou: ' + e.message, 'err'); }
 }
@@ -7542,10 +7545,11 @@ async function aprovarMensagemPlano(id, texto) {
   return rmRpc('epos_aprovar_mensagem', { p_tarefa_id: id, p_texto: texto });
 }
 async function rmAprovar(id, semRecarregar) {
-  const t = (document.getElementById('rm-t-' + id)?.value || '').trim();
+  const t = String(_rmEdits[id] ?? document.getElementById('rm-t-' + id)?.value ?? '').trim();
   if (!t) { toast('Escreva a mensagem antes de aprovar', 'err'); return false; }
   try {
     const quando = await aprovarMensagemPlano(id, t);
+    delete _rmEdits[id];
     if (!semRecarregar) { toast('Aprovada. Sai às ' + labData(quando)); _rmSel.delete(id); await rmLoad(); }
     return true;
   } catch (e) { toast('Não aprovou: ' + e.message, 'err'); return false; }
@@ -7562,8 +7566,24 @@ async function rmDescartarPlano(id) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.sugerida`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }), body: JSON.stringify({ status: 'descartada', concluida_em: new Date().toISOString() }) });
     if (!r.ok) throw new Error('erro ' + r.status);
-    _rmSel.delete(id); toast('Descartada'); await rmLoad();
+    _rmSel.delete(id); delete _rmEdits[id]; toast('Descartada'); await rmLoad();
   } catch (e) { toast('Não descartou: ' + e.message, 'err'); }
+}
+// 09/11: editar a mensagem que já está na fila (só enquanto não saiu; o horário não muda)
+function rmEditarFila(id) {
+  const s = _rmFila.find(x => x.id === id), box = document.getElementById('rm-fm-' + id);
+  if (!s || !box) return;
+  box.innerHTML = `<small>Mensagem (editando)</small><textarea id="rm-fe-${id}" maxlength="1000">${labEsc(_rmEdits['f-' + id] ?? s.mensagem_final ?? s.mensagem ?? '')}</textarea>
+    <div class="rm-acoes"><button class="rm-btn forte" onclick="rmSalvarFila('${id}')">Salvar</button><button class="rm-btn" onclick="delete _rmEdits['f-${id}'];rmRender()">Cancelar edição</button></div>`;
+  const ta = document.getElementById('rm-fe-' + id);
+  ta.oninput = () => { _rmEdits['f-' + id] = ta.value; };
+  ta.focus();
+}
+async function rmSalvarFila(id) {
+  const t = String(document.getElementById('rm-fe-' + id)?.value || '').trim();
+  if (!t) { toast('Escreva a mensagem', 'err'); return; }
+  try { await rmRpc('remarketing_editar', { p_id: id, p_texto: t }); delete _rmEdits['f-' + id]; toast('Mensagem salva. O horário na fila continua o mesmo.', 'ok'); await rmLoad(); }
+  catch (e) { toast('Não salvou: ' + e.message, 'err'); }
 }
 async function rmCancelarEnvio(id) {
   try { await rmRpc('remarketing_descartar', { p_id: id }); toast('Envio cancelado'); await rmLoad(); }

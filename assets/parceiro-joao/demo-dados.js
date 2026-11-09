@@ -1,5 +1,5 @@
 /* Demonstração do sistema comercial (parceiro João) — 09/11/2026.
-   DADOS 100% FICTÍCIOS de uma clínica (odontologia + estética), gerados no navegador com semente fixa:
+   DADOS 100% FICTÍCIOS de uma clínica de estética, gerados no navegador com semente fixa:
    nenhum nome, telefone ou conversa é real. Este arquivo só monta os dados; o demo-banco.js responde às consultas. */
 (function () {
 'use strict';
@@ -47,27 +47,27 @@ var EQUIPE = [
 
 /* ── procedimentos, campanhas e criativos ── */
 var PROC = [
-  { k: 'implante', art: 'do', nome: 'implante dentário', seg: 'Odontologia', v: [3800, 5200], peso: 22, camp: 'Implantes — Novembro', criat: ['Vídeo — depoimento implante', 'Antes e depois — implante'],
-    pergunta: ['Oi, vi o anúncio do implante. Quanto fica?', 'Boa noite! Perdi um dente da frente, vocês fazem implante?', 'Quanto custa o implante com a coroa?'],
-    duvida: ['Dói muito? Tenho pavor de dentista.', 'Precisa de enxerto? Já me falaram que meu osso é fino.', 'Quanto tempo leva tudo?'] },
-  { k: 'alinhador', art: 'do', nome: 'alinhador invisível', seg: 'Odontologia', v: [6900, 8900], peso: 14, camp: 'Alinhadores — Outubro', criat: ['Carrossel — alinhador x aparelho', 'Vídeo — rotina com alinhador'],
-    pergunta: ['Vocês fazem alinhador transparente? Qual o valor?', 'Oi! Queria saber do alinhador invisível pra minha filha de 16 anos'],
-    duvida: ['Dá pra parcelar?', 'Quanto tempo de tratamento mais ou menos?'] },
-  { k: 'lente', art: 'das', nome: 'lentes de contato dental', seg: 'Odontologia', v: [9800, 14500], peso: 10, camp: 'Sorriso novo — Lentes', criat: ['Vídeo — transformação do sorriso', 'Antes e depois — lentes'],
-    pergunta: ['Queria saber das lentes de contato nos dentes', 'Quanto custa a lente de porcelana por dente?'],
-    duvida: ['Desgasta o dente?', 'Fica natural ou fica muito branco?'] },
-  { k: 'clareamento', art: 'do', nome: 'clareamento', seg: 'Odontologia', v: [690, 990], peso: 18, camp: 'Clareamento — Black Friday', criat: ['Story — Black Friday clareamento', 'Vídeo — clareamento em 1 sessão'],
-    pergunta: ['Ainda tem a promoção do clareamento?', 'Oi, o clareamento é a laser ou de moldeira?'],
-    duvida: ['Fica sensível depois?', 'Quantas sessões?'] },
-  { k: 'harmonizacao', art: 'da', nome: 'harmonização facial', seg: 'Estética', v: [2200, 3800], peso: 16, camp: 'Harmonização — Black Friday', criat: ['Reels — harmonização natural', 'Antes e depois — mandíbula'],
-    pergunta: ['Oi! Quero fazer harmonização, como funciona?', 'Vocês fazem preenchimento labial?'],
-    duvida: ['Fica artificial?', 'Quanto tempo dura o resultado?'] },
-  { k: 'botox', art: 'da', nome: 'toxina botulínica', seg: 'Estética', v: [1100, 1600], peso: 12, camp: 'Botox — Novembro', criat: ['Vídeo — botox preventivo', 'Carrossel — mitos do botox'],
+  { k: 'harmonizacao', art: 'da', nome: 'harmonização facial', seg: 'Estética', grp: 'Injetáveis', v: [2200, 3800], peso: 20, camp: 'Harmonização — Black Friday', criat: ['Reels — harmonização natural', 'Antes e depois — mandíbula'],
+    pergunta: ['Oi! Quero fazer harmonização, como funciona?', 'Vi o vídeo da harmonização, quanto fica?', 'Boa noite! Vocês fazem harmonização de mandíbula?'],
+    duvida: ['Fica artificial?', 'Quanto tempo dura o resultado?', 'Tem que ficar de repouso depois?'] },
+  { k: 'botox', art: 'da', nome: 'toxina botulínica', seg: 'Estética', grp: 'Injetáveis', v: [1100, 1600], peso: 18, camp: 'Botox — Novembro', criat: ['Vídeo — botox preventivo', 'Carrossel — mitos do botox'],
     pergunta: ['Quanto custa o botox na testa?', 'Boa tarde, queria fazer botox nas rugas dos olhos'],
-    duvida: ['Quem aplica é dentista mesmo?', 'Em quantos dias aparece o resultado?'] },
-  { k: 'avaliacao', art: 'da', nome: 'avaliação', seg: 'Odontologia', v: [0, 0], peso: 8, camp: 'Avaliação — Google', criat: ['Pesquisa — dentista perto de mim'],
-    pergunta: ['Queria marcar uma avaliação', 'Estou com um dente quebrado, vocês atendem hoje?'],
-    duvida: ['A avaliação é paga?', 'Vocês aceitam convênio?'] }
+    duvida: ['Em quantos dias aparece o resultado?', 'A testa fica paralisada?'] },
+  { k: 'labial', art: 'do', nome: 'preenchimento labial', seg: 'Estética', grp: 'Injetáveis', v: [1400, 2200], peso: 14, camp: 'Lábios — Novembro', criat: ['Reels — lábios naturais', 'Antes e depois — lábios'],
+    pergunta: ['Oi, queria saber do preenchimento labial', 'Quanto fica 1 ml de ácido hialurônico nos lábios?'],
+    duvida: ['Incha muito?', 'Fica com cara de boca de pato?'] },
+  { k: 'bioestimulador', art: 'do', nome: 'bioestimulador de colágeno', seg: 'Estética', grp: 'Injetáveis', v: [2400, 4200], peso: 12, camp: 'Bioestimulador — Flacidez', criat: ['Vídeo — flacidez no rosto', 'Carrossel — colágeno depois dos 35'],
+    pergunta: ['Vocês fazem bioestimulador de colágeno?', 'Quero tratar a flacidez do rosto, o que vocês indicam?'],
+    duvida: ['Quantas sessões precisa?', 'Em quanto tempo vejo resultado?'] },
+  { k: 'laser', art: 'da', nome: 'depilação a laser', seg: 'Estética', grp: 'Pele e laser', v: [900, 1800], peso: 12, camp: 'Depilação a laser — Pacotes', criat: ['Story — pacote axila + virilha', 'Vídeo — laser sem dor'],
+    pergunta: ['Qual o valor do pacote de depilação a laser?', 'O laser de vocês funciona em pele morena?'],
+    duvida: ['Dói?', 'Quantas sessões até acabar os pelos?'] },
+  { k: 'limpeza', art: 'da', nome: 'limpeza de pele', seg: 'Estética', grp: 'Pele e laser', v: [180, 280], peso: 10, camp: 'Limpeza de pele — Primeira visita', criat: ['Reels — limpeza profunda', 'Carrossel — cravos e espinhas'],
+    pergunta: ['Quanto custa a limpeza de pele?', 'Vocês tratam acne?'],
+    duvida: ['Fica vermelho depois?', 'De quanto em quanto tempo tem que fazer?'] },
+  { k: 'avaliacao', art: 'da', nome: 'avaliação', seg: 'Estética', grp: 'Pele e laser', v: [0, 0], peso: 8, camp: 'Avaliação — Google', criat: ['Pesquisa — clínica de estética perto de mim'],
+    pergunta: ['Queria marcar uma avaliação', 'Vocês atendem sábado?'],
+    duvida: ['A avaliação é paga?', 'Vocês aceitam cartão?'] }
 ];
 var PESO_TOTAL = PROC.reduce(function (a, p) { return a + p.peso; }, 0);
 function sortearProc() { var r = R() * PESO_TOTAL; for (var i = 0; i < PROC.length; i++) { r -= PROC[i].peso; if (r <= 0) return PROC[i]; } return PROC[0]; }
@@ -107,13 +107,13 @@ for (var i = 0; i < N; i++) {
   var p = sortearProc(), o = sortearOrigem(), etapa = etapaPorIdade((AGORA - criado) / DIA);
   if (p.k === 'avaliacao' && o.src && o.src !== 'google') o = ORIGENS[2];
   var camp = o.src === 'facebook' || o.src === 'instagram' ? p.camp : o.src === 'google' ? 'Avaliação — Google' : null;
-  var criat = camp ? (o.src === 'google' ? 'Pesquisa — dentista perto de mim' : pick(p.criat)) : null;
+  var criat = camp ? (o.src === 'google' ? 'Pesquisa — clínica de estética perto de mim' : pick(p.criat)) : null;
   var l = {
     id: 5000 + i, telefone: '5561000' + String(100100 + i * 7), nome: nome, canal: o.canal, criado_em: iso(criado),
     utm_source: o.src, utm_medium: o.src === 'google' ? 'cpc' : o.src ? 'paid_social' : null, utm_campaign: camp, utm_content: criat,
     utm_term: null, utm_id: null, ad_id: camp ? '1200' + (PROC.indexOf(p) * 10 + p.criat.indexOf(criat) + 1) : null, adset_id: null, placement: o.src === 'instagram' ? 'instagram_reels' : o.src === 'facebook' ? 'facebook_feed' : null,
     fbclid: o.src === 'facebook' && R() < 0.5 ? 'demo-fb-' + i : null, ctwa_clid: o.canal === 'ctwa' ? 'demo-ctwa-' + i : null,
-    crm_stage: etapa, segmento: p.seg, servico_prestado: p.nome, perfil: p.seg, cidade: null, patologia: null, paga_ir: null, valor_ir: null,
+    crm_stage: etapa, segmento: p.seg, servico_prestado: p.nome, perfil: p.nome.charAt(0).toUpperCase() + p.nome.slice(1), cidade: null, patologia: null, paga_ir: null, valor_ir: null,
     _proc: p.k, _fem: fem, _primeiro: primeiro,
     qualificado: ORDEM_ETAPA[etapa] >= 2 && ORDEM_ETAPA[etapa] <= 5, agendou: ORDEM_ETAPA[etapa] >= 3 && ORDEM_ETAPA[etapa] <= 5,
     compareceu: etapa === 'compareceu' || etapa === 'fechou', fechou: etapa === 'fechou', descartado: etapa === 'desqualificado' && R() < 0.5,
@@ -147,7 +147,7 @@ for (var i = 0; i < N; i++) {
     }
   }
   if (etapa === 'perdido') { var mp = pick(MOTIVOS_PERDA); l.motivo_perda_categoria = mp[0]; l._motivo = mp[1]; hist.push({ de: 'em_conversa', para: 'perdido', em: iso(criado + entre(3, 12) * DIA), por: 'Analista' }); }
-  if (etapa === 'desqualificado') { l._motivo = pick(['Procurava atendimento pelo convênio, que a clínica não aceita.', 'Mora em outro estado; perguntou só por curiosidade.', 'Era fornecedor oferecendo material, não paciente.']); hist.push({ de: 'em_conversa', para: 'desqualificado', em: iso(criado + entre(1, 3) * DIA), por: 'Analista' }); }
+  if (etapa === 'desqualificado') { l._motivo = pick(['Procurava procedimento pelo convênio, que a clínica não aceita.', 'Mora em outro estado; perguntou só por curiosidade.', 'Era fornecedor oferecendo material, não paciente.']); hist.push({ de: 'em_conversa', para: 'desqualificado', em: iso(criado + entre(1, 3) * DIA), por: 'Analista' }); }
   l.stage_historico = hist;
   // quem atende e quando falaram por último
   var parada = etapa === 'em_conversa' || etapa === 'qualificado';
@@ -192,15 +192,15 @@ function conversa(l) {
   var h0 = new Date(t - 3 * HORA).getUTCHours(), noite = h0 >= 20 || h0 < 7;
   add('paciente', pick(p.pergunta), 0);
   add('ia', 'Oi, ' + pn + '! Aqui é a ' + CFG.ia + ', da ' + CFG.clinica + '.' + (noite ? ' Pode falar, estou por aqui a qualquer hora.' : '') + ' ' +
-    (p.k === 'avaliacao' ? 'Consigo te encaixar na avaliação, sim. Você está sentindo dor agora ou é para uma revisão?' :
+    (p.k === 'avaliacao' ? 'Consigo te encaixar na avaliação, sim. Qual área você quer tratar?' :
       'O valor ' + p.art + ' ' + p.nome + ' depende do que a ' + CFG.donaCurta + ' encontrar na avaliação, porque cada caso pede um plano diferente. Me conta: é a primeira vez que você vai fazer?'), 1);
   if (et === 'novo') return m;
   add('paciente', pick(['É sim, primeira vez.', 'Já fiz uma vez em outra clínica, mas não gostei.', 'Primeira vez. Tô pesquisando.', 'Sim! Tenho vontade faz tempo.']));
-  add('ia', 'Entendi. ' + (p.seg === 'Estética' ? 'Aqui o procedimento é feito pela ' + CFG.donaCurta + ', com foco em resultado natural.' : 'Na avaliação a ' + CFG.donaCurta + ' examina, tira as dúvidas e já te passa o plano com o valor exato.') + ' A avaliação dura 30 minutos e não tem custo. Posso ver um horário para você?', 1);
+  add('ia', 'Entendi. ' + 'Na avaliação a ' + CFG.donaCurta + ' olha a sua pele, tira as dúvidas e já te passa o plano com o valor exato, sempre com foco em resultado natural.' + ' A avaliação dura 30 minutos e não tem custo. Posso ver um horário para você?', 1);
   add('paciente', pick(p.duvida));
   add('ia', pick(['Ótima pergunta. ', 'Muita gente pergunta isso. ', 'Entendo a preocupação. ']) + (p.duvida.indexOf(m[m.length - 1].texto) === 0 ? 'A ' + CFG.donaCurta + ' explica tudo com calma na avaliação, e o conforto do paciente é prioridade aqui.' : 'Na avaliação ela te mostra cada etapa e o que esperar.') + (function () { var a = proximoHorario(t, 1), b = proximoHorario(a, 1); return ' Tenho ' + diaSem(a) + ' às ' + horaBR(a) + ' ou ' + diaSem(b) + ' às ' + horaBR(b) + '. Algum fica bom?'; })(), 1);
   if (et === 'em_conversa') { if (R() < 0.5) add('paciente', pick(['Vou ver minha agenda e te falo.', 'Deixa eu confirmar com meu marido.', 'Essa semana tá corrido, depois te chamo.'])); return m; }
-  if (et === 'desqualificado') { add('paciente', pick(['Vocês aceitam Amil?', 'Na verdade queria saber se atendem pelo convênio.'])); add('ia', 'Hoje a clínica atende só particular, com parcelamento no cartão. Se mudar de ideia, é só me chamar.'); return m; }
+  if (et === 'desqualificado') { add('paciente', pick(['Vocês aceitam convênio?', 'Na verdade queria saber se o plano de saúde cobre.'])); add('ia', 'Hoje a clínica atende só particular, com parcelamento no cartão. Se mudar de ideia, é só me chamar.'); return m; }
   add('paciente', pick(['Dá pra parcelar?', 'Aceita cartão? Em quantas vezes?', 'Tem desconto no Pix?']));
   add('ia', 'Dá sim: até 12x no cartão, e no Pix tem condição especial. A ' + CFG.donaCurta + ' te passa os números certinhos na avaliação.', 1);
   if (et === 'qualificado') { add('paciente', pick(['Legal. Vou me organizar e já te falo o dia.', 'Perfeito, vou ver o melhor dia.'])); return m; }
@@ -227,9 +227,9 @@ function uuid(n) { return 'd0e1f2a3-0000-4000-8000-' + String(100000000000 + n).
 var recentes = LEADS.filter(function (l) { return AGORA - Date.parse(l.criado_em) < 6 * DIA; });
 var abertos = LEADS.filter(function (l) { return (l.crm_stage === 'em_conversa' || l.crm_stage === 'qualificado') && AGORA - l._ultLead > 26 * HORA && AGORA - Date.parse(l.criado_em) < 20 * DIA; });
 var PEDIDOS = [
-  { trecho: 'Consegue me mandar o orçamento do alinhador por escrito? Quero mostrar pro meu marido.', proc: 'alinhador', rasc: 'Oi, {n}! Aqui é a Dra. Camila. Para o orçamento sair certo eu preciso ver seus dentes: a avaliação leva 30 minutos e já sai com o plano por escrito. Tenho amanhã às 9h ou às 16h. Qual fica melhor?' },
-  { trecho: 'Vocês parcelam o implante em 12x? Se sim quero fechar essa semana.', proc: 'implante', rasc: 'Oi, {n}! Aqui é a Dra. Camila. Parcelamos em até 12x no cartão, sim. Para fechar ainda esta semana, consigo sua avaliação na quinta às 10h. Posso reservar?' },
-  { trecho: 'Tem encaixe amanhã cedo? Estou com muita dor no dente.', proc: 'avaliacao', rasc: 'Oi, {n}! Aqui é a Beatriz, da recepção. Consegui um encaixe amanhã às 8h com a Dra. Camila. Posso confirmar?' }];
+  { trecho: 'Consegue me mandar o valor da harmonização por escrito? Quero mostrar pro meu marido.', proc: 'harmonizacao', rasc: 'Oi, {n}! Aqui é a Dra. Camila. O valor depende do que o seu rosto pede, então ele sai na avaliação: são 30 minutos e você já sai com o plano e o valor certo para mostrar em casa. Tenho amanhã às 9h ou às 16h. Qual fica melhor?' },
+  { trecho: 'Vocês parcelam o bioestimulador em 10x? Se sim quero fechar essa semana.', proc: 'bioestimulador', rasc: 'Oi, {n}! Aqui é a Dra. Camila. Parcelamos em até 12x no cartão, sim. Para começar ainda esta semana, consigo sua avaliação na quinta às 10h. Posso reservar?' },
+  { trecho: 'Tem horário amanhã cedo para limpeza de pele? Tenho um evento no sábado.', proc: 'limpeza', rasc: 'Oi, {n}! Aqui é a Beatriz, da recepção. Consegui um horário amanhã às 8h, a tempo do seu evento. Posso confirmar?' }];
 var usados = {};
 PEDIDOS.forEach(function (pd, k) {
   var livre = function (x) { return !usados[x.telefone] && (x.crm_stage === 'qualificado' || x.crm_stage === 'em_conversa') && (k !== 0 || x._fem); };
@@ -303,18 +303,18 @@ LEADS.filter(function (l) { return l.atendido_por === 'equipe' && l.responsavel_
 
 /* ── laboratório: testes da IA antes de ir ao ar ── */
 var LAB = [
-  { titulo: 'Paciente pergunta preço do implante às 23h → ' + CFG.ia + ' → avaliação marcada', nicho: 'odontologia', dur: 74, conversa: [
-    ['cliente', 'Boa noite, quanto custa o implante?'], ['donna', 'Boa noite! Aqui é a ' + CFG.ia + ', da ' + CFG.clinica + '. O valor depende da avaliação, que é gratuita e leva 30 minutos. Você perdeu o dente faz tempo?'],
-    ['cliente', 'Uns 2 anos'], ['donna', 'Entendi. Tenho quinta às 9h ou sexta às 15h30. Qual prefere?'], ['cliente', 'Sexta'], ['donna', 'Agendado ✅ sexta às 15h30 com a ' + CFG.donaCurta + '. Te mando um lembrete na véspera.']],
+  { titulo: 'Cliente pergunta preço da harmonização às 23h → ' + CFG.ia + ' → avaliação marcada', nicho: 'estética', dur: 74, conversa: [
+    ['cliente', 'Boa noite, quanto custa a harmonização?'], ['donna', 'Boa noite! Aqui é a ' + CFG.ia + ', da ' + CFG.clinica + '. O valor depende da avaliação, que é gratuita e leva 30 minutos. É a primeira vez que você vai fazer?'],
+    ['cliente', 'É sim'], ['donna', 'Entendi. Tenho quinta às 9h ou sexta às 15h30. Qual prefere?'], ['cliente', 'Sexta'], ['donna', 'Agendado ✅ sexta às 15h30 com a ' + CFG.donaCurta + '. Te mando um lembrete na véspera.']],
     final: { agendou: true, crm_stage: 'agendou' } },
-  { titulo: 'Áudio pedindo encaixe por dor → ' + CFG.ia + ' → aviso para a recepção', nicho: 'odontologia', dur: 41, conversa: [
-    ['cliente', '[áudio] Oi, tô com muita dor no dente, vocês têm encaixe amanhã cedo?'], ['donna', 'Sinto muito pela dor. Já avisei a recepção para encontrar um encaixe amanhã cedo e te respondem em instantes.']],
+  { titulo: 'Áudio pedindo horário urgente antes de um evento → ' + CFG.ia + ' → aviso para a recepção', nicho: 'estética', dur: 41, conversa: [
+    ['cliente', '[áudio] Oi, tenho um casamento no sábado, vocês têm horário de limpeza de pele amanhã cedo?'], ['donna', 'Que bom, vamos deixar sua pele pronta! Já avisei a recepção para encontrar um horário amanhã cedo e te respondem em instantes.']],
     final: { agendou: false, crm_stage: 'qualificado' } },
   { titulo: 'Paciente diz "vou pensar" → Analista sugere retomada em 2 dias', nicho: 'estética', dur: 58, conversa: [
     ['cliente', 'Quanto custa o botox na testa?'], ['donna', 'O valor sai na avaliação, que é gratuita. É a primeira vez que você vai aplicar?'], ['cliente', 'É sim. Vou pensar e te falo'],
     ['donna', 'Claro! Fico por aqui. Se quiser, já deixo reservado um horário sem compromisso.']], final: { agendou: false, crm_stage: 'em_conversa' } },
-  { titulo: 'Pergunta sobre convênio → ' + CFG.ia + ' explica que é particular, sem insistir', nicho: 'odontologia', dur: 22, conversa: [
-    ['cliente', 'Vocês atendem Amil?'], ['donna', 'Hoje atendemos só particular, com parcelamento em até 12x no cartão. Se quiser, te passo como funciona a avaliação.']],
+  { titulo: 'Pergunta sobre convênio → ' + CFG.ia + ' explica que é particular, sem insistir', nicho: 'estética', dur: 22, conversa: [
+    ['cliente', 'O plano de saúde cobre?'], ['donna', 'Hoje atendemos só particular, com parcelamento em até 12x no cartão. Se quiser, te passo como funciona a avaliação.']],
     final: { agendou: false, crm_stage: 'em_conversa' } }];
 var LAB_ROWS = LAB.map(function (x, k) {
   var t0 = AGORA - (k * 26 + 3) * HORA;
