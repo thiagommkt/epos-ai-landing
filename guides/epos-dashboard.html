@@ -2026,7 +2026,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="rule"></div>
   <div class="chat-wrap" style="display:flex;flex-direction:column">
     <div style="padding:10px 16px;background:rgba(145,70,255,.06);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0">
-      <span style="font-family:var(--fM);font-size:11px;color:var(--muted)">⚠️ Se aparecer tela de login — <a href="https://chatwoot.eposmktfilmsia.com.br" target="_blank" style="color:var(--purple);text-decoration:none">abra em nova aba</a>, faça login e clique em Recarregar</span>
+      <span></span><!-- 08/11 (Thiago): aviso "Se aparecer tela de login…" removido; os botões Abrir e Recarregar ficam -->
       <div style="display:flex;gap:8px;flex-shrink:0">
         <button onclick="window.open('https://chatwoot.eposmktfilmsia.com.br','_blank')" style="padding:5px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↗ Abrir</button>
         <button onclick="var f=document.getElementById('chatwoot-iframe');f.src=f.src" style="padding:5px 12px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fM);font-size:10px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--bd)'">↻ Recarregar</button>
@@ -4311,7 +4311,8 @@ async function adiarTarefa(id, telefone) {
   } catch(e) { toast('Erro ao adiar — tente novamente', 'err'); }
 }
 
-// Teto de reativação (Thiago, 17/10): 25 mensagens por dia para leads que não falaram nas últimas 24 h, por número de WhatsApp
+// Teto de reativação (Thiago, 17/10): mensagens por dia para leads que não falaram nas últimas 24 h, por número de WhatsApp.
+// Valor vem de system_config.reativacao_limite_dia: Epos 35 desde 08/11 (fila de remarketing de 35/dia), FM 25.
 async function mostrarCotaReativacao() {
   const el = document.getElementById('panel-cota-reativacao');
   if (!el) return;
@@ -7485,9 +7486,7 @@ function cwModalAbrir(id, titulo, ev) {
     m.innerHTML = `<div class="cw-modal-caixa">
         <div class="cw-modal-topo"><b id="cw-modal-titulo"></b>
           <a id="cw-modal-nova" class="rm-btn" target="_blank" rel="noopener">Abrir em nova aba ↗</a>
-          <button class="rm-btn" onclick="cwModalFechar()">✕ Fechar</button></div>
-        <div class="cw-modal-aviso">Se aparecer a tela de login do Chatwoot, clique em "Abrir em nova aba", entre uma vez e volte aqui.</div>
-        <iframe id="cw-modal-frame" allow="microphone; camera; clipboard-write" title="Conversa no Chatwoot"></iframe></div>`;
+          <button class="rm-btn" onclick="cwModalFechar()">✕ Fechar</button></div>        <iframe id="cw-modal-frame" allow="microphone; camera; clipboard-write" title="Conversa no Chatwoot"></iframe></div>`;
     m.addEventListener('click', e => { if (e.target === m) cwModalFechar(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') cwModalFechar(); });
     document.body.appendChild(m);
