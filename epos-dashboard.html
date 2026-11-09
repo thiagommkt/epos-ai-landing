@@ -2200,6 +2200,9 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .rm-marca { display:flex; gap:6px; align-items:center; font-family:var(--fB); font-size:12px; color:var(--muted); cursor:pointer; }
     @media (max-width: 860px) { .rm-acoes a { margin-left:0; flex-basis:100%; } .rm-btn { padding:8px 12px; } }
     /* 08/11 (Thiago): a conversa do Chatwoot abre numa janela por cima do painel, sem sair da página */
+    .rm-av-quando { background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-family:var(--fM); font-size:11px; padding:5px 8px; }
+    .krm-conversa, .lead-conversa { pointer-events:auto; cursor:pointer; background:transparent; border:1px solid var(--bd); border-radius:6px; padding:1px 6px; font-size:12px; line-height:1.4; }
+    .krm-conversa:hover, .lead-conversa:hover { border-color:var(--purple); background:var(--pur-l); }
     .cw-modal { position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,.72); display:none; align-items:center; justify-content:center; padding:24px; }
     .cw-modal.aberto { display:flex; }
     .cw-modal-caixa { width:min(1200px,100%); height:min(880px,100%); background:var(--bg2); border:1px solid var(--bd-b); display:flex; flex-direction:column; }
@@ -3352,7 +3355,7 @@ function renderLeads() {
       ? `<span style="color:var(--neon)">${new Date(l.data_agendamento).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}</span>`
       : '<span style="color:var(--dim)">—</span>';
     return `<tr class="lead-linha" data-tel="${escHtml(l.telefone||'')}" style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
-      <td class="td-hi" style="padding-left:12px">${escHtml(l.nome||'—')}</td>
+      <td class="td-hi" style="padding-left:12px">${escHtml(l.nome||'—')}${l.chatwoot_conversation_id ? ` <button class="lead-conversa" title="Ver a conversa" data-nome="${escHtml(l.nome || '')}" onclick="event.stopPropagation();return cwModalAbrir(${l.chatwoot_conversation_id}, this.dataset.nome, event)">💬</button>` : ''}</td>
       <td>${escHtml(l.perfil||'—')}</td>
       <td><span class="score">${l.score||0}</span></td>
       <td>${escHtml(l.cidade||'—')}</td>
@@ -4498,6 +4501,7 @@ async function loadCRM() {
           <div style="display:flex;align-items:center;gap:4px">
             ${l.qualificado ? `<span style="width:6px;height:6px;border-radius:50%;background:var(--neon);display:inline-block"></span>` : ''}
             <span class="krm-score">${l.score||0}</span>
+            ${l.chatwoot_conversation_id ? `<button class="krm-conversa" title="Ver a conversa" data-nome="${escHtml(l.nome || '')}" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();return cwModalAbrir(${l.chatwoot_conversation_id}, this.dataset.nome, event)">💬</button>` : ''}
           </div>
         </div>
       </div>`;
@@ -5219,11 +5223,12 @@ async function openLeadPanel(lead) {
     ${(cs => { const n=parseInt(cs)||0; if(!n) return `<div class="panel-score" style="color:var(--muted)">${lead.score||0}<small>score manual (sem IA ainda)</small></div>`; const c=n>=9?'#3fb950':n>=7?'#e8893d':n>=4?'#e3b341':'#FF5E5B'; const lbl=n>=9?'Quente':n>=7?'Engajado':n>=4?'Morno':'Frio'; return `<div class="panel-score" style="color:${c}">${n}<small>O Analista · ${lbl}</small></div>`; })(lead.crm_score)}
 
     ${lead.chatwoot_conversation_id ? `
-    <button onclick="openConversationInChat(${lead.chatwoot_conversation_id})"
+    <button data-nome="${escHtml(lead.nome || '')}" onclick="return cwModalAbrir(${lead.chatwoot_conversation_id}, this.dataset.nome, event)"
       style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(145,70,255,.08);border:1px solid var(--bd-b);color:var(--purple);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-bottom:16px;transition:all .2s"
       onmouseover="this.style.background='var(--purple)';this.style.color='#fff'" onmouseout="this.style.background='rgba(145,70,255,.08)';this.style.color='var(--purple)'">
-      💬 Abrir conversa no Chat →
-    </button>` : `<div style="margin-bottom:16px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Conversa do Chat ainda não vinculada — será vinculada na próxima auditoria</div>`}
+      💬 Ver a conversa
+    </button>
+    <div style="text-align:right;margin:-10px 0 14px"><a href="javascript:void(0)" onclick="openConversationInChat(${lead.chatwoot_conversation_id})" style="font-family:var(--fM);font-size:10px;color:var(--dim)">ou abrir na aba Chat</a></div>` : `<div style="margin-bottom:16px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Conversa do Chat ainda não vinculada — será vinculada na próxima auditoria</div>`}
 
     <div class="panel-section">Identificação</div>
     <div class="panel-row"><div class="panel-key">WhatsApp</div><div class="panel-val">${telFmt}</div></div>
@@ -7559,10 +7564,14 @@ async function rmCarregarAvisos() {
       <div class="rm-topo"><h3><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(t.lead_telefone)}')" style="color:inherit;text-decoration:none">${labEsc(nome)}</a></h3>
         <div class="rm-chips"><span class="rm-chip alto">Nota ${labEsc(pl.nota || 10)}</span>${sm.data ? `<span class="rm-chip">${labEsc(sm.data)} · ${sm.onde === 'disparo' ? 'número de disparo' : 'conversa com a Donna'}</span>` : ''}</div></div>
       <div class="rm-txt"><small>O que a pessoa pediu</small>${labEsc(t.acao)}</div>
-      ${t.mensagem_sugerida ? `<div class="rm-txt"><small>Rascunho da sua resposta (pode editar antes de copiar)</small></div><textarea class="rm-rascunho" id="rm-av-t-${t.id}" maxlength="2000" oninput="_rmEdits['av-${t.id}']=this.value">${labEsc(_rmEdits['av-' + t.id] ?? t.mensagem_sugerida)}</textarea>` : ''}
+      ${t.mensagem_sugerida ? `<div class="rm-txt"><small>Sua resposta (edite e envie pela Donna, agora ou programada)</small></div><textarea class="rm-rascunho" id="rm-av-t-${t.id}" maxlength="2000" oninput="_rmEdits['av-${t.id}']=this.value">${labEsc(_rmEdits['av-' + t.id] ?? t.mensagem_sugerida)}</textarea>` : ''}
       ${Array.isArray((pl.aviso || {}).dados_faltando) && pl.aviso.dados_faltando.length ? `<div class="rm-txt"><small>Falta saber</small>${labEsc(pl.aviso.dados_faltando.join('; '))}</div>` : ''}
-      <div class="rm-acoes">${t.mensagem_sugerida ? `<button class="rm-btn" onclick="rmCopiarRascunho('${t.id}')">Copiar rascunho</button>` : ''}
-        <button class="rm-btn forte" onclick="rmAvisoRespondido('${t.id}')">✓ Respondi</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
+      <div class="rm-acoes">
+        <button class="rm-btn forte" onclick="rmAvisoEnviar('${t.id}', true)">Enviar agora pela Donna</button>
+        <input id="rm-av-q-${t.id}" type="datetime-local" aria-label="Dia e hora do envio" class="rm-av-quando">
+        <button class="rm-btn" onclick="rmAvisoEnviar('${t.id}', false)">Programar</button>
+        <button class="rm-btn" onclick="rmCopiarRascunho('${t.id}')">Copiar</button>
+        <button class="rm-btn" onclick="rmAvisoRespondido('${t.id}')" title="Use quando você já respondeu pelo celular ou por outro canal">Já respondi por fora</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
     </div>`;
   }).join('') + '</div>';
 }
@@ -7571,6 +7580,33 @@ function rmCopiarRascunho(id) {
   const ok = () => toast('Rascunho copiado', 'ok');
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => prompt('Copie o rascunho:', txt));
   else prompt('Copie o rascunho:', txt);
+}
+// 09/11: a resposta editada sai pela Donna (fila das mensagens programadas: 1 por vez, fila central) e o pedido fica resolvido
+async function rmAvisoEnviar(id, agora) {
+  const av = _rmAvisos[id];
+  if (!av) return;
+  const texto = String(document.getElementById('rm-av-t-' + id)?.value ?? _rmEdits['av-' + id] ?? av.mensagem_sugerida ?? '').trim();
+  if (!texto) { toast('Escreva a resposta antes de enviar', 'err'); return; }
+  let quando;
+  if (agora) quando = new Date(Date.now() + 70 * 1000);
+  else {
+    const v = document.getElementById('rm-av-q-' + id)?.value;
+    quando = v ? new Date(v) : null;
+    if (!quando || isNaN(quando)) { toast('Escolha o dia e a hora do envio', 'err'); return; }
+    if (quando.getTime() < Date.now() + 60 * 1000) { toast('Escolha um horário no futuro', 'err'); return; }
+  }
+  if (!(await liberarAgendamento(av.lead_telefone))) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/mensagens_agendadas`, { method: 'POST', headers: sbJson({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ conta: 'epos', lead_telefone: av.lead_telefone, texto, agendada_para: quando.toISOString(), criada_por: quemSou() }) });
+    if (avisoAgendadaDupla(r, av.lead_telefone)) return;
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    await fetch(`${SB_URL}/rest/v1/tarefas?id=eq.${id}&status=eq.pendente`, { method: 'PATCH', headers: sbJson({ 'Prefer': 'return=minimal' }),
+      body: JSON.stringify({ status: 'feita', concluida_em: new Date().toISOString(), mensagem_sugerida: texto }) });
+    delete _rmEdits['av-' + id];
+    toast(agora ? '✅ Resposta enviada para a fila da Donna: sai em cerca de 1 minuto' : '✅ Resposta programada para ' + dataHoraBRT(quando.toISOString()), 'ok');
+    rmCarregarAvisos();
+  } catch (e) { toast('Não enviou: ' + e.message, 'err'); }
 }
 async function rmAvisoRespondido(id) {
   try {
