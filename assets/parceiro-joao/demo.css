@@ -1,0 +1,19 @@
+/* Demonstração (parceiro João), 09/11/2026: identidade do logo dele (H branco sobre degradê marinho) no tema claro. */
+html:root[data-theme="light"]{--bg:#F5F7FB!important;--bg2:#FFFFFF!important;--bg3:#E8EEF7!important;--purple:#16305E!important;--pur-l:rgba(22,48,94,0.10)!important;--text:#0F214A!important}
+html:root[data-theme="light"] body{background:linear-gradient(150deg,#EEF2F8 0%,#F5F7FB 45%,#EAF0F8 100%)!important}
+html:root[data-theme="light"] main{background:linear-gradient(160deg,#E9EEF6 0%,#F2F5FA 50%,#E6ECF5 100%)!important}
+.agenda-iframe{filter:none!important}
+#s-chat .chat-wrap>div:first-child{display:none!important}
+[data-sec="campanhas"]{display:none!important}
+.mobile-logo{white-space:nowrap;font-size:13px!important;min-width:0;overflow:hidden;text-overflow:ellipsis}
+html:root[data-theme="light"] aside{background:linear-gradient(170deg,#061030 0%,#0F214A 45%,#16305E 80%,#2B4B7B 100%)!important;border-right:0!important}
+html:root[data-theme="light"] aside nav a.active{background:rgba(255,255,255,0.12)!important;color:#fff!important}
+.sb-logo{align-items:center}
+.demo-logo{width:40px;height:40px;border-radius:11px;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.25);object-fit:cover}
+.mobile-logo{display:flex;align-items:center;gap:8px;text-transform:none!important}
+.mobile-logo img{width:28px;height:28px;border-radius:8px}
+/* só da operação interna da Epos: fora da demonstração */
+[data-sec="clientes"],[data-sec="prospeccao"],#db-meta-clientes,#metodo-rastreio-card{display:none!important}
+.demo-faixa{position:fixed;right:14px;bottom:14px;z-index:9999;background:#061030;color:#fff;font:600 11px/1 'DM Sans',sans-serif;letter-spacing:.04em;
+  padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(6,16,48,.25);pointer-events:none;opacity:.92}
+@media(max-width:768px){.demo-faixa{bottom:74px;right:10px}}
