@@ -5369,11 +5369,20 @@ async function openLeadPanel(lead) {
         ? `<div style="padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.06em">
             ✅ Compareceu — confirmado
            </div>`
+        : lead.nao_compareceu_em
+        ? `<div style="padding:12px;background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.3);color:#ff6b6b;font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.04em">
+            ❌ Não compareceu — a Donna mandou a mensagem para remarcar (${new Date(lead.nao_compareceu_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })})
+           </div>`
         : `<button id="compareceu-btn" onclick="marcarCompareceu('${lead.telefone}')"
             style="width:100%;padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
             ✅ Confirmar presença na consulta
            </button>
-           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando o lead comparecer à consulta ou reunião.</div>`
+           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">Marque quando o lead comparecer à consulta ou reunião.</div>
+           ${(lead.agendou || lead.dia_agendamento) ? `<button id="nao-compareceu-btn" onclick="marcarNaoCompareceu('${lead.telefone}')"
+            style="width:100%;margin-top:10px;padding:12px;background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.3);color:#ff6b6b;cursor:pointer;font-family:var(--fD);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .2s">
+            ❌ Não compareceu
+           </button>
+           <div style="font-size:11px;color:var(--dim);margin-top:6px;font-family:var(--fM)">A Donna manda na hora a mensagem para remarcar, com os horários livres do próximo dia útil.</div>` : ''}`
       }
     </div>
 
@@ -5499,6 +5508,28 @@ async function marcarCompareceu(telefone) {
   } catch(e) {
     toast('Erro ao marcar compareceu: ' + e.message, 'err');
     if (btn) { btn.disabled = false; btn.textContent = '✅ Confirmar presença na consulta'; }
+  }
+}
+
+// ═══ NÃO COMPARECEU (12/11, Thiago: remarketing de quem faltou) ═══
+// Clicar = aprovação: o fluxo [Epos] Não compareceu → Donna (yBw3yVQwf6STsyZT) manda na hora, pela fila, a mensagem para
+// remarcar com os horários reais do próximo dia útil, fecha a tarefa da reunião e guarda os horários oferecidos.
+async function marcarNaoCompareceu(telefone) {
+  if (!confirm('O lead não entrou na reunião?\n\nA Donna vai mandar agora a mensagem para remarcar, com os horários livres do próximo dia útil.')) return;
+  const btn = document.getElementById('nao-compareceu-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+  try {
+    const r = await fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-nao-compareceu', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: PROXY_TOKEN, telefone })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.erro || ('Erro ' + r.status));
+    toast('❌ Não compareceu — mensagem enviada: ' + (j.texto || '').slice(0, 90) + '…', 'ok');
+    const lead = allLeads.find(l => l.telefone === telefone);
+    if (lead) { Object.assign(lead, { nao_compareceu_em: new Date().toISOString(), agendou: false, dia_agendamento: null }); setTimeout(() => openLeadPanel(lead), 200); }
+  } catch (e) {
+    toast('Erro ao marcar não compareceu: ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '❌ Não compareceu'; }
   }
 }
 
