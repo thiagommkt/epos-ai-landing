@@ -1624,8 +1624,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
   <!-- Vendas inevitáveis (Torneira, CRM v3): o que está escapando agora — RPC epos_torneira -->
   <style>
-    #torneira-card .tor-kpis{grid-template-columns:repeat(6,1fr);margin-bottom:12px}
-    @media(max-width:1280px){#torneira-card .tor-kpis{grid-template-columns:repeat(3,1fr)}}
+    #torneira-card .tor-kpis{grid-template-columns:repeat(7,1fr);margin-bottom:12px}
+    @media(max-width:1500px){#torneira-card .tor-kpis{grid-template-columns:repeat(4,1fr)}}
     #torneira-card .tor-lig-acoes{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
     #torneira-card .tor-lig-acoes a,#torneira-card .tor-lig-acoes select{font-family:var(--fM);font-size:10.5px;padding:5px 9px;border-radius:8px;border:1px solid var(--g-bd);background:transparent;color:var(--text);text-decoration:none;cursor:pointer}
     #torneira-card .tor-lig-acoes a{border-color:rgba(31,175,90,.5);color:#1FAF5A}
@@ -1653,7 +1653,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     #torneira-card .tor-sub{font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:2px}
     #torneira-card .tor-tempo{font-family:var(--fM);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0}
     #torneira-card .tor-vazio{font-family:var(--fM);font-size:11px;color:var(--dim);line-height:1.6;padding:8px 0}
-    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos],#torneira-card .tor-kpi[data-tor=ligacao]{grid-column:1/-1}}
+    @media(max-width:768px){#torneira-card .tor-kpis{grid-template-columns:1fr 1fr!important}#torneira-card .tor-kpi[data-tor=novos]{grid-column:1/-1}}
     @media(max-width:768px){.socio-kpis{grid-template-columns:1fr 1fr!important}}
     .tor-selo{display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.04em;margin:0 4px 4px 0;pointer-events:none}
     .tor-selo.sr{background:rgba(255,94,91,.15);color:#FF5E5B}
@@ -3853,6 +3853,23 @@ async function registrarLigacao(tel, resultado) {
     if (window._panelLead?.telefone === tel) carregarTarefasLead(tel);
   } catch (e) { toast('Não registrou: ' + e.message, 'err'); }
 }
+// 12/11 (Thiago: "Preciso de um filtro de fácil acesso para pessoas que responderam positivamente ao disparo, pois são quentes
+// também... Leads quentes: 6,7 pra cima, que eu clico e sei que responderam positivamente, perguntaram, demonstraram interesse,
+// responderam o raio-x e afins"). RPC epos_leads_quentes: nota do Analista >= 6, raio-X, botão "Com certeza" do vídeo ou mensagem
+// julgada quente; fora quem pediu para parar, fechou, perdido e recusa. Cada um vem com o motivo (frase e data) e o próximo passo.
+let _torQuentes = [];
+const QUENTE_FILTRO = { raio_x: 'Raio-X', disparo: 'Responderam ao vídeo', mensagem: 'Mensagem quente', n9: 'Nota 9–10', n7: 'Nota 7–8', n6: 'Nota 6', sem_passo: 'Sem próximo passo' };
+function quenteCasa(l, k) {
+  const n = l.nota || 0, f = l.fontes || [];
+  return k === 'n9' ? n >= 9 : k === 'n7' ? n >= 7 && n <= 8 : k === 'n6' ? n === 6 : k === 'sem_passo' ? !l.proximo : f.includes(k);
+}
+async function carregarQuentes() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_leads_quentes`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' });
+    const d = await r.json();
+    _torQuentes = r.ok && Array.isArray(d) ? d : [];
+  } catch (e) { _torQuentes = []; }
+}
 async function carregarNovos() {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/rpc/epos_novos_leads`, {
@@ -3887,7 +3904,7 @@ async function loadTorneira() {
   const alvo = document.getElementById('torneira-conteudo');
   if (!alvo) return;
   alvo.innerHTML = '<div class="loading"></div>';
-  try { await Promise.all([carregarTorneira(), carregarNovos(), carregarLigacoes()]); renderTorneira(); }
+  try { await Promise.all([carregarTorneira(), carregarNovos(), carregarLigacoes(), carregarQuentes()]); renderTorneira(); }
   catch (e) { alvo.innerHTML = `<div class="tor-vazio">Não foi possível carregar a Torneira (${escHtml(e.message)}).</div>`; }
 }
 
@@ -3913,7 +3930,7 @@ function renderTorneira() {
   const semPasso = _torDados.filter(l => l.aguardando_equipe || l.sem_proximo_passo);
   // Novos leads (19/10): quem chegou, por período (hoje, ontem, essa semana, 7, 15 e 30 dias)
   const novos = _torNovos;
-  if (!comFaixa.length && !semPasso.length && !novos.length && !_torLig.length) {
+  if (!comFaixa.length && !semPasso.length && !novos.length && !_torLig.length && !_torQuentes.length) {
     alvo.innerHTML = '<div class="tor-vazio">✅ Torneira fechada: nenhum lead esperando resposta, parado ou sem próximo passo.</div>';
     return;
   }
@@ -3954,6 +3971,28 @@ function renderTorneira() {
         <select onclick="event.stopPropagation()" onchange="registrarLigacao('${escHtml(l.telefone)}', this.value)" aria-label="Resultado da ligação">
           <option value="">Resultado…</option>${Object.entries(LIG_RES).map(([k, t]) => `<option value="${k}">${t}</option>`).join('')}</select></div></div>`;
     }).join('');
+  } else if (sit === 'quentes') {
+    const fSel = QUENTE_FILTRO[faixaSel] ? faixaSel : null;
+    titulo = 'Leads quentes'; sufixo = fSel ? ' · ' + QUENTE_FILTRO[fSel].toLowerCase() : ' · os mais quentes primeiro';
+    chips = Object.keys(QUENTE_FILTRO).map(k => [k, _torQuentes.filter(l => quenteCasa(l, k)).length]).filter(([, q]) => q)
+      .map(([k, q]) => `<button class="tor-chip${fSel === k ? ' ativo' : ''}" data-faixa="${k}" onclick="filtrarTorneira('quentes','${k}')">${QUENTE_FILTRO[k]} · <b>${q}</b></button>`).join('');
+    lista = fSel ? _torQuentes.filter(l => quenteCasa(l, fSel)) : _torQuentes;
+    const dataCurta = iso => iso ? new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }) : '';
+    linhas = lista.slice(0, 80).map(l => {
+      const n = nome(l), nota = l.nota;
+      const cor = nota >= 9 ? '#FF5E5B' : nota >= 7 ? '#F97316' : nota >= 6 ? '#e3b341' : '#9146FF';
+      const selo = nota ? `🔥 nota ${nota}` : (l.fontes || []).includes('raio_x') ? '🔥 raio-X' : '🔥 quente';
+      const ult = l.ultima_msg_lead_em ? ` · última msg dele há ${torDuracao(Math.max(0, Math.round((Date.now() - Date.parse(l.ultima_msg_lead_em)) / 60000)))}` : '';
+      const passo = l.nao_compareceu ? 'faltou à reunião' + (l.proximo ? ' · ' + l.proximo : '')
+        : l.proximo ? l.proximo + (l.proximo_em ? (Date.parse(l.proximo_em) < Date.now() ? ' · atrasado desde ' + dataCurta(l.proximo_em) : ' · ' + dataHoraBRT(l.proximo_em)) : '') : 'sem próximo passo: reativar';
+      return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
+      <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
+      <div style="flex:1;min-width:0"><div class="tor-nome">${escHtml(n)}</div>
+        <div class="tor-sub">${escHtml(maskPhone(l.telefone || ''))}${l.nicho ? ' · ' + escHtml(l.nicho) : ''} · ${escHtml(etapa(l.crm_stage))}${l.remarketings ? ` · ${l.remarketings} remarketing${l.remarketings === 1 ? '' : 's'}` : ''}${ult}</div>
+        ${l.motivo ? `<div class="tor-lig-ctx">${escHtml(l.motivo)}${l.motivo_em ? ' · ' + dataCurta(l.motivo_em) : ''}</div>` : ''}
+        <div class="tor-sub" style="margin-top:3px;color:${l.proximo && !l.nao_compareceu ? 'var(--muted)' : '#F97316'}">➜ ${escHtml(passo)}</div></div>
+      <span class="tor-tempo" style="color:${cor};background:${cor}1f">${selo}</span></div>`;
+    }).join('');
   } else if (sit === 'novos') {
     const per = NOVO_PER[faixaSel] ? faixaSel : 'hoje';
     titulo = 'Novos leads'; sufixo = ' · ' + NOVO_PER[per].toLowerCase();
@@ -3986,18 +4025,22 @@ function renderTorneira() {
   }
   const novosHoje = novos.filter(l => l.hoje), semHumano = novosHoje.filter(l => !l.atendido_humano).length;
   const notaNovos = novosHoje.length ? (semHumano ? `${semHumano} ainda sem atendimento humano` : 'todos já atendidos por humano') : `nenhum hoje · ontem: ${novos.filter(l => l.ontem).length}`;
+  // 12/11 (Thiago): "novos leads hoje e leads quentes devem ser os primeiros, seguido de escapando agora e precisam de ligação"
+  const qSemPasso = _torQuentes.filter(l => !l.proximo).length;
+  const notaQuentes = _torQuentes.length ? (qSemPasso ? `${qSemPasso} sem próximo passo · reativar` : 'todos com próximo passo') : 'nenhum agora';
   alvo.innerHTML = `<div class="kpi-row tor-kpis">
       ${card('novos', 'Novos leads hoje', novosHoje.length, notaNovos)}
+      ${card('quentes', '🔥 Leads quentes', _torQuentes.length, notaQuentes)}
       ${card('todos', 'Leads escapando agora', comFaixa.length, 'esperando resposta ou sem retorno')}
+      ${card('ligacao', 'Precisam de ligação', _torLig.length, _torLig.length ? (() => { const q = _torLig.filter(l => (l.prioridade || 4) <= 2).length; return q ? `${q} quente${q === 1 ? '' : 's'} primeiro · plano em ordem` : 'plano em ordem de prioridade'; })() : 'nenhuma ligação pendente')}
       ${card('sem_resposta', 'Esperando nossa resposta', sr.length, maisAntigo(sr))}
       ${card('parado', 'Sem retorno do lead', pa.length, maisAntigo(pa))}
       ${card('aguardando', 'Aguardando a equipe', semPasso.length, 'próximo passo pronto, falta a equipe dar o start')}
-      ${card('ligacao', 'Precisam de ligação', _torLig.length, _torLig.length ? (() => { const q = _torLig.filter(l => (l.prioridade || 4) <= 2).length; return q ? `${q} quente${q === 1 ? '' : 's'} primeiro · plano em ordem` : 'plano em ordem de prioridade'; })() : 'nenhuma ligação pendente')}
     </div>
     <div class="tor-painel">
       <div class="chart-sub-lbl tor-painel-topo"><span>${titulo}${sufixo} (${lista.length})</span><span class="tor-dica">${sit === 'ligacao' ? 'Ligue e registre o resultado · clique no nome para abrir a ficha' : 'Clique no lead para abrir a ficha'}</span></div>
       ${chips ? `<div class="tor-chips">${chips}</div>` : ''}
-      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : sit === 'ligacao' ? 'Nenhuma ligação pendente. ✅' : 'Nenhum lead aqui. ✅'}</div>`}</div>
+      <div id="torneira-lista">${linhas || `<div class="tor-vazio">${sit === 'novos' ? 'Nenhum lead novo neste período.' : sit === 'ligacao' ? 'Nenhuma ligação pendente. ✅' : sit === 'quentes' ? 'Nenhum lead quente agora.' : 'Nenhum lead aqui. ✅'}</div>`}</div>
       ${lista.length > 80 ? `<div class="tor-vazio">Mostrando 80 de ${lista.length}.</div>` : ''}
     </div>`;
 }
