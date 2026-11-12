@@ -4174,6 +4174,7 @@ async function carregarTarefasLead(telefone) {
         <textarea id="plano-txt-${t.id}" maxlength="1000" style="width:100%;min-height:70px;box-sizing:border-box;background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-size:12px;padding:6px 8px;margin-bottom:6px">${escHtml(t.mensagem_sugerida)}</textarea>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button onclick="aprovarPlanoFicha('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid var(--bd-b);color:var(--purple)">Aprovar envio</button>
+          <button onclick="enviarAgoraFicha('${t.id}','${telefone}',null)" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon)" title="Aprova e manda já pela Donna, fora da ordem da fila">⚡ Enviar agora</button>
           <button onclick="descartarTarefa('${t.id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Descartar</button>
         </div></div>`;
     }
@@ -4183,7 +4184,7 @@ async function carregarTarefasLead(telefone) {
       return `<div class="tarefa-item" style="padding:8px;border:1px solid var(--bd);margin-bottom:6px">
         <div style="font-family:var(--fM);font-size:9px;color:var(--purple);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">✉️ Na fila de envio · sai às ${dataHoraBRT(f.agendada_para || t.quando)}</div>
         <div style="font-size:11px;color:var(--muted);white-space:pre-wrap;margin-bottom:6px">${escHtml(t.mensagem_sugerida || '')}</div>
-        <button onclick="cancelarEnvioFicha('${t.remarketing_id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Cancelar envio</button></div>`;
+        ${f.status === 'aprovada' ? `<button onclick="enviarAgoraFicha('${t.id}','${telefone}','${t.remarketing_id}')" style="${_BTN_MINI};border:1px solid rgba(0,245,160,.4);color:var(--neon);margin-right:6px" title="Manda já pela Donna, fora da ordem da fila">⚡ Enviar agora</button>` : ''}<button onclick="cancelarEnvioFicha('${t.remarketing_id}','${telefone}')" style="${_BTN_MINI};border:1px solid rgba(255,94,91,.4);color:#FF5E5B">Cancelar envio</button></div>`;
     }
     if (t.status === 'sugerida') {
       // Sugestão do Analista ainda não confirmada pelo vendedor (ele também pode responder pelo WhatsApp)
@@ -4217,6 +4218,17 @@ async function aprovarPlanoFicha(id, telefone) {
   if (!txt) { toast('Escreva a mensagem antes de aprovar', 'err'); return; }
   try { const q = await aprovarMensagemPlano(id, txt); toast('Aprovada. Sai às ' + dataHoraBRT(q)); carregarTarefasLead(telefone); }
   catch (e) { toast('Não aprovou: ' + e.message, 'err'); }
+}
+// 12/11: "enviar essa mensagem agora" na próxima etapa da ficha (sugestão do Analista ou mensagem já na fila)
+async function enviarAgoraFicha(tarefaId, telefone, filaId) {
+  const nome = (window._panelLead && window._panelLead.telefone === telefone && window._panelLead.nome) || telefone;
+  let texto = null;
+  if (!filaId) {
+    texto = (document.getElementById('plano-txt-' + tarefaId)?.value || '').trim();
+    if (!texto) { toast('Escreva a mensagem antes de enviar', 'err'); return; }
+  }
+  if (await rmEnviarAgora({ tarefaId, filaId, texto, nome }) === null) return;
+  carregarTarefasLead(telefone);
 }
 async function cancelarEnvioFicha(id, telefone) {
   try { await rmRpc('remarketing_descartar', { p_id: id }); toast('Envio cancelado'); carregarTarefasLead(telefone); }
@@ -7513,7 +7525,7 @@ function rmRender() {
   document.getElementById('rm-barra').innerHTML = _rmAba === 'aprovar' && itens.length
     ? `<label class="rm-marca"><input type="checkbox" onchange="rmMarcarTodos(this.checked)" ${itens.every(t => _rmSel.has(t.id)) ? 'checked' : ''}> Marcar todas</label>
        <button class="rm-btn forte" onclick="rmAprovarSelecionadas()" ${_rmSel.size ? '' : 'disabled'}>Aprovar selecionadas (${_rmSel.size})</button>
-       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 35 por dia, sempre pela Donna. O mais quente (nota do Analista) sai primeiro.</span>` : '';
+       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 35 por dia, sempre pela Donna. Quem fez o raio-X sai primeiro; depois, o mais quente (nota do Analista). ⚡ Enviar agora manda na hora, fora da fila.</span>` : '';
   const lista = document.getElementById('rm-lista');
   if (!itens.length) {
     lista.innerHTML = `<div class="rm-vazio">${{ aprovar: 'Nenhuma mensagem planejada esperando aprovação.<br>O Analista planeja quando a conversa de um lead esfria; ligações aparecem no card "Precisam de ligação" do Painel.', fila: 'Nada na fila de envio.', historico: 'Nenhum envio nos últimos 7 dias.' }[_rmAba]}</div>`;
@@ -7567,11 +7579,11 @@ function rmCardPlano(t) {
     <div class="rm-txt"><small>Mensagem (pode editar antes de aprovar) · planejada para ${labData(t.quando)}</small></div>
     <textarea id="rm-t-${t.id}" maxlength="1000" oninput="_rmEdits['${t.id}']=this.value">${labEsc(_rmEdits[t.id] ?? t.mensagem_sugerida ?? '')}</textarea>
     <div class="rm-acoes"><label class="rm-marca"><input type="checkbox" ${_rmSel.has(t.id) ? 'checked' : ''} onchange="rmMarcar('${t.id}',this.checked)"> Selecionar</label>
-      <button class="rm-btn forte" onclick="rmAprovar('${t.id}')">Aprovar</button><button class="rm-btn" onclick="rmDescartarPlano('${t.id}')">Descartar</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
+      <button class="rm-btn forte" onclick="rmAprovar('${t.id}')">Aprovar</button><button class="rm-btn" onclick="rmEnviarAgoraPlano('${t.id}')" title="Aprova e manda já pela Donna, fora da ordem da fila">⚡ Enviar agora</button><button class="rm-btn" onclick="rmDescartarPlano('${t.id}')">Descartar</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
   </div>`;
 }
 function rmCardFila(s) {
-  const st = s.status === 'aprovada' ? `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn" onclick="rmEditarFila('${s.id}')">Editar</button><button class="rm-btn" onclick="rmCancelarEnvio('${s.id}')">Cancelar envio</button>`
+  const st = s.status === 'aprovada' ? `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn forte" onclick="rmEnviarAgoraFila('${s.id}')" title="Manda já pela Donna, fora da ordem da fila">⚡ Enviar agora</button><button class="rm-btn" onclick="rmEditarFila('${s.id}')">Editar</button><button class="rm-btn" onclick="rmCancelarEnvio('${s.id}')">Cancelar envio</button>`
     : `<span class="rm-status${['falhou', 'cancelada'].includes(s.status) ? ' erro' : ''}">${RM_STATUS[s.status] || s.status}${s.enviada_em ? ' em ' + labData(s.enviada_em) : s.aprovada_em ? ' em ' + labData(s.aprovada_em) : ''}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span>`;
   return `<div class="rm-card" id="rm-${s.id}">
     <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${rmChips(s.canal_aquisicao, s.stage, s.sinais, s.numero)}</div></div>
@@ -7703,6 +7715,43 @@ async function rmSalvarFila(id) {
 async function rmCancelarEnvio(id) {
   try { await rmRpc('remarketing_descartar', { p_id: id }); toast('Envio cancelado'); await rmLoad(); }
   catch (e) { toast('Não cancelou: ' + e.message, 'err'); }
+}
+// 12/11 (Thiago: "Inclua no remarketing e no modal, a opção da próxima etapa um 'enviar essa mensagem agora'"):
+// pede ao "[Epos] Remarketing — Enviar aprovadas" ESTA mensagem já, fora da ordem e do horário da fila.
+// Se ainda é sugestão, aprova antes (com o texto editado). As conferências do envio continuam
+// (o contato escreveu, a equipe falou, pediu para parar): se alguma pegar, a mensagem não sai e o motivo aparece.
+const RM_AGORA_MOTIVO = { nao_esta_na_fila: 'essa mensagem não está mais na fila', outra_execucao_pegou: 'ela já está saindo agora' };
+// Devolve true (saiu), false (aprovada/na fila, mas não saiu agora) ou null (cancelou ou não aprovou: nada mudou)
+async function rmEnviarAgora({ tarefaId, filaId, texto, nome }) {
+  if (!confirm(`Enviar agora para ${nome || 'o contato'}, pela Donna?\n\nA mensagem sai em alguns segundos, fora da ordem da fila.`)) return null;
+  if (texto != null) {
+    try { await aprovarMensagemPlano(tarefaId, texto); }
+    catch (e) { toast('Não aprovou: ' + e.message, 'err'); return null; }
+  }
+  try {
+    toast('Enviando pela Donna…');
+    const r = await fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-remarketing-envio', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, enviar_agora: filaId || null, tarefa_id: filaId ? null : tarefaId }) });
+    const j = await r.json().catch(() => ({}));
+    if (j.status === 'enviada') { toast('✅ Enviada agora pela Donna', 'ok'); return true; }
+    const motivo = j.erro || RM_AGORA_MOTIVO[j.status] || j.status || ('erro ' + r.status);
+    toast((texto != null ? 'Aprovada, mas não saiu agora: ' : 'Não saiu agora: ') + motivo, 'err');
+    return false;
+  } catch (e) { toast((texto != null ? 'Aprovada, mas não saiu agora: ' : 'Não enviou: ') + e.message, 'err'); return false; }
+}
+async function rmEnviarAgoraPlano(id) {
+  const t = _rmPlanos.find(x => x.id === id) || {};
+  const texto = String(_rmEdits[id] ?? document.getElementById('rm-t-' + id)?.value ?? '').trim();
+  if (!texto) { toast('Escreva a mensagem antes de enviar', 'err'); return; }
+  const nome = (t.plano || {}).nome || (_rmLeads[t.lead_telefone] || {}).nome || t.lead_telefone;
+  if (await rmEnviarAgora({ tarefaId: id, texto, nome }) === null) return;
+  delete _rmEdits[id]; _rmSel.delete(id); await rmLoad();
+}
+async function rmEnviarAgoraFila(id) {
+  const s = _rmFila.find(x => x.id === id) || {};
+  if (await rmEnviarAgora({ filaId: id, nome: s.lead_nome || s.lead_telefone }) === null) return;
+  await rmLoad();
 }
 rmPodeVer();
 loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
