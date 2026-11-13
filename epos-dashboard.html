@@ -4496,6 +4496,7 @@ const STAGES = [
   { key: 'novo', label: 'Novo Lead', color: 'var(--muted)' },
   { key: 'em_conversa', label: 'Em Conversa', color: 'var(--purple)' },
   { key: 'qualificado', label: 'Qualificado', color: 'var(--purple)' },
+  { key: 'ligacao_marcada', label: 'Ligação marcada', color: '#e3b341' },   // 13/11: ligação de alinhamento de 5 min antes da apresentação
   { key: 'agendou', label: 'Agendou', color: 'var(--neon)' },
   { key: 'compareceu', label: 'Compareceu', color: 'var(--neon)' },
   { key: 'fechou', label: 'Fechou', color: 'var(--neon)' },
@@ -5337,6 +5338,7 @@ async function openLeadPanel(lead) {
     <div class="panel-section">Qualificação</div>
 
     ${linhaDoTempoLead(lead)}
+    ${blocoMarcarLigacao(lead)}
     ${blocoMarcarReuniao(lead)}
     <div class="panel-section">Próximo contato</div>
     <div id="panel-tarefas" style="margin-bottom:8px"><div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</div></div>
@@ -5681,6 +5683,86 @@ async function marcarReuniao(telefone) {
     toast('Não marcou: ' + e.message, 'err');
     if (btn) { btn.disabled = false; btn.textContent = '📅 Marcar reunião'; }
   }
+}
+// 13/11 (Thiago): ligação de alinhamento de 5 min antes da apresentação, para definir expectativas. Mesmo fluxo do Marcar
+// reunião com tipo 'ligacao': 15 min na agenda sem Meet, etapa "Ligação marcada", tarefa para você (aviso 15 min antes),
+// confirmação na hora e lembrete ao lead 1 h antes. Depois da ligação: Marcar apresentação, Não é perfil ou Não atendeu.
+const LIGACAO_CONFIRMA = 'Combinado, {nome}! O Thiago te liga {dia} às {hora}.';
+const LIGACAO_LEMBRA = '{nome}, daqui a pouco, às {hora}, o Thiago te liga para a nossa conversa rápida de 5 minutos.';
+const LIGACAO_NAO_ATENDEU = 'Oi, {nome}! O Thiago tentou te ligar agora e não conseguiu falar com você. Qual o melhor horário para ele te ligar? É rapidinho, 5 minutos.';
+function blocoMarcarLigacao(lead) {
+  const tel = escHtml(lead.telefone);
+  const marcada = (lead.crm_stage || '') === 'ligacao_marcada';
+  const est = 'background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:6px';
+  const btn = (cor, txt, acao) => `<button onclick="${acao}" style="flex:1;min-width:120px;padding:8px;background:transparent;border:1px solid ${cor};color:${cor};font-family:var(--fD);font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">${txt}</button>`;
+  return `<div class="panel-section">Ligação de alinhamento</div>
+    ${marcada ? `<div style="padding:10px;margin-bottom:8px;border:1px solid rgba(227,179,65,.4);background:rgba(227,179,65,.07);color:#e3b341;font-family:var(--fD);font-size:12px;font-weight:700">📞 Ligação marcada (o horário está na tarefa abaixo). Depois de ligar:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        ${btn('var(--neon)', '📅 Marcar apresentação', "document.getElementById('reuniao-box').open=true;document.getElementById('reuniao-box').scrollIntoView({behavior:'smooth',block:'center'})")}
+        ${btn('#FF5E5B', '❌ Não é perfil', `ligacaoNaoEPerfil('${tel}')`)}
+        ${btn('#e3b341', '📵 Não atendeu', `ligacaoNaoAtendeu('${tel}')`)}
+      </div>` : ''}
+    <details id="ligacao-box" style="margin-bottom:12px;border:1px solid var(--bd-b);padding:8px 10px">
+      <summary style="cursor:pointer;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#e3b341">${marcada ? '🔁 Remarcar ligação' : '📞 Marcar ligação (5 min)'}</summary>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:9px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <input id="lig-data" type="date" aria-label="Dia da ligação" style="${est};flex:1;min-width:130px">
+          <input id="lig-hora" type="time" step="900" aria-label="Hora da ligação" style="${est};width:100px">
+        </div>
+        <label style="font-family:var(--fM);font-size:10.5px;color:var(--muted);display:flex;gap:6px;align-items:center"><input id="lig-conf-on" type="checkbox" checked> Mandar a confirmação agora pela Donna</label>
+        <textarea id="lig-conf" rows="2" aria-label="Texto da confirmação da ligação" style="${est};font-family:var(--fB);font-size:12px">${escHtml(LIGACAO_CONFIRMA)}</textarea>
+        <label style="font-family:var(--fM);font-size:10.5px;color:var(--muted);display:flex;gap:6px;align-items:center"><input id="lig-lemb-on" type="checkbox" checked> Lembrete ao lead 1 h antes</label>
+        <textarea id="lig-lemb" rows="2" aria-label="Texto do lembrete da ligação" style="${est};font-family:var(--fB);font-size:12px">${escHtml(LIGACAO_LEMBRA)}</textarea>
+        <div style="font-family:var(--fM);font-size:9.5px;color:var(--dim)">{nome}, {dia} e {hora} são preenchidos sozinhos. 15 min no Google Agenda (sem Meet). Você recebe o aviso 15 min antes. Lembrete só das 8h às 22h.</div>
+        <button id="lig-btn" onclick="marcarLigacao('${tel}')" style="padding:9px;background:rgba(227,179,65,.08);border:1px solid rgba(227,179,65,.45);color:#e3b341;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer">${marcada ? '🔁 Remarcar ligação' : '📞 Marcar ligação'}</button>
+      </div>
+    </details>`;
+}
+async function marcarLigacao(telefone) {
+  const data = document.getElementById('lig-data')?.value, hora = document.getElementById('lig-hora')?.value;
+  if (!data || !hora) { toast('Escolha o dia e a hora da ligação', 'err'); return; }
+  const inicio = `${data}T${hora}:00-03:00`;
+  if (Date.parse(inicio) < Date.now()) { toast('Esse horário já passou', 'err'); return; }
+  const confirmacao = document.getElementById('lig-conf-on')?.checked ? (document.getElementById('lig-conf')?.value || '').trim() : '';
+  const lembOn = document.getElementById('lig-lemb-on')?.checked;
+  const lembrete = lembOn ? (document.getElementById('lig-lemb')?.value || '').trim() : '';
+  const quando = new Date(inicio).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  if (!confirm(`Marcar a ligação de alinhamento para ${quando}?\n\n• 15 min no Google Agenda (sem Meet)\n• Etapa Ligação marcada\n${confirmacao ? '• A Donna manda a confirmação agora\n' : ''}${lembrete ? '• Lembrete ao lead 1 h antes\n' : ''}• Aviso para você 15 min antes`)) return;
+  const btn = document.getElementById('lig-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Marcando...'; }
+  try {
+    const r = await fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-marcar-reuniao', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: PROXY_TOKEN, telefone, inicio, tipo: 'ligacao', confirmacao, lembrete, lembrete_perto: lembrete, lembrete_horas: lembOn ? [1] : [] }) });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.erro || ('erro ' + r.status));
+    const partes = [`📞 ${j.dia}, às ${j.hora}`];
+    if (j.confirmacao) partes.push(j.confirmacao.enviada ? 'confirmação enviada' : j.confirmacao.laboratorio ? 'confirmação (teste, não saiu)' : 'confirmação NÃO saiu' + (j.confirmacao.erro ? ': ' + j.confirmacao.erro : ''));
+    toast('✅ Ligação marcada · ' + partes.join(' · '), 'ok');
+    const lead = (typeof allLeads !== 'undefined' ? allLeads : []).find(l => l.telefone === telefone);
+    if (lead) { Object.assign(lead, { crm_stage: 'ligacao_marcada' }); setTimeout(() => openLeadPanel(lead), 300); }
+    else carregarTarefasLead(telefone);
+  } catch (e) {
+    toast('Não marcou: ' + e.message, 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '📞 Marcar ligação'; }
+  }
+}
+async function ligacaoNaoEPerfil(telefone) {
+  if (!confirm('Não é perfil? O lead vai para Perdido.')) return;
+  try {
+    await updateCRMStage(null, 'perdido', telefone);
+    const lead = (typeof allLeads !== 'undefined' ? allLeads : []).find(l => l.telefone === telefone);
+    if (lead) { lead.crm_stage = 'perdido'; setTimeout(() => openLeadPanel(lead), 200); }
+    toast('Lead movido para Perdido', 'ok');
+  } catch (e) { toast('Não moveu: ' + e.message, 'err'); }
+}
+function ligacaoNaoAtendeu(telefone) {
+  const lead = (typeof allLeads !== 'undefined' ? allLeads : []).find(l => l.telefone === telefone) || {};
+  const nome = String(lead.nome || '').trim().split(/\s+/)[0] || '';
+  const caixa = document.getElementById('msg-input');
+  if (!caixa) { toast('Caixa de mensagem não encontrada', 'err'); return; }
+  caixa.value = LIGACAO_NAO_ATENDEU.replace('{nome}', nome ? nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase() : '').replace('Oi, !', 'Oi!');
+  caixa.scrollIntoView({ behavior: 'smooth', block: 'center' }); caixa.focus();
+  toast('Mensagem pronta na caixa: revise e envie', 'ok');
 }
 async function marcarNaoCompareceu(telefone) {
   if (!confirm('O lead não entrou na reunião?\n\nA Donna vai mandar agora a mensagem para remarcar, com os horários livres do próximo dia útil.')) return;
