@@ -2472,9 +2472,11 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   const BIO_KEY = 'epos_bio_credential';
   const isMob = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const bioSupp = isMob && window.PublicKeyCredential !== undefined;
-  const bioReg = bioSupp && !!(getCk(BIO_KEY) || localStorage.getItem(BIO_KEY));
+  // 12/11: no celular, cada sessão nova passa pela senha (preenchida pelo Face ID do iPhone); sem chave-senha (WebAuthn)
+  const bioReg = isMob;
   const bioVerif = sessionStorage.getItem('epos_bio_verified') === '1';
   if (bioReg && !bioVerif) {
+    try { const q = new URLSearchParams(location.search); if (q.get('lead')) sessionStorage.setItem('abrir_lead', q.get('lead')); if (q.get('aba')) sessionStorage.setItem('abrir_aba', q.get('aba')); } catch (e) {}
     location.replace('login-epos.html');
     throw new Error('bio_required');
   }
