@@ -141,7 +141,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div class="field">
         <input id="email-input" type="email" placeholder="E-mail de acesso"
           onkeydown="if(event.key==='Enter')document.getElementById('pwd-input').focus()"
-          autocomplete="email">
+          autocomplete="username">
       </div>
       <div class="field">
         <input id="pwd-input" type="password" placeholder="Senha de acesso"
@@ -239,15 +239,20 @@ function showMsg(id, text, type = '') {
 }
 
 // ─── BIOMETRIA: INIT ──────────────────────────────────────
-const credId = getCookie(BIO_KEY) || localStorage.getItem(BIO_KEY);
+// 12/11/2026 (Thiago: "não quero que ele tente logar assim, somente assim"): sem chave-senha (WebAuthn), que abria no iPhone a
+// janela "Não há chaves-senha salvas". No celular a entrada é e-mail + senha preenchidos pelo iPhone (Face ID das senhas salvas),
+// pedida de novo a cada sessão nova do celular. A credencial antiga é apagada deste aparelho.
+try { localStorage.removeItem(BIO_KEY); } catch (e) {}
+document.cookie = BIO_KEY + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict';
+const credId = null;
 const bioSection = document.getElementById('bio-section');
 const bioRegister = document.getElementById('bio-register');
 const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-const bioSupported = isMobile && window.PublicKeyCredential !== undefined;
+const bioSupported = false;   // 12/11: chave-senha desligada (ver acima)
 
 // ─── AUTO REDIRECT ────────────────────────────────────────
 // Só redireciona sem pedir nada se biometria NÃO estiver registrada
-if (checkAuth() && !(credId && bioSupported)) {
+if (checkAuth() && (!isMobile || sessionStorage.getItem('epos_bio_verified') === '1')) {
   location.href = DASHBOARD_URL;
 }
 
@@ -272,7 +277,7 @@ async function entrar() {
       bioRegister.classList.add('show');
       showMsg('reg-msg', 'Ative o Face ID para entrar sem senha nas próximas vezes', '');
     } else {
-      if (credId) sessionStorage.setItem('epos_bio_verified', '1');
+      sessionStorage.setItem('epos_bio_verified', '1');
       setTimeout(() => location.href = DASHBOARD_URL, 400);
     }
   } catch (e) {
