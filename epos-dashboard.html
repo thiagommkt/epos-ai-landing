@@ -3337,6 +3337,28 @@ function stageBadge(l) {
   return `<span class="badge" style="background:transparent;border:1px solid ${s.color};color:${s.color}">${escHtml(s.label)}</span>`;
 }
 
+// 13/11/2026: data da reunião na lista. dia_agendamento = horário real (Marcar reunião / Donna); data_agendamento = só o dia
+// (AAAA-MM-DD). Antes o dia sozinho era lido como meia-noite de Londres e aparecia "12/11, 21:00" para reunião em 13/11.
+function fmtAgendamento(l, soDia) {
+  if (!l) return '';
+  const tz = { timeZone: 'America/Sao_Paulo' };
+  const comHora = v => {
+    const d = new Date(v); if (isNaN(d)) return '';
+    // meia-noite de Londres em ponto = só o dia (a data foi gravada sem horário)
+    if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0) {
+      const p = n => String(n).padStart(2, '0');
+      return `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}` + (soDia ? `/${d.getUTCFullYear()}` : '');
+    }
+    const dia = d.toLocaleDateString('pt-BR', { ...tz, day: '2-digit', month: '2-digit', ...(soDia ? { year: 'numeric' } : {}) });
+    const hora = d.toLocaleTimeString('pt-BR', { ...tz, hour: '2-digit', minute: '2-digit' });
+    return soDia || hora === '00:00' ? dia : `${dia}, ${hora}`;
+  };
+  if (l.dia_agendamento) { const s = comHora(l.dia_agendamento); if (s) return s; }
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(l.data_agendamento || '').trim());
+  if (m) return soDia ? `${m[3]}/${m[2]}/${m[1]}` : `${m[3]}/${m[2]}`;
+  return l.data_agendamento ? comHora(l.data_agendamento) : '';
+}
+
 function renderLeads() {
   let filtered = leadsFilter === 'descartados' ? allLeads.filter(l => l.descartado) :
     leadsFilter === 'todos' ? allLeads.filter(l => !l.descartado) :
@@ -3353,8 +3375,9 @@ function renderLeads() {
 
   const html = filtered.map(l => {
     const leadJson = encodeURIComponent(JSON.stringify(l));
-    const agenda = l.data_agendamento
-      ? `<span style="color:var(--neon)">${new Date(l.data_agendamento).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}</span>`
+    const quandoAgenda = fmtAgendamento(l);
+    const agenda = quandoAgenda
+      ? `<span style="color:var(--neon)">${escHtml(quandoAgenda)}</span>`
       : '<span style="color:var(--dim)">—</span>';
     return `<tr class="lead-linha" data-tel="${escHtml(l.telefone||'')}" style="cursor:pointer" onclick="openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))" onmouseover="this.style.background='rgba(145,70,255,.06)'" onmouseout="this.style.background=''">
       <td class="td-hi" style="padding-left:12px">${escHtml(l.nome||'—')}${l.chatwoot_conversation_id ? ` <button class="lead-conversa" title="Ver a conversa" data-nome="${escHtml(l.nome || '')}" onclick="event.stopPropagation();return cwModalAbrir(${l.chatwoot_conversation_id}, this.dataset.nome, event)">💬</button>` : ''}</td>
@@ -3394,7 +3417,7 @@ function exportCSV() {
     l.score||0,
     l.cidade||'',
     l.descartado ? 'Descartado' : (STAGES.find(x => x.key === getStage(l))?.label || getStage(l)),
-    l.data_agendamento ? new Date(l.data_agendamento).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) : '',
+    fmtAgendamento(l, true),
     l.criado_em ? new Date(l.criado_em).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) : ''
   ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
   const csv = '﻿' + [headers.join(','), ...rows].join('\r\n');
