@@ -5597,10 +5597,10 @@ function blocoMarcarReuniao(lead) {
         <label style="font-family:var(--fM);font-size:10.5px;color:var(--muted);display:flex;gap:6px;align-items:center"><input id="reu-conf-on" type="checkbox" checked> Mandar a confirmação agora pela Donna</label>
         <textarea id="reu-conf" rows="3" aria-label="Texto da confirmação" style="${est};font-family:var(--fB);font-size:12px">${escHtml(REUNIAO_CONFIRMA)}</textarea>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:var(--fM);font-size:10.5px;color:var(--muted)">Lembretes ao lead:
-          ${[[24, '1 dia antes', false], [6, '6 h antes', true], [3, '3 h antes', true], [1, '1 h antes', false]].map(([h, t, on]) =>
+          ${[[24, '1 dia antes', false], [6, '6 h antes', true], [3, '3 h antes', false], [1, '1 h antes', true]].map(([h, t, on]) =>
             `<label style="display:flex;gap:4px;align-items:center"><input type="checkbox" class="reu-lemb-h" value="${h}" ${on ? 'checked' : ''}> ${t}</label>`).join('')}</div>
         <textarea id="reu-lemb" rows="3" aria-label="Texto do lembrete" style="${est};font-family:var(--fB);font-size:12px">${escHtml(REUNIAO_LEMBRA)}</textarea>
-        <div style="font-family:var(--fM);font-size:9.5px;color:var(--dim)">{nome}, {quando} e {link} são preenchidos sozinhos (o link do Meet é criado na hora). Mensagens ao lead só das 8h às 22h: o que cair fora vai às 8h, e lembretes juntos viram um só. Você recebe o aviso 1 h antes.</div>
+        <div style="font-family:var(--fM);font-size:9.5px;color:var(--dim)">{nome}, {quando} e {link} são preenchidos sozinhos (o link do Meet é criado na hora). A confirmação sai na hora. Lembretes só das 8h às 22h: o que cair fora vai às 8h; se dois ficarem juntos, vale o mais perto da reunião. Você recebe o aviso 1 h antes.</div>
         <button id="reu-btn" onclick="marcarReuniao('${tel}')" style="padding:9px;background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.4);color:var(--neon);font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer">${futura ? '🔁 Remarcar' : '📅 Marcar reunião'}</button>
       </div>
     </details>`;
@@ -5616,7 +5616,7 @@ async function marcarReuniao(telefone) {
   const lembrete = lembH.length ? (document.getElementById('reu-lemb')?.value || '').trim() : '';
   const hTxt = h => h === 24 ? '1 dia' : h + ' h';
   const quando = new Date(inicio).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-  if (!confirm(`Marcar a reunião para ${quando}?\n\n• Evento no Google Agenda com link do Meet\n• Etapa Agendou\n${confirmacao ? '• A Donna manda a confirmação agora (fora das 8h–22h, vai às 8h)\n' : ''}${lembrete ? `• Lembretes ao lead: ${lembH.map(hTxt).join(' e ')} antes\n` : ''}• Aviso para você 1 h antes`)) return;
+  if (!confirm(`Marcar a reunião para ${quando}?\n\n• Evento no Google Agenda com link do Meet\n• Etapa Agendou\n${confirmacao ? '• A Donna manda a confirmação agora\n' : ''}${lembrete ? `• Lembretes ao lead: ${lembH.map(hTxt).join(' e ')} antes\n` : ''}• Aviso para você 1 h antes`)) return;
   const btn = document.getElementById('reu-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Marcando...'; }
   try {
@@ -5626,7 +5626,7 @@ async function marcarReuniao(telefone) {
     if (!j.ok) throw new Error(j.erro || ('erro ' + r.status));
     const partes = [`📅 ${j.dia}, às ${j.hora}`];
     const hm = iso => new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-    if (j.confirmacao) partes.push(j.confirmacao.enviada ? 'confirmação enviada' : j.confirmacao.adiada_para ? 'confirmação sai ' + hm(j.confirmacao.adiada_para) : 'confirmação NÃO saiu' + (j.confirmacao.erro ? ': ' + j.confirmacao.erro : ''));
+    if (j.confirmacao) partes.push(j.confirmacao.enviada ? 'confirmação enviada' : j.confirmacao.laboratorio ? 'confirmação (teste, não saiu)' : 'confirmação NÃO saiu' + (j.confirmacao.erro ? ': ' + j.confirmacao.erro : ''));
     if (Array.isArray(j.lembretes)) partes.push(j.lembretes.length ? 'lembretes: ' + j.lembretes.map(l => hm(l.em)).join(' e ') : 'sem lembrete');
     toast('✅ Reunião marcada · ' + partes.join(' · '), 'ok');
     const lead = (typeof allLeads !== 'undefined' ? allLeads : []).find(l => l.telefone === telefone);
