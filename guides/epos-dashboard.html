@@ -3985,7 +3985,7 @@ function renderTorneira() {
       const cor = nota >= 9 ? '#FF5E5B' : nota >= 7 ? '#F97316' : nota >= 6 ? '#e3b341' : '#9146FF';
       const selo = nota ? `🔥 nota ${nota}` : (l.fontes || []).includes('raio_x') ? '🔥 raio-X' : '🔥 quente';
       const ult = l.ultima_msg_lead_em ? ` · última msg dele há ${torDuracao(Math.max(0, Math.round((Date.now() - Date.parse(l.ultima_msg_lead_em)) / 60000)))}` : '';
-      const passo = l.nao_compareceu ? 'faltou à reunião' + (l.proximo ? ' · ' + l.proximo : '')
+      const passo = l.nao_compareceu ? (l.proximo === 'reunião marcada' ? 'remarcado (furou antes)' : 'faltou à reunião') + (l.proximo ? ' · ' + l.proximo : '')
         : l.proximo ? l.proximo + (l.proximo_em ? (Date.parse(l.proximo_em) < Date.now() ? ' · atrasado desde ' + dataCurta(l.proximo_em) : ' · ' + dataHoraBRT(l.proximo_em)) : '') : 'sem próximo passo: reativar';
       return `<div class="tor-linha" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone('${escHtml(l.telefone)}')">
       <div class="tor-avatar">${escHtml(n === 'Sem nome' ? '?' : n.charAt(0).toUpperCase())}</div>
@@ -4506,9 +4506,22 @@ function setCrmPeriod(btn, val) {
   loadCRM();
 }
 
+// 13/11 (Thiago: "poderia manter o agendou, mas com uma subcategoria, tipo 'Furou'"; "o selo não precisa sumir até confirmar
+// que a pessoa compareceu. Ou além do furou, pode colocar um 'remarcado'"). Furou = faltou e ainda não remarcou;
+// Remarcado = faltou e já tem nova reunião. Some só ao confirmar presença. Compareceu continua etapa própria.
+function lideFurou(l) { return !!(l && l.nao_compareceu_em && !l.agendou && !l.compareceu); }
+function lideRemarcado(l) { return !!(l && l.nao_compareceu_em && l.agendou && !l.compareceu); }
+function seloFurou(l) {
+  if (!lideFurou(l) && !lideRemarcado(l)) return '';
+  const d = new Date(l.nao_compareceu_em).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' });
+  const est = 'display:inline-block;padding:2px 6px;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none';
+  return lideFurou(l)
+    ? `<div style="${est};background:rgba(255,94,91,.15);color:#FF5E5B">❌ FUROU ${d} · REMARCAR</div>`
+    : `<div style="${est};background:rgba(227,179,65,.15);color:#e3b341">🔁 REMARCADO · FUROU ${d}</div>`;
+}
 async function loadCRM() {
   document.getElementById('kanban-board').innerHTML = '<div class="loading"></div>';
-  let query = `${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico&descartado=eq.false&order=criado_em.desc&limit=500`;
+  let query = `${TABLE}?select=nome,telefone,perfil,score,crm_score,criado_em,agendou,fechou,qualificado,compareceu,em_atendimento,dify_conversation_id,dify_ativo,crm_stage,data_agendamento,chatwoot_conversation_id,cidade,canal,notas,ultima_interacao_humano,ultima_msg_lead_em,auditoria_ia_resumo,auditoria_ia_motivo_perda,auditoria_ia_em,auditoria_ia_proxima_acao,rmkt_historico,crm_person_id,servico_prestado,valor_servico,nao_compareceu_em,dia_agendamento&descartado=eq.false&order=criado_em.desc&limit=500`;
   if (crmPeriodDays === 'month') {
     const brt = new Date(Date.now() - 3*60*60*1000);
     const mes0 = new Date(Date.UTC(brt.getUTCFullYear(), brt.getUTCMonth(), 1) + 3*60*60*1000).toISOString();
@@ -4549,6 +4562,7 @@ async function loadCRM() {
         onclick="if(!_dragging)openLeadPanel(JSON.parse(decodeURIComponent('${leadJson}')))">
         <div class="krm-name" style="pointer-events:none">${l.nome||'Lead sem nome'}</div>
         ${torSelo(l.telefone)}
+        ${seloFurou(l)}
         ${seloProximoContato(l.telefone)}
         ${(function(cs){const n=parseInt(cs)||0;if(n>=9)return '<div style="display:inline-block;padding:2px 6px;background:rgba(255,94,91,.15);color:#FF5E5B;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🔴 URGENTE</div>';if(n>=7)return '<div style="display:inline-block;padding:2px 6px;background:rgba(232,137,61,.15);color:#e8893d;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟠 PRIORITÁRIO</div>';if(n>=4)return '<div style="display:inline-block;padding:2px 6px;background:rgba(227,179,65,.12);color:#e3b341;font-family:var(--fM);font-size:8px;font-weight:700;letter-spacing:.06em;margin-bottom:4px;pointer-events:none">🟡 NORMAL</div>';return '';})(l.crm_score)}
         <div class="krm-path" style="pointer-events:none">${l.perfil||'—'}</div>
@@ -5427,7 +5441,7 @@ async function openLeadPanel(lead) {
         ? `<div style="padding:12px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.06em">
             ✅ Compareceu — confirmado
            </div>`
-        : lead.nao_compareceu_em
+        : lideFurou(lead)
         ? `<div style="padding:12px;background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.3);color:#ff6b6b;font-family:var(--fD);font-size:13px;font-weight:700;text-align:center;letter-spacing:.04em">
             ❌ Não compareceu — a Donna mandou a mensagem para remarcar (${new Date(lead.nao_compareceu_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })})
            </div>`
@@ -5588,8 +5602,10 @@ function blocoMarcarReuniao(lead) {
   const est = 'background:var(--bg3);border:1px solid var(--bd);color:var(--text);font-family:var(--fM);font-size:11px;padding:6px';
   return `<div class="panel-section">Reunião</div>
     ${futura ? `<div style="padding:10px;margin-bottom:8px;border:1px solid rgba(0,245,160,.35);background:rgba(0,245,160,.06);color:var(--neon);font-family:var(--fD);font-size:12px;font-weight:700">📅 Reunião marcada: ${escHtml(quando)}</div>` : ''}
+    ${lideFurou(lead) ? `<div style="padding:10px;margin-bottom:8px;border:1px solid rgba(255,94,91,.35);background:rgba(255,94,91,.06);color:#FF5E5B;font-family:var(--fD);font-size:12px;font-weight:700">❌ Furou em ${escHtml(new Date(lead.nao_compareceu_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))} · a Donna já mandou a mensagem para remarcar</div>`
+      : lideRemarcado(lead) ? `<div style="padding:8px 10px;margin-bottom:8px;border:1px solid rgba(227,179,65,.35);background:rgba(227,179,65,.06);color:#e3b341;font-family:var(--fD);font-size:11px;font-weight:700">🔁 Remarcado · furou em ${escHtml(new Date(lead.nao_compareceu_em).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }))}</div>` : ''}
     <details id="reuniao-box" style="margin-bottom:12px;border:1px solid var(--bd-b);padding:8px 10px">
-      <summary style="cursor:pointer;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--purple)">${futura ? '🔁 Remarcar reunião' : '📅 Marcar reunião'}</summary>
+      <summary style="cursor:pointer;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--purple)">${futura || lideFurou(lead) ? '🔁 Remarcar reunião' : '📅 Marcar reunião'}</summary>
       <div style="display:flex;flex-direction:column;gap:7px;margin-top:9px">
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <input id="reu-data" type="date" aria-label="Dia da reunião" style="${est};flex:1;min-width:130px">
@@ -5636,7 +5652,7 @@ async function marcarReuniao(telefone) {
     if (Array.isArray(j.lembretes)) partes.push(j.lembretes.length ? 'lembretes: ' + j.lembretes.map(l => hm(l.em)).join(' e ') : 'sem lembrete');
     toast('✅ Reunião marcada · ' + partes.join(' · '), 'ok');
     const lead = (typeof allLeads !== 'undefined' ? allLeads : []).find(l => l.telefone === telefone);
-    if (lead) { Object.assign(lead, { agendou: true, dia_agendamento: j.inicio, crm_stage: 'agendou', nao_compareceu_em: null }); setTimeout(() => openLeadPanel(lead), 300); }
+    if (lead) { Object.assign(lead, { agendou: true, dia_agendamento: j.inicio, crm_stage: 'agendou' }); setTimeout(() => openLeadPanel(lead), 300); }
     else carregarTarefasLead(telefone);
   } catch (e) {
     toast('Não marcou: ' + e.message, 'err');
