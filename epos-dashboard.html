@@ -3915,6 +3915,27 @@ function novoOrigem(l) {
   const camp = String(l.utm_campaign || '').trim();
   return camp ? `${base} · ${/^campanha/i.test(camp) ? camp : 'campanha ' + camp}` : base;
 }
+// 14/11 (Thiago: "incluir de onde o cliente veio: campanha, link de qual dos perfis, link direto, google"): a origem do raio-X vem
+// pronta do fluxo do raio-X (entrada da visita, percurso e 1ª visita); raio-X antigo sem rótulo usa as UTMs gravadas.
+function rotuloOrigemUtm(o) {
+  if (!o) return '';
+  if (o.rotulo) return o.rotulo;
+  const med = String(o.utm_medium || '').toLowerCase();
+  if (/^(paid|cpc|ppc|ads?)$/.test(med) || o.ad_id) return ['Anúncio Meta', o.utm_campaign && `campanha "${o.utm_campaign}"`, o.utm_content && `anúncio "${o.utm_content}"`, o.placement && String(o.placement).replace(/_/g, ' ')].filter(Boolean).join(' · ');
+  if (o.utm_source === 'site') return 'Site da Epos' + (o.utm_content ? ` (página ${o.utm_content})` : '');
+  if (o.utm_source === 'metodo') return 'Página do Método';
+  return '';
+}
+function origemLeadFicha(l) {
+  const linhas = [];
+  const q = l.quiz_respostas && l.quiz_respostas.origem;
+  const rq = rotuloOrigemUtm(q);
+  if (rq) linhas.push('Raio-X' + (l.quiz_respostas.enviado_em ? ' (' + fmtDate(l.quiz_respostas.enviado_em) + ')' : '') + ': ' + rq + (q.percurso ? ' → ' + q.percurso : '') + (q.primeira_visita ? ' · 1ª visita em ' + q.primeira_visita : ''));
+  const p = l.prospeccao;
+  if (p && p.origem) linhas.push('1º contato: ' + (p.origem === 'disparo_oficial' ? 'disparo oficial' : p.origem) + (p.fonte === 'google_maps' ? ' (empresa achada no Google Maps)' : '') + (p.enviado_em ? ', ' + fmtDate(p.enviado_em) : ''));
+  else if (!rq || l.canal !== 'quiz_epos') linhas.push((rq ? '1º contato: ' : '') + (l.ctwa_clid ? 'Anúncio Meta (clique para o WhatsApp)' : novoOrigem(l)));
+  return linhas.map(escHtml).join('<br>');
+}
 
 // Selo no card do kanban (ex.: "⏱ 2 h sem resposta")
 function torSelo(tel) {
@@ -5331,6 +5352,7 @@ async function openLeadPanel(lead) {
     <div class="panel-row"><div class="panel-key">Cidade</div><div class="panel-val">${lead.cidade||'—'}</div></div>
     <div class="panel-row"><div class="panel-key">Chegou em</div><div class="panel-val">${fmtDate(lead.criado_em)}</div></div>
     <div class="panel-row"><div class="panel-key">Canal</div><div class="panel-val">${lead.canal||'whatsapp'}</div></div>
+    <div class="panel-row"><div class="panel-key">Origem</div><div class="panel-val">${origemLeadFicha(lead)}</div></div>
     <div class="panel-section">No site</div>
     <div id="panel-historico-site" style="margin-bottom:8px"><div style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</div></div>
     <div class="panel-row"><div class="panel-key">Quem atende</div><div class="panel-val" id="panel-quem-atende"><span style="font-family:var(--fM);font-size:10px;color:var(--dim)">Carregando...</span></div></div>
@@ -5700,7 +5722,7 @@ function blocoMarcarLigacao(lead) {
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
         ${btn('var(--neon)', '📅 Marcar apresentação', "document.getElementById('reuniao-box').open=true;document.getElementById('reuniao-box').scrollIntoView({behavior:'smooth',block:'center'})")}
         ${btn('#FF5E5B', '❌ Não é perfil', `ligacaoNaoEPerfil('${tel}')`)}
-        ${btn('#e3b341', '📵 Não atendeu', `ligacaoNaoAtendeu('${tel}')`)}
+        ${btn('#e3b341', '📵 Não atendeu', `ligacaoNaoAtendeu('${tel}', this)`)}
       </div>` : ''}
     <details id="ligacao-box" style="margin-bottom:12px;border:1px solid var(--bd-b);padding:8px 10px">
       <summary style="cursor:pointer;font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#e3b341">${marcada ? '🔁 Remarcar ligação' : '📞 Marcar ligação (5 min)'}</summary>
@@ -5755,14 +5777,23 @@ async function ligacaoNaoEPerfil(telefone) {
     toast('Lead movido para Perdido', 'ok');
   } catch (e) { toast('Não moveu: ' + e.message, 'err'); }
 }
-function ligacaoNaoAtendeu(telefone) {
-  const lead = (typeof allLeads !== 'undefined' ? allLeads : []).find(l => l.telefone === telefone) || {};
-  const nome = String(lead.nome || '').trim().split(/\s+/)[0] || '';
-  const caixa = document.getElementById('msg-input');
-  if (!caixa) { toast('Caixa de mensagem não encontrada', 'err'); return; }
-  caixa.value = LIGACAO_NAO_ATENDEU.replace('{nome}', nome ? nome.charAt(0).toUpperCase() + nome.slice(1).toLowerCase() : '').replace('Oi, !', 'Oi!');
-  caixa.scrollIntoView({ behavior: 'smooth', block: 'center' }); caixa.focus();
-  toast('Mensagem pronta na caixa: revise e envie', 'ok');
+// 14/11 (Thiago: "Não atendeu: já envia uma mensagem, não precisa nem revisar"): um clique manda na hora, pela Donna e pela fila,
+// o texto LIGACAO_NAO_ATENDEU. A Donna continua ativa: quando o lead disser o horário, ela marca a nova ligação. A tarefa da ligação
+// fecha como "não atendeu". Fluxo [Epos] Não compareceu → Donna (tipo ligacao_nao_atendeu); trava de 1 h contra clique duplo.
+async function ligacaoNaoAtendeu(telefone, el) {
+  if (el) { el.disabled = true; el.textContent = 'Enviando...'; }
+  try {
+    const r = await fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-nao-compareceu', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: PROXY_TOKEN, telefone, tipo: 'ligacao_nao_atendeu' })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.erro || ('HTTP ' + r.status));
+    toast(j.laboratorio ? 'Laboratório: nada foi enviado' : '✅ A Donna avisou que você ligou e pediu o melhor horário', 'ok');
+    if (el) el.textContent = '✅ Enviado';
+  } catch (e) {
+    toast('Não enviou: ' + e.message, 'err');
+    if (el) { el.disabled = false; el.textContent = '📵 Não atendeu'; }
+  }
 }
 async function marcarNaoCompareceu(telefone) {
   if (!confirm('O lead não entrou na reunião?\n\nA Donna vai mandar agora a mensagem para remarcar, com os horários livres do próximo dia útil.')) return;
