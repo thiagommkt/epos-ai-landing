@@ -8173,7 +8173,9 @@ document.addEventListener('DOMContentLoaded', updateThemeBtn);
         <select id="notif-pessoa" onchange="renderNotificacoes()"></select>
       </div>
       <div id="notif-sem-tel" style="display:none;font-size:12px;color:var(--amber,#f59e0b);margin-bottom:10px"></div>
+      <div id="notif-trava-info" style="display:none;font-size:12px;color:var(--muted);margin-bottom:10px">🔒 Avisos travados pelo administrador. Só o admin muda.</div>
       <div id="notif-lista"></div>
+      <label id="notif-trava-box" style="display:none;align-items:center;gap:8px;margin:12px 0 0;text-transform:none;letter-spacing:0;font-weight:600;font-size:12px;color:var(--text);cursor:pointer"><input id="notif-trava" type="checkbox" style="width:auto"> 🔒 Travar: só o admin muda os avisos desta pessoa</label>
       <div style="margin-top:16px;padding:12px;border:1px solid var(--bd);border-radius:8px">
         <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;color:var(--text);cursor:pointer"><input id="notif-sil" type="checkbox" style="width:auto" onchange="document.getElementById('notif-sil-horas').style.opacity=this.checked?'1':'.45'"> Horário de silêncio</label>
         <div id="notif-sil-horas" style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--muted)">das <input id="notif-sil-de" type="time" value="22:00" style="width:auto;padding:4px 6px"> às <input id="notif-sil-ate" type="time" value="07:00" style="width:auto;padding:4px 6px"></div>
@@ -8206,7 +8208,7 @@ function _notifJwt() { try { return JSON.parse(localStorage.getItem('sb-phszzzwq
 function _notifSouAdmin() { return (_notifJwt().app_metadata || {}).role === 'admin'; }
 function _notifHeaders() { return { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' }; }
 async function _notifCarregar() {
-  const r = await fetch(`${SB_URL}/rest/v1/equipe?conta=eq.${NOTIF_CONTA}&ativo=eq.true&select=id,nome,papel,email_login,telefone_whatsapp,notificacoes,silencio_ativo,silencio_de,silencio_ate&order=nome.asc`, { headers: _notifHeaders() });
+  const r = await fetch(`${SB_URL}/rest/v1/equipe?conta=eq.${NOTIF_CONTA}&ativo=eq.true&select=id,nome,papel,email_login,telefone_whatsapp,notificacoes,notificacoes_travadas,silencio_ativo,silencio_de,silencio_ate&order=nome.asc`, { headers: _notifHeaders() });
   const d = r.ok ? await r.json() : [];
   _notifEquipe = Array.isArray(d) ? d : [];
 }
@@ -8240,18 +8242,27 @@ function renderNotificacoes() {
   if (!m) return;
   const pref = m.notificacoes || {};
   const ehAdm = m.papel === 'admin';
+  const souAdm = _notifSouAdmin();
+  const travada = !!m.notificacoes_travadas;
+  const bloqueado = travada && !souAdm;   // 15/11: avisos travados pelo admin
+  const tudoDesligado = pref.todas === false;
+  document.getElementById('notif-trava-info').style.display = travada ? '' : 'none';
+  document.getElementById('notif-trava-box').style.display = (souAdm && !ehAdm) ? 'flex' : 'none';
+  document.getElementById('notif-trava').checked = travada;
+  document.getElementById('notif-salvar').style.display = bloqueado ? 'none' : '';
   const aviso = document.getElementById('notif-sem-tel');
   aviso.style.display = m.telefone_whatsapp ? 'none' : '';
   aviso.textContent = m.telefone_whatsapp ? '' : 'Sem WhatsApp cadastrado na equipe: os avisos não chegam até cadastrar o número.';
   const grupos = NOTIF_GRUPOS.filter(g => (!g.soAdmin || ehAdm) && (!g.soEpos || NOTIF_CONTA === 'epos'));
   document.getElementById('notif-lista').innerHTML = grupos.map(g => {
-    const on = g.fixo ? true : pref[g.k] !== false;
+    const on = g.fixo ? true : (!tudoDesligado && pref[g.k] !== false);
     return `<label style="display:flex;align-items:flex-start;gap:10px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;text-transform:none;letter-spacing:0;font-weight:400;cursor:${g.fixo ? 'default' : 'pointer'}">
-      <input type="checkbox" data-grupo="${g.k}" ${on ? 'checked' : ''} ${g.fixo ? 'disabled' : ''} style="width:auto;margin-top:3px">
+      <input type="checkbox" data-grupo="${g.k}" ${on ? 'checked' : ''} ${(g.fixo || bloqueado) ? 'disabled' : ''} style="width:auto;margin-top:3px">
       <span><span style="display:block;font-size:13px;font-weight:600;color:var(--text)">${g.t}</span><span style="display:block;font-size:11px;color:var(--muted);line-height:1.45;margin-top:2px">${g.d}</span></span></label>`;
   }).join('');
   const sil = document.getElementById('notif-sil');
   sil.checked = !!m.silencio_ativo;
+  sil.disabled = bloqueado; document.getElementById('notif-sil-de').disabled = bloqueado; document.getElementById('notif-sil-ate').disabled = bloqueado;
   document.getElementById('notif-sil-de').value = String(m.silencio_de || '22:00').slice(0, 5);
   document.getElementById('notif-sil-ate').value = String(m.silencio_ate || '07:00').slice(0, 5);
   document.getElementById('notif-sil-horas').style.opacity = sil.checked ? '1' : '.45';
@@ -8261,9 +8272,12 @@ async function salvarNotificacoes() {
   const m = _notifEquipe.find(x => String(x.id) === String(id));
   if (!m) return;
   const pref = {};
-  document.querySelectorAll('#notif-lista input[data-grupo]').forEach(i => { if (!i.disabled && !i.checked) pref[i.dataset.grupo] = false; });
+  const _caixas = [...document.querySelectorAll('#notif-lista input[data-grupo]')].filter(i => !i.disabled);
+  _caixas.forEach(i => { if (!i.checked) pref[i.dataset.grupo] = false; });
+  if (_caixas.length && _caixas.every(i => !i.checked)) pref.todas = false;   // tudo desligado = nenhuma mensagem automática
   const corpo = { notificacoes: pref, silencio_ativo: document.getElementById('notif-sil').checked,
     silencio_de: document.getElementById('notif-sil-de').value || '22:00', silencio_ate: document.getElementById('notif-sil-ate').value || '07:00' };
+  if (_notifSouAdmin() && m.papel !== 'admin') corpo.notificacoes_travadas = document.getElementById('notif-trava').checked;
   const b = document.getElementById('notif-salvar');
   b.disabled = true; b.style.opacity = '.5';
   try {
