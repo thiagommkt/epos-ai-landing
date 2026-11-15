@@ -1598,6 +1598,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
         <span class="transcricao-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0"></span>
         <span class="transcricao-label">🎙️ Transcrição: carregando...</span>
       </button>
+      <button class="modo-dono-btn" id="notif-btn" onclick="abrirNotificacoes()" title="Escolher quais avisos chegam no seu WhatsApp" style="display:none;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--bd-b);background:transparent;color:var(--muted);font-family:var(--fM);font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;border-radius:4px">🔔 Notificações</button>
   <style>/* 26/10: opções do seletor de silêncio ilegíveis no tema escuro */ #silencio-sel option{background:#18181c;color:#f2f2f4}</style>
       <select id="silencio-sel" onchange="definirSilencio(this.value)" title="Quanto tempo a IA fica desligada depois que alguém da equipe fala com o lead" style="display:none;padding:7px 10px;border:1px solid var(--bd);background:var(--bg);color:var(--text);color-scheme:dark;font-family:var(--fD);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer"><option value="12">IA após humano: 12 h</option><option value="24">IA após humano: 24 h</option><option value="48">IA após humano: 48 h</option><option value="72">IA após humano: 72 h</option><option value="87600">IA após humano: permanente</option></select>
       <div class="sec-badge" id="db-live">● LIVE</div>
@@ -6554,6 +6555,130 @@ document.addEventListener('DOMContentLoaded', updateThemeBtn);
   document.addEventListener('visibilitychange', () => { if (document.hidden) enviar(true); });
   addEventListener('pagehide', () => enviar(true));
 })();
+</script>
+
+<!-- 14/11: notificações por pessoa (equipe.notificacoes + horário de silêncio; os fluxos consultam aviso_decidir) -->
+<div class="lead-panel-overlay" id="notif-overlay" onclick="fecharNotificacoes()">
+  <div class="lead-panel" style="max-width:520px;border-radius:10px" onclick="event.stopPropagation()">
+    <div class="panel-header">
+      <div class="panel-title">🔔 Notificações no WhatsApp</div>
+      <button class="panel-close" onclick="fecharNotificacoes()" aria-label="Fechar">✕</button>
+    </div>
+    <div class="panel-body" style="padding:8px 24px 24px">
+      <div id="notif-pessoa-box" style="display:none;margin-bottom:12px">
+        <label for="notif-pessoa">Pessoa da equipe</label>
+        <select id="notif-pessoa" onchange="renderNotificacoes()"></select>
+      </div>
+      <div id="notif-sem-tel" style="display:none;font-size:12px;color:var(--amber,#f59e0b);margin-bottom:10px"></div>
+      <div id="notif-lista"></div>
+      <div style="margin-top:16px;padding:12px;border:1px solid var(--bd);border-radius:8px">
+        <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;color:var(--text);cursor:pointer"><input id="notif-sil" type="checkbox" style="width:auto" onchange="document.getElementById('notif-sil-horas').style.opacity=this.checked?'1':'.45'"> Horário de silêncio</label>
+        <div id="notif-sil-horas" style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--muted)">das <input id="notif-sil-de" type="time" value="22:00" style="width:auto;padding:4px 6px"> às <input id="notif-sil-ate" type="time" value="07:00" style="width:auto;padding:4px 6px"></div>
+        <div style="font-family:var(--fM);font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5">Nesse período o WhatsApp não apita: os avisos ficam guardados e chegam juntos no fim do silêncio. Lead quente e agenda chegam na hora.</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button onclick="fecharNotificacoes()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--bd);color:var(--muted);font-family:var(--fD);font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px">Cancelar</button>
+        <button id="notif-salvar" onclick="salvarNotificacoes()" style="flex:2;padding:10px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.45);color:#F97316;font-family:var(--fD);font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;border-radius:4px">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// ═══ NOTIFICAÇÕES POR PESSOA (14/11) ═══
+// Cada pessoa liga/desliga os grupos de aviso que chegam no próprio WhatsApp; o admin ajusta os de toda a equipe.
+// Sem escolha gravada = recebe (como antes). Os fluxos do n8n consultam aviso_decidir(conta, telefone, grupo).
+const NOTIF_CONTA = 'fm';
+const NOTIF_GRUPOS = [
+  { k: 'lead_novo', t: 'Leads novos', d: 'Raio-X, formulário, lead pelo WhatsApp ou anúncio, "lead aguarda especialista"' },
+  { k: 'lead_quente', t: 'Lead quente / pedido concreto', d: 'Quando alguém pede preço, reunião ou proposta. Chega mesmo no horário de silêncio' },
+  { k: 'agenda', t: 'Agenda', d: 'Ligação ou reunião marcada, lembretes antes, "a reunião passou: entrou?". Chega mesmo no horário de silêncio' },
+  { k: 'sem_resposta', t: 'Sem resposta (Torneira)', d: '"Sem resposta há X", "sem resposta da equipe"' },
+  { k: 'audio', t: 'Áudio recebido', d: 'Quando a IA está desligada e alguém da equipe precisa ouvir' },
+  { k: 'sugestoes', t: 'Sugestões do Analista', d: 'Sugestão de contato e remarketing para aprovar', soEpos: true },
+  { k: 'relatorios', t: 'Relatórios', d: 'Relatório diário, avaliação diária, Meta Ads 7 dias' },
+  { k: 'erros', t: 'Erros do sistema', d: 'Sempre ligado; só para o admin', fixo: true, soAdmin: true }
+];
+let _notifEquipe = [];
+function _notifJwt() { try { return JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user || {}; } catch (e) { return {}; } }
+function _notifSouAdmin() { return (_notifJwt().app_metadata || {}).role === 'admin'; }
+function _notifHeaders() { return { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' }; }
+async function _notifCarregar() {
+  const r = await fetch(`${SB_URL}/rest/v1/equipe?conta=eq.${NOTIF_CONTA}&ativo=eq.true&select=id,nome,papel,email_login,telefone_whatsapp,notificacoes,silencio_ativo,silencio_de,silencio_ate&order=nome.asc`, { headers: _notifHeaders() });
+  const d = r.ok ? await r.json() : [];
+  _notifEquipe = Array.isArray(d) ? d : [];
+}
+async function initNotificacoes() {
+  const btn = document.getElementById('notif-btn');
+  if (!btn) return;
+  try {
+    await _notifCarregar();
+    const eu = String(_notifJwt().email || '').toLowerCase();
+    const minha = _notifEquipe.some(m => String(m.email_login || '').toLowerCase() === eu);
+    btn.style.display = (minha || _notifSouAdmin()) ? 'flex' : 'none';
+  } catch (e) { btn.style.display = 'none'; }
+}
+async function abrirNotificacoes() {
+  await _notifCarregar().catch(() => {});
+  const eu = String(_notifJwt().email || '').toLowerCase();
+  const adm = _notifSouAdmin();
+  const lista = adm ? _notifEquipe : _notifEquipe.filter(m => String(m.email_login || '').toLowerCase() === eu);
+  if (!lista.length) { toast('Seu e-mail não está na equipe deste painel', 'err'); return; }
+  const sel = document.getElementById('notif-pessoa');
+  const minha = lista.find(m => String(m.email_login || '').toLowerCase() === eu) || lista[0];
+  sel.innerHTML = lista.map(m => `<option value="${m.id}" ${m.id === minha.id ? 'selected' : ''}>${escHtml(m.nome)}${m.papel ? ' · ' + escHtml(m.papel) : ''}</option>`).join('');
+  document.getElementById('notif-pessoa-box').style.display = (adm && lista.length > 1) ? '' : 'none';
+  renderNotificacoes();
+  document.getElementById('notif-overlay').classList.add('show');
+}
+function fecharNotificacoes() { document.getElementById('notif-overlay').classList.remove('show'); }
+function renderNotificacoes() {
+  const id = document.getElementById('notif-pessoa').value;
+  const m = _notifEquipe.find(x => String(x.id) === String(id));
+  if (!m) return;
+  const pref = m.notificacoes || {};
+  const ehAdm = m.papel === 'admin';
+  const aviso = document.getElementById('notif-sem-tel');
+  aviso.style.display = m.telefone_whatsapp ? 'none' : '';
+  aviso.textContent = m.telefone_whatsapp ? '' : 'Sem WhatsApp cadastrado na equipe: os avisos não chegam até cadastrar o número.';
+  const grupos = NOTIF_GRUPOS.filter(g => (!g.soAdmin || ehAdm) && (!g.soEpos || NOTIF_CONTA === 'epos'));
+  document.getElementById('notif-lista').innerHTML = grupos.map(g => {
+    const on = g.fixo ? true : pref[g.k] !== false;
+    return `<label style="display:flex;align-items:flex-start;gap:10px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;text-transform:none;letter-spacing:0;font-weight:400;cursor:${g.fixo ? 'default' : 'pointer'}">
+      <input type="checkbox" data-grupo="${g.k}" ${on ? 'checked' : ''} ${g.fixo ? 'disabled' : ''} style="width:auto;margin-top:3px">
+      <span><span style="display:block;font-size:13px;font-weight:600;color:var(--text)">${g.t}</span><span style="display:block;font-size:11px;color:var(--muted);line-height:1.45;margin-top:2px">${g.d}</span></span></label>`;
+  }).join('');
+  const sil = document.getElementById('notif-sil');
+  sil.checked = !!m.silencio_ativo;
+  document.getElementById('notif-sil-de').value = String(m.silencio_de || '22:00').slice(0, 5);
+  document.getElementById('notif-sil-ate').value = String(m.silencio_ate || '07:00').slice(0, 5);
+  document.getElementById('notif-sil-horas').style.opacity = sil.checked ? '1' : '.45';
+}
+async function salvarNotificacoes() {
+  const id = document.getElementById('notif-pessoa').value;
+  const m = _notifEquipe.find(x => String(x.id) === String(id));
+  if (!m) return;
+  const pref = {};
+  document.querySelectorAll('#notif-lista input[data-grupo]').forEach(i => { if (!i.disabled && !i.checked) pref[i.dataset.grupo] = false; });
+  const corpo = { notificacoes: pref, silencio_ativo: document.getElementById('notif-sil').checked,
+    silencio_de: document.getElementById('notif-sil-de').value || '22:00', silencio_ate: document.getElementById('notif-sil-ate').value || '07:00' };
+  const b = document.getElementById('notif-salvar');
+  b.disabled = true; b.style.opacity = '.5';
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/equipe?id=eq.${encodeURIComponent(m.id)}`, { method: 'PATCH', headers: { ..._notifHeaders(), Prefer: 'return=representation' }, body: JSON.stringify(corpo) });
+    const rows = r.ok ? await r.json() : [];
+    if (!rows.length) throw new Error('sem permissão');
+    Object.assign(m, rows[0]);
+    toast(`🔔 Notificações de ${m.nome} salvas`, 'ok');
+    fecharNotificacoes();
+  } catch (e) {
+    toast('Erro ao salvar as notificações. Tente de novo', 'err');
+  } finally { b.disabled = false; b.style.opacity = '1'; }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('notif-overlay')?.classList.contains('show')) fecharNotificacoes(); });
+(function _notifEsperarLogin(n) {
+  if (window._ACCESS_TOKEN || n > 40) { initNotificacoes(); return; }
+  setTimeout(() => _notifEsperarLogin(n + 1), 500);
+})(0);
 </script>
 </body>
 </html>
