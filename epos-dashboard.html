@@ -3517,7 +3517,7 @@ async function carregarNotaAtendimento(telefone) {
   const titulo = `<div style="font-family:var(--fM);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Avaliação do atendimento${qtd ? ` · ${qtd} dia${qtd > 1 ? 's' : ''} avaliado${qtd > 1 ? 's' : ''}` : ''}</div>`;
   if (!qtd) {
     box.innerHTML = `<div class="nota-atendimento nota-vazia" style="padding:10px 12px;border:1px dashed var(--bd);margin-bottom:8px">${titulo}
-      <div style="font-size:12px;line-height:1.5;color:var(--muted)">Ainda sem avaliação. Todo dia às 7h o Analista dá nota ao atendimento humano do dia anterior: velocidade, qualificação, objeção, próximo passo e tom.</div></div>`;
+      <div style="font-size:12px;line-height:1.5;color:var(--muted)">Ainda sem avaliação. Todo dia às 7h o Analista dá nota ao atendimento do dia anterior, da Donna e da equipe: velocidade, qualificação, objeção, próximo passo e tom.</div></div>`;
     return;
   }
   const quando = o => new Date(o.dia + 'T12:00:00').toLocaleDateString('pt-BR');
