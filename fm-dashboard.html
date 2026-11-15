@@ -4276,7 +4276,8 @@ async function loadNotificacoes() {
             <div class="notif-time">${d}</div>
           </div>`;
         }).join('');
-    const fullHtml = `<div class="notif-hdr">Notificações CRM<button onclick="markNotificacoesLidas()">Marcar lidas</button></div>` + html;
+    const _escolher = window._notifPodeEscolher ? `<button type="button" onclick="event.stopPropagation();toggleNotifPanel();abrirNotificacoes()" style="display:block;width:calc(100% - 16px);margin:6px 8px 4px;padding:8px 10px;background:transparent;border:1px solid var(--bd-b);border-radius:8px;color:var(--purple);font-family:var(--fM);font-size:10px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-align:left">⚙️ Escolher os avisos do WhatsApp</button>` : '';   // 15/11: a escolha dos avisos fica dentro do sino
+    const fullHtml = `<div class="notif-hdr">Notificações CRM<button onclick="markNotificacoesLidas()">Marcar lidas</button></div>` + _escolher + html;
     ['notif-panel-desk', 'notif-panel-mobile'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = fullHtml;
@@ -6616,7 +6617,8 @@ async function initNotificacoes() {
     await _notifCarregar();
     const eu = String(_notifJwt().email || '').toLowerCase();
     const minha = _notifEquipe.some(m => String(m.email_login || '').toLowerCase() === eu);
-    btn.style.display = (minha || _notifSouAdmin()) ? 'flex' : 'none';
+    window._notifPodeEscolher = !!(minha || _notifSouAdmin()); btn.style.display = 'none';   // 15/11: botão separado sai; a escolha abre pelo sino redondo
+    if (window._notifPodeEscolher && typeof loadNotificacoes === 'function') loadNotificacoes();
   } catch (e) { btn.style.display = 'none'; }
 }
 async function abrirNotificacoes() {
