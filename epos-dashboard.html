@@ -8028,10 +8028,20 @@ rmPodeVer();
 loadTranscricao(); loadSilencio(); crmPausarTodosMostrar();
 loadWaClicks();
 loadNotificacoes();
-setInterval(loadDashboard, 30000); // fallback polling a cada 30s
 loadTorneira();
-setInterval(loadTorneira, 60000); // Torneira: atualiza a cada minuto
-setInterval(loadNotificacoes, 60000); // recarrega notificações a cada 1min
+// 15/11 (queda do Supabase no plano gratuito): o painel aberto consultava o banco ~75 vezes por minuto, dia e noite, mesmo com a
+// aba escondida. Agora só atualiza com a aba na frente. A reserva vai de 30 s para 5 min (o Realtime continua trazendo cada mudança
+// na hora) e, ao voltar para a aba, atualiza o que passou de 1 min.
+const _painelUltima = { dash: Date.now(), torneira: Date.now(), notif: Date.now() };
+const _painelFn = { dash: () => loadDashboard(), torneira: () => loadTorneira(), notif: () => loadNotificacoes() };
+function _painelAtualiza(nome) { if (document.hidden) return; _painelUltima[nome] = Date.now(); _painelFn[nome](); }
+setInterval(() => _painelAtualiza('dash'), 300000);
+setInterval(() => _painelAtualiza('torneira'), 300000);
+setInterval(() => _painelAtualiza('notif'), 120000);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  for (const k of Object.keys(_painelUltima)) if (Date.now() - _painelUltima[k] > 60000) _painelAtualiza(k);
+});
 
 // Supabase Realtime: atualiza dashboard instantaneamente quando dados mudam
 (function initRealtime() {
@@ -8040,8 +8050,9 @@ setInterval(loadNotificacoes, 60000); // recarrega notificações a cada 1min
     let realtimeDebounce;
     sbClient.channel('db-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, () => {
+        if (document.hidden) { _painelUltima.dash = 0; return; }   // 15/11: aba escondida não recarrega; atualiza ao voltar
         clearTimeout(realtimeDebounce);
-        realtimeDebounce = setTimeout(loadDashboard, 800);
+        realtimeDebounce = setTimeout(() => _painelAtualiza('dash'), 3000);   // junta rajadas de mudanças
       })
       .subscribe((status) => {
         const dot = document.querySelector('.live-dot');
