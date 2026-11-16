@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Guia de ligação · Epos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- 16/11/2026 (Thiago: "Vamos criar um guia de ligação pré apresentação com isso. Uma página onde eu coloco o nome do cliente no começo,
+     tem os espaços pra marcar e preencher e no final, me envia por whatsapp todas as infos e salva no banco de dados as infos inseridas").
+     Login = a mesma sessão do painel Epos. "Salvar e enviar" → n8n "[Epos] Guia de ligação (painel)" (ZDFaVNTohyKa79M3): confere o login,
+     grava em ligacoes_guia, anota no lead e manda o resumo no WhatsApp de quem preencheu. Rascunho fica no aparelho até enviar. -->
+<style>
+  :root { --bg:#0E0E10; --bg2:#18181B; --bg3:#1F1F23; --bd:rgba(145,70,255,.18); --bd-b:rgba(145,70,255,.38); --pur:#9146FF; --pur-l:rgba(145,70,255,.14);
+          --neon:#00F5A0; --warn:#FF5E5B; --amb:#F5B83D; --text:#EFEFF1; --muted:rgba(239,239,241,.6); --dim:rgba(239,239,241,.35);
+          --fD:'DM Sans', system-ui, sans-serif; --fM:'DM Mono', ui-monospace, monospace; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--text); font-family:var(--fD); -webkit-font-smoothing:antialiased; }
+  body { padding:0 16px 120px; }
+  .topo { position:sticky; top:0; z-index:10; background:rgba(14,14,16,.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); margin:0 -16px; padding:12px 16px; border-bottom:1px solid var(--bd); display:flex; align-items:center; gap:12px; }
+  .topo h1 { font-size:15px; letter-spacing:.06em; text-transform:uppercase; margin:0; flex:1; }
+  .topo h1 span { color:var(--pur); }
+  .timer { font:600 18px var(--fM); padding:6px 12px; border-radius:10px; border:1px solid var(--bd-b); background:var(--bg2); cursor:pointer; min-width:92px; text-align:center; user-select:none; }
+  .timer.rodando { border-color:var(--neon); color:var(--neon); }
+  .timer.fim { border-color:var(--warn); color:var(--warn); }
+  .wrap { max-width:760px; margin:0 auto; }
+  .cliente { margin:18px 0 8px; position:relative; }
+  label.tit { display:block; font:700 11px var(--fD); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  input[type=text], input[type=datetime-local], textarea { width:100%; background:var(--bg2); border:1px solid var(--bd); color:var(--text); font:15px var(--fD); padding:11px 12px; border-radius:10px; outline:none; }
+  input:focus, textarea:focus { border-color:var(--pur); }
+  textarea { min-height:64px; resize:vertical; line-height:1.45; }
+  #cli-nome { font-size:20px; font-weight:700; padding:14px; }
+  .sug { position:absolute; left:0; right:0; top:100%; background:var(--bg3); border:1px solid var(--bd-b); border-radius:10px; margin-top:4px; z-index:5; overflow:hidden; display:none; }
+  .sug button { display:flex; justify-content:space-between; gap:10px; width:100%; text-align:left; background:none; border:0; border-bottom:1px solid var(--bd); color:var(--text); padding:10px 12px; font:14px var(--fD); cursor:pointer; }
+  .sug button small { color:var(--muted); font-family:var(--fM); }
+  .lead-ok { font-size:12px; color:var(--neon); margin-top:6px; min-height:16px; }
+  .bloco { background:var(--bg2); border:1px solid var(--bd); border-radius:14px; padding:16px; margin-top:14px; }
+  .bloco-tit { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .bloco-tit h2 { margin:0; font-size:16px; }
+  .bloco-tit span { font:500 11px var(--fM); color:var(--muted); white-space:nowrap; }
+  details.fala { background:var(--pur-l); border-left:3px solid var(--pur); border-radius:8px; padding:8px 12px; margin-bottom:12px; }
+  details.fala summary { cursor:pointer; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  details.fala p { margin:8px 0 2px; font-size:14px; line-height:1.5; }
+  .campo { margin-top:12px; }
+  .campo > span { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .check { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; border:1px solid var(--bd); border-radius:10px; margin-top:8px; cursor:pointer; font-size:14px; }
+  .check input { width:20px; height:20px; accent-color:var(--neon); flex-shrink:0; margin:0; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { padding:8px 13px; border-radius:999px; border:1px solid var(--bd-b); background:transparent; color:var(--text); font:600 13px var(--fD); cursor:pointer; }
+  .chip.on { background:var(--text); color:var(--bg); border-color:var(--text); }
+  .duas { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:560px) { .duas { grid-template-columns:1fr; } }
+  .filtro-res { margin-top:12px; padding:12px; border-radius:10px; font-weight:700; font-size:14px; }
+  .filtro-res.ok { background:rgba(0,245,160,.1); color:var(--neon); }
+  .filtro-res.meio { background:rgba(245,184,61,.12); color:var(--amb); }
+  .filtro-res.nao { background:rgba(255,94,91,.12); color:var(--warn); }
+  .obj p { margin:8px 0; font-size:14px; line-height:1.5; }
+  .obj b { color:var(--text); }
+  .rodape { position:fixed; left:0; right:0; bottom:0; background:rgba(14,14,16,.95); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-top:1px solid var(--bd); padding:12px 16px calc(12px + env(safe-area-inset-bottom)); }
+  .rodape .wrap { display:flex; gap:10px; align-items:center; }
+  .btn { border:0; border-radius:12px; padding:14px 18px; font:700 15px var(--fD); cursor:pointer; }
+  .btn-env { flex:1; background:var(--pur); color:#fff; }
+  .btn-env:disabled { opacity:.5; cursor:default; }
+  .btn-limpar { background:transparent; color:var(--muted); border:1px solid var(--bd-b); }
+  .msg { font-size:13px; margin-top:8px; min-height:18px; }
+  .msg.ok { color:var(--neon); } .msg.erro { color:var(--warn); }
+</style>
+</head>
+<body>
+<script>
+// Login: a mesma sessão do painel Epos (sem sessão válida → tela de login)
+(function () {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || 'null'); } catch (e) {}
+  if (!s || !s.access_token || (s.expires_at || 0) * 1000 < Date.now()) { location.replace('login-epos.html'); throw new Error('login'); }
+  window._TOKEN = s.access_token;
+})();
+</script>
+
+<div class="topo">
+  <h1>Guia de <span>ligação</span></h1>
+  <div class="timer" id="timer" title="Toque para iniciar ou pausar; segure para zerar">5:00</div>
+</div>
+
+<div class="wrap">
+  <div class="cliente">
+    <label class="tit" for="cli-nome">Cliente</label>
+    <input type="text" id="cli-nome" placeholder="Nome do cliente ou da empresa" autocomplete="off">
+    <div class="sug" id="sug"></div>
+    <div class="lead-ok" id="lead-ok"></div>
+  </div>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>1. Abertura e combinado</h2><span>0:00–0:30</span></div>
+    <details class="fala" open><summary>O que falar</summary>
+      <p>"Oi <b class="nm">[nome]</b>, aqui é o Thiago, da Epos, tudo bem? Combinamos 5 minutinhos. Ainda é um bom momento?"</p>
+      <p>"Quero entender três coisas rápidas e, se fizer sentido, a gente marca uma apresentação onde eu te mostro como resolveria. Se eu achar que não faz sentido, te falo com sinceridade. Pode ser?"</p>
+    </details>
+    <label class="check"><input type="checkbox" data-k="abertura_momento"> Confirmou que é um bom momento</label>
+    <label class="check"><input type="checkbox" data-k="abertura_objetivo"> Combinou o objetivo da ligação</label>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>2. Como vende hoje</h2><span>0:30–1:00</span></div>
+    <details class="fala"><summary>O que falar</summary>
+      <p>"Hoje, de onde vem quem compra de você? Loja, Instagram, WhatsApp, indicação?" · "Quem responde o WhatsApp e o direct?"</p>
+    </details>
+    <div class="campo"><span>Onde vende</span>
+      <div class="chips" data-k="onde_vende">
+        <button type="button" class="chip">Loja física</button><button type="button" class="chip">Instagram</button><button type="button" class="chip">WhatsApp</button>
+        <button type="button" class="chip">Site</button><button type="button" class="chip">Indicação</button><button type="button" class="chip">Anúncio</button>
+      </div>
+    </div>
+    <div class="duas">
+      <div class="campo"><span>Quem atende o WhatsApp / direct</span><input type="text" data-k="quem_atende"></div>
+      <div class="campo"><span>Valor médio da venda</span><input type="text" data-k="valor_medio" inputmode="decimal"></div>
+    </div>
+    <div class="campo"><span>Vendas ou contatos por semana pelo celular</span><input type="text" data-k="vendas_celular"></div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>3. Problema e consequência</h2><span>1:00–2:00</span></div>
+    <details class="fala"><summary>O que falar</summary>
+      <p>"Você comentou que [dor do raio-X ou da conversa]. Me conta como é isso no dia a dia."</p>
+      <p>"Quando alguém pergunta o preço e some, o que acontece?" · "Se os próximos meses rodarem igual ao último, como fica?"</p>
+    </details>
+    <div class="campo"><span>Principal problema, nas palavras do cliente</span><textarea data-k="problema"></textarea></div>
+    <div class="campo"><span>O que acontece com quem pergunta e some</span><textarea data-k="some"></textarea></div>
+    <div class="campo"><span>Se nada mudar…</span><textarea data-k="consequencia"></textarea></div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>4. O que quer e o que já tentou</h2><span>2:00–3:00</span></div>
+    <details class="fala"><summary>O que falar</summary>
+      <p>"O que você já tentou? Impulsionar, alguém cuidando do Instagram, agência? O que funcionou e o que não funcionou?"</p>
+      <p>"Se desse certo, o que mudaria para você?"</p>
+    </details>
+    <div class="campo"><span>Já tentou (e como foi)</span><textarea data-k="ja_tentou"></textarea></div>
+    <div class="campo"><span>Como seria o sucesso para ele</span><textarea data-k="sucesso"></textarea></div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>5. Ponte</h2><span>3:00–3:40</span></div>
+    <details class="fala"><summary>O que falar</summary>
+      <p>"Pelo que você falou, [repetir a dor nas palavras dele]. A gente faz duas coisas que se completam: anúncio para trazer quem compra, não curioso, e uma IA no WhatsApp que responde na hora, de dia, à noite e no fim de semana, e encaminha para você fechar. Diferente de impulsionar post, o anúncio já chega com alguém respondendo."</p>
+      <p><b>Não prometa resultado.</b> A prova é mostrar funcionando na apresentação.</p>
+    </details>
+    <label class="check"><input type="checkbox" data-k="ponte_feita"> Fiz a ponte com as palavras do cliente</label>
+    <div class="campo"><span>Frase dele que eu repeti</span><input type="text" data-k="ponte_frase"></div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>6. Quem decide e quanto investe</h2><span>3:40–4:20</span></div>
+    <details class="fala"><summary>O que falar</summary>
+      <p>"Além de você, alguém decide junto?" · "Você já separou algum valor para divulgação, mesmo que pequeno?"</p>
+    </details>
+    <div class="duas">
+      <div class="campo"><span>Quem decide</span><input type="text" data-k="decisor"></div>
+      <div class="campo"><span>Verba (atual ou disposto)</span><input type="text" data-k="verba"></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>7. Fechar a data</h2><span>4:20–5:00</span></div>
+    <details class="fala"><summary>O que falar</summary>
+      <p>"Faz sentido eu te mostrar isso funcionando, montado para o seu caso. É uma apresentação de 1 hora pelo Google Meet. Fica melhor [dia A] às [hora] ou [dia B] às [hora]?"</p>
+      <p>"Fica num lugar tranquilo, de preferência no computador. Se alguém decide com você, chama para estar junto. Te mando o convite agora e um lembrete no dia."</p>
+    </details>
+    <div class="campo"><span>Apresentação</span>
+      <div class="chips" data-k="apresentacao" data-um="1">
+        <button type="button" class="chip" data-v="sim">Marcada</button><button type="button" class="chip" data-v="ainda">Ainda não</button><button type="button" class="chip" data-v="nao">Não faz sentido</button>
+      </div>
+    </div>
+    <div class="campo"><span>Data e hora da apresentação</span><input type="datetime-local" data-k="apresentacao_data"></div>
+    <div class="campo"><span>Próximo passo combinado</span><textarea data-k="proximo_passo"></textarea></div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>Vale a apresentação de 1 h?</h2><span>filtro</span></div>
+    <label class="check"><input type="checkbox" data-k="filtro.perfil"> <span><b>Perfil:</b> vende pelo celular e o valor da venda comporta anúncio + IA</span></label>
+    <label class="check"><input type="checkbox" data-k="filtro.interesse"> <span><b>Interesse:</b> contou a dor com detalhe, disse que quer</span></label>
+    <label class="check"><input type="checkbox" data-k="filtro.momento"> <span><b>Momento:</b> quer resultado agora (data, temporada, meta)</span></label>
+    <label class="check"><input type="checkbox" data-k="filtro.decisao"> <span><b>Decisão e verba:</b> decide (ou traz quem decide) e tem algum valor</span></label>
+    <div class="filtro-res nao" id="filtro-res">0 de 4 → agradecer e deixar a porta aberta</div>
+  </section>
+
+  <section class="bloco">
+    <div class="bloco-tit"><h2>Observações</h2><span>livre</span></div>
+    <textarea data-k="observacoes" style="min-height:100px" placeholder="Tudo o que não coube acima: números, nomes, datas, oportunidades…"></textarea>
+  </section>
+
+  <section class="bloco obj">
+    <details><summary style="cursor:pointer;font-weight:700">Se ele disser… (objeções)</summary>
+      <p><b>"Quanto custa?"</b> — "Justo perguntar. Antes, quanto você estima que deixa de vender por mês com quem pergunta e some? Dá para contratar tudo ou só uma parte; na apresentação te mostro as opções com valor, do tamanho do seu negócio."</p>
+      <p><b>"Não tenho dinheiro para anunciar."</b> — "O que pesa mais: o valor ou o medo de gastar e não vender? Dá para começar pelo atendimento, que não depende de anúncio."</p>
+      <p><b>"Me manda por WhatsApp."</b> — "Mando um resumo, sim. Mas o que te ajuda a decidir é ver funcionando com o seu caso. Qual dia fica melhor?"</p>
+      <p><b>"Vou pensar."</b> — "Claro. O que você precisaria ver para ter certeza? Vamos deixar marcado; se não fizer sentido, você cancela."</p>
+      <p><b>"Já tenho alguém."</b> — "Ótimo, a gente soma. Quem responde quem chama à noite e no domingo hoje?"</p>
+    </details>
+  </section>
+</div>
+
+<div class="rodape">
+  <div class="wrap">
+    <button class="btn btn-limpar" id="btn-limpar" type="button">Limpar</button>
+    <button class="btn btn-env" id="btn-env" type="button">Salvar e enviar</button>
+  </div>
+  <div class="wrap"><div class="msg" id="msg"></div></div>
+</div>
+
+<script>
+const SB = 'https://phszzzwqkujmmfregtsj.supabase.co';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+const URL_ENVIO = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-guia-ligacao';
+const RASC = 'guia_ligacao_rascunho';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+let lead = null;   // { telefone, nome }
+
+// ── estado ⇄ campos ──
+function coletar() {
+  const r = { filtro: {} };
+  $$('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    let v;
+    if (el.classList.contains('chips')) {
+      const on = [...el.querySelectorAll('.chip.on')].map(c => c.dataset.v || c.textContent.trim());
+      v = el.dataset.um ? (on[0] || '') : on;
+    } else if (el.type === 'checkbox') v = el.checked;
+    else v = el.value;
+    if (k.startsWith('filtro.')) r.filtro[k.slice(7)] = v; else r[k] = v;
+  });
+  return r;
+}
+function aplicar(r) {
+  $$('[data-k]').forEach(el => {
+    const k = el.dataset.k, v = k.startsWith('filtro.') ? (r.filtro || {})[k.slice(7)] : r[k];
+    if (v === undefined) return;
+    if (el.classList.contains('chips')) el.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', [].concat(v).includes(c.dataset.v || c.textContent.trim())));
+    else if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v;
+  });
+}
+function salvarRascunho() {
+  try { localStorage.setItem(RASC, JSON.stringify({ cliente: $('#cli-nome').value, lead, respostas: coletar() })); } catch (e) {}
+  atualizarFiltro(); nomeNasFalas();
+}
+function atualizarFiltro() {
+  const f = coletar().filtro, n = ['perfil', 'interesse', 'momento', 'decisao'].filter(k => f[k]).length;
+  const el = $('#filtro-res');
+  el.className = 'filtro-res ' + (n >= 3 ? 'ok' : n >= 1 ? 'meio' : 'nao');
+  el.textContent = `${n} de 4 → ` + (n >= 3 ? 'marcar a apresentação' : n >= 1 ? 'marcar, mostrando só uma parte do Método' : 'agradecer e deixar a porta aberta');
+}
+function nomeNasFalas() {
+  const n = ($('#cli-nome').value || '').trim().split(/\s+/)[0] || '[nome]';
+  $$('.nm').forEach(b => b.textContent = n);
+}
+
+// ── chips ──
+$$('.chips').forEach(g => g.addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  if (g.dataset.um) g.querySelectorAll('.chip').forEach(x => x !== c && x.classList.remove('on'));
+  c.classList.toggle('on'); salvarRascunho();
+}));
+document.addEventListener('input', e => { if (e.target.closest('[data-k]') || e.target.id === 'cli-nome') salvarRascunho(); });
+document.addEventListener('change', e => { if (e.target.closest('[data-k]')) salvarRascunho(); });
+
+// ── busca do lead no CRM ──
+let _tBusca;
+$('#cli-nome').addEventListener('input', () => {
+  lead = null; $('#lead-ok').textContent = '';
+  clearTimeout(_tBusca);
+  const q = $('#cli-nome').value.trim();
+  if (q.length < 2) { $('#sug').style.display = 'none'; return; }
+  _tBusca = setTimeout(async () => {
+    try {
+      const termo = encodeURIComponent('*' + q.replace(/[(),*]/g, ' ') + '*');
+      const r = await fetch(`${SB}/rest/v1/leads?or=(nome.ilike.${termo},telefone.ilike.${termo})&select=telefone,nome,crm_stage&order=criado_em.desc&limit=6`,
+        { headers: { apikey: ANON, Authorization: 'Bearer ' + window._TOKEN } });
+      const ls = r.ok ? await r.json() : [];
+      const box = $('#sug');
+      box.innerHTML = ls.map(l => `<button type="button" data-t="${l.telefone}" data-n="${(l.nome || '').replace(/"/g, '&quot;')}"><span>${(l.nome || 'Sem nome').replace(/</g, '&lt;')}</span><small>${l.telefone} · ${l.crm_stage || ''}</small></button>`).join('')
+        + `<button type="button" data-t="" data-n=""><span>Usar só o nome digitado (sem lead do CRM)</span><small>novo</small></button>`;
+      box.style.display = 'block';
+    } catch (e) {}
+  }, 300);
+});
+$('#sug').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.t) { lead = { telefone: b.dataset.t, nome: b.dataset.n }; $('#cli-nome').value = b.dataset.n; $('#lead-ok').textContent = '✓ Ligado ao lead ' + b.dataset.t + ' (a ligação vai para as notas dele)'; }
+  else { lead = null; $('#lead-ok').textContent = ''; }
+  $('#sug').style.display = 'none'; salvarRascunho();
+});
+document.addEventListener('click', e => { if (!e.target.closest('.cliente')) $('#sug').style.display = 'none'; });
+
+// ── cronômetro de 5 min (toque: inicia/pausa; segurar: zera) ──
+let _seg = 300, _iv = null, _press;
+function pintarTimer() {
+  const t = $('#timer'), s = Math.abs(_seg);
+  t.textContent = (_seg < 0 ? '-' : '') + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  t.classList.toggle('rodando', !!_iv && _seg > 60); t.classList.toggle('fim', _seg <= 60);
+}
+$('#timer').addEventListener('click', () => {
+  if (_iv) { clearInterval(_iv); _iv = null; } else _iv = setInterval(() => { _seg--; pintarTimer(); }, 1000);
+  pintarTimer();
+});
+$('#timer').addEventListener('pointerdown', () => { _press = setTimeout(() => { clearInterval(_iv); _iv = null; _seg = 300; pintarTimer(); }, 700); });
+['pointerup', 'pointerleave'].forEach(ev => $('#timer').addEventListener(ev, () => clearTimeout(_press)));
+
+// ── limpar / enviar ──
+$('#btn-limpar').addEventListener('click', () => {
+  if (!confirm('Limpar o guia para uma nova ligação?')) return;
+  try { localStorage.removeItem(RASC); } catch (e) {}
+  location.reload();
+});
+$('#btn-env').addEventListener('click', async () => {
+  const cliente = $('#cli-nome').value.trim(), msg = $('#msg'), btn = $('#btn-env');
+  if (!cliente) { msg.className = 'msg erro'; msg.textContent = 'Coloque o nome do cliente no topo.'; $('#cli-nome').focus(); return; }
+  btn.disabled = true; msg.className = 'msg'; msg.textContent = 'Salvando e mandando…';
+  try {
+    const r = await fetch(URL_ENVIO, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: window._TOKEN, cliente, lead_telefone: lead ? lead.telefone : '', respostas: coletar() }) });
+    const j = await r.json().catch(() => ({}));
+    if (!j.ok) throw new Error(j.erro || ('erro ' + r.status));
+    msg.className = 'msg ok';
+    msg.textContent = '✓ Salvo' + (j.nota ? ', anotado no lead' : '') + (j.whatsapp ? ' e enviado no seu WhatsApp.' : '. (O WhatsApp não saiu agora; o resumo ficou salvo.)');
+    try { localStorage.removeItem(RASC); } catch (e) {}
+    btn.textContent = 'Enviado ✓';
+  } catch (e) {
+    msg.className = 'msg erro'; msg.textContent = 'Não consegui enviar: ' + e.message + '. O rascunho continua salvo aqui.';
+    btn.disabled = false;
+  }
+});
+
+// ── rascunho salvo ──
+try {
+  const d = JSON.parse(localStorage.getItem(RASC) || 'null');
+  if (d) { $('#cli-nome').value = d.cliente || ''; lead = d.lead || null; if (lead) $('#lead-ok').textContent = '✓ Ligado ao lead ' + lead.telefone; aplicar(d.respostas || {}); }
+} catch (e) {}
+atualizarFiltro(); nomeNasFalas(); pintarTimer();
+</script>
+</body>
+</html>
