@@ -2143,6 +2143,102 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .num-pend { opacity:.85; }
     .num-pend p { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.45; }
     .num-vazio { color:var(--muted); font-size:13px; padding:12px 0; }
+    /* 16/11: Instagram no estilo do painel profissional da Meta (perfil, grade de conteúdos, detalhe do post) */
+    .ig-perfil { display:flex; align-items:center; gap:14px; margin:2px 0 14px; }
+    .ig-ava { width:60px; height:60px; border-radius:50%; padding:2.5px; flex-shrink:0; background:conic-gradient(from 210deg,#FEDA75,#FA7E1E,#D62976,#962FBF,#4F5BD5,#FEDA75); }
+    .ig-ava img { width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; border:2.5px solid var(--bg2); background:var(--bg3); }
+    .ig-pinfo { min-width:0; }
+    .ig-nome { font-family:var(--fD); font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ig-user { color:var(--muted); font-size:13px; }
+    .ig-stats { display:flex; gap:14px; flex-wrap:wrap; margin-top:5px; font-size:13px; color:var(--muted); }
+    .ig-stats b { color:var(--text); font-weight:700; }
+    .ig-abrir { margin-left:auto; align-self:flex-start; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--text); text-decoration:none; border:1px solid var(--bd-b); padding:7px 11px; border-radius:8px; white-space:nowrap; }
+    .ig-abrir:hover { background:var(--surface-h); }
+    .ig-abrir svg, .ig-ver svg { width:13px; height:13px; }
+    .ig-bar { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin:6px 0 10px; }
+    .ig-chips { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+    .ig-chips::-webkit-scrollbar { display:none; }
+    .ig-chip { padding:6px 12px; border-radius:999px; border:1px solid var(--bd-b); background:transparent; color:var(--text); font:600 12px var(--fD); cursor:pointer; white-space:nowrap; }
+    .ig-chip span { color:var(--muted); font-weight:500; margin-left:2px; }
+    .ig-chip.on { background:var(--text); color:var(--bg); border-color:var(--text); }
+    .ig-chip.on span { color:var(--bg); opacity:.6; }
+    .ig-ctl { display:flex; gap:6px; align-items:center; }
+    .ig-sel-w { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--fD); font-weight:600; }
+    .ig-sel { appearance:none; -webkit-appearance:none; background:var(--bg3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; border:1px solid var(--bd-b); color:var(--text); font:600 12px var(--fD); padding:7px 28px 7px 11px; border-radius:8px; cursor:pointer; text-transform:none; letter-spacing:0; }
+    .ig-ord { display:inline-flex; border:1px solid var(--bd-b); border-radius:8px; overflow:hidden; }
+    .ig-ord button { background:transparent; border:0; color:var(--muted); font:600 12px var(--fD); padding:7px 11px; cursor:pointer; }
+    .ig-ord button.on { background:var(--pur-l); color:var(--text); }
+    .ig-grade { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:6px; }
+    .ig-tile { position:relative; aspect-ratio:3/4; overflow:hidden; border-radius:8px; background:var(--bg3); cursor:pointer; border:0; padding:0; display:block; width:100%; color:#fff; font-family:var(--fD); animation:igIn .45s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i) * 22ms); }
+    .ig-tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; transition:transform .6s cubic-bezier(.2,.7,.2,1); }
+    .ig-tile::after { content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(to top, rgba(0,0,0,.74) 0%, rgba(0,0,0,0) 40%), linear-gradient(to bottom, rgba(0,0,0,.32) 0%, rgba(0,0,0,0) 20%); }
+    .ig-tile:focus-visible { outline:2px solid var(--purple); outline-offset:2px; }
+    .ig-falha { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--dim); }
+    .ig-falha svg { width:26px; height:26px; }
+    .ig-tipo { position:absolute; top:8px; right:8px; z-index:2; width:18px; height:18px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.55)); }
+    .ig-tipo svg { width:18px; height:18px; display:block; }
+    .ig-rank { position:absolute; top:8px; left:8px; z-index:2; font:700 10px var(--fM); color:#0E0E10; background:#00F5A0; padding:2px 7px; border-radius:999px; letter-spacing:.02em; }
+    .ig-val { position:absolute; left:9px; bottom:10px; z-index:2; display:flex; align-items:center; gap:5px; font-weight:700; font-size:13.5px; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+    .ig-val svg { width:15px; height:15px; }
+    .ig-medidor { position:absolute; left:0; bottom:0; height:3px; z-index:3; background:#9146FF; border-radius:0 2px 2px 0; }
+    .ig-hover { position:absolute; inset:0; z-index:4; background:rgba(10,8,16,.8); display:flex; flex-direction:column; justify-content:center; gap:7px; padding:12px; opacity:0; transition:opacity .18s; text-align:left; font-size:12px; }
+    .ig-hover small { font:600 10px var(--fM); letter-spacing:.06em; color:rgba(255,255,255,.6); margin-bottom:2px; }
+    .ig-hover div { display:flex; align-items:center; gap:7px; }
+    .ig-hover svg { width:14px; height:14px; flex-shrink:0; }
+    .ig-hover span { font-weight:700; }
+    .ig-hover em { font-style:normal; color:rgba(255,255,255,.62); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    @media (hover:hover) { .ig-tile:hover img { transform:scale(1.05); } .ig-tile:hover .ig-hover { opacity:1; } }
+    @keyframes igIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    @keyframes igFade { from { opacity:0; } to { opacity:1; } }
+    @keyframes igSobe { from { transform:translateY(100%); } to { transform:none; } }
+    .ig-det-bg { position:fixed; inset:0; z-index:10050; background:rgba(0,0,0,.62); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:24px; animation:igFade .18s; }
+    .ig-det { position:relative; background:var(--bg2); border:1px solid var(--bd-b); border-radius:14px; width:min(880px, 100%); max-height:calc(100vh - 48px); display:grid; grid-template-columns:minmax(0, 360px) minmax(0, 1fr); overflow:hidden; box-shadow:0 30px 90px rgba(0,0,0,.55); }
+    .ig-pega { display:none; }
+    .ig-det-midia { position:relative; background:#000; min-height:420px; }
+    .ig-det-midia img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+    .ig-nav { position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; border:0; background:rgba(255,255,255,.88); color:#111; font-size:20px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.35); }
+    .ig-ant { left:10px; } .ig-prox { right:10px; }
+    .ig-det-info { padding:18px 20px; overflow:auto; display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .ig-det-top { display:flex; align-items:center; gap:10px; }
+    .ig-det-top img { width:34px; height:34px; border-radius:50%; object-fit:cover; }
+    .ig-det-top b { display:block; font-family:var(--fD); font-size:14px; }
+    .ig-det-top small { color:var(--muted); font-size:12px; }
+    .ig-fechar { margin-left:auto; width:32px; height:32px; border-radius:50%; border:1px solid var(--bd-b); background:transparent; color:var(--text); font-size:15px; cursor:pointer; flex-shrink:0; }
+    .ig-det-leg { margin:0; font-size:13px; line-height:1.55; white-space:pre-line; color:var(--text); max-height:8.5em; overflow:auto; }
+    .ig-det-dest { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .ig-det-big { background:var(--surface); border:1px solid var(--bd); border-radius:10px; padding:12px 14px; }
+    .ig-det-big small { display:block; font:600 10px var(--fD); letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+    .ig-det-big b { display:block; font:700 28px var(--fD); letter-spacing:-.02em; margin:4px 0 2px; }
+    .ig-x { font-size:11.5px; font-weight:600; }
+    .ig-x.up { color:var(--neon); } .ig-x.down { color:var(--warn); }
+    .ig-det-tab { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--bd); border:1px solid var(--bd); border-radius:10px; overflow:hidden; }
+    .ig-det-tab div { background:var(--bg2); padding:10px 12px; display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); min-width:0; }
+    .ig-det-tab svg { width:15px; height:15px; flex-shrink:0; }
+    .ig-det-tab span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ig-det-tab b { margin-left:auto; color:var(--text); font:700 14px var(--fD); }
+    .ig-det-tab div:last-child:nth-child(odd) { grid-column:1 / -1; }
+    .ig-det-pe { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:4px; }
+    .ig-det-pe > span { font:500 11px var(--fM); color:var(--muted); }
+    .ig-ver { display:inline-flex; align-items:center; gap:7px; background:var(--purple); color:#fff; text-decoration:none; font:700 13px var(--fD); padding:10px 16px; border-radius:9px; }
+    @media (max-width:768px) {
+      .ig-grade { grid-template-columns:repeat(3, 1fr); gap:3px; }
+      .ig-tile { border-radius:3px; }
+      .ig-val { font-size:12px; left:6px; bottom:8px; } .ig-val svg { width:13px; height:13px; }
+      .ig-tipo { top:6px; right:6px; width:15px; height:15px; } .ig-tipo svg { width:15px; height:15px; }
+      .ig-rank { top:6px; left:6px; }
+      .ig-abrir span { display:none; } .ig-abrir { padding:8px; }
+      .ig-ctl { width:100%; } .ig-sel-w { flex:1; } .ig-sel { flex:1; width:100%; }
+      .ig-det-bg { align-items:flex-end; padding:0; }
+      .ig-det { grid-template-columns:1fr; border-radius:18px 18px 0 0; max-height:90vh; overflow:auto; animation:igSobe .3s cubic-bezier(.2,.8,.2,1); border-bottom:0; }
+      .ig-pega { display:block; position:absolute; top:7px; left:50%; transform:translateX(-50%); width:38px; height:4px; border-radius:2px; background:rgba(255,255,255,.55); z-index:2; }
+      .ig-det-midia { min-height:0; height:42vh; }
+      .ig-det-info { overflow:visible; padding:16px 16px 22px; }
+      .ig-det-big b { font-size:24px; }
+      .ig-det-tab { grid-template-columns:1fr; }
+      .ig-det-pe { flex-direction:column-reverse; align-items:stretch; } .ig-ver { justify-content:center; padding:12px 16px; }
+      .ig-stats { gap:2px 12px; font-size:12.5px; }
+    }
+    @media (prefers-reduced-motion:reduce) { .ig-tile, .ig-det, .ig-det-bg { animation:none; } .ig-tile img { transition:none; } }
   </style>
   <div id="num-corpo"><div class="num-vazio">Carregando…</div></div>
 </section>
@@ -7756,6 +7852,132 @@ function numBarras(pts, titulo) {
   return `<div class="num-sub-tit">${titulo || 'Alcance por dia'}</div><div class="num-barras">` + pts.map(p =>
     `<div class="num-barra" title="${numDia(p.dia)}: ${numFmt(p.v)}"><i style="height:${Math.max(2, Math.round(p.v / max * 82))}px"></i><small>${p.dia.slice(8, 10)}</small></div>`).join('') + '</div>';
 }
+// ═══ Instagram no estilo do painel profissional da Meta (16/11) ═══
+const NUM_IG_ICO = {
+  olho: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  pessoas: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.6 14.8c1.6.8 2.6 2.4 2.9 5.2"/>',
+  raio: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  coracao: '<path d="M12 20.5s-7.6-4.5-9.3-9.3C1.4 7.6 3.7 4 7.3 4c2.1 0 3.6 1.1 4.7 2.7C13.1 5.1 14.6 4 16.7 4c3.6 0 5.9 3.6 4.6 7.2-1.7 4.8-9.3 9.3-9.3 9.3z"/>',
+  balao: '<path d="M20.6 15.6A8.9 8.9 0 1 0 12 20.9c1.6 0 3.1-.4 4.4-1.1L21 21z"/>',
+  aviao: '<path d="M22 3 10.5 11.2M22 3l-6.8 18-3.7-9.3L3 8.4z"/>',
+  marcador: '<path d="M19 21l-7-5.2L5 21V4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5z"/>',
+  relogio: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',
+  grafico: '<path d="M3 20h18M6 16l4-5 3.5 3L19 7"/>',
+  reel: '<rect x="2.5" y="2.5" width="19" height="19" rx="5"/><path d="M2.5 8.2h19M8.2 2.5l3 5.7M14.6 2.5l3 5.7"/><path d="M10 11.6v6.2l5.3-3.1z" fill="currentColor" stroke="none"/>',
+  carrossel: '<rect x="7" y="7" width="14" height="14" rx="2.5"/><path d="M16.8 3H5.6A2.6 2.6 0 0 0 3 5.6v11.2"/>',
+  play: '<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
+  imagem: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15.5l-5-5L5 21"/>',
+  fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+};
+function numIco(k) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NUM_IG_ICO[k] || ''}</svg>`; }
+const NUM_IG_MET = [['views', 'Visualizações', 'olho'], ['alcance', 'Alcance', 'pessoas'], ['interacoes', 'Interações', 'raio'], ['curtidas', 'Curtidas', 'coracao'],
+  ['comentarios', 'Comentários', 'balao'], ['compartilhamentos', 'Compartilhamentos', 'aviao'], ['salvos', 'Salvamentos', 'marcador']];
+const NUM_IG_TIPOS = { reel: ['Reels', 'reel', 'Reel'], carrossel: ['Carrosséis', 'carrossel', 'Carrossel'], foto: ['Fotos', '', 'Foto'], video: ['Vídeos', 'play', 'Vídeo'] };
+const _numIg = {};   // id do bloco → { perfil, lista, foto, tipo, met, ord }
+let _numIgAberto = null;
+function numIgId(perfil) { return 'ig-' + String(perfil).replace(/[^a-z0-9]/gi, ''); }
+function numIgMets(st) { return NUM_IG_MET.filter(([k]) => st.lista.some(c => c[k] != null)); }
+function numIgVisiveis(st) {
+  const l = st.lista.filter(c => st.tipo === 'todos' || c.tipo === st.tipo);
+  return st.ord === 'top' ? [...l].sort((a, b) => (Number(b[st.met]) || 0) - (Number(a[st.met]) || 0))
+                          : [...l].sort((a, b) => String(b.quando || '').localeCompare(String(a.quando || '')));
+}
+function numIgPerfil(perfil, nome, foto, seg) {
+  return `<div class="ig-perfil"><div class="ig-ava">${foto ? `<img src="${escHtml(foto)}" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">` : ''}</div>`
+    + `<div class="ig-pinfo"><div class="ig-nome">${escHtml(nome || perfil)}</div><div class="ig-user">${escHtml(perfil)}</div>`
+    + `<div class="ig-stats"><span><b>${numFmt(seg.posts)}</b> posts</span><span><b>${numFmt(seg.seguidores)}</b> seguidores</span><span><b>${numFmt(seg.seguindo)}</b> seguindo</span></div></div>`
+    + `<a class="ig-abrir" href="https://www.instagram.com/${escHtml(String(perfil).replace('@', ''))}/" target="_blank" rel="noopener" aria-label="Abrir perfil no Instagram"><span>Abrir perfil</span>${numIco('fora')}</a></div>`;
+}
+function numIgSecao(perfil, lista, foto) {
+  const id = numIgId(perfil);
+  const st = _numIg[id] = Object.assign({ tipo: 'todos', ord: 'recente' }, _numIg[id] || {}, { perfil, lista, foto });
+  if (!st.met || !numIgMets(st).some(([k]) => k === st.met)) st.met = (numIgMets(st)[0] || ['curtidas'])[0];
+  return `<div class="ig-conteudo" id="${id}">${numIgCorpo(id)}</div>`;
+}
+function numIgCorpo(id) {
+  const st = _numIg[id], vis = numIgVisiveis(st), mets = numIgMets(st);
+  const tipos = Object.keys(NUM_IG_TIPOS).filter(tp => st.lista.some(c => c.tipo === tp));
+  const chips = [['todos', 'Todos', st.lista.length], ...tipos.map(tp => [tp, NUM_IG_TIPOS[tp][0], st.lista.filter(c => c.tipo === tp).length])]
+    .map(([tp, rot, n]) => `<button class="ig-chip${st.tipo === tp ? ' on' : ''}" onclick="numIgSet('${id}','tipo','${tp}')">${rot}<span>${n}</span></button>`).join('');
+  const opts = mets.map(([k, rot]) => `<option value="${k}"${k === st.met ? ' selected' : ''}>${rot}</option>`).join('');
+  const max = Math.max(1, ...vis.map(c => Number(c[st.met]) || 0));
+  const icoMet = (NUM_IG_MET.find(m => m[0] === st.met) || [])[2] || 'coracao';
+  const tiles = vis.map((c, i) => {
+    const v = Number(c[st.met]) || 0, tp = NUM_IG_TIPOS[c.tipo] || ['', '', 'Post'];
+    const hov = mets.slice(0, 5).map(([k, rot, ic]) => c[k] != null ? `<div>${numIco(ic)}<span>${numFmt(c[k])}</span><em>${rot}</em></div>` : '').join('');
+    return `<button class="ig-tile" style="--i:${i}" onclick="numIgAbrir('${id}','${escHtml(c.id)}')" aria-label="${tp[2]} de ${numDia(String(c.quando || '').slice(0, 10))}: ${numFmt(v)}">`
+      + `<span class="ig-falha">${numIco(tp[1] || 'imagem')}</span>`
+      + (c.thumb ? `<img src="${escHtml(c.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '')
+      + (tp[1] ? `<span class="ig-tipo">${numIco(tp[1])}</span>` : '')
+      + (st.ord === 'top' && i < 3 && v > 0 ? `<span class="ig-rank">#${i + 1}</span>` : '')
+      + `<span class="ig-val">${numIco(icoMet)}${numFmt(v)}</span><span class="ig-medidor" style="width:${Math.round(v / max * 100)}%"></span>`
+      + `<span class="ig-hover"><small>${numDia(String(c.quando || '').slice(0, 10))}</small>${hov}</span></button>`;
+  }).join('');
+  return `<div class="ig-bar"><div class="ig-chips">${chips}</div><div class="ig-ctl">`
+    + `<label class="ig-sel-w">Mostrar <select class="ig-sel" onchange="numIgSet('${id}','met',this.value)">${opts}</select></label>`
+    + `<div class="ig-ord"><button class="${st.ord === 'recente' ? 'on' : ''}" onclick="numIgSet('${id}','ord','recente')">Recentes</button>`
+    + `<button class="${st.ord === 'top' ? 'on' : ''}" onclick="numIgSet('${id}','ord','top')">Melhores</button></div></div></div>`
+    + `<div class="ig-grade">${tiles || '<div class="num-vazio">Nenhum conteúdo deste tipo.</div>'}</div>`;
+}
+function numIgSet(id, k, v) {
+  const st = _numIg[id], el = document.getElementById(id);
+  if (!st || !el) return;
+  st[k] = v; el.innerHTML = numIgCorpo(id);
+}
+function numIgAbrir(id, cid) {
+  const st = _numIg[id]; if (!st) return;
+  const vis = numIgVisiveis(st), i = vis.findIndex(c => String(c.id) === String(cid));
+  if (i < 0) return;
+  _numIgAberto = { id, i };
+  let bg = document.getElementById('ig-det-bg');
+  if (!bg) {
+    bg = document.createElement('div'); bg.id = 'ig-det-bg'; bg.className = 'ig-det-bg';
+    bg.addEventListener('click', e => { if (e.target === bg) numIgFechar(); });
+    document.body.appendChild(bg);
+    document.addEventListener('keydown', e => {
+      if (!_numIgAberto) return;
+      if (e.key === 'Escape') numIgFechar(); else if (e.key === 'ArrowRight') numIgPassar(1); else if (e.key === 'ArrowLeft') numIgPassar(-1);
+    });
+  }
+  bg.innerHTML = numIgDetalhe(st, vis[i], i, vis.length);
+  bg.style.display = 'flex'; document.body.style.overflow = 'hidden';
+}
+function numIgFechar() {
+  const bg = document.getElementById('ig-det-bg');
+  if (bg) bg.style.display = 'none';
+  document.body.style.overflow = ''; _numIgAberto = null;
+}
+function numIgPassar(d) {
+  if (!_numIgAberto) return;
+  const st = _numIg[_numIgAberto.id], vis = numIgVisiveis(st);
+  numIgAbrir(_numIgAberto.id, vis[(_numIgAberto.i + d + vis.length) % vis.length].id);
+}
+function numIgDetalhe(st, c, i, n) {
+  const um = x => Number(x).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  const media = k => { const vs = st.lista.filter(x => x[k] != null).map(x => Number(x[k]) || 0); return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : 0; };
+  const vsMedia = k => {
+    const m = media(k); if (!m || c[k] == null) return '';
+    const r = (Number(c[k]) || 0) / m;
+    return `<span class="ig-x ${r >= 1 ? 'up' : 'down'}">${r >= 1 ? '▲' : '▼'} ${um(r)}× a média</span>`;
+  };
+  const princ = c.views != null ? [['views', 'Visualizações'], ['alcance', 'Alcance']] : [['curtidas', 'Curtidas'], ['comentarios', 'Comentários']];
+  const dest = princ.map(([k, rot]) => `<div class="ig-det-big"><small>${rot}</small><b>${numFmt(c[k])}</b>${vsMedia(k)}</div>`).join('');
+  const linhas = NUM_IG_MET.filter(([k]) => c[k] != null && !princ.some(([p]) => p === k)).map(([k, rot, ic]) => `<div>${numIco(ic)}<span>${rot}</span><b>${numFmt(c[k])}</b></div>`);
+  if (c.tempo_medio_s != null) linhas.push(`<div>${numIco('relogio')}<span>Tempo médio assistido</span><b>${um(c.tempo_medio_s)} s</b></div>`);
+  if (c.alcance && c.interacoes != null) linhas.push(`<div>${numIco('grafico')}<span>Engajamento</span><b>${um(c.interacoes / c.alcance * 100)}%</b></div>`);
+  const tp = NUM_IG_TIPOS[c.tipo] || ['', '', 'Post'];
+  const quando = c.quando ? new Date(c.quando).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+  const leg = String(c.legenda || '');
+  return `<div class="ig-det" role="dialog" aria-modal="true" aria-label="Detalhe do conteúdo"><span class="ig-pega"></span>`
+    + `<div class="ig-det-midia">${c.thumb ? `<img src="${escHtml(c.thumb)}" alt="" referrerpolicy="no-referrer">` : ''}`
+    + (n > 1 ? `<button class="ig-nav ig-ant" onclick="numIgPassar(-1)" aria-label="Anterior">‹</button><button class="ig-nav ig-prox" onclick="numIgPassar(1)" aria-label="Próximo">›</button>` : '') + '</div>'
+    + `<div class="ig-det-info"><div class="ig-det-top">${st.foto ? `<img src="${escHtml(st.foto)}" alt="" referrerpolicy="no-referrer">` : ''}`
+    + `<div><b>${escHtml(st.perfil)}</b><small>${tp[2]} · ${escHtml(quando)}</small></div><button class="ig-fechar" onclick="numIgFechar()" aria-label="Fechar">✕</button></div>`
+    + `<p class="ig-det-leg">${escHtml(leg || '(sem legenda)')}${leg.length >= 160 ? '…' : ''}</p>`
+    + `<div class="ig-det-dest">${dest}</div>` + (linhas.length ? `<div class="ig-det-tab">${linhas.join('')}</div>` : '')
+    + (c.views == null ? '<div class="num-aviso">Conta só com números públicos. Alcance e visualizações aparecem quando a página do Facebook entrar no acesso da Meta.</div>' : '')
+    + `<div class="ig-det-pe"><span>${i + 1} de ${n} · média dos últimos ${st.lista.length}</span><a class="ig-ver" href="${escHtml(c.link || '#')}" target="_blank" rel="noopener">Ver no Instagram ${numIco('fora')}</a></div></div></div>`;
+}
 function numCartaoInstagram(perfil, linhas) {
   const ult = linhas[linhas.length - 1] || {}, d = ult.dados || {};
   const comInsights = linhas.some(l => l.dados && l.dados.insights);
@@ -7775,8 +7997,11 @@ function numCartaoInstagram(perfil, linhas) {
   const posts = (d.posts_recentes || []).slice(0, 5).map(p =>
     `<a class="num-post" href="${escHtml(p.link || '#')}" target="_blank" rel="noopener"><span>${escHtml(p.texto || '(sem legenda)')}</span><b>♥ ${numFmt(p.curtidas)} · 💬 ${numFmt(p.comentarios)}</b></a>`).join('');
   const aviso = comInsights ? '' : '<div class="num-aviso">Só os números públicos. Para ver alcance e visitas, a página do Facebook desta conta precisa entrar no mesmo acesso da Meta.</div>';
-  return `<div class="num-card"><div class="num-card-tit">Instagram ${escHtml(perfil)} <span>atualizado em ${numDia(ult.dia)}</span></div>${aviso}<div class="kpi-row num-kpis">${kpis}</div>${barras}`
-    + (posts ? '<div class="num-sub-tit">Posts que mais renderam (curtidas e comentários)</div>' + posts : '') + '</div>';
+  const conts = numExtra(linhas, 'conteudos') || [], foto = numExtra(linhas, 'foto_perfil');   // 16/11: grade estilo Meta; sem conteudos, a lista antiga
+  const secao = conts.length ? `<div class="num-sub-tit">Conteúdo publicado · últimos ${conts.length}</div>` + numIgSecao(perfil, conts, foto)
+    : (posts ? '<div class="num-sub-tit">Posts que mais renderam (curtidas e comentários)</div>' + posts : '');
+  return `<div class="num-card"><div class="num-card-tit">Instagram <span>atualizado em ${numDia(ult.dia)}</span></div>${numIgPerfil(perfil, numExtra(linhas, 'nome'), foto, seg)}`
+    + `${aviso}<div class="kpi-row num-kpis">${kpis}</div>${barras}${secao}</div>`;
 }
 function numSoma(ls, k) { return ls.reduce((s, l) => s + (Number((l.dados || {})[k]) || 0), 0); }
 function numKpi(rot, val, sub) { return `<div class="kpi"><div class="kpi-lbl">${rot}</div><div class="kpi-val">${val}</div><div class="num-sub">${sub}</div></div>`; }
