@@ -7742,7 +7742,7 @@ async function labPodeVer() {
     if (an) an.style.display = adm === true ? '' : 'none';
   } catch (e) {}
 }
-// ═══ NÚMEROS (16/11): Instagram pela Meta; Google entra quando for conectado ═══
+// ═══ NÚMEROS (16/11): Instagram pela Meta; YouTube, site (GA4) e busca (Search Console) pelo Google ═══
 let _numDias = 7;
 function numFmt(n) { return n == null ? '—' : Number(n).toLocaleString('pt-BR'); }
 function numDia(s) { return s ? s.slice(8, 10) + '/' + s.slice(5, 7) : ''; }   // 'AAAA-MM-DD' sem passar por Date (fuso)
@@ -7751,9 +7751,9 @@ function numVar(a, b) {
   const p = Math.round((a - b) / b * 100);
   return `<span style="color:${p >= 0 ? 'var(--neon)' : 'var(--warn)'};font-weight:600">${p >= 0 ? '▲' : '▼'} ${Math.abs(p)}%</span> <span class="num-sub">vs ${_numDias} dias antes</span>`;
 }
-function numBarras(pts) {
+function numBarras(pts, titulo) {
   const max = Math.max(1, ...pts.map(p => p.v));
-  return '<div class="num-sub-tit">Alcance por dia</div><div class="num-barras">' + pts.map(p =>
+  return `<div class="num-sub-tit">${titulo || 'Alcance por dia'}</div><div class="num-barras">` + pts.map(p =>
     `<div class="num-barra" title="${numDia(p.dia)}: ${numFmt(p.v)}"><i style="height:${Math.max(2, Math.round(p.v / max * 82))}px"></i><small>${p.dia.slice(8, 10)}</small></div>`).join('') + '</div>';
 }
 function numCartaoInstagram(perfil, linhas) {
@@ -7778,10 +7778,58 @@ function numCartaoInstagram(perfil, linhas) {
   return `<div class="num-card"><div class="num-card-tit">Instagram ${escHtml(perfil)} <span>atualizado em ${numDia(ult.dia)}</span></div>${aviso}<div class="kpi-row num-kpis">${kpis}</div>${barras}`
     + (posts ? '<div class="num-sub-tit">Posts que mais renderam (curtidas e comentários)</div>' + posts : '') + '</div>';
 }
+function numSoma(ls, k) { return ls.reduce((s, l) => s + (Number((l.dados || {})[k]) || 0), 0); }
+function numKpi(rot, val, sub) { return `<div class="kpi"><div class="kpi-lbl">${rot}</div><div class="kpi-val">${val}</div><div class="num-sub">${sub}</div></div>`; }
+function numKpiVar(rot, rec, ant, k) { const a = numSoma(rec, k), b = numSoma(ant, k); return numKpi(rot, numFmt(a), numVar(a, b)); }
+function numExtra(linhas, k) { return (([...linhas].reverse().find(l => l.dados && l.dados[k] != null) || {}).dados || {})[k]; }
+function numDesde(linhas) {   // histórico menor que os dois períodos: avisa de quando vem
+  return linhas.length && linhas.length < 2 * _numDias ? `<div class="num-aviso">Histórico desde ${numDia(linhas[0].dia)}. A comparação com o período anterior fica completa com o tempo.</div>` : '';
+}
+function numItem(href, txt, val) {
+  return href ? `<a class="num-post" href="${escHtml(href)}" target="_blank" rel="noopener"><span>${escHtml(txt)}</span><b>${val}</b></a>`
+              : `<div class="num-post"><span>${escHtml(txt)}</span><b>${val}</b></div>`;
+}
+function numCartaoYoutube(perfil, linhas) {
+  const rec = linhas.slice(-_numDias), ant = linhas.slice(-2 * _numDias, -_numDias), ult = linhas[linhas.length - 1] || {};
+  const saldo = numSoma(rec, 'inscritos_ganhos') - numSoma(rec, 'inscritos_perdidos');
+  const kpis = numKpi('Inscritos', numFmt(numExtra(linhas, 'inscritos')), (saldo >= 0 ? '+' : '') + numFmt(saldo) + ' no período')
+    + numKpiVar('Visualizações', rec, ant, 'views') + numKpiVar('Minutos assistidos', rec, ant, 'minutos')
+    + numKpiVar('Curtidas', rec, ant, 'curtidas') + numKpiVar('Compartilhamentos', rec, ant, 'compartilhamentos');
+  const vids = (numExtra(linhas, 'top_videos') || []).map(v => numItem(v.link, v.titulo || '', `${numFmt(v.views)} views · ${numFmt(v.minutos)} min`)).join('');
+  return `<div class="num-card"><div class="num-card-tit">YouTube ${escHtml(numExtra(linhas, 'canal') || perfil)} <span>Studio · dados até ${numDia(ult.dia)}</span></div>${numDesde(linhas)}`
+    + `<div class="kpi-row num-kpis">${kpis}</div>` + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).views) || 0 })), 'Visualizações por dia')
+    + (vids ? '<div class="num-sub-tit">Vídeos mais vistos (últimos 28 dias)</div>' + vids : '') + '</div>';
+}
+const NUM_ORIGENS = { 'Direct': 'Direto (link ou digitado)', 'Organic Search': 'Busca do Google', 'Paid Search': 'Anúncio no Google', 'Organic Social': 'Redes sociais',
+  'Paid Social': 'Anúncio nas redes', 'Referral': 'Outros sites', 'Email': 'E-mail', 'Organic Video': 'Vídeo', 'Cross-network': 'Anúncio (várias redes)', 'Unassigned': 'Não identificado' };
+function numCartaoSite(perfil, linhas) {
+  const rec = linhas.slice(-_numDias), ant = linhas.slice(-2 * _numDias, -_numDias), ult = linhas[linhas.length - 1] || {};
+  let kpis = numKpiVar('Visitantes', rec, ant, 'usuarios') + numKpiVar('Visitas', rec, ant, 'sessoes') + numKpiVar('Páginas vistas', rec, ant, 'visualizacoes');
+  if (numSoma(linhas, 'conversoes') > 0) kpis += numKpiVar('Conversões', rec, ant, 'conversoes');
+  const pags = (numExtra(linhas, 'top_paginas') || []).map(x => numItem('https://' + perfil + x.pagina, x.pagina === '/' ? 'Página inicial' : x.pagina, numFmt(x.views))).join('');
+  const orig = (numExtra(linhas, 'origens') || []).map(o => numItem('', NUM_ORIGENS[o.canal] || o.canal, numFmt(o.sessoes) + (o.sessoes === 1 ? ' visita' : ' visitas'))).join('');
+  return `<div class="num-card"><div class="num-card-tit">Site ${escHtml(perfil)} <span>Google Analytics · dados até ${numDia(ult.dia)}</span></div>${numDesde(linhas)}`
+    + `<div class="kpi-row num-kpis">${kpis}</div>` + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).sessoes) || 0 })), 'Visitas por dia')
+    + (pags ? '<div class="num-sub-tit">Páginas mais vistas (últimos 28 dias)</div>' + pags : '')
+    + (orig ? '<div class="num-sub-tit">De onde vêm as visitas (últimos 28 dias)</div>' + orig : '') + '</div>';
+}
+function numCartaoBusca(perfil, linhas) {
+  const reais = linhas.filter(l => !(l.dados || {}).sem_dados);
+  const rec = reais.slice(-_numDias), ant = reais.slice(-2 * _numDias, -_numDias), ult = reais[reais.length - 1] || linhas[linhas.length - 1] || {};
+  const cl = numSoma(rec, 'cliques'), im = numSoma(rec, 'impressoes');
+  const pos = im ? rec.reduce((s, l) => s + (Number(l.dados.posicao) || 0) * (Number(l.dados.impressoes) || 0), 0) / im : 0;
+  const um = n => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  const kpis = numKpiVar('Cliques', rec, ant, 'cliques') + numKpiVar('Vezes que apareceu', rec, ant, 'impressoes')
+    + numKpi('Taxa de clique', im ? um(cl / im * 100) + '%' : '—', 'cliques ÷ vezes que apareceu')
+    + numKpi('Posição média', pos ? um(pos) : '—', 'quanto menor, mais no topo');
+  const bus = (numExtra(linhas, 'top_buscas') || []).map(q => numItem('', q.busca, `${numFmt(q.cliques)} cliques · ${numFmt(q.impressoes)}× · pos. ${um(Number(q.posicao) || 0)}`)).join('');
+  return `<div class="num-card"><div class="num-card-tit">Busca do Google ${escHtml(perfil)} <span>Search Console · dados até ${numDia(ult.dia)}</span></div>`
+    + '<div class="num-aviso">O Google entrega estes números com 2 a 3 dias de atraso.</div>'
+    + `<div class="kpi-row num-kpis">${kpis}</div>` + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).impressoes) || 0 })), 'Vezes que o site apareceu na busca, por dia')
+    + '<div class="num-sub-tit">Buscas em que o site apareceu (últimos 28 dias)</div>'
+    + (bus || '<div class="num-vazio">O Google ainda não mostrou nenhuma busca com o site nos últimos 28 dias.</div>') + '</div>';
+}
 const NUM_PENDENTES = [
-  ['YouTube e YouTube Studio', 'Inscritos, visualizações, tempo assistido e de onde vem o público.', 'APIs ativadas em 16/11. Falta conectar: o Thiago entra uma vez com a conta Google e autoriza.'],
-  ['Site (Google Analytics)', 'Visitas, páginas mais vistas e conversões do site.', 'APIs ativadas em 16/11. Falta conectar a conta Google.'],
-  ['Busca do Google (Search Console)', 'Buscas em que o site aparece, cliques e posição média.', 'APIs ativadas em 16/11. Falta conectar a conta Google.'],
   ['Google Meu Negócio', 'Visualizações do perfil, ligações, pedidos de rota e cliques no site.', 'O Google só libera a API 60 dias depois da validação do perfil (lembrete no WhatsApp em 15/01/2027). Até lá, os números ficam na aba "Desempenho" do próprio perfil.'],
 ];
 async function numLoad(dias) {
@@ -7793,9 +7841,13 @@ async function numLoad(dias) {
   let html = '';
   try {
     const { data } = await sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`);
-    const porPerfil = {};
-    for (const l of (data || [])) if (l.fonte === 'instagram') (porPerfil[l.perfil] = porPerfil[l.perfil] || []).push(l);
-    for (const [perfil, linhas] of Object.entries(porPerfil)) html += numCartaoInstagram(perfil, linhas);
+    const grupos = {};   // fonte|perfil → linhas por dia
+    for (const l of (data || [])) (grupos[l.fonte + '|' + l.perfil] = grupos[l.fonte + '|' + l.perfil] || []).push(l);
+    const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, busca: numCartaoBusca };
+    for (const f of Object.keys(CARTOES))
+      for (const [k, linhas] of Object.entries(grupos)) if (k.startsWith(f + '|')) {
+        try { html += CARTOES[f](k.slice(f.length + 1), linhas); } catch (e) { html += `<div class="num-vazio">Não consegui montar o cartão ${escHtml(k)}.</div>`; }
+      }
     if (!html) html = '<div class="num-vazio">Ainda não há números gravados. A rotina roda todo dia às 06h10.</div>';
   } catch (e) { html = '<div class="num-vazio">Não consegui ler os números agora.</div>'; }
   html += NUM_PENDENTES.map(([tit, oque, estado]) => `<div class="num-card num-pend"><div class="num-card-tit">${tit} <span>em breve</span></div><p>${oque}</p><p>${estado}</p></div>`).join('');
