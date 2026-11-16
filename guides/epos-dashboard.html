@@ -2188,6 +2188,15 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .ig-hover span { font-weight:700; }
     .ig-hover em { font-style:normal; color:rgba(255,255,255,.62); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     @media (hover:hover) { .ig-tile:hover img { transform:scale(1.05); } .ig-tile:hover .ig-hover { opacity:1; } }
+    .ig-stories { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 8px; scroll-snap-type:x proximity; scrollbar-width:thin; }
+    .ig-story { flex:0 0 120px; width:120px; aspect-ratio:9/16; border-radius:12px; scroll-snap-align:start; box-shadow:0 0 0 2px var(--bg2), 0 0 0 3.5px #D62976; margin:3px; }
+    .ig-sdata { position:absolute; top:8px; left:8px; z-index:2; font:600 10.5px var(--fM); letter-spacing:.02em; text-shadow:0 1px 3px rgba(0,0,0,.65); }
+    .ig-snota { font-size:11.5px; color:var(--muted); margin:-4px 0 10px; }
+    .ig-sres { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:1px; background:var(--bd); border:1px solid var(--bd); border-radius:10px; overflow:hidden; margin-bottom:12px; }
+    .ig-sres div { background:var(--bg2); padding:11px 13px; min-width:0; }
+    .ig-sres b { display:block; font:700 21px var(--fD); letter-spacing:-.01em; }
+    .ig-sres span { display:block; font:600 10px var(--fD); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+    .ig-sres small { display:block; font-size:11px; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     @keyframes igIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
     @keyframes igFade { from { opacity:0; } to { opacity:1; } }
     @keyframes igSobe { from { transform:translateY(100%); } to { transform:none; } }
@@ -2226,6 +2235,9 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       .ig-val { font-size:12px; left:6px; bottom:8px; } .ig-val svg { width:13px; height:13px; }
       .ig-tipo { top:6px; right:6px; width:15px; height:15px; } .ig-tipo svg { width:15px; height:15px; }
       .ig-rank { top:6px; left:6px; }
+      .ig-story { flex-basis:98px; width:98px; border-radius:10px; }
+      .ig-sres { grid-template-columns:repeat(3, minmax(0, 1fr)); } .ig-sres div { padding:9px 10px; } .ig-sres b { font-size:17px; }
+      .ig-sres div:last-child:nth-child(3n+2) { grid-column:span 2; }
       .ig-abrir span { display:none; } .ig-abrir { padding:8px; }
       .ig-ctl { width:100%; } .ig-sel-w { flex:1; } .ig-sel { flex:1; width:100%; }
       .ig-det-bg { align-items:flex-end; padding:0; }
@@ -7868,15 +7880,25 @@ const NUM_IG_ICO = {
   play: '<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
   imagem: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15.5l-5-5L5 21"/>',
   fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  avancar: '<path d="M9 5l7 7-7 7"/>',
+  voltar: '<path d="M15 5l-7 7 7 7"/>',
+  proximo: '<path d="M5 5l7 7-7 7M13 5l7 7-7 7"/>',
+  sair: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/>',
+  seguir: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5M19 8v6M16 11h6"/>',
+  perfil: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18.5c1.2-2.2 3.2-3.3 5.5-3.3s4.3 1.1 5.5 3.3"/>',
 };
 function numIco(k) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NUM_IG_ICO[k] || ''}</svg>`; }
 const NUM_IG_MET = [['views', 'Visualizações', 'olho'], ['alcance', 'Alcance', 'pessoas'], ['interacoes', 'Interações', 'raio'], ['curtidas', 'Curtidas', 'coracao'],
   ['comentarios', 'Comentários', 'balao'], ['compartilhamentos', 'Compartilhamentos', 'aviao'], ['salvos', 'Salvamentos', 'marcador']];
-const NUM_IG_TIPOS = { reel: ['Reels', 'reel', 'Reel'], carrossel: ['Carrosséis', 'carrossel', 'Carrossel'], foto: ['Fotos', '', 'Foto'], video: ['Vídeos', 'play', 'Vídeo'] };
+const NUM_IG_TIPOS = { reel: ['Reels', 'reel', 'Reel'], carrossel: ['Carrosséis', 'carrossel', 'Carrossel'], foto: ['Fotos', '', 'Foto'], video: ['Vídeos', 'play', 'Vídeo'], story: ['Stories', '', 'Story'] };
+const NUM_IG_MET_STORY = [['views', 'Visualizações', 'olho'], ['alcance', 'Alcance', 'pessoas'], ['respostas', 'Respostas', 'balao'], ['compartilhamentos', 'Compartilhamentos', 'aviao'],
+  ['visitas_perfil', 'Visitas ao perfil', 'perfil'], ['seguiram', 'Seguiram', 'seguir'], ['avancar', 'Toques para avançar', 'avancar'], ['voltar', 'Toques para voltar', 'voltar'],
+  ['proximo', 'Pulou para o próximo', 'proximo'], ['saidas', 'Saídas', 'sair']];
+let _numStories = {};   // perfil → stories guardados (instagram_stories)
 const _numIg = {};   // id do bloco → { perfil, lista, foto, tipo, met, ord }
 let _numIgAberto = null;
 function numIgId(perfil) { return 'ig-' + String(perfil).replace(/[^a-z0-9]/gi, ''); }
-function numIgMets(st) { return NUM_IG_MET.filter(([k]) => st.lista.some(c => c[k] != null)); }
+function numIgMets(st) { return (st.mets || NUM_IG_MET).filter(([k]) => st.lista.some(c => c[k] != null)); }
 function numIgVisiveis(st) {
   const l = st.lista.filter(c => st.tipo === 'todos' || c.tipo === st.tipo);
   return st.ord === 'top' ? [...l].sort((a, b) => (Number(b[st.met]) || 0) - (Number(a[st.met]) || 0))
@@ -7887,6 +7909,30 @@ function numIgPerfil(perfil, nome, foto, seg) {
     + `<div class="ig-pinfo"><div class="ig-nome">${escHtml(nome || perfil)}</div><div class="ig-user">${escHtml(perfil)}</div>`
     + `<div class="ig-stats"><span><b>${numFmt(seg.posts)}</b> posts</span><span><b>${numFmt(seg.seguidores)}</b> seguidores</span><span><b>${numFmt(seg.seguindo)}</b> seguindo</span></div></div>`
     + `<a class="ig-abrir" href="https://www.instagram.com/${escHtml(String(perfil).replace('@', ''))}/" target="_blank" rel="noopener" aria-label="Abrir perfil no Instagram"><span>Abrir perfil</span>${numIco('fora')}</a></div>`;
+}
+function numIgStories(perfil, stories, foto) {   // 16/11: stories guardados a cada 3 h pela rotina "[Epos] Stories do Instagram"
+  const id = 'igs-' + String(perfil).replace(/[^a-z0-9]/gi, '');
+  const lista = (stories || []).map(s => ({ ...(s.dados || {}), id: s.id, tipo: 'story', quando: s.publicado_em, link: s.link, thumb: s.thumb, legenda: '' }));
+  _numIg[id] = Object.assign({ tipo: 'todos', ord: 'recente' }, _numIg[id] || {}, { perfil, lista, foto, mets: NUM_IG_MET_STORY, met: 'views' });
+  const desde = Date.now() - _numDias * 864e5, per = lista.filter(c => new Date(c.quando).getTime() >= desde);
+  const soma = k => per.reduce((s, c) => s + (Number(c[k]) || 0), 0), um = x => Number(x).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  const views = soma('views');
+  const it = (val, rot, sub) => `<div><b>${val}</b><span>${rot}</span><small>${sub}</small></div>`;
+  const kpis = it(numFmt(per.length), 'Stories', `últimos ${_numDias} dias`)
+    + it(per.length ? numFmt(Math.round(soma('alcance') / per.length)) : '—', 'Alcance médio', 'por story')
+    + it(numFmt(views), 'Visualizações', 'somadas')
+    + it(numFmt(soma('respostas')), 'Respostas', 'no direct')
+    + it(views ? um(soma('saidas') / views * 100) + '%' : '—', 'Saídas', 'das visualizações');
+  const tiles = lista.map((c, i) => {
+    const q = c.quando ? new Date(c.quando) : null;
+    const quando = q ? q.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + q.toLocaleTimeString('pt-BR', { hour: '2-digit' }) + 'h' : '';
+    return `<button class="ig-tile ig-story" style="--i:${i}" onclick="numIgAbrir('${id}','${escHtml(c.id)}')" aria-label="Story de ${quando}: ${numFmt(c.views)} visualizações">`
+      + `<span class="ig-falha">${numIco('imagem')}</span>`
+      + (c.thumb ? `<img src="${escHtml(c.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '')
+      + `<span class="ig-sdata">${quando}</span><span class="ig-val">${numIco('olho')}${numFmt(c.views)}</span></button>`;
+  }).join('');
+  return `<div class="num-sub-tit">Stories</div><div class="ig-snota">Guardados desde 16/11, a cada 3 h: a Meta só entrega os números enquanto o story está no ar.</div>`
+    + `<div class="ig-sres">${kpis}</div><div class="ig-stories">${tiles || '<div class="num-vazio">Nenhum story guardado ainda.</div>'}</div>`;
 }
 function numIgSecao(perfil, lista, foto) {
   const id = numIgId(perfil);
@@ -7956,13 +8002,13 @@ function numIgDetalhe(st, c, i, n) {
   const um = x => Number(x).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
   const media = k => { const vs = st.lista.filter(x => x[k] != null).map(x => Number(x[k]) || 0); return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : 0; };
   const vsMedia = k => {
-    const m = media(k); if (!m || c[k] == null) return '';
+    const m = media(k); if (!m || c[k] == null || st.lista.length < 3) return '';
     const r = (Number(c[k]) || 0) / m;
     return `<span class="ig-x ${r >= 1 ? 'up' : 'down'}">${r >= 1 ? '▲' : '▼'} ${um(r)}× a média</span>`;
   };
   const princ = c.views != null ? [['views', 'Visualizações'], ['alcance', 'Alcance']] : [['curtidas', 'Curtidas'], ['comentarios', 'Comentários']];
   const dest = princ.map(([k, rot]) => `<div class="ig-det-big"><small>${rot}</small><b>${numFmt(c[k])}</b>${vsMedia(k)}</div>`).join('');
-  const linhas = NUM_IG_MET.filter(([k]) => c[k] != null && !princ.some(([p]) => p === k)).map(([k, rot, ic]) => `<div>${numIco(ic)}<span>${rot}</span><b>${numFmt(c[k])}</b></div>`);
+  const linhas = (st.mets || NUM_IG_MET).filter(([k]) => c[k] != null && !princ.some(([p]) => p === k)).map(([k, rot, ic]) => `<div>${numIco(ic)}<span>${rot}</span><b>${numFmt(c[k])}</b></div>`);
   if (c.tempo_medio_s != null) linhas.push(`<div>${numIco('relogio')}<span>Tempo médio assistido</span><b>${um(c.tempo_medio_s)} s</b></div>`);
   if (c.alcance && c.interacoes != null) linhas.push(`<div>${numIco('grafico')}<span>Engajamento</span><b>${um(c.interacoes / c.alcance * 100)}%</b></div>`);
   const tp = NUM_IG_TIPOS[c.tipo] || ['', '', 'Post'];
@@ -7973,7 +8019,7 @@ function numIgDetalhe(st, c, i, n) {
     + (n > 1 ? `<button class="ig-nav ig-ant" onclick="numIgPassar(-1)" aria-label="Anterior">‹</button><button class="ig-nav ig-prox" onclick="numIgPassar(1)" aria-label="Próximo">›</button>` : '') + '</div>'
     + `<div class="ig-det-info"><div class="ig-det-top">${st.foto ? `<img src="${escHtml(st.foto)}" alt="" referrerpolicy="no-referrer">` : ''}`
     + `<div><b>${escHtml(st.perfil)}</b><small>${tp[2]} · ${escHtml(quando)}</small></div><button class="ig-fechar" onclick="numIgFechar()" aria-label="Fechar">✕</button></div>`
-    + `<p class="ig-det-leg">${escHtml(leg || '(sem legenda)')}${leg.length >= 160 ? '…' : ''}</p>`
+    + (c.tipo === 'story' ? '' : `<p class="ig-det-leg">${escHtml(leg || '(sem legenda)')}${leg.length >= 160 ? '…' : ''}</p>`)
     + `<div class="ig-det-dest">${dest}</div>` + (linhas.length ? `<div class="ig-det-tab">${linhas.join('')}</div>` : '')
     + (c.views == null ? '<div class="num-aviso">Conta só com números públicos. Alcance e visualizações aparecem quando a página do Facebook entrar no acesso da Meta.</div>' : '')
     + `<div class="ig-det-pe"><span>${i + 1} de ${n} · média dos últimos ${st.lista.length}</span><a class="ig-ver" href="${escHtml(c.link || '#')}" target="_blank" rel="noopener">Ver no Instagram ${numIco('fora')}</a></div></div></div>`;
@@ -8000,8 +8046,9 @@ function numCartaoInstagram(perfil, linhas) {
   const conts = numExtra(linhas, 'conteudos') || [], foto = numExtra(linhas, 'foto_perfil');   // 16/11: grade estilo Meta; sem conteudos, a lista antiga
   const secao = conts.length ? `<div class="num-sub-tit">Conteúdo publicado · últimos ${conts.length}</div>` + numIgSecao(perfil, conts, foto)
     : (posts ? '<div class="num-sub-tit">Posts que mais renderam (curtidas e comentários)</div>' + posts : '');
+  const stor = comInsights ? numIgStories(perfil, _numStories[perfil] || [], foto) : '';   // stories só da conta com acesso da Meta
   return `<div class="num-card"><div class="num-card-tit">Instagram <span>atualizado em ${numDia(ult.dia)}</span></div>${numIgPerfil(perfil, numExtra(linhas, 'nome'), foto, seg)}`
-    + `${aviso}<div class="kpi-row num-kpis">${kpis}</div>${barras}${secao}</div>`;
+    + `${aviso}<div class="kpi-row num-kpis">${kpis}</div>${barras}${stor}${secao}</div>`;
 }
 function numSoma(ls, k) { return ls.reduce((s, l) => s + (Number((l.dados || {})[k]) || 0), 0); }
 function numKpi(rot, val, sub) { return `<div class="kpi"><div class="kpi-lbl">${rot}</div><div class="kpi-val">${val}</div><div class="num-sub">${sub}</div></div>`; }
@@ -8065,7 +8112,11 @@ async function numLoad(dias) {
   const desde = new Date(Date.now() - (2 * _numDias + 3) * 864e5).toISOString().slice(0, 10);
   let html = '';
   try {
-    const { data } = await sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`);
+    const desde30 = new Date(Date.now() - 31 * 864e5).toISOString();
+    const [{ data }, rs] = await Promise.all([sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`),
+      sb(`instagram_stories?conta=eq.epos&publicado_em=gte.${desde30}&order=publicado_em.desc&select=id,perfil,publicado_em,tipo,thumb,link,dados`).catch(() => ({ data: [] }))]);
+    _numStories = {};
+    for (const s of ((rs && rs.data) || [])) (_numStories[s.perfil] = _numStories[s.perfil] || []).push(s);
     const grupos = {};   // fonte|perfil → linhas por dia
     for (const l of (data || [])) (grupos[l.fonte + '|' + l.perfil] = grupos[l.fonte + '|' + l.perfil] || []).push(l);
     const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, busca: numCartaoBusca };
