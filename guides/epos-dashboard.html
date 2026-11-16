@@ -2212,6 +2212,18 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .ig-story { flex:0 0 120px; width:120px; aspect-ratio:9/16; border-radius:12px; scroll-snap-align:start; box-shadow:0 0 0 2px var(--bg2), 0 0 0 3.5px #D62976; margin:3px; }
     .ig-sdata { position:absolute; top:8px; left:8px; z-index:2; font:600 10.5px var(--fM); letter-spacing:.02em; text-shadow:0 1px 3px rgba(0,0,0,.65); }
     .ig-snota { font-size:11.5px; color:var(--muted); margin:-4px 0 10px; }
+    .yt-bar { justify-content:flex-end; }
+    .yt-grade { grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px 12px; }
+    .ig-yt { aspect-ratio:auto; background:transparent; border-radius:0; overflow:visible; text-align:left; color:var(--text); }
+    .ig-yt::after { display:none; }
+    .yt-capa { position:relative; display:block; aspect-ratio:16/9; border-radius:10px; overflow:hidden; background:var(--bg3); }
+    .yt-capa::after { content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(to top, rgba(0,0,0,.62) 0%, rgba(0,0,0,0) 45%); }
+    .yt-dur { position:absolute; right:7px; bottom:8px; z-index:2; background:rgba(0,0,0,.82); color:#fff; font:600 11px var(--fM); padding:2px 5px; border-radius:4px; }
+    .yt-tit { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font:600 13.5px/1.35 var(--fD); margin-top:8px; }
+    .yt-meta { display:block; font-size:12px; color:var(--muted); margin-top:3px; }
+    .ig-det.ig-det-yt { grid-template-columns:1fr; width:min(760px, 100%); overflow:auto; }
+    .ig-det-yt .ig-det-midia { min-height:0; aspect-ratio:16/9; }
+    .ig-det-yt .ig-det-info { overflow:visible; }
     .ig-sres { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:1px; background:var(--bd); border:1px solid var(--bd); border-radius:10px; overflow:hidden; margin-bottom:12px; }
     .ig-sres div { background:var(--bg2); padding:11px 13px; min-width:0; }
     .ig-sres b { display:block; font:700 21px var(--fD); letter-spacing:-.01em; }
@@ -2256,6 +2268,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       .ig-tipo { top:6px; right:6px; width:15px; height:15px; } .ig-tipo svg { width:15px; height:15px; }
       .ig-rank { top:6px; left:6px; }
       .ig-story { flex-basis:98px; width:98px; border-radius:10px; }
+      .yt-grade { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px 8px; } .ig-tile.ig-yt { border-radius:0; } .yt-capa { border-radius:8px; }
+      .yt-tit { font-size:12.5px; } .yt-meta { font-size:11px; }
+      .yt-bar .ig-ctl { flex-wrap:wrap; } .yt-bar .ig-sel-w { flex:1 1 100%; } .yt-bar .ig-ord { margin-left:auto; }
+      .ig-det-yt .ig-det-midia { height:auto; }
       .ig-sres { grid-template-columns:repeat(3, minmax(0, 1fr)); } .ig-sres div { padding:9px 10px; } .ig-sres b { font-size:17px; }
       .ig-sres div:last-child:nth-child(3n+2) { grid-column:span 2; }
       .ig-abrir span { display:none; } .ig-abrir { padding:8px; }
@@ -7955,6 +7971,46 @@ function numIgStories(perfil, stories, foto) {   // 16/11: stories guardados a c
   return `<div class="num-sub-tit">Stories</div><div class="ig-snota">Guardados desde 16/11, a cada 3 h: a Meta só entrega os números enquanto o story está no ar.</div>`
     + `<div class="ig-sres">${kpis}</div><div class="ig-stories">${tiles || '<div class="num-vazio">Nenhum story guardado ainda.</div>'}</div>`;
 }
+// ═══ YouTube no estilo do Studio (16/11, Thiago: "adicione as miniaturas do youtube também") ═══
+const NUM_YT_MET = [['views_total', 'Visualizações (total)', 'olho'], ['views', 'Visualizações (28 dias)', 'olho'], ['minutos', 'Minutos assistidos (28 dias)', 'relogio'],
+  ['duracao_media_s', 'Duração média assistida', 'relogio'], ['pct_medio', '% média assistida', 'grafico'], ['curtidas_total', 'Curtidas (total)', 'coracao'],
+  ['comentarios_total', 'Comentários (total)', 'balao'], ['compartilhamentos', 'Compartilhamentos (28 dias)', 'aviao'], ['inscritos', 'Inscritos ganhos (28 dias)', 'seguir']];
+function numSeg(s) { s = Math.round(Number(s) || 0); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); }
+const NUM_YT_FMT = { duracao_media_s: v => numSeg(v), pct_medio: v => v == null ? '—' : Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' };
+NUM_IG_TIPOS.yt = ['Vídeos', 'play', 'Vídeo do YouTube'];
+function numYtSecao(perfil, lista, foto) {
+  const id = 'yt-' + String(perfil).replace(/[^a-z0-9]/gi, '');
+  const conts = (lista || []).map(v => ({ ...v, tipo: 'yt', quando: v.publicado, legenda: v.titulo || '', thumb: v.thumb_g || v.thumb, thumb_p: v.thumb || v.thumb_g }));
+  _numIg[id] = Object.assign({ tipo: 'todos', ord: 'recente', met: 'views_total' }, _numIg[id] || {},
+    { perfil, lista: conts, foto, mets: NUM_YT_MET, fmt: NUM_YT_FMT, yt: true, ver: 'Ver no YouTube', princ: [['views_total', 'Visualizações (total)'], ['views', 'Últimos 28 dias']] });
+  return `<div class="ig-conteudo" id="${id}">${numYtCorpo(id)}</div>`;
+}
+function numYtCorpo(id) {
+  const st = _numIg[id], vis = numIgVisiveis(st), mets = numIgMets(st);
+  const fv = (k, v) => (st.fmt && st.fmt[k]) ? st.fmt[k](v) : numFmt(v);
+  const opts = mets.map(([k, rot]) => `<option value="${k}"${k === st.met ? ' selected' : ''}>${rot}</option>`).join('');
+  const max = Math.max(1, ...vis.map(c => Number(c[st.met]) || 0));
+  const icoMet = (mets.find(m => m[0] === st.met) || [])[2] || 'olho';
+  const tiles = vis.map((c, i) => {
+    const v = Number(c[st.met]) || 0, d = String(c.quando || '');
+    return `<button class="ig-tile ig-yt" style="--i:${i}" onclick="numIgAbrir('${id}','${escHtml(c.id)}')" aria-label="${escHtml(c.titulo || 'Vídeo')}">`
+      + `<span class="yt-capa"><span class="ig-falha">${numIco('play')}</span>`
+      + (c.thumb_p ? `<img src="${escHtml(c.thumb_p)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '')
+      + (st.ord === 'top' && i < 3 && v > 0 ? `<span class="ig-rank">#${i + 1}</span>` : '')
+      + `<span class="ig-val">${numIco(icoMet)}${fv(st.met, c[st.met])}</span><span class="yt-dur">${numSeg(c.duracao_s)}</span>`
+      + `<span class="ig-medidor" style="width:${Math.round(v / max * 100)}%"></span></span>`
+      + `<span class="yt-tit">${escHtml(c.titulo || '')}</span><span class="yt-meta">${d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(2, 4) : ''} · ${numFmt(c.views_total)} visualizações</span></button>`;
+  }).join('');
+  return `<div class="ig-bar yt-bar"><div class="ig-ctl"><label class="ig-sel-w">Mostrar <select class="ig-sel" onchange="numYtSet('${id}','met',this.value)">${opts}</select></label>`
+    + `<div class="ig-ord"><button class="${st.ord === 'recente' ? 'on' : ''}" onclick="numYtSet('${id}','ord','recente')">Recentes</button>`
+    + `<button class="${st.ord === 'top' ? 'on' : ''}" onclick="numYtSet('${id}','ord','top')">Melhores</button></div></div></div>`
+    + `<div class="ig-grade yt-grade">${tiles || '<div class="num-vazio">Nenhum vídeo público no canal.</div>'}</div>`;
+}
+function numYtSet(id, k, v) {
+  const st = _numIg[id], el = document.getElementById(id);
+  if (!st || !el) return;
+  st[k] = v; el.innerHTML = numYtCorpo(id);
+}
 function numIgSecao(perfil, lista, foto) {
   const id = numIgId(perfil);
   const st = _numIg[id] = Object.assign({ tipo: 'todos', ord: 'recente' }, _numIg[id] || {}, { perfil, lista, foto });
@@ -8027,15 +8083,17 @@ function numIgDetalhe(st, c, i, n) {
     const r = (Number(c[k]) || 0) / m;
     return `<span class="ig-x ${r >= 1 ? 'up' : 'down'}">${r >= 1 ? '▲' : '▼'} ${um(r)}× a média</span>`;
   };
-  const princ = c.views != null ? [['views', 'Visualizações'], ['alcance', 'Alcance']] : [['curtidas', 'Curtidas'], ['comentarios', 'Comentários']];
-  const dest = princ.map(([k, rot]) => `<div class="ig-det-big"><small>${rot}</small><b>${numFmt(c[k])}</b>${vsMedia(k)}</div>`).join('');
-  const linhas = (st.mets || NUM_IG_MET).filter(([k]) => c[k] != null && !princ.some(([p]) => p === k)).map(([k, rot, ic]) => `<div>${numIco(ic)}<span>${rot}</span><b>${numFmt(c[k])}</b></div>`);
+  const princ = st.princ || (c.views != null ? [['views', 'Visualizações'], ['alcance', 'Alcance']] : [['curtidas', 'Curtidas'], ['comentarios', 'Comentários']]);
+  const fv = k => (st.fmt && st.fmt[k]) ? st.fmt[k](c[k]) : numFmt(c[k]);
+  const dest = princ.map(([k, rot]) => `<div class="ig-det-big"><small>${rot}</small><b>${fv(k)}</b>${vsMedia(k)}</div>`).join('');
+  const linhas = (st.mets || NUM_IG_MET).filter(([k]) => c[k] != null && !princ.some(([p]) => p === k)).map(([k, rot, ic]) => `<div>${numIco(ic)}<span>${rot}</span><b>${fv(k)}</b></div>`);
+  if (st.yt && c.duracao_s) linhas.unshift(`<div>${numIco('play')}<span>Duração do vídeo</span><b>${numSeg(c.duracao_s)}</b></div>`);
   if (c.tempo_medio_s != null) linhas.push(`<div>${numIco('relogio')}<span>Tempo médio assistido</span><b>${um(c.tempo_medio_s)} s</b></div>`);
   if (c.alcance && c.interacoes != null) linhas.push(`<div>${numIco('grafico')}<span>Engajamento</span><b>${um(c.interacoes / c.alcance * 100)}%</b></div>`);
   const tp = NUM_IG_TIPOS[c.tipo] || ['', '', 'Post'];
   const quando = c.quando ? new Date(c.quando).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
   const leg = String(c.legenda || '');
-  return `<div class="ig-det" role="dialog" aria-modal="true" aria-label="Detalhe do conteúdo"><span class="ig-pega"></span>`
+  return `<div class="ig-det${st.yt ? ' ig-det-yt' : ''}" role="dialog" aria-modal="true" aria-label="Detalhe do conteúdo"><span class="ig-pega"></span>`
     + `<div class="ig-det-midia">${c.thumb ? `<img src="${escHtml(c.thumb)}" alt="" referrerpolicy="no-referrer">` : ''}`
     + (n > 1 ? `<button class="ig-nav ig-ant" onclick="numIgPassar(-1)" aria-label="Anterior">‹</button><button class="ig-nav ig-prox" onclick="numIgPassar(1)" aria-label="Próximo">›</button>` : '') + '</div>'
     + `<div class="ig-det-info"><div class="ig-det-top">${st.foto ? `<img src="${escHtml(st.foto)}" alt="" referrerpolicy="no-referrer">` : ''}`
@@ -8043,7 +8101,7 @@ function numIgDetalhe(st, c, i, n) {
     + (c.tipo === 'story' ? '' : `<p class="ig-det-leg">${escHtml(leg || '(sem legenda)')}${leg.length >= 160 ? '…' : ''}</p>`)
     + `<div class="ig-det-dest">${dest}</div>` + (linhas.length ? `<div class="ig-det-tab">${linhas.join('')}</div>` : '')
     + (c.views == null ? '<div class="num-aviso">Conta só com números públicos. Alcance e visualizações aparecem quando a página do Facebook entrar no acesso da Meta.</div>' : '')
-    + `<div class="ig-det-pe"><span>${i + 1} de ${n} · média dos últimos ${st.lista.length}</span><a class="ig-ver" href="${escHtml(c.link || '#')}" target="_blank" rel="noopener">Ver no Instagram ${numIco('fora')}</a></div></div></div>`;
+    + `<div class="ig-det-pe"><span>${i + 1} de ${n} · média dos últimos ${st.lista.length}</span><a class="ig-ver" href="${escHtml(c.link || '#')}" target="_blank" rel="noopener">${st.ver || 'Ver no Instagram'} ${numIco('fora')}</a></div></div></div>`;
 }
 function numCartaoInstagram(perfil, linhas) {
   const ult = linhas[linhas.length - 1] || {}, d = ult.dados || {};
@@ -8091,7 +8149,9 @@ function numCartaoYoutube(perfil, linhas) {
   const vids = (numExtra(linhas, 'top_videos') || []).map(v => numItem(v.link, v.titulo || '', `${numFmt(v.views)} views · ${numFmt(v.minutos)} min`)).join('');
   return `<div class="num-card"><div class="num-card-tit">YouTube ${escHtml(numExtra(linhas, 'canal') || perfil)} <span>Studio · dados até ${numDia(ult.dia)}</span></div>${numDesde(linhas)}`
     + `<div class="kpi-row num-kpis">${kpis}</div>` + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).views) || 0 })), 'Visualizações por dia')
-    + (vids ? '<div class="num-sub-tit">Vídeos mais vistos (últimos 28 dias)</div>' + vids : '') + '</div>';
+    + ((numExtra(linhas, 'lista_videos') || []).length   // 16/11: grade estilo Studio; sem a lista, os mais vistos como antes
+        ? `<div class="num-sub-tit">Vídeos do canal · ${numExtra(linhas, 'lista_videos').length} públicos</div>` + numYtSecao(perfil, numExtra(linhas, 'lista_videos'), numExtra(linhas, 'canal_foto'))
+        : (vids ? '<div class="num-sub-tit">Vídeos mais vistos (últimos 28 dias)</div>' + vids : '')) + '</div>';
 }
 const NUM_ORIGENS = { 'Direct': 'Direto (link ou digitado)', 'Organic Search': 'Busca do Google', 'Paid Search': 'Anúncio no Google', 'Organic Social': 'Redes sociais',
   'Paid Social': 'Anúncio nas redes', 'Referral': 'Outros sites', 'Email': 'E-mail', 'Organic Video': 'Vídeo', 'Cross-network': 'Anúncio (várias redes)', 'Unassigned': 'Não identificado' };
