@@ -1575,6 +1575,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2"/></svg>
       Status
     </a>
+    <a data-sec="numeros" id="nav-numeros" style="display:none" onclick="navTo('numeros')">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 14V9.5M6.2 14V5.5M9.8 14V7.5M13.5 14V2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Números
+    </a>
     <a data-sec="laboratorio" id="nav-laboratorio" style="display:none" onclick="navTo('laboratorio')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1h4M7 1v5L2.5 13.2A1.2 1.2 0 0 0 3.5 15h9a1.2 1.2 0 0 0 1-1.8L9 6V1" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M4.3 11h7.4" stroke="currentColor" stroke-width="1.2"/></svg>
       Laboratório
@@ -2102,6 +2106,46 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
 <!-- ══ PROSPECÇÃO SWaaS ══ -->
 <!-- 27/10 (Thiago: "Vamos abrir esta aba laboratório"): testes da Donna com número falso (scripts/simular_whatsapp.py). Só administrador. -->
+<!-- 16/11 (Thiago: "conseguimos inserir os dados no dashboard já?" / "Pode fazer"): números das redes e do Google. Foto diária às 06h10
+     ("[Epos] Números das redes", tabela metricas_redes, só admin lê). Instagram já entra; Google aparece quando for conectado. -->
+<section class="section" id="s-numeros">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">NÚMEROS <span>REDES E GOOGLE</span></div>
+      <div class="sec-sub">FOTO DIÁRIA ÀS 06H10 · COMPARAÇÃO COM O PERÍODO ANTERIOR</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="num-per" data-d="7" onclick="numLoad(7)">7 dias</button>
+      <button class="num-per" data-d="30" onclick="numLoad(30)">30 dias</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <style>
+    .num-per { padding:6px 12px; background:transparent; border:1px solid var(--bd); color:var(--muted); font-family:var(--fD); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
+    .num-per.ativo { border-color:var(--purple); color:var(--text); background:var(--pur-l); }
+    #num-corpo { display:flex; flex-direction:column; gap:16px; }
+    .num-card { background:var(--bg2); border:1px solid var(--bd); padding:16px; border-radius:10px; }
+    .num-card-tit { font-family:var(--fD); font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:12px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+    .num-card-tit span { color:var(--muted); font-weight:500; letter-spacing:0; text-transform:none; font-size:12px; }
+    .num-kpis { grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); margin-bottom:12px; }
+    .num-kpis .kpi-val { font-size:clamp(22px, 2.2vw, 30px); white-space:nowrap; }   /* 6 cartões lado a lado: 3.072 cortava em 34px */
+    @media (max-width:768px) { #s-numeros .num-kpis .kpi-val { font-size:26px !important; } }   /* no celular a regra geral aumenta a fonte e 5.000 cortava */
+    .num-sub { font-size:11px; color:var(--muted); }
+    .num-sub-tit { font-family:var(--fD); font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:14px 0 8px; }
+    .num-barras { display:flex; align-items:flex-end; gap:3px; height:90px; }
+    .num-barra { flex:1; min-width:6px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; }
+    .num-barra i { display:block; width:100%; background:var(--purple); border-radius:3px 3px 0 0; opacity:.85; }
+    .num-barra small { font-size:9px; color:var(--dim); }
+    .num-post { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid var(--bd); color:var(--text); text-decoration:none; font-size:13px; }
+    .num-post span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+    .num-post b { flex-shrink:0; font-weight:600; color:var(--muted); font-size:12px; }
+    .num-aviso { font-size:12px; color:var(--muted); border-left:3px solid var(--purple); padding:6px 10px; margin-bottom:12px; background:var(--pur-l); }
+    .num-pend { opacity:.85; }
+    .num-pend p { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.45; }
+    .num-vazio { color:var(--muted); font-size:13px; padding:12px 0; }
+  </style>
+  <div id="num-corpo"><div class="num-vazio">Carregando…</div></div>
+</section>
 <section class="section" id="s-laboratorio">
   <div class="sec-head">
     <div>
@@ -4792,6 +4836,7 @@ function show(id) {
     if(id==='clientes') loadClientes();
     if(id==='prospeccao') { loadProspeccao(); pmLoad(); }
     if(id==='laboratorio') labLoad();
+    if(id==='numeros') numLoad();
     if(id==='remarketing') rmLoad();
   }
   if(id==='dashboard') {
@@ -7693,7 +7738,68 @@ async function labPodeVer() {
     const adm = await fetch(`${SB_URL}/rest/v1/rpc/epos_eh_admin`, { method: 'POST', headers: _modoDonoHeaders(), body: '{}' }).then(r => r.json());
     const a = document.getElementById('nav-laboratorio');
     if (a) a.style.display = adm === true ? '' : 'none';
+    const an = document.getElementById('nav-numeros');   // 16/11: aba Números, só admin
+    if (an) an.style.display = adm === true ? '' : 'none';
   } catch (e) {}
+}
+// ═══ NÚMEROS (16/11): Instagram pela Meta; Google entra quando for conectado ═══
+let _numDias = 7;
+function numFmt(n) { return n == null ? '—' : Number(n).toLocaleString('pt-BR'); }
+function numDia(s) { return s ? s.slice(8, 10) + '/' + s.slice(5, 7) : ''; }   // 'AAAA-MM-DD' sem passar por Date (fuso)
+function numVar(a, b) {
+  if (!b) return '<span class="num-sub">sem base anterior</span>';
+  const p = Math.round((a - b) / b * 100);
+  return `<span style="color:${p >= 0 ? 'var(--neon)' : 'var(--warn)'};font-weight:600">${p >= 0 ? '▲' : '▼'} ${Math.abs(p)}%</span> <span class="num-sub">vs ${_numDias} dias antes</span>`;
+}
+function numBarras(pts) {
+  const max = Math.max(1, ...pts.map(p => p.v));
+  return '<div class="num-sub-tit">Alcance por dia</div><div class="num-barras">' + pts.map(p =>
+    `<div class="num-barra" title="${numDia(p.dia)}: ${numFmt(p.v)}"><i style="height:${Math.max(2, Math.round(p.v / max * 82))}px"></i><small>${p.dia.slice(8, 10)}</small></div>`).join('') + '</div>';
+}
+function numCartaoInstagram(perfil, linhas) {
+  const ult = linhas[linhas.length - 1] || {}, d = ult.dados || {};
+  const comInsights = linhas.some(l => l.dados && l.dados.insights);
+  const recentes = linhas.slice(-_numDias), anteriores = linhas.slice(-2 * _numDias, -_numDias);
+  const soma = (ls, k) => ls.reduce((s, l) => s + (Number((l.dados || {})[k]) || 0), 0);
+  const seg = ([...linhas].reverse().find(l => l.dados && l.dados.seguidores != null) || {}).dados || {};
+  let kpis = `<div class="kpi"><div class="kpi-lbl">Seguidores</div><div class="kpi-val">${numFmt(seg.seguidores)}</div><div class="num-sub">${comInsights ? '+' + numFmt(soma(recentes, 'novos_seguidores')) + ' no período' : 'seguindo ' + numFmt(seg.seguindo)}</div></div>`;
+  if (comInsights) {
+    for (const [k, rot] of [['reach', 'Alcance'], ['views', 'Visualizações'], ['profile_views', 'Visitas ao perfil'], ['total_interactions', 'Interações'], ['website_clicks', 'Cliques no link']]) {
+      const a = soma(recentes, k), b = soma(anteriores, k);
+      kpis += `<div class="kpi"><div class="kpi-lbl">${rot}</div><div class="kpi-val">${numFmt(a)}</div><div class="num-sub">${numVar(a, b)}</div></div>`;
+    }
+  } else {
+    kpis += `<div class="kpi"><div class="kpi-lbl">Posts</div><div class="kpi-val">${numFmt(seg.posts)}</div><div class="num-sub">publicados no perfil</div></div>`;
+  }
+  const barras = comInsights ? numBarras(recentes.map(l => ({ dia: l.dia, v: Number((l.dados || {}).reach) || 0 }))) : '';
+  const posts = (d.posts_recentes || []).slice(0, 5).map(p =>
+    `<a class="num-post" href="${escHtml(p.link || '#')}" target="_blank" rel="noopener"><span>${escHtml(p.texto || '(sem legenda)')}</span><b>♥ ${numFmt(p.curtidas)} · 💬 ${numFmt(p.comentarios)}</b></a>`).join('');
+  const aviso = comInsights ? '' : '<div class="num-aviso">Só os números públicos. Para ver alcance e visitas, a página do Facebook desta conta precisa entrar no mesmo acesso da Meta.</div>';
+  return `<div class="num-card"><div class="num-card-tit">Instagram ${escHtml(perfil)} <span>atualizado em ${numDia(ult.dia)}</span></div>${aviso}<div class="kpi-row num-kpis">${kpis}</div>${barras}`
+    + (posts ? '<div class="num-sub-tit">Posts que mais renderam (curtidas e comentários)</div>' + posts : '') + '</div>';
+}
+const NUM_PENDENTES = [
+  ['YouTube e YouTube Studio', 'Inscritos, visualizações, tempo assistido e de onde vem o público.', 'APIs ativadas em 16/11. Falta conectar: o Thiago entra uma vez com a conta Google e autoriza.'],
+  ['Site (Google Analytics)', 'Visitas, páginas mais vistas e conversões do site.', 'APIs ativadas em 16/11. Falta conectar a conta Google.'],
+  ['Busca do Google (Search Console)', 'Buscas em que o site aparece, cliques e posição média.', 'APIs ativadas em 16/11. Falta conectar a conta Google.'],
+  ['Google Meu Negócio', 'Visualizações do perfil, ligações, pedidos de rota e cliques no site.', 'O Google só libera a API 60 dias depois da validação do perfil (lembrete no WhatsApp em 15/01/2027). Até lá, os números ficam na aba "Desempenho" do próprio perfil.'],
+];
+async function numLoad(dias) {
+  if (dias) _numDias = dias;
+  document.querySelectorAll('.num-per').forEach(b => b.classList.toggle('ativo', +b.dataset.d === _numDias));
+  const corpo = document.getElementById('num-corpo');
+  if (!corpo) return;
+  const desde = new Date(Date.now() - (2 * _numDias + 3) * 864e5).toISOString().slice(0, 10);
+  let html = '';
+  try {
+    const { data } = await sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`);
+    const porPerfil = {};
+    for (const l of (data || [])) if (l.fonte === 'instagram') (porPerfil[l.perfil] = porPerfil[l.perfil] || []).push(l);
+    for (const [perfil, linhas] of Object.entries(porPerfil)) html += numCartaoInstagram(perfil, linhas);
+    if (!html) html = '<div class="num-vazio">Ainda não há números gravados. A rotina roda todo dia às 06h10.</div>';
+  } catch (e) { html = '<div class="num-vazio">Não consegui ler os números agora.</div>'; }
+  html += NUM_PENDENTES.map(([tit, oque, estado]) => `<div class="num-card num-pend"><div class="num-card-tit">${tit} <span>em breve</span></div><p>${oque}</p><p>${estado}</p></div>`).join('');
+  corpo.innerHTML = html;
 }
 async function labLoad() {
   const lista = document.getElementById('lab-lista');
