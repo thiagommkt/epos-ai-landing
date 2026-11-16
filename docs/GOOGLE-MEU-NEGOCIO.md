@@ -8,11 +8,11 @@ Decisões de 31/10: sem escritório aberto ao público (área de atendimento, en
 
 | # | Etapa | Status |
 |---|---|---|
-| 1 | Criar o perfil (nome "Epos", área de atendimento, endereço oculto) | em andamento (31/10) |
+| 1 | Criar o perfil (nome "Epos", área de atendimento, endereço oculto) | ✅ no ar em 16/11 (https://share.google/PSRRF6ReuP0hmglKf) |
 | 2 | Categoria principal + 4 secundárias (item 2) | pendente |
 | 3 | Áreas de atendimento (item 2) | pendente |
 | 4 | Telefone (Donna com o 9), site com UTM, horário 9h–19h seg a sex | pendente |
-| 5 | Verificação (vídeo, item 10) | pendente |
+| 5 | Verificação (vídeo, item 10) | ⚠️ pendente: em 16/11 o Google mostra "Validação necessária" (botão Validar). A contagem dos 60 dias do item 13 só começa quando a validação é aprovada |
 | 6 | Descrição (item 3) | pendente |
 | 7 | Serviços (item 4) | pendente |
 | 8 | Perguntas e respostas (item 5) | pendente |
@@ -20,7 +20,7 @@ Decisões de 31/10: sem escritório aberto ao público (área de atendimento, en
 | 10 | Primeiras 10 avaliações de clientes reais, mesmo link para todos, uma nova a cada 3 semanas | pendente |
 | 11 | Bing Places importando do Google (de onde o ChatGPT e o Copilot tiram empresas locais) | pendente |
 | 12 | Search Console + Analytics (item 8.6) | pendente |
-| 13 | Pedir a API do Perfil da Empresa: 60 dias depois da verificação (data = verificação + 60) | aguarda a data da verificação |
+| 13 | Pedir a API do Perfil da Empresa: 60 dias depois da verificação (data = verificação + 60) | ❌ 1ª tentativa recusada em 16/11 (perfil sem 60 dias de validação). **Nova tentativa: 60 dias depois da validação.** Lembrete no WhatsApp do Thiago em 15/01/2027, 10h. Respostas prontas no item 13 abaixo |
 | 14 | Primeiros posts, um por semana (item 6) | pendente |
 
 ## 1. Negócio sem endereço aberto ao público: como funciona
@@ -101,3 +101,22 @@ O repositório github.com/google/skills tem skills de Google Cloud, Ads API e An
 5. Fale ou legende: nome, o que a Epos faz e que atende por área, sem receber cliente no local.
 6. Sem cortes, sem edição, sem filtro, na vertical, com boa luz.
 O Google só pede o vídeo se a verificação normal não bastar, então grave só quando ele pedir.
+
+## 13. API do Perfil da Empresa: nova tentativa (60 dias depois da validação)
+
+**16/11/2026:** as APIs já estão ativadas no Google Cloud (projeto "Patagon Agencia", `infinite-cache-482116-v4`): Business Profile Performance, Business Information e Account Management, além de YouTube, Analytics, Search Console e Google Ads. O pedido de acesso foi **recusado** porque o perfil não tinha 60 dias de validação ("não cumpre os nossos critérios").
+
+**Quando tentar de novo:** 60 dias depois que o Google aprovar a validação do perfil (botão "Validar" no aviso azul). Lembrete programado no WhatsApp do Thiago para **15/01/2027 às 10h**. Se a validação sair depois de 16/11, somar 60 dias à data dela.
+
+**Formulário:** https://support.google.com/business/contact/api_default → "Candidatura para acesso básico à API".
+
+| Pergunta | Resposta |
+|---|---|
+| Número do projeto do Google Cloud | O **número** (só algarismos) no cartão "Informações do projeto": https://console.cloud.google.com/home/dashboard?project=infinite-cache-482116-v4 |
+| Website da empresa | https://eposmktfilmsia.com.br |
+| Como teve conhecimento deste formulário? | Pela documentação oficial da API do Google Business Profile (developers.google.com/my-business). |
+| Principal motivo do acesso | Acompanhar as métricas do nosso próprio Perfil da Empresa no Google (visualizações, buscas, ligações, pedidos de rota e cliques no site) em um painel interno da empresa. Uso somente leitura, para um único perfil, o da própria Epos. |
+| O perfil está validado há 60 dias? | **Sim** (só quando for verdade; conferir a data em business.google.com) |
+| O projeto já está na lista de autorizações? | Não |
+
+**Depois de aprovado:** o Claude conecta a conta no n8n (escopo `business.manage`, somente leitura dos números) e junta os números do perfil ao painel com YouTube, Studio, site, Search Console e Instagram.
