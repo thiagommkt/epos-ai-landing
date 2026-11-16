@@ -239,6 +239,24 @@ main{flex:1;min-width:0;overflow-y:auto;overscroll-behavior-y:contain;background
 .agenda-wrap{border:1px solid var(--bd);position:relative;overflow:hidden;background:var(--bg2)}
 .agenda-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--neon));z-index:2}
 .agenda-iframe{width:100%;height:calc(100vh - 160px);min-height:620px;border:none;display:block;margin-top:2px;filter:invert(90%) hue-rotate(180deg)}
+.agenda-lista{display:none}
+@media(max-width:768px){.agenda-wrap{display:none}.agenda-lista{display:block}}
+.ag-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 12px}
+.ag-topo span{font-size:12px;color:var(--muted)}
+.ag-btn{background:transparent;border:1px solid var(--bd-b);color:var(--text);font:600 12px var(--fD);padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.ag-dia{margin-bottom:16px}
+.ag-dia-tit{font-family:var(--fD);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ag-dia-tit.hoje{color:var(--neon)}
+.ag-ev{display:flex;gap:12px;align-items:stretch;background:var(--bg2);border:1px solid var(--bd);border-left:3px solid var(--purple);border-radius:10px;padding:11px 12px;margin-bottom:8px}
+.ag-ev.passou{opacity:.55;border-left-color:var(--dim)}
+.ag-hora{flex-shrink:0;width:52px;font:700 15px var(--fD)}
+.ag-hora small{display:block;font:500 11px var(--fM);color:var(--muted);margin-top:2px}
+.ag-info{min-width:0;flex:1}
+.ag-info a{color:var(--text);text-decoration:none;font-weight:600;font-size:14px;line-height:1.35;display:block}
+.ag-info small{display:block;color:var(--muted);font-size:12px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ag-meet{align-self:center;flex-shrink:0;background:var(--purple);color:#fff;text-decoration:none;font:700 12px var(--fD);padding:8px 11px;border-radius:8px}
+.ag-vazio{color:var(--muted);font-size:13px;padding:14px 0}
+.ag-pe{font-size:11px;color:var(--dim);margin-top:4px}
 .chat-noframe{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg3);padding:40px}
 .chat-noframe h3{font-family:var(--fD);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .chat-noframe p{font-size:13px;color:var(--muted);text-align:center;max-width:360px;line-height:1.6}
@@ -2057,6 +2075,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
   <div class="rule"></div>
 
+  <!-- 16/11: no celular, lista própria (agenda_eventos, cópia do Google a cada 10 min); a janela do Google fica vazia lá -->
+  <div class="agenda-lista" id="agenda-lista"></div>
   <div class="agenda-wrap">
     <iframe
       class="agenda-iframe"
@@ -4944,6 +4964,7 @@ function show(id) {
     if(id==='clientes') loadClientes();
     if(id==='prospeccao') { loadProspeccao(); pmLoad(); }
     if(id==='laboratorio') labLoad();
+    if(id==='agenda') agendaLoad();
     if(id==='numeros') numLoad();
     if(id==='remarketing') rmLoad();
   }
@@ -8128,6 +8149,48 @@ async function numLoad(dias) {
   } catch (e) { html = '<div class="num-vazio">Não consegui ler os números agora.</div>'; }
   html += NUM_PENDENTES.map(([tit, oque, estado]) => `<div class="num-card num-pend"><div class="num-card-tit">${tit} <span>em breve</span></div><p>${oque}</p><p>${estado}</p></div>`).join('');
   corpo.innerHTML = html;
+}
+// ═══ AGENDA NO CELULAR (16/11): lista de agenda_eventos (cópia do Google a cada 10 min) ═══
+let _agAntes = false;
+async function agendaLoad(antes) {
+  const box = document.getElementById('agenda-lista');
+  if (!box || !window.matchMedia('(max-width:768px)').matches) return;
+  if (antes !== undefined) _agAntes = antes;
+  const desde = new Date(); desde.setHours(0, 0, 0, 0);
+  if (_agAntes) desde.setDate(desde.getDate() - 15);
+  if (!box.innerHTML) box.innerHTML = '<div class="ag-vazio">Carregando a agenda…</div>';
+  let evs = [];
+  try {
+    const { data } = await sb(`agenda_eventos?conta=eq.epos&inicio=gte.${encodeURIComponent(desde.toISOString())}&order=inicio.asc&select=id,inicio,fim,dia_inteiro,titulo,local,meet,link,convidados`);
+    evs = data || [];
+  } catch (e) { box.innerHTML = '<div class="ag-vazio">Não consegui ler a agenda agora. Tente de novo em instantes.</div>'; return; }
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const chave = d => d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+  const rotDia = d => {
+    const dif = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - hoje) / 864e5);
+    const base = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '');
+    return dif === 0 ? 'Hoje · ' + base : dif === 1 ? 'Amanhã · ' + base : dif === -1 ? 'Ontem · ' + base : base;
+  };
+  const hora = d => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
+  const grupos = [];
+  for (const e of evs) {
+    const d = new Date(e.inicio), k = chave(d);
+    if (!grupos.length || grupos[grupos.length - 1].k !== k) grupos.push({ k, d, evs: [] });
+    grupos[grupos.length - 1].evs.push(e);
+  }
+  const agora = Date.now();
+  const html = grupos.map(g => `<div class="ag-dia"><div class="ag-dia-tit${chave(g.d) === chave(hoje) ? ' hoje' : ''}">${rotDia(g.d)}</div>` + g.evs.map(e => {
+    const ini = new Date(e.inicio), fim = e.fim ? new Date(e.fim) : null, passou = (fim || ini).getTime() < agora;
+    const conv = Array.isArray(e.convidados) && e.convidados.length ? e.convidados.join(', ') : (e.local || '');
+    return `<div class="ag-ev${passou ? ' passou' : ''}"><div class="ag-hora">${e.dia_inteiro ? 'Dia todo' : hora(ini)}${!e.dia_inteiro && fim ? `<small>até ${hora(fim)}</small>` : ''}</div>`
+      + `<div class="ag-info"><a href="${escHtml(e.link || 'https://calendar.google.com')}" target="_blank" rel="noopener">${escHtml(e.titulo || '(sem título)')}</a>${conv ? `<small>${escHtml(conv)}</small>` : ''}</div>`
+      + (e.meet && !passou ? `<a class="ag-meet" href="${escHtml(e.meet)}" target="_blank" rel="noopener">Meet</a>` : '') + '</div>';
+  }).join('') + '</div>').join('');
+  const nFrente = evs.filter(e => new Date(e.inicio).getTime() >= agora).length;
+  box.innerHTML = `<div class="ag-topo"><span>${nFrente} ${nFrente === 1 ? 'compromisso' : 'compromissos'} pela frente</span>`
+    + `<button class="ag-btn" onclick="agendaLoad(${!_agAntes})">${_agAntes ? 'Só de hoje em diante' : 'Ver 15 dias anteriores'}</button></div>`
+    + (html || '<div class="ag-vazio">Nenhum compromisso de hoje em diante.</div>')
+    + '<div class="ag-pe">Cópia da agenda do Google, atualizada a cada 10 minutos.</div>';
 }
 async function labLoad() {
   const lista = document.getElementById('lab-lista');
