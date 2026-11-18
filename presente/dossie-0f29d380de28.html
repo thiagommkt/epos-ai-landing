@@ -1,0 +1,3047 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dossiê de Ferramentas Criativas com IA — Guia Pessoal de Instalação e Uso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0d12;
+      --bg-elevated: #111620;
+      --bg-card: #151b27;
+      --bg-card-hover: #192131;
+      --bg-code: #0c1018;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
+      --text: #eef2f7;
+      --text-muted: #9ba6b8;
+      --text-dim: #6d788d;
+      --accent: #f59e0b;
+      --accent-soft: rgba(245, 158, 11, 0.14);
+      --cyan: #38bdf8;
+      --cyan-soft: rgba(56, 189, 248, 0.13);
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.14);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167, 139, 250, 0.14);
+      --rose: #fb7185;
+      --rose-soft: rgba(251, 113, 133, 0.14);
+      --radius: 14px;
+      --radius-sm: 9px;
+      --max-w: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.65;
+      font-size: 16px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(245, 158, 11, 0.07), transparent 36%),
+        radial-gradient(circle at 88% 4%, rgba(56, 189, 248, 0.06), transparent 34%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 40px 24px 96px;
+    }
+
+    /* Hero / Capa */
+    .hero {
+      background: linear-gradient(145deg, #131926 0%, #0e131d 100%);
+      border: 1px solid var(--border-strong);
+      border-radius: 20px;
+      padding: 40px 38px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--cyan), var(--green));
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      margin: 0 0 16px;
+      font-weight: 800;
+    }
+
+    .hero-lead {
+      font-size: 1.08rem;
+      color: var(--text-muted);
+      max-width: 820px;
+      margin: 0 0 24px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .hero-box {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+
+    .hero-box strong {
+      display: block;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .hero-box span {
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+
+    .personal-notice {
+      margin-top: 20px;
+      padding: 13px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(251, 113, 133, 0.08);
+      border: 1px solid rgba(251, 113, 133, 0.25);
+      color: #fecdd3;
+      font-size: 0.92rem;
+    }
+
+    /* Sumário */
+    .toc {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 44px;
+    }
+
+    .toc-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin: 0 0 14px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px 18px;
+    }
+
+    .toc-link {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s ease;
+    }
+
+    .toc-link:hover {
+      background: rgba(255, 255, 255, 0.05);
+      text-decoration: none;
+    }
+
+    .toc-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      min-width: 24px;
+    }
+
+    .toc-sub {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip-link {
+      font-size: 0.83rem;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+
+    .chip-link:hover {
+      color: var(--text);
+      border-color: var(--cyan);
+      text-decoration: none;
+    }
+
+    /* Seções */
+    section {
+      margin-bottom: 56px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-header {
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: clamp(1.45rem, 2.5vw, 1.9rem);
+      margin: 0;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin: 32px 0 14px;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      scroll-margin-top: 24px;
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      margin: 0 0 16px;
+      padding-left: 22px;
+      color: var(--text-muted);
+    }
+
+    li {
+      margin-bottom: 7px;
+    }
+
+    li strong {
+      color: var(--text);
+    }
+
+    /* Callouts */
+    .callout {
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      margin: 18px 0;
+      font-size: 0.95rem;
+    }
+
+    .callout-warn {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fde68a;
+    }
+
+    .callout-info {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.28);
+      color: #bae6fd;
+    }
+
+    .callout-ok {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.28);
+      color: #a7f3d0;
+    }
+
+    .callout strong {
+      color: #ffffff;
+    }
+
+    /* Tabelas */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-elevated);
+      margin: 18px 0 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--text);
+      font-weight: 700;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    /* Código */
+    code {
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.86em;
+      background: rgba(255, 255, 255, 0.07);
+      color: #f8fafc;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    pre {
+      position: relative;
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 16px 18px;
+      overflow-x: auto;
+      margin: 10px 0 16px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      display: block;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: var(--text);
+    }
+
+    /* Busca de ferramentas */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      margin-bottom: 28px;
+    }
+
+    .filter-input {
+      flex: 1 1 280px;
+      background: var(--bg-code);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 10px 14px;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .filter-input:focus {
+      border-color: var(--cyan);
+    }
+
+    .filter-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Cards de ferramentas */
+    .category-block {
+      margin-bottom: 44px;
+      scroll-margin-top: 24px;
+    }
+
+    .category-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent);
+      border-left: 4px solid var(--accent);
+      padding: 12px 18px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 18px;
+    }
+
+    .category-banner h3 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .category-banner span {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .tool-card:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-card-hover);
+    }
+
+    .tool-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tool-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-public {
+      background: var(--green-soft);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-pack {
+      background: var(--accent-soft);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-plugin {
+      background: var(--cyan-soft);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .badge-mcp {
+      background: var(--purple-soft);
+      color: #c4b5fd;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+
+    .badge-local {
+      background: var(--rose-soft);
+      color: #fda4af;
+      border: 1px solid rgba(251, 113, 133, 0.3);
+    }
+
+    .tool-rows {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 8px 16px;
+      font-size: 0.94rem;
+    }
+
+    .tool-label {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-top: 2px;
+    }
+
+    .tool-val {
+      color: var(--text-muted);
+      min-width: 0;
+    }
+
+    .tool-val pre {
+      margin: 4px 0 6px;
+      padding: 11px 14px;
+    }
+
+    .prompt-box {
+      background: rgba(56, 189, 248, 0.06);
+      border-left: 3px solid var(--cyan);
+      padding: 9px 13px;
+      border-radius: 0 8px 8px 0;
+      color: #e0f2fe;
+      font-size: 0.91rem;
+      font-style: italic;
+    }
+
+    /* Receitas */
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .recipe-card {
+      background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 26px 28px;
+    }
+
+    .recipe-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .recipe-num {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .recipe-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .recipe-card ol {
+      margin-bottom: 0;
+    }
+
+    .recipe-card li {
+      margin-bottom: 9px;
+    }
+
+    /* Dois painéis lado a lado */
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+      margin: 18px 0;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+    }
+
+    .panel h4 {
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        padding: 26px 20px;
+      }
+      .tool-rows {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .tool-label {
+        margin-top: 8px;
+        color: var(--accent);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 1. CAPA CURTA -->
+    <header class="hero" id="topo">
+      <div class="eyebrow">Presente Pessoal · Dossiê Prático</div>
+      <h1>Arsenal Criativo com Agentes de IA</h1>
+      <p class="hero-lead">
+        Guia completo de instalação e situações reais de uso das ferramentas criativas que rodamos no dia a dia com <strong>Claude Code</strong> e <strong>Google Antigravity</strong> — cobrindo vídeo em código, motion design, interfaces sem cara de template, geração local e em nuvem de imagens, carrosséis, copywriting, clonagem de voz e editores integrados via MCP.
+      </p>
+
+      <div class="hero-grid">
+        <div class="hero-box">
+          <strong>Para quem é</strong>
+          <span>Presente pessoal do Thiago em agradecimento pela força com o Google AI Ultra — feito para quem já tem intimidade com terminal, mas nunca viu esse ecossistema montado.</span>
+        </div>
+        <div class="hero-box">
+          <strong>O que tem dentro</strong>
+          <span>Preparação da máquina (Windows e Mac), configuração nos dois agentes, catálogo comentado de 50+ skills, plugins, apps locais e MCPs, mais 8 receitas completas passo a passo.</span>
+        </div>
+        <div class="hero-box">
+          <strong>Filosofia do setup</strong>
+          <span>Combinar agentes de código + skills especializadas (que dão repertório de diretor de arte/motion) + ferramentas locais gratuitas (FFmpeg, Playwright, ComfyUI, VoiceStudio).</span>
+        </div>
+      </div>
+
+      <div class="personal-notice">
+        <strong>Aviso de uso pessoal:</strong> este material é um presente privado entre amigos, não uma publicação comercial. Nenhuma chave ou credencial está incluída aqui — cada seção mostra exatamente onde gerar as suas próprias chaves com segurança. Algumas skills listadas abaixo vieram de pacotes fechados/curados sem repositório público aberto; para essas, o Thiago envia a pasta diretamente se a licença permitir.
+      </div>
+    </header>
+
+    <!-- SUMÁRIO COM ÂNCORAS -->
+    <nav class="toc" aria-label="Sumário">
+      <p class="toc-title">Sumário Rápido</p>
+      <div class="toc-grid">
+        <a class="toc-link" href="#sec-base"><span class="toc-num">01</span> Base: o que instalar primeiro</a>
+        <a class="toc-link" href="#sec-ambientes"><span class="toc-num">02</span> Skills no Claude Code e Antigravity</a>
+        <a class="toc-link" href="#sec-catalogo"><span class="toc-num">03</span> Catálogo completo por categoria</a>
+        <a class="toc-link" href="#sec-receitas"><span class="toc-num">04</span> 8 Receitas completas passo a passo</a>
+        <a class="toc-link" href="#sec-chaves"><span class="toc-num">05</span> Chaves, contas e boas práticas</a>
+        <a class="toc-link" href="#sec-problemas"><span class="toc-num">06</span> Problemas comuns e soluções</a>
+      </div>
+      <div class="toc-sub">
+        <a class="chip-link" href="#cat-video">🎬 Vídeo e motion (15)</a>
+        <a class="chip-link" href="#cat-design">🎨 Design, UI e marca (27)</a>
+        <a class="chip-link" href="#cat-imagem">🖼️ Imagem (5)</a>
+        <a class="chip-link" href="#cat-social">📱 Redes sociais e copy (6)</a>
+        <a class="chip-link" href="#cat-voz">🎙️ Voz (1 + integrações)</a>
+        <a class="chip-link" href="#cat-mcp">🔌 Editores via MCP (5)</a>
+      </div>
+    </nav>
+
+    <!-- 2. BASE: O QUE INSTALAR PRIMEIRO -->
+    <section id="sec-base">
+      <div class="section-header">
+        <span class="section-kicker">Seção 01 · Fundação</span>
+        <h2>Base: o que instalar primeiro</h2>
+      </div>
+      <p>
+        Quase todas as skills criativas apoiam-se em cinco ferramentas de base no sistema operacional (mais o Playwright para exportar artes HTML em PNG de alta resolução). Instale tudo em disco interno rápido (SSD principal, como <code>C:\</code> no Windows), nunca em HD externo USB.
+      </p>
+
+      <div class="two-col">
+        <div class="panel">
+          <h4>Windows (PowerShell via <code>winget</code>)</h4>
+          <ol>
+            <li>Abra o <strong>PowerShell</strong> e instale os cinco pacotes de base:</li>
+          </ol>
+<pre><code>winget install --id Git.Git -e
+winget install --id OpenJS.NodeJS.LTS -e
+winget install --id Python.Python.3.12 -e
+winget install --id astral-sh.uv -e
+winget install --id Gyan.FFmpeg -e</code></pre>
+          <ol start="2">
+            <li><strong>Feche e reabra o terminal</strong> para atualizar o <code>PATH</code>.</li>
+            <li>Instale o Playwright e o navegador Chromium para exportação de slides/carrosséis:</li>
+          </ol>
+<pre><code>pip install playwright
+python -m playwright install chromium</code></pre>
+        </div>
+
+        <div class="panel">
+          <h4>macOS (Terminal via <code>brew</code>)</h4>
+          <ol>
+            <li>Com o Homebrew instalado, rode no <strong>Terminal</strong>:</li>
+          </ol>
+<pre><code>brew install git node python@3.12 uv ffmpeg</code></pre>
+          <ol start="2">
+            <li>Reabra o terminal (ou recarregue seu <code>~/.zshrc</code>).</li>
+            <li>Instale o Playwright e o Chromium:</li>
+          </ol>
+<pre><code>pip3 install playwright
+python3 -m playwright install chromium</code></pre>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ferramenta</th>
+              <th>Para que serve no arsenal criativo</th>
+              <th>Observação de versão</th>
+              <th>Comando de conferência</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Node.js LTS</strong></td>
+              <td>Executa CLIs de vídeo em HTML (HyperFrames, OpenFilm, Huashu Motion), GSAP, Remotion e servidores MCP via <code>npx</code>.</td>
+              <td>HyperFrames exige <strong>Node.js 22+</strong>. Verifique se o LTS instalado é 22 ou superior.</td>
+              <td><code>node -v</code></td>
+            </tr>
+            <tr>
+              <td><strong>Python 3.12</strong></td>
+              <td>Roda scripts das skills de corte/áudio (<code>ffmpeg-skill</code>), exportação de slides e geração de ativos.</td>
+              <td>3.12 é o ponto ideal de compatibilidade geral (nota: <code>manimgx</code> isolado pede 3.13+ via <code>uv</code>).</td>
+              <td><code>python --version</code> / <code>python3 --version</code></td>
+            </tr>
+            <tr>
+              <td><strong>uv</strong></td>
+              <td>Gerenciador ultrarrápido de pacotes e ambientes Python; fornece o <code>uvx</code> para rodar MCPs (como <code>heygen-mcp</code>) sem poluir o sistema.</td>
+              <td>Mantém versões separadas do Python sob demanda sem conflito.</td>
+              <td><code>uv --version</code></td>
+            </tr>
+            <tr>
+              <td><strong>Git</strong></td>
+              <td>Clona e atualiza os repositórios de skills direto na pasta do agente.</td>
+              <td>Qualquer versão atual.</td>
+              <td><code>git --version</code></td>
+            </tr>
+            <tr>
+              <td><strong>FFmpeg</strong></td>
+              <td>Motor local gratuito de codificação MP4/MOV/WAV, normalização de volume (LUFS), corte e reenquadramento.</td>
+              <td><code>ffmpeg-skill</code> pede <strong>FFmpeg 6.1+</strong>.</td>
+              <td><code>ffmpeg -version</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. COMO INSTALAR SKILLS NO CLAUDE CODE E NO ANTIGRAVITY -->
+    <section id="sec-ambientes">
+      <div class="section-header">
+        <span class="section-kicker">Seção 02 · Agentes &amp; Diretórios</span>
+        <h2>Como instalar skills no Claude Code e no Google Antigravity</h2>
+      </div>
+      <p>
+        Uma <strong>skill</strong> nada mais é do que uma pasta contendo um arquivo <code>SKILL.md</code> (com instruções especializadas, regras de direção de arte e referências) e, às vezes, pastas auxiliares como <code>scripts/</code>, <code>references/</code> e <code>templates/</code>. Tanto o Claude Code quanto o Antigravity leem exatamente o mesmo formato.
+      </p>
+
+      <div class="callout callout-warn">
+        <strong>Importante sobre o Google AI Ultra e o Gemini CLI:</strong> o antigo <strong>Gemini CLI parou de aceitar contas pessoais em 18/06/2026</strong>. Para usar sua conta pessoal com o plano <strong>Google AI Ultra</strong> na linha de comando e no desktop, use o <strong>Google Antigravity</strong> (aplicativo desktop + CLI <code>agy</code>).
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <h4>1. No Claude Code</h4>
+          <ul>
+            <li><strong>Onde ficam as skills globais:</strong> <code>~/.claude/skills/</code> (no Windows: <code>C:\Users\&lt;SeuUsuario&gt;\.claude\skills\</code>).</li>
+            <li><strong>Onde ficam por projeto (opcional):</strong> <code>.claude/skills/</code> na raiz do projeto.</li>
+            <li><strong>Plugins de marketplace:</strong> instalados dentro de uma sessão interativa do Claude Code com os comandos <code>/plugin marketplace add dono/repo</code> e depois <code>/plugin install</code>.</li>
+          </ul>
+          <p><strong>Passo a passo com <code>git clone</code> (macOS/Linux ou Git Bash/PowerShell):</strong></p>
+<pre><code># 1. Crie a pasta global de skills se ainda não existir
+mkdir -p ~/.claude/skills
+
+# 2. Entre na pasta e clone uma skill direta
+cd ~/.claude/skills
+git clone https://github.com/blader/humanizer.git</code></pre>
+        </div>
+
+        <div class="panel">
+          <h4>2. No Google Antigravity (app + CLI <code>agy</code>)</h4>
+          <ul>
+            <li><strong>Onde ficam as skills globais:</strong> <code>~/.gemini/antigravity-cli/skills/</code> (no Windows: <code>C:\Users\&lt;SeuUsuario&gt;\.gemini\antigravity-cli\skills\</code>).</li>
+            <li><strong>Onde ficam por projeto:</strong> <code>.agents/skills/</code> na raiz do projeto.</li>
+            <li><strong>Regra de ouro #1 (limite de catálogo):</strong> o catálogo automático do Antigravity comporta cerca de <strong>~248 skills</strong>. Se você jogar centenas de pastas lá dentro, as excedentes ficam de fora da listagem automática.</li>
+            <li><strong>Regra de ouro #2 (sem atalhos):</strong> o Antigravity <strong>não segue atalhos de pasta</strong> (symlinks ou junctions do Windows). Copie as pastas reais!</li>
+          </ul>
+          <p><strong>Truque para usar todas as skills sem estourar o limite de ~248:</strong> mantenha as pastas clonadas em <code>~/.claude/skills/</code> (ou copie só as favoritas para <code>~/.gemini/antigravity-cli/skills/</code>) e liste os caminhos completos dos <code>SKILL.md</code> no seu arquivo global <code>~/.gemini/GEMINI.md</code> dizendo ao agente para ler o <code>SKILL.md</code> correspondente antes de executar a tarefa.</p>
+        </div>
+      </div>
+
+      <h3>Atenção à estrutura dos repositórios (skill única vs. coleção de skills)</h3>
+      <p>
+        Existem dois tipos de repositório no GitHub:
+      </p>
+      <ol>
+        <li><strong>Repositório de skill única</strong> (ex.: <code>humanizer</code>, <code>huashu-motion</code>, <code>huashu-design</code>, <code>design-dna</code>): o <code>SKILL.md</code> já está na raiz do repositório. Basta dar <code>git clone</code> dentro da pasta de skills.</li>
+        <li><strong>Repositório-coleção</strong> (ex.: <code>hyperframes</code>, <code>gsap-skills</code>, <code>marketingskills</code>, <code>motion-design-skill</code>, <code>design-motion-principles</code>, <code>brand-skills</code>): o repositório guarda várias subpastas dentro de <code>skills/&lt;nome&gt;/SKILL.md</code>. Nesse caso você pode usar o instalador universal <code>npx skills add &lt;dono/repo&gt;</code> <strong>ou</strong> clonar o repositório e copiar o conteúdo de <code>skills/*</code> para a pasta de skills do agente.</li>
+      </ol>
+
+      <p><strong>Script rápido para clonar os repositórios públicos de uma vez em <code>~/.claude/skills/</code>:</strong></p>
+<pre><code>cd ~/.claude/skills
+
+git clone https://github.com/heygen-com/hyperframes.git
+git clone https://github.com/DojoCodingLabs/remotion-superpowers.git
+git clone https://github.com/greensock/gsap-skills.git
+git clone https://github.com/LottieFiles/motion-design-skill.git
+git clone https://github.com/kylezantos/design-motion-principles.git
+git clone https://github.com/alchaincyf/huashu-motion.git
+git clone https://github.com/alchaincyf/huashu-design.git
+git clone https://github.com/nexu-io/open-design.git
+git clone https://github.com/zanwei/design-dna.git
+git clone https://github.com/Owl-Listener/designer-skills.git
+git clone https://github.com/Owl-Listener/ai-design-skills.git
+git clone https://github.com/cofoundy/brand-skills.git
+git clone https://github.com/AThevon/genjutsu.git
+git clone https://github.com/CloudAI-X/threejs-skills.git
+git clone https://github.com/guinacio/claude-image-gen.git
+git clone https://github.com/coreyhaines31/marketingskills.git
+git clone https://github.com/blader/humanizer.git</code></pre>
+
+      <p><strong>Copiando uma skill para o Antigravity (PowerShell no Windows / Terminal no Mac):</strong></p>
+<pre><code># Windows (PowerShell) — copia pastas reais (sem atalho)
+New-Item -ItemType Directory -Force "$HOME\.gemini\antigravity-cli\skills"
+Copy-Item -Recurse -Force "$HOME\.claude\skills\humanizer" "$HOME\.gemini\antigravity-cli\skills\"
+Copy-Item -Recurse -Force "$HOME\.claude\skills\gsap-skills\skills\*" "$HOME\.gemini\antigravity-cli\skills\"
+
+# macOS / Linux
+mkdir -p ~/.gemini/antigravity-cli/skills
+cp -R ~/.claude/skills/humanizer ~/.gemini/antigravity-cli/skills/
+cp -R ~/.claude/skills/gsap-skills/skills/* ~/.gemini/antigravity-cli/skills/</code></pre>
+    </section>
+
+    <!-- 4. CATÁLOGO POR CATEGORIA -->
+    <section id="sec-catalogo">
+      <div class="section-header">
+        <span class="section-kicker">Seção 03 · Ferramentas Detalhadas</span>
+        <h2>Catálogo completo por categoria</h2>
+      </div>
+      <p>
+        Use a busca abaixo para filtrar instantaneamente qualquer skill, plugin, ferramenta local ou conector MCP por nome ou finalidade (por exemplo: <code>carrossel</code>, <code>legenda</code>, <code>logo</code>, <code>3d</code>, <code>landing</code>, <code>voz</code>).
+      </p>
+
+      <div class="filter-bar">
+        <input
+          type="search"
+          id="toolSearch"
+          class="filter-input"
+          placeholder="Filtrar ferramentas por nome, uso ou palavra-chave..."
+          aria-label="Filtrar ferramentas"
+        />
+        <span class="filter-count" id="toolCount">Exibindo todas as ferramentas</span>
+      </div>
+
+      <!-- CATEGORIA 1: VÍDEO E MOTION -->
+      <div class="category-block" id="cat-video">
+        <div class="category-banner">
+          <h3>🎬 Vídeo e motion</h3>
+          <span>Vídeos renderizados a partir de HTML/React/Python, animações GSAP/3D e edição via FFmpeg</span>
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- hyperframes -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">hyperframes</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-local">19 subskills inclusas</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Framework aberto que transforma composições em HTML, CSS e animações controladas no tempo em vídeos MP4 determinísticos, guiado pela skill roteadora <code>hyperframes</code>.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">
+                1) Criar vídeos de lançamento de produto a partir da URL de um site (<code>product-launch-video</code>), vídeos explicativos sem rosto (<code>faceless-explainer</code>), vinhetas curtas (<code>motion-graphics</code>) ou clipes sincronizados na batida da música (<code>music-to-video</code>).<br />
+                2) Colocar legendas animadas (<code>embedded-captions</code>) ou cartões gráficos (<code>talking-head-recut</code>) sobre um vídeo de alguém falando, explicar um Pull Request do GitHub (<code>pr-to-video</code>), criar decks interativos (<code>slideshow</code>) ou migrar projetos do Remotion (<code>remotion-to-hyperframes</code>).<br />
+                <em>Subskills de suporte em <code>skills/</code>:</em> <code>general-video</code>, <code>figma</code>, <code>media-use</code>, <code>hyperframes-cli</code>, <code>hyperframes-core</code>, <code>hyperframes-animation</code>, <code>hyperframes-creative</code>, <code>hyperframes-keyframes</code> e <code>hyperframes-registry</code>.
+              </div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># Opção 1: instalador de skills (instala o conjunto principal sob demanda)
+npx skills add heygen-com/hyperframes --full-depth
+
+# Opção 2: git clone em ~/.claude/skills/
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/heygen-com/hyperframes.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js 22+ e FFmpeg instalados localmente. Renderização local 100% gratuita (sem chave de API obrigatória; nuvem/modelos externos são opcionais).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Usando /hyperframes, crie um vídeo de 20 segundos em 9:16 apresentando meu aplicativo de controle financeiro pessoal, com abertura tipográfica forte, demonstração de tela animada e prévia no navegador antes de renderizar o MP4."</div></div>
+            </div>
+          </article>
+
+          <!-- remotion-superpowers -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">remotion-superpowers</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-plugin">Plugin / Remotion</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Plugin aberto que transforma o Remotion (vídeo em React) em um estúdio completo com legendas palavra por palavra, transições, busca de vídeos de arquivo, música, locução e revisão por IA.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Produzir vídeos curtos (Reels/TikTok/Shorts) programáticos em React com legendas animadas via Whisper e vídeos gratuitos do Pexels. 2) Integrar geração de trilha, narração, clipes de IA e gráficos animados em D3/Three.js num único projeto Remotion.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># No Claude Code (recomendado pelo repositório):
+/plugin marketplace add DojoCodingLabs/remotion-superpowers
+/plugin install remotion-superpowers@remotion-superpowers
+
+# Ou via git clone em ~/.claude/skills/:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/DojoCodingLabs/remotion-superpowers.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js, Python e <code>uv</code>. Remotion local e Whisper são gratuitos; integrações externas (Pexels grátis com chave; KIE/ElevenLabs/Replicate/TwelveLabs pagos por uso) são configuradas opcionalmente via <code>/setup</code>.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Crie um vídeo vertical de 30 segundos em Remotion sobre 3 hábitos de produtividade para desenvolvedores, buscando vídeos de apoio gratuitos no Pexels, transições suaves e legendas destacadas palavra por palavra."</div></div>
+            </div>
+          </article>
+
+          <!-- gsap-skills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">gsap-skills</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Pacote oficial de skills da GreenSock que ensina o agente a programar animações precisas com GSAP (timelines, ScrollTrigger, SplitText, MorphSVG, Flip, React/Vue/Svelte e performance).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Criar seções de site que fixam na tela e animam conforme a rolagem (ScrollTrigger). 2) Animar letras/palavras (SplitText), transições de layout (Flip) ou linhas do tempo complexas para vídeos em HTML.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># Instala detectando Claude Code ou Antigravity (--agent antigravity):
+npx skills add https://github.com/greensock/gsap-skills
+
+# Ou via git clone:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/greensock/gsap-skills.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Nada pago — toda a biblioteca GSAP e todos os seus ex-plugins pagos agora são 100% gratuitos na npm pública (inclusive para uso comercial), sem token nem cadastro.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Adicione uma animação com GSAP ScrollTrigger e SplitText na seção principal desta página: fixe o painel esquerdo enquanto os 3 cartões da direita entram em sequência conforme o usuário rola."</div></div>
+            </div>
+          </article>
+
+          <!-- motion-design-skill -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">motion-design-skill</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Guia universal de direção de movimento criado pela LottieFiles que ensina duração, curvas de aceleração, os 12 princípios da Disney adaptados para telas e coreografia antes de escrever código.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Dar vida a microinterações de UI (botão enviando → sucesso → erro, entrada de modais e cartões). 2) Definir a personalidade de movimento de uma marca independente da tecnologia (CSS, GSAP, Framer Motion ou Lottie).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>npx skills add LottieFiles/motion-design-skill
+# Ou: cd ~/.claude/skills &amp;&amp; git clone https://github.com/LottieFiles/motion-design-skill.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves nem dependências extras.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Coreografe a sequência de abertura deste painel financeiro — primeiro o gráfico principal, depois os indicadores numéricos e por fim a barra lateral — aplicando curvas naturais da motion-design-skill."</div></div>
+            </div>
+          </article>
+
+          <!-- design-motion-principles -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">design-motion-principles</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Skill com dois modos (criar e auditar) que pondera três escolas reais de motion (contenção rápida de Emil Kowalski, refinamento de Jakub Krehel e experimentação de Jhey Tompkins).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Auditar um front-end já pronto para achar estados secos sem transição ou exageros típicos de IA (tudo pulsando/dando zoom no hover), gerando um relatório HTML com demos ao vivo. 2) Construir componentes interativos calibrados para o tipo de produto.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>npx skills add kylezantos/design-motion-principles
+# Ou: cd ~/.claude/skills &amp;&amp; git clone https://github.com/kylezantos/design-motion-principles.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves de API.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Faça uma auditoria completa das animações deste projeto com design-motion-principles e gere o relatório HTML apontando onde faltam transições de saída e onde há animação exagerada."</div></div>
+            </div>
+          </article>
+
+          <!-- huashu-motion -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">huashu-motion</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Diretor e estúdio interativo de vídeos promocionais e explicativos em HTML + GSAP renderizados quadro a quadro no seu próprio Google Chrome, com geração integrada de trilha e efeitos sonoros.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Criar um vídeo de lançamento de software capturando cores, fontes e telas reais do projeto (<code>om grab</code>) e propondo 3 direções antes de animar. 2) Revisar o vídeo clicando exatamente sobre o elemento no estúdio web local (<code>om studio</code>) para pedir ajustes pontuais.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>cd ~/.claude/skills &amp;&amp; git clone https://github.com/alchaincyf/huashu-motion.git
+# O CLI também roda via: npx huashu-motion</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Google Chrome instalado na máquina, Node.js e FFmpeg. 100% local e gratuito.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use huashu-motion para criar um vídeo de lançamento de 30 segundos (16:9) para o projeto desta pasta: colete os materiais reais, me mostre as 3 direções de movimento e abra o estúdio para eu revisar."</div></div>
+            </div>
+          </article>
+
+          <!-- threejs-skills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">threejs-skills</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Coleção de 10 skills técnicas para Three.js cobrindo cena, geometrias, materiais PBR, iluminação, texturas, carregamento GLTF/GLB, shaders GLSL, pós-processamento (bloom/DOF) e interação.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Colocar um objeto 3D interativo ou fundo com shader customizado no hero de uma landing page. 2) Construir cenas 3D sincronizadas com linhas do tempo de vídeo em HTML.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>cd ~/.claude/skills &amp;&amp; git clone https://github.com/CloudAI-X/threejs-skills.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves. Requer apenas navegador com suporte a WebGL.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Crie uma cena Three.js leve para o topo de um site de hardware de áudio: um anel metálico com iluminação de estúdio, reflexo suave, efeito fresnel em GLSL e rotação reagindo ao mouse."</div></div>
+            </div>
+          </article>
+
+          <!-- ffmpeg-skill -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">ffmpeg-skill</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Caixa de ferramentas local com 42 scripts em Python sobre o FFmpeg para cortar, juntar, reenquadrar, legendar, remover silêncio, sincronizar, normalizar volume (LUFS) e converter HDR para SDR.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Limpar pausas mortas de uma gravação bruta, converter de 16:9 para 9:16 e deixar o áudio cravado em -14 LUFS para Reels/YouTube. 2) Inspecionar quadros em mosaico (<code>look.py</code>) e validar codecs antes de postar, sem reencodar quando o corte puder ser sem perda.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (veio de pacote — o Thiago envia a pasta se a licença permitir). Copie a pasta <code>ffmpeg-skill</code> para <code>~/.claude/skills/ffmpeg-skill/</code> ou <code>~/.gemini/antigravity-cli/skills/ffmpeg-skill/</code>.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">FFmpeg 6.1+ e Python 3.10+ (usa apenas biblioteca padrão do Python, sem nuvem e sem custo).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Analise o arquivo aula-bruta.mp4 com a ffmpeg-skill, remova silêncios maiores que 0.8s, converta para 9:16 mantendo o assunto centralizado, normalize o áudio em -14 LUFS e valide a saída para Instagram Reels."</div></div>
+            </div>
+          </article>
+
+          <!-- manimgx -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">manimgx</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Skill para criar, inspecionar layout e exportar animações matemáticas, gráficos precisos, fórmulas LaTeX e cenas 3D em Python usando o motor ManimGX (estilo 3Blue1Brown).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Explicar visualmente juros compostos, algoritmos, estatística ou física com vetores e equações que se transformam na tela. 2) Gerar trechos técnicos limpíssimos para inserir em vídeos explicativos.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">A skill vem de pacote (o Thiago envia a pasta se a licença permitir). Para instalar a ferramenta CLI do ManimGX na máquina:
+<pre><code>uv tool install --python 3.14 manimgx</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Python 3.13+ (gerenciado automaticamente pelo <code>uv</code> acima). Texto, matemática e codificação de vídeo já vêm embutidos no pacote, grátis.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Com manimgx, crie uma animação de 15 segundos em 1920x1080 mostrando como uma curva exponencial supera uma reta ao longo do tempo, inspecione se não há texto sobreposto e exporte o MP4."</div></div>
+            </div>
+          </article>
+
+          <!-- motionmaxxing -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">motionmaxxing</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Diretor e crítico implacável de filmes promocionais em HTML/GSAP baseado em ~4.300 movimentos medidos quadro a quadro em 53 peças profissionais, com scripts próprios de inspeção visual.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Quando um vídeo promocional não pode ter cara de slide ou de IA genérica (proíbe HUDs falsos, cartões pequenos flutuando no vazio e fades preguiçosos). 2) Auditar e refinar ritmo, continuidade de objetos entre cortes e impacto visual com checagens objetivas (<code>look.py</code> e <code>lint.mjs</code>).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js, Python e navegador local (funciona sobre HyperFrames ou HTML puro, grátis; chave ElevenLabs é opcional apenas se quiser locução gerada por nuvem).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use motionmaxxing para dirigir um vídeo de 20 segundos revelando o novo recurso de busca instantânea do nosso app: extraia a identidade visual, crie transições por continuidade de movimento e rode todos os gates antes de entregar."</div></div>
+            </div>
+          </article>
+
+          <!-- business-motion-film -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">business-motion-film</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Metodologia completa para planejar, construir e revisar comerciais curtos (15–40 s) de negócios reais (serviços locais, e-commerce, B2B) unindo HTML/GSAP, Three.js seletivo e crítica independente ("Gauntlet").</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Produzir um anúncio que precisa ser compreendido mesmo no mudo e gerar pedidos de orçamento sem inventar provas falsas. 2) Submeter cada cena a um subagente crítico independente antes de fechar o corte final.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js, FFmpeg e navegador local (geradores externos de imagem/vídeo são opcionais se você já tiver fotos reais do negócio).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Monte o briefing e o storyboard de 30 segundos com business-motion-film para uma empresa de energia solar residencial focada em agendar vistoria técnica gratuita, e depois construa o filme passando pelo Gauntlet."</div></div>
+            </div>
+          </article>
+
+          <!-- open-edit -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">open-edit</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Kit de edição em código e CLI (<code>@veedstudio/openedit-cli</code>) com transcrição cronometrada por palavra, reenquadramento automático guiado por detecção facial (MediaPipe), remoção de fundo, lipsync e renderização Chrome incremental.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Reenquadrar entrevistas horizontais para vertical (9:16) acompanhando automaticamente o rosto de quem fala e posicionando textos atrás do apresentador. 2) Re-renderizar apenas o trecho alterado de uma composição HTML ou exportar o projeto editável para o editor da VEED.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">A skill vem de pacote (o Thiago envia a pasta se a licença permitir). No projeto, ela inicializa o CLI oficial com:
+<pre><code>npx --yes @veedstudio/openedit-cli init --dry --workspace .</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js, Chrome e FFmpeg; recursos em nuvem (transcrição VEED, apresentadores IA ou modelos <code>fal</code>) exigem conta/créditos na VEED ou chave da fal.ai (avisa antes de gastar).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use open-edit para detectar o rosto neste corte de podcast horizontal, reenquadrar para 9:16 seguindo quem está falando e adicionar um título grande passando atrás do apresentador nos primeiros 4 segundos."</div></div>
+            </div>
+          </article>
+
+          <!-- openfilm -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">openfilm</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Ponte enxuta para criar, cortar, inspecionar e renderizar vídeos como páginas web (<code>film.html</code> / <code>window.film</code>) usando o estúdio e CLI do OpenFilm.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Autorar rapidamente animações, clipes musicais ou vídeos de produto diretamente como uma página HTML autocontida com preview em estúdio próprio.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">A skill vem de pacote (o Thiago envia a pasta se a licença permitir). O motor é executado sob demanda via:
+<pre><code>npx -y openfilm@latest</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js e navegador local. Conferir detalhes adicionais no manual impresso pelo próprio comando <code>npx -y openfilm@latest</code>.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Abra um novo filme com openfilm e monte uma vinheta tipográfica rítmica de 12 segundos anunciando um workshop online de fotografia."</div></div>
+            </div>
+          </article>
+
+          <!-- video-talkcraft -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">video-talkcraft</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Esteira avançada para vídeos narrados/falados que pré-corta hesitações da locução, extrai marcação de tempo por palavra na CPU, planeja camadas de cena (SHOTBOOK) e renderiza em Remotion usando 108 cartões de animação prontos.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Transformar uma gravação de voz + roteiro em um vídeo horizontal ou vertical com estética limpa (estilo Apple), câmera suave e gráficos que entram nos pontos semânticos certos sem poluir a tela.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills e rode o script interno <code>runtime/check-runtime.sh</code> indicado no <code>SKILL.md</code>.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js, Python 3 e FFmpeg (alinhamento de áudio roda em CPU local grátis; integração Fish Audio é opcional). Nota: as instruções internas do <code>SKILL.md</code> original estão em chinês, mas o agente lê e aplica perfeitamente em português quando você pede.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Tenho este arquivo narracao.wav e o roteiro em texto: use video-talkcraft (adaptando textos de tela e legendas para português do Brasil) para alinhar os tempos, montar o SHOTBOOK e renderizar o vídeo em 1920x1080."</div></div>
+            </div>
+          </article>
+
+          <!-- anything2explainer -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">anything2explainer</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Gerador ponta a ponta de vídeos educativos/explicativos de 2 a 8 minutos em Remotion sobre fundo escuro com ondas de pontos, diagramas vetoriais, narração, legendas e barra de progresso por capítulos.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Transformar um artigo técnico, documentação ou conceito complexo (ex.: "como funciona busca vetorial") em uma aula visual completa dividida em capítulos, validando os primeiros 30 segundos antes de renderizar o resto.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js, Python 3, FFmpeg e ~5 GB livres em disco por projeto. Aceita áudio próprio (ex.: gerado no VoiceStudio) em <code>public/assets/&lt;slug&gt;/audio.wav</code>.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use anything2explainer para transformar este artigo sobre criptografia de ponta a ponta em um vídeo explicativo de 3 minutos; vou fornecer a narração em WAV e quero aprovar a prévia dos primeiros 30 segundos."</div></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- CATEGORIA 2: DESIGN, UI E MARCA -->
+      <div class="category-block" id="cat-design">
+        <div class="category-banner">
+          <h3>🎨 Design, UI e marca</h3>
+          <span>Sistemas visuais, landing pages sem clichês de IA, protótipos, apresentações e identidade de marca</span>
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- huashu-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">huashu-design</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Estúdio de design em HTML para protótipos interativos, apresentações 1920×1080, infográficos e demos animadas que exige checar fatos reais na web e sempre entrega 3 direções iniciais distintas para você escolher.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Quando você quer explorar o visual de um produto ou deck de slides comparando 3 caminhos estéticos reais antes de bater o martelo. 2) Criar apresentações e infográficos com acabamento gráfico editorial em HTML.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>cd ~/.claude/skills &amp;&amp; git clone https://github.com/alchaincyf/huashu-design.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, roda direto pelo agente e navegador local.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Com huashu-design, crie uma apresentação de 10 slides (1920x1080) para uma cafeteria especial que vende assinatura mensal de grãos: me mostre primeiro as 3 direções visuais para eu escolher."</div></div>
+            </div>
+          </article>
+
+          <!-- open-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">open-design</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-local">App + Skills + MCP</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Alternativa de código aberto ao Claude Design (app desktop macOS/Windows + CLI/MCP <code>od</code>) que reúne 100+ skills, 151 sistemas de design (<code>DESIGN.md</code>) e exportação para HTML, PDF, PPTX e MP4.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Gerar protótipos web/mobile, decks ou carrosséis guiados por um contrato de marca <code>DESIGN.md</code> em uma interface visual local conectada ao Claude Code ou Antigravity. 2) Refatorar componentes de um repositório existente para seguir um design system.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># Como repositório de skills:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/nexu-io/open-design.git
+
+# Ou baixe o app desktop em https://github.com/nexu-io/open-design/releases
+# e conecte ao agente via: od mcp install claude   (ou: od mcp install antigravity)</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Licença Apache 2.0, gratuito localmente (usa os próprios agentes CLI já instalados na sua máquina ou chave própria BYOK).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use open-design para gerar um protótipo de landing page SaaS seguindo um sistema de design minimalista escuro, pronto para visualizar e exportar."</div></div>
+            </div>
+          </article>
+
+          <!-- design-dna -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">design-dna</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Extrator e gerador de identidade visual em 3 dimensões: tokens medidos (cores, fontes, grid, raios), percepção de estilo (clima, densidade) e efeitos especiais (WebGL, partículas, shaders, scroll).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Você viu 2 ou 3 sites incríveis, tirou print ou copiou a URL e quer extrair o "DNA" deles num arquivo JSON estruturado. 2) Gerar uma página inédita para o seu próprio conteúdo aplicando exatamente esse perfil JSON.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>cd ~/.claude/skills &amp;&amp; git clone https://github.com/zanwei/design-dna.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Analise estas duas capturas de tela com design-dna, extraia o JSON completo das 3 dimensões e depois gere uma página de lançamento para o meu estúdio de arquitetura usando esse DNA."</div></div>
+            </div>
+          </article>
+
+          <!-- designer-skills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">designer-skills</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-plugin">9 plugins / 97 skills</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Suíte de prática de design de produto cobrindo pesquisa com usuários, sistemas de design, estratégia UX, UI, design de interação, testes de usabilidade, DesignOps e crítica visual.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Estruturar pesquisa de usuário, mapas de jornada, arquitetura de informação ou avaliação heurística de uma interface. 2) Tokenizar um sistema de design ou pedir uma crítica visual rigorosa de hierarquia, contraste e densidade.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># No Claude Code (escolha apenas os módulos desejados em /plugin -> Discover):
+/plugin marketplace add Owl-Listener/designer-skills
+
+# Ou clone o repositório:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/Owl-Listener/designer-skills.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use visual-critique do pacote designer-skills para avaliar a tela inicial do meu aplicativo: aponte falhas de hierarquia visual, contraste, agrupamento Gestalt e densidade de informação."</div></div>
+            </div>
+          </article>
+
+          <!-- ai-design-skills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">ai-design-skills</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-plugin">6 plugins / 44 skills</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Coleção focada em Agentic Experience Design (AXD): como projetar interfaces de produtos baseados em IA (fluxo misto humano-IA, estados de incerteza/erro, passagem de bastão, avaliação e arquitetura de prompts).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Projetar um assistente, copiloto ou painel com IA sem cair na armadilha de "só jogar uma caixa de chat". 2) Definir como a interface mostra confiança da resposta, pede confirmação em ações sensíveis e lida com falhas do modelo.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># No Claude Code:
+/plugin marketplace add Owl-Listener/ai-design-skills
+
+# Ou via git clone:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/Owl-Listener/ai-design-skills.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Estou desenhando um assistente financeiro por IA: ajude-me a projetar os estados de erro, confirmação antes de movimentar valores e calibração de tom quando o modelo não tem certeza."</div></div>
+            </div>
+          </article>
+
+          <!-- brand-skills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">brand-skills</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Esteira de 15 skills que transforma uma ideia de negócio em uma marca coerente: nome (baseado em metáforas, não clichês), posicionamento, arquitetura, identidade visual, voz, mensagens e manual salvo em <code>brand.yaml</code>.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Criar do zero o nome, a narrativa, o posicionamento e o brand book de um novo produto ou empresa em minutos. 2) Gerar um pacote <code>brand.yaml</code> reutilizável para que todas as próximas páginas e peças falem a mesma língua.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>npx skills add cofoundy/brand-skills
+# Ou: cd ~/.claude/skills &amp;&amp; git clone https://github.com/cofoundy/brand-skills.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis (licença MIT), sem chaves obrigatórias.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Estou lançando uma plataforma de contabilidade simplificada para criadores de conteúdo no Brasil: rode o pipeline da brand-skills para propor nomes fortes, posicionamento, tom de voz, paleta, tipografia e salvar o brand book."</div></div>
+            </div>
+          </article>
+
+          <!-- genjutsu -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">genjutsu</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-plugin">/genjutsu:cast &amp; paint</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Sistema criativo multiplataforma (Web, Android Jetpack Compose e Apple SwiftUI) dividido em dois rituais: <code>cast</code> (eleva interações e animações pontuais) e <code>paint</code> (constrói um universo visual e design system completo do zero).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Usar <code>/genjutsu:cast</code> para deixar um componente, menu ou rolagem com física impecável na sua stack real. 2) Usar <code>/genjutsu:paint</code> para desenhar um site ou aplicativo inteiro aprovando antes uma amostra viva de cores, fontes e curvas de movimento.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># No Claude Code:
+/plugin marketplace add AThevon/genjutsu
+/plugin install genjutsu
+
+# Ou via git clone:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/AThevon/genjutsu.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis (licença MIT), sem chaves obrigatórias.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"/genjutsu:paint Crie do zero o portfólio interativo de um diretor de fotografia: faça o brainstorm da direção criativa, me mostre a tese visual em uma página viva e depois implemente."</div></div>
+            </div>
+          </article>
+
+          <!-- claude-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">claude-design</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Metodologia de produção de artefatos de alta fidelidade em HTML (landing pages, decks, protótipos, pôsteres e wireframes) que verifica fatos na web, exige ativos reais da marca e oferece 3 variações quando o pedido é aberto.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Transformar um pedido vago ("faz um deck bonito para investidores" ou "crie um pôster para evento") em opções concretas, fugindo de gradientes agressivos e listas com emojis.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, apenas navegador local para inspecionar o HTML gerado.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use claude-design para criar um protótipo navegável de aplicativo de reserva de quadras de tênis: proponha a escala tipográfica e 3 variações de direção visual antes de fechar a versão final."</div></div>
+            </div>
+          </article>
+
+          <!-- design-taste-frontend -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">design-taste-frontend</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Skill front-end anti-clichê para landing pages, portfólios e redesigns que interpreta o público antes de programar e regula 3 mostradores: variância estética, intensidade de movimento e densidade visual.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Construir páginas de vendas ou institucionais que precisam ter cara de projeto autoral — bloqueando roxo-IA, Inter + slate-900 e a clássica fileira de 3 cartões iguais.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Com design-taste-frontend, construa a landing page de uma consultoria B2B de segurança cibernética para diretores de TI: declare sua leitura de design primeiro e entregue o HTML responsivo completo."</div></div>
+            </div>
+          </article>
+
+          <!-- high-end-visual-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">high-end-visual-design</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Diretriz de engenharia estética nível agência premiada: impõe fontes expressivas (Geist, Clash Display, serifa editorial), cartões com borda dupla aninhada ("double-bezel"), navegação em ilha flutuante e respiro amplo.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Quando um site de produto premium, imobiliária de alto padrão ou SaaS moderno precisa transmitir valor alto logo na primeira dobra, com colapso limpo para celular (<code>100dvh</code>).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Aplique high-end-visual-design no arquétipo Editorial Luxury para criar o site de uma marca artesanal de relógios mecânicos, com bento grid assimétrico e botões em ilha."</div></div>
+            </div>
+          </article>
+
+          <!-- minimalist-ui -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">minimalist-ui</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Protocolo de minimalismo utilitário e editorial estilo documento (inspirado em ferramentas de trabalho enxutas): fundo osso/branco quente, contraste entre serifa editorial e sans geométrica, zero gradientes, zero emojis e pastéis contidos só em etiquetas.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Ferramentas de escrita, documentação, produtos de conhecimento, blogs editoriais ou SaaS que pedem calma visual absoluta e legibilidade impecável.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Desenhe com minimalist-ui a página de apresentação de um aplicativo de notas para pesquisadores acadêmicos, usando fundo off-white quente, títulos em Instrument Serif e atalhos de teclado estilizados."</div></div>
+            </div>
+          </article>
+
+          <!-- industrial-brutalist-ui -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">industrial-brutalist-ui</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Arquitetura de interfaces mecânicas em dois modos puros (impresso industrial suíço claro com vermelho de alerta, ou terminal escuro de telemetria aeroespacial), com grades visíveis, fontes monoespaçadas e texturas analógicas.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Portfólios ousados de engenharia/criação, painéis densos de telemetria, produtos de hardware, IA de infraestrutura ou editoriais técnicos.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Construa um painel de monitoramento de frota de drones autônomos usando industrial-brutalist-ui no modo escuro Tactical Telemetry, com JetBrains Mono e indicadores de precisão."</div></div>
+            </div>
+          </article>
+
+          <!-- stitch-design-taste -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">stitch-design-taste</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Gerador de especificações semânticas <code>DESIGN.md</code> escritas na linguagem visual que o Google Stitch interpreta para gerar telas limpas, assimétricas e livres de clichês.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Antes de gerar telas no Google Stitch (<code>labs.google/stitch</code>), para travar paleta neutra com um único tom de destaque, tipografia expressiva e comportamento dos componentes.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis para gerar o <code>DESIGN.md</code>; acesso ao Google Stitch em <code>labs.google/stitch</code> para usar lá.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Gere um arquivo DESIGN.md com stitch-design-taste para um aplicativo web de gestão de clínicas odontológicas, com atmosfera calma, alta legibilidade e zero roxo neon."</div></div>
+            </div>
+          </article>
+
+          <!-- gpt-taste -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">gpt-taste</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Engenharia de landing pages com estrutura AIDA, sorteio determinístico de layouts para nunca repetir a mesma cara, regra rígida de títulos largos em até 2–3 linhas, bento grids sem células vazias e animações GSAP ScrollTrigger.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Criar páginas de marketing ricas em movimento (seções fixadas, cartões empilháveis no scroll, microimagens embutidas dentro do título principal) que funcionam de primeira.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, usa GSAP aberto.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Monte uma landing page AIDA completa com gpt-taste para uma marca de bicicletas elétricas urbanas, aplicando títulos largos em até 2 linhas, bento grid denso sem buracos e seções com GSAP ScrollTrigger."</div></div>
+            </div>
+          </article>
+
+          <!-- image-to-code -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">image-to-code</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Fluxo "imagem primeiro, código depois": o agente primeiro gera imagens de direção de arte amplas e legíveis para as seções do site, analisa cada detalhe visual delas e só então escreve o código fiel.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Quando programar direto do texto está gerando layouts sem graça e você quer ver a direção artística em imagem antes de transformar em HTML/CSS/React. 2) Converter mockups visuais em front-end limpo sem "cartão dentro de cartão dentro de cartão".</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Requer um gerador de imagens conectado ao agente (como <code>nano-banana</code>, <code>claude-image-gen</code> ou imagens geradas no ComfyUI) para a etapa 1.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use image-to-code para criar a página inicial de uma torrefação de cafés especiais: primeiro gere as imagens de referência de cada seção, analise a composição e implemente o código fielmente."</div></div>
+            </div>
+          </article>
+
+          <!-- redesign-existing-projects -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">redesign-existing-projects</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Checklist cirúrgico de evolução visual para projetos já prontos: escaneia a base de código atual, diagnostica defeitos de tipografia, cor, sombra e alinhamento, e melhora o visual sem quebrar funcionalidades.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Dar banho de loja num sistema, dashboard ou landing page funcional que ficou com cara amadora (preto puro <code>#000</code>, botões desalinhados, misturas de cinza quente e frio, uso de <code>100vh</code> quebrando no celular).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, funciona com qualquer CSS (Tailwind, CSS puro, styled-components etc.).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Rode redesign-existing-projects neste projeto: liste os problemas visuais encontrados na auditoria e aplique as melhorias mantendo toda a lógica atual intacta."</div></div>
+            </div>
+          </article>
+
+          <!-- apple-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">apple-design</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Tradução prática das palestras de design da Apple na WWDC (como <em>Designing Fluid Interfaces</em>) para a web: resposta no <code>pointerdown</code>, arraste 1:1 com velocidade herdada, molas interrompíveis e materiais translúcidos.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Criar gavetas (sheets), carrosséis táteis, modais e botões web que parecem objetos físicos contínuos no dedo ou no mouse, podendo ser interrompidos no meio da animação.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Construa um painel inferior arrastável (bottom sheet) para mobile web seguindo a apple-design: resposta imediata ao toque, acompanhamento 1:1 do dedo, projeção de inércia e mola interrompível."</div></div>
+            </div>
+          </article>
+
+          <!-- apple-hig-designer -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">apple-hig-designer</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Especialista nas Human Interface Guidelines (HIG) da Apple para criar componentes e telas estilo iOS/macOS baseados em clareza, deferência ao conteúdo, profundidade em camadas e acessibilidade.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Desenhar aplicativos web, protótipos de apps iOS/macOS ou painéis administrativos limpos com hierarquia San Francisco e ícones estilo SF Symbols.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Desenhe com apple-hig-designer uma tela de ajustes e assinatura para um aplicativo estilo macOS/iOS, respeitando os quatro pilares do HIG e suporte a modo claro e escuro."</div></div>
+            </div>
+          </article>
+
+          <!-- frontend-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">frontend-design</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Skill concisa e direta que obriga o agente a assumir um ponto de vista estético marcante (editorial, art déco, orgânico, industrial, luxo refinado etc.) antes de escrever componentes, páginas ou pôsteres em HTML/CSS/React.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Tarefas rápidas de interface em que você quer código limpo, variáveis CSS organizadas, tipografia com personalidade e atmosfera visual sem carregar um framework pesado.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Usando frontend-design, crie uma página de convite e programação para um festival de jazz noturno com estética art déco contemporânea, tipografia contrastante e animação escalonada na abertura."</div></div>
+            </div>
+          </article>
+
+          <!-- ui-ux-pro-max -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">ui-ux-pro-max</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Base pesquisável de inteligência de UI/UX contendo 67 estilos visuais, 96 paletas de cores por setor, 57 combinações de fontes, 25 tipos de gráfico e 99 diretrizes de usabilidade para 13 stacks (React, Next, Vue, SwiftUI, Flutter, Tailwind etc.).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Escolher rapidamente a paleta, o par de fontes e o tipo certo de gráfico para o nicho de um projeto novo. 2) Revisar acessibilidade (contraste 4.5:1, foco de teclado, áreas de toque mínimas de 44×44 px).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir; nota: uma versão dela também vem embutida como subskill dentro do <code>genjutsu</code>). Copie para a pasta de skills.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Python 3 (para rodar os scripts locais de busca na base da skill), grátis.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Consulte ui-ux-pro-max para recomendar a melhor paleta de cores, combinação de fontes e arquitetura de gráficos para um dashboard de saúde preventiva, e monte a tela principal em React + Tailwind."</div></div>
+            </div>
+          </article>
+
+          <!-- brandkit -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">brandkit</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Direção de arte especializada em gerar pranchas visuais de identidade de marca (logo simbólico, diagramas geométricos de construção, paleta, tipografia enxuta e mockups de aplicação) em uma única imagem coesa.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Visualizar rapidamente como uma marca nova ficaria apresentada num painel de estúdio de branding (modo escuro técnico, editorial, luxo, cultural ou app de consumo).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Usa um gerador de imagens acoplado ao agente (como <code>nano-banana</code>, <code>claude-image-gen</code> ou ComfyUI).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use a skill brandkit junto com o gerador de imagens para criar uma prancha completa de diretrizes de marca para uma startup desenvolvedora de ferramentas de linha de comando chamada 'Kestrel'."</div></div>
+            </div>
+          </article>
+
+          <!-- banner-design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">banner-design</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Sistema multi-formato para criar capas de redes sociais (YouTube, LinkedIn, X), banners de anúncios (Google Display, Meta) e heróis de site respeitando dimensões exatas e zonas de segurança (70–80% centrais).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Gerar de uma só vez 3 opções de direção de arte de banner para campanha ou capa de canal em HTML/CSS prontas para exportar em PNG.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (pacote ClaudeKit — o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Navegador/Playwright para captura final; gerador de imagem é opcional para elementos ilustrados/fotográficos.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Crie com banner-design 3 opções de capa para perfil de LinkedIn (1584x396) para um engenheiro de dados freelancer, respeitando a zona segura da foto de perfil à esquerda."</div></div>
+            </div>
+          </article>
+
+          <!-- brand -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">brand</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Guardião operacional de consistência de marca: organiza manual de voz e identidade em <code>docs/brand-guidelines.md</code> e traz scripts Node para sincronizá-lo automaticamente com tokens JSON e variáveis CSS.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Manter um documento-mestre da marca dentro do repositório e injetar automaticamente paleta e regras em novos criativos, banners e páginas.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js local, grátis.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use a skill brand para estruturar o arquivo docs/brand-guidelines.md da minha marca e sincronizar as cores e fontes em variáveis CSS prontas para uso."</div></div>
+            </div>
+          </article>
+
+          <!-- design -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">design</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Canivete suíço unificado que roteia criação de logotipos (55 estilos), papelaria corporativa (CIP com 50 entregáveis), ícones SVG, slides, banners e artes sociais multi-plataforma.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Gerar briefs e conceitos de logo por indústria, conjuntos de ícones vetoriais SVG consistentes ou pacotes visuais para múltiplas redes sociais de uma vez.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Python 3 e Node.js locais; usa chave Gemini (AI Studio) apenas nas funções que geram bitmaps de logo/mockup por IA.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Usando a skill design, pesquise referências minimalistas para o setor de saúde e gere um pacote de 8 ícones SVG lineares coesos para o nosso aplicativo."</div></div>
+            </div>
+          </article>
+
+          <!-- design-system -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">design-system</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Arquitetura formal de tokens em 3 camadas (<code>primitivo → semântico → componente</code>), escalas de espaçamento/tipografia, estados de componentes e geração de apresentações fiéis ao sistema.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Estruturar variáveis CSS e tema Tailwind de forma escalável (para trocar tema claro/escuro ou rebrand sem caçar hexadecimais espalhados pelo código).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js local, grátis.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Estruture com design-system uma arquitetura de tokens de três camadas (primitivo, semântico e componente) para nosso sistema web com suporte nativo a modo claro e escuro."</div></div>
+            </div>
+          </article>
+
+          <!-- slides -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">slides</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Criador de apresentações estratégicas em HTML navegável com gráficos interativos em Chart.js, padrões de layout testados e fórmulas de copywriting para apresentações comerciais ou executivas.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Montar um pitch deck ou relatório de resultados com gráficos reais em HTML que abre em qualquer navegador (e pode virar PDF pelo navegador/Playwright).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, apenas navegador local.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Crie com a skill slides uma apresentação comercial de 8 lâminas em HTML escuro com gráficos Chart.js mostrando redução de tempo operacional de uma ferramenta de automação."</div></div>
+            </div>
+          </article>
+
+          <!-- ui-styling -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">ui-styling</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Guia prático para construir interfaces acessíveis combinando primitivos <code>shadcn/ui</code> (Radix UI), Tailwind CSS e composições visuais em Canvas.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Implementar tabelas de dados, formulários complexos, diálogos, paletas de comando (<code>Cmd+K</code>) e modo escuro em projetos Next.js, Vite ou Astro seguindo as melhores práticas do <code>shadcn/ui</code>.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Projeto React/Vite/Next/Astro com Node.js, grátis.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Usando ui-styling, monte uma tela de gerenciamento de pedidos com shadcn/ui e Tailwind contendo filtros, tabela ordenável, gaveta de detalhes e modo escuro."</div></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- CATEGORIA 3: IMAGEM -->
+      <div class="category-block" id="cat-imagem">
+        <div class="category-banner">
+          <h3>🖼️ Imagem</h3>
+          <span>Geração e edição de imagens na nuvem (Gemini/OpenAI), localmente na GPU (ComfyUI) e direção visual de telas</span>
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- claude-image-gen -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">claude-image-gen</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-plugin">Skill + CLI + MCP</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Gerador de imagens integrado que roteia automaticamente entre modelos do Google Gemini e da OpenAI (<code>gpt-image-2</code>), aceitando proporções configuráveis (1:1, 16:9, 9:16) e até 5 imagens de referência.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Gerar ilustrações, fotos de herói para sites, fundos de slides ou variações guiadas por uma imagem de referência direto durante a construção de uma página.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># No Claude Code (instala skill + CLI + MCP juntos):
+/plugin marketplace add guinacio/claude-image-gen
+/plugin install media-pipeline@media-pipeline-marketplace
+
+# Ou via git clone:
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/guinacio/claude-image-gen.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Pelo menos uma chave de API: <code>GEMINI_API_KEY</code> (Google AI Studio) e/ou <code>OPENAI_API_KEY</code> (OpenAI Platform), cobradas por imagem gerada. Node.js 20+ para build manual.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Gere com claude-image-gen uma foto editorial em 16:9 de uma mesa de marcenaria minimalista iluminada por luz natural lateral, salve em assets/hero.png e aplique na página."</div></div>
+            </div>
+          </article>
+
+          <!-- nano-banana -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">nano-banana</span>
+              <div class="badges">
+                <span class="badge badge-mcp">Conector MCP</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Servidor MCP dedicado aos modelos de imagem do Gemini para gerar imagens inéditas e fazer edições iterativas em cima da última imagem criada sem sair do chat do agente.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Criar ativos visuais para anúncios, carrosséis e thumbnails e refinar em etapas ("mantenha o cenário, mas troque a iluminação para fim de tarde").</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Registre o servidor MCP <code>nano-banana</code> na configuração MCP do seu Claude Code ou Antigravity passando sua chave Gemini (comando exato do pacote: <em>conferir no repositório do conector</em>).</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Chave da API do Gemini (<code>GEMINI_API_KEY</code>), criada no <strong>Google AI Studio</strong>. <strong>Atenção:</strong> o uso da API é cobrado à parte por consumo e não está incluído na franquia da assinatura mensal do Google AI Ultra.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use o MCP nano-banana para gerar uma fotografia de estúdio em fundo grafite de um fone de ouvido sem fio fosco; depois faça uma segunda versão adicionando gotas sutis de água."</div></div>
+            </div>
+          </article>
+
+          <!-- ComfyUI -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">ComfyUI (versão portátil NVIDIA)</span>
+              <div class="badges">
+                <span class="badge badge-local">Ferramenta local · Grátis</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Motor visual baseado em nós para gerar, editar e ampliar imagens por IA localmente na sua própria placa de vídeo NVIDIA, sem mensalidade e sem custo por tentativa.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Gerar dezenas de variações de cenários, retratos, texturas ou fundos de thumbnail sem gastar um centavo de API. 2) Rodar fluxos com controle fino de pose, iluminação, inpainting e upscale.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Baixe o pacote oficial <strong>Windows Portable (NVIDIA)</strong> no repositório oficial do ComfyUI no GitHub (<em>conferir link da última release no repositório</em>), extraia em uma pasta no SSD principal (ex.: <code>C:\ComfyUI\</code>, já vem com Python próprio embutido) e execute o script de inicialização para GPU NVIDIA.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">PC com GPU NVIDIA — <strong>8 GB de VRAM já bastam tranquilamente para geração de imagem</strong> (usando checkpoints modernos em FP8/GGUF). Custo zero de execução.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Monte para mim um prompt detalhado (positivo, negativo, proporção e iluminação) otimizado para gerar no meu ComfyUI local o fundo cinematográfico desta miniatura de YouTube."</div></div>
+            </div>
+          </article>
+
+          <!-- imagegen-frontend-web -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">imagegen-frontend-web</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Diretor de arte para referências visuais de sites que impõe uma regra de ouro: gerar <strong>uma imagem horizontal separada para cada seção da página</strong> (ex.: 6 seções = 6 imagens), mantendo a mesma paleta e variando a composição.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Explorar conceitos visuais completos de uma landing page de alta conversão sem aquele erro clássico de espremer o site inteiro num único PNG comprido e ilegível.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Um gerador de imagens ativo no agente (como <code>nano-banana</code> ou <code>claude-image-gen</code>).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use imagegen-frontend-web para conceber o visual de uma landing page de 6 seções para uma escola online de idiomas: gere 1 imagem horizontal nítida por seção com a mesma identidade."</div></div>
+            </div>
+          </article>
+
+          <!-- imagegen-frontend-mobile -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">imagegen-frontend-mobile</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Diretor de arte exclusivo para gerar imagens conceituais de telas e fluxos de aplicativos móveis (iOS e Android) com hierarquia limpa, áreas seguras reais e moldura discreta de smartphone (gera apenas imagens, não código).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Apresentar rapidamente o conceito visual de um fluxo de onboarding, carteira digital ou app de treino em 4 telas consistentes antes de iniciar o desenvolvimento.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Gerador de imagens ativo no agente (<code>nano-banana</code> ou <code>claude-image-gen</code>).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Com imagegen-frontend-mobile, gere 4 imagens de telas consistentes (boas-vindas, metas, treino do dia e progresso) para um app iOS minimalista de corrida de rua."</div></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- CATEGORIA 4: REDES SOCIAIS E COPY -->
+      <div class="category-block" id="cat-social">
+        <div class="category-banner">
+          <h3>📱 Redes sociais e copy</h3>
+          <span>Copywriting, limpeza de vícios de IA, legendas, carrosséis em PNG, estratégia para YouTube e anúncios</span>
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- marketingskills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">marketingskills</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+                <span class="badge badge-local">35+ subskills</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Biblioteca completa de marketing para agentes cobrindo <code>copywriting</code>, <code>copy-editing</code>, <code>social</code>, <code>ad-creative</code>, <code>ads</code>, <code>video</code>, <code>image</code>, <code>cro</code>, <code>offers</code>, <code>cold-email</code>, <code>launch</code> e <code>seo-audit</code>, todas conectadas por um documento-base <code>product-marketing</code>.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Escrever o texto persuasivo de uma landing page, estruturar uma oferta irresistível ou criar dezenas de variações de títulos e textos para anúncios pagos. 2) Planejar calendário de redes sociais e roteiros de vídeo alinhados ao posicionamento do produto.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code># Instala para o Claude Code:
+npx skills add coreyhaines31/marketingskills -a claude-code
+
+# Ou via plugin no Claude Code:
+/plugin marketplace add coreyhaines31/marketingskills
+/plugin install marketing-skills
+
+# Ou git clone (as skills ficam em marketingskills/skills/*):
+cd ~/.claude/skills &amp;&amp; git clone https://github.com/coreyhaines31/marketingskills.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use as skills copywriting e cro do pacote marketingskills para escrever o texto completo da página de vendas de um curso intensivo de SQL para analistas de negócios."</div></div>
+            </div>
+          </article>
+
+          <!-- humanizer -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">humanizer</span>
+              <div class="badges">
+                <span class="badge badge-public">Repositório público</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Revisor editorial baseado no guia "Signs of AI writing" da Wikipédia que caça e elimina tiques robóticos de IA (simbolismos inflados, excesso de travessões, regra de três forçada, adjetivos vazios e gerúndios superficiais) sem inventar fatos.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Passar como filtro final em qualquer legenda de Instagram, roteiro de vídeo, artigo, e-mail ou texto de site antes de publicar. 2) Calibrar a escrita usando um texto real antigo seu como amostra de voz.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>cd ~/.claude/skills &amp;&amp; git clone https://github.com/blader/humanizer.git</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis (licença MIT), sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Passe este rascunho de post pela skill humanizer: mantenha todos os dados reais, corte qualquer frase com cara de IA e adapte para um tom direto e natural em português do Brasil."</div></div>
+            </div>
+          </article>
+
+          <!-- instagram-skills -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">instagram-skills</span>
+              <div class="badges">
+                <span class="badge badge-plugin">Plugin Claude Code</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Plugin do marketplace do Claude Code dedicado ao Instagram, com fluxos para escrever legendas que seguram leitura, humanizar textos de feed/Reels e otimizar bio e posicionamento de perfil.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Escrever legendas com gancho forte na primeira linha para acompanhar um carrossel ou Reels recém-editado. 2) Revisar a bio, nome de busca e destaques de um perfil profissional.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Dentro do Claude Code, execute na ordem:
+<pre><code>/plugin marketplace add sergebulaev/instagram-skills
+/plugin install</code></pre>
+                <em>(Para usar no Antigravity, após instalar no Claude Code ou clonar o repositório, copie as pastas de <code>skills/</code> do plugin para <code>~/.gemini/antigravity-cli/skills/</code>).</em>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, sem chaves.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Usando instagram-skills, escreva 2 opções de legenda para este Reels de 30 segundos sobre organização financeira para autônomos e passe pelo humanizador do Instagram."</div></div>
+            </div>
+          </article>
+
+          <!-- Marketing-Skills-Carrossel -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">Marketing-Skills-Carrossel</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Gerador completo de carrosséis para Instagram (<code>instagram-carousel</code>): coleta identidade da marca, escreve os slides em português, monta uma prévia HTML deslizável estilo feed e exporta cada lâmina em PNG <strong>1080×1350 px</strong> via Playwright.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Produzir carrosséis educativos ou de autoridade (7 a 10 slides) com tipografia editorial, imagens embutidas em base64 e nitidez perfeita sem abrir ferramentas manuais de arrastar caixinhas.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Python 3 + Playwright com Chromium instalado localmente (grátis).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Crie um carrossel de 7 slides com Marketing-Skills-Carrossel para o perfil @estudioluz sobre '5 erros de iluminação que deixam sua sala menor': gere a prévia HTML primeiro para eu aprovar antes de exportar os PNGs 1080x1350."</div></div>
+            </div>
+          </article>
+
+          <!-- youtube -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">youtube</span>
+              <div class="badges">
+                <span class="badge badge-pack">Pacote curado (sem repo público)</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Orquestrador com 14 subskills para YouTube: auditoria de canal, ideias baseadas em demanda, SEO, ganchos dos primeiros 30 segundos (<code>/youtube hook</code>), roteiros com retenção, briefing de thumbnail, Shorts, análise de métricas e metadados de upload.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Planejar um vídeo novo do zero: validar o título + briefing visual da miniatura antes mesmo de gravar, e depois escrever o gancho e o roteiro completo. 2) Reaproveitar um vídeo longo em cortes verticais (Shorts/Reels).</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Sem repositório público conhecido (o Thiago envia a pasta se a licença permitir). Copie para a pasta de skills do agente.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Grátis, usa busca web do próprio agente quando precisa pesquisar concorrentes e tendências.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Use /youtube thumbnail e /youtube hook para um canal iniciante de reviews de notebooks custo-benefício: crie 3 conceitos de miniatura + título de alto CTR e o gancho dos primeiros 30 segundos."</div></div>
+            </div>
+          </article>
+
+          <!-- Playwright -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">Playwright (exportador visual)</span>
+              <div class="badges">
+                <span class="badge badge-local">Ferramenta local · Grátis</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Motor de navegador invisível (headless Chromium) usado pelo agente para fotografar carrosséis, slides, banners e páginas HTML com escala de alta densidade (DPI) exata.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Converter slides HTML de carrossel (420×525 px com fator de escala 2.5714×) em PNGs cravados em 1080×1350 px. 2) Tirar prints automáticos de páginas web em desktop e mobile para inspeção visual do próprio agente.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">
+<pre><code>pip install playwright
+python -m playwright install chromium</code></pre>
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Python 3 instalado localmente. Grátis.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Aprovado o carrossel em HTML! Agora use Playwright em modo invisível (headless) para aguardar o carregamento das fontes e exportar cada slide individual em 1080x1350 px na pasta ./saida-png/."</div></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- CATEGORIA 5: VOZ -->
+      <div class="category-block" id="cat-voz">
+        <div class="category-banner">
+          <h3>🎙️ Voz</h3>
+          <span>Síntese de fala (TTS) e clonagem vocal local sem custo por caractere</span>
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- VoiceStudio -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">VoiceStudio</span>
+              <div class="badges">
+                <span class="badge badge-local">Ferramenta local · TTS &amp; Clonagem</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Estúdio local de síntese de voz (Text-to-Speech) e clonagem vocal para gerar locuções naturais e consistentes direto na sua máquina, exportando em WAV/MP3.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">
+                1) Gerar narrações em português para vídeos explicativos (<code>hyperframes</code>, <code>anything2explainer</code>, <code>huashu-motion</code>) sem pagar créditos por minuto em serviços de nuvem.<br />
+                2) Criar um perfil de voz clonada (sua própria voz ou voz com autorização expressa) para manter o mesmo locutor em toda uma série de Reels ou aulas.
+              </div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Instale sempre no SSD principal (<code>C:\</code> no Windows). Para pacote/instalador correspondente à sua versão de sistema e GPU, <em>conferir no repositório oficial do projeto</em>.</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Computador local (GPU NVIDIA acelera bastante a geração e a clonagem) + um áudio limpo de referência (sem música de fundo nem eco) para clonar o timbre. Custo zero por geração.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Escreva um roteiro de locução de 45 segundos com pontuação pensada para leitura natural no VoiceStudio (frases curtas, números escritos por extenso); assim que eu gerar o locucao.wav, combine-o com o vídeo a 100% de volume na voz e música baixa ao fundo usando a ffmpeg-skill."</div></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- CATEGORIA 6: EDITORES VIA MCP -->
+      <div class="category-block" id="cat-mcp">
+        <div class="category-banner">
+          <h3>🔌 Editores e conectores via MCP</h3>
+          <span>Pontes Model Context Protocol que deixam o agente pilotar editores instalados, avatares e documentação ao vivo</span>
+        </div>
+
+        <div class="callout callout-info">
+          <strong>Como funcionam os MCPs nos dois ambientes:</strong> no Claude Code você registra servidores via <code>claude mcp add ...</code> (ou no arquivo local de configuração MCP do usuário); no Antigravity o registro fica na configuração global de MCP do usuário (<code>~/.gemini/config/mcp_config.json</code>) ou do projeto (<code>.agents/mcp_config.json</code>). Cada pessoa configura com sua própria chave local.
+        </div>
+
+        <div class="tools-grid">
+
+          <!-- photoshop MCP -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">photoshop (MCP)</span>
+              <div class="badges">
+                <span class="badge badge-mcp">Conector MCP</span>
+                <span class="badge badge-local">App Desktop Local</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Conector MCP que permite ao agente controlar o Adobe Photoshop aberto na sua máquina: criar documentos, camadas, textos, máscaras, recortar assunto, ajustar curvas/cores, aplicar receitas de tratamento e salvar PSD/PNG/WebP.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Montar um arquivo PSD editável em camadas organizadas (fundo gerado no ComfyUI + recorte de pessoa + tipografia editável + correção de cor) para dar o toque final manual se quiser. 2) Automatizar lotes de variantes sociais, remoção de fundo ou marcas d'água.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Com o Adobe Photoshop instalado no computador, instale a ponte/servidor MCP para Photoshop e adicione-o ao seu arquivo de configuração MCP (pacote e passo exato do plugin: <em>conferir no repositório do conector</em>).</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Licença ativa do Adobe Photoshop instalado localmente na máquina (Windows ou macOS). Não exige chave de API extra para operações locais de camadas/filtros.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Com o Photoshop aberto, use o MCP photoshop para criar um documento 1280x720, posicionar fundo.png na base, recortar o sujeito de retrato.png em nova camada, aplicar tratamento de retrato e adicionar o título editável 'GUIA DEFINITIVO' no topo esquerdo."</div></div>
+            </div>
+          </article>
+
+          <!-- concat MCP -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">concat (MCP)</span>
+              <div class="badges">
+                <span class="badge badge-mcp">Conector MCP</span>
+                <span class="badge badge-local">Editor de Vídeo Desktop</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Conector MCP do editor de vídeo <strong>Concat</strong> que dá ao agente controle direto sobre projetos de linha do tempo: importar mídia, cortar/dividir/mover clipes, velocidade, estabilização, máscaras, keyframes, legendas, títulos e exportação.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Quando você quer que o agente monte a primeira edição completa (cortes, legendas, títulos, zoom keyframes) dentro de uma timeline visual real que você pode abrir no app Concat para ajustar um corte fino com o mouse.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Instale o aplicativo <strong>Concat</strong> na máquina e registre o conector MCP dele no Claude Code / Antigravity (caminho/comando do binário MCP: <em>conferir na documentação/repositório do app Concat</em>).</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Aplicativo Concat instalado localmente.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Crie um novo projeto vertical 1080x1920 no Concat via MCP, importe os 3 takes da pasta ./gravacoes/, monte a sequência cortando as falhas iniciais, adicione legendas e gere um frame de prévia."</div></div>
+            </div>
+          </article>
+
+          <!-- HeyGen MCP -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">HeyGen (heygen-mcp)</span>
+              <div class="badges">
+                <span class="badge badge-mcp">Servidor MCP Oficial</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Servidor MCP oficial da HeyGen para listar avatares/vozes e gerar vídeos com apresentadores digitais sincronizados por IA diretamente por comandos do agente.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Produzir vídeos institucionais, treinamentos ou anúncios com avatar falante quando ninguém vai gravar câmera presencialmente, para depois finalizar overlays no <code>hyperframes</code> ou <code>concat</code>.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Roda direto via <code>uvx</code> sem precisar clonar nada. Exemplo de comando/configuração MCP:
+<pre><code># No Claude Code (substitua pela sua chave ou leia do ambiente):
+claude mcp add heygen -e HEYGEN_API_KEY=SUA_CHAVE_AQUI -- uvx heygen-mcp</code></pre>
+                No Antigravity, aponte <code>command: "uvx"</code>, <code>args: ["heygen-mcp"]</code> e a variável <code>HEYGEN_API_KEY</code> no bloco <code>env</code> do seu MCP.
+              </div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val"><code>uv</code> instalado + variável <code>HEYGEN_API_KEY</code> gerada na sua conta HeyGen. <strong>Atenção:</strong> a API da HeyGen consome créditos próprios de API (separados da assinatura comum de uso pelo site).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Liste meus avatares disponíveis via heygen-mcp, me peça confirmação de qual usar antes de gastar créditos, e gere um vídeo de 25 segundos com este roteiro em português."</div></div>
+            </div>
+          </article>
+
+          <!-- context7 MCP -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">context7 (MCP)</span>
+              <div class="badges">
+                <span class="badge badge-mcp">Conector MCP</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Conector MCP que busca documentação e exemplos de código atualizados de qualquer biblioteca aberta (GSAP, Three.js, Remotion, Tailwind v4, Next.js, Playwright etc.) em tempo real.</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Sempre que o agente for programar animações, shaders ou componentes usando bibliotecas que mudaram recentemente, evitando que ele invente parâmetros antigos de memória.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Adicione o servidor MCP <code>context7</code> ao Claude Code / Antigravity (comando exato e eventual chave gratuita para limite maior: <em>conferir no repositório oficial do Context7</em>).</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Node.js (<code>npx</code>) e conexão com a internet. Uso básico gratuito.</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Consulte a documentação atual do @gsap/react e do Tailwind CSS no context7 antes de escrever os componentes animados desta página."</div></div>
+            </div>
+          </article>
+
+          <!-- nano-banana lembrete MCP -->
+          <article class="tool-card">
+            <div class="tool-top">
+              <span class="tool-name">nano-banana (resumo MCP)</span>
+              <div class="badges">
+                <span class="badge badge-mcp">Conector MCP · Imagem</span>
+              </div>
+            </div>
+            <div class="tool-rows">
+              <div class="tool-label">O que é</div>
+              <div class="tool-val">Conector MCP de geração e edição contínua de imagens via API do Google Gemini (detalhado na categoria <a href="#cat-imagem">Imagem</a> acima).</div>
+
+              <div class="tool-label">Quando usar</div>
+              <div class="tool-val">1) Gerar ou retocar imagens sob demanda enquanto o agente monta sites, slides, carrosséis ou composições no Photoshop/HyperFrames.</div>
+
+              <div class="tool-label">Como instalar</div>
+              <div class="tool-val">Configurado via JSON de MCP com sua <code>GEMINI_API_KEY</code> (<em>conferir pacote no repositório do conector</em>).</div>
+
+              <div class="tool-label">O que precisa</div>
+              <div class="tool-val">Chave criada no Google AI Studio (faturada por consumo à parte do Google AI Ultra).</div>
+
+              <div class="tool-label">Pedido de exemplo</div>
+              <div class="tool-val"><div class="prompt-box">"Gere com nano-banana um ícone 3D minimalista em argila fosca para ilustrar o cartão de segurança da nossa landing page."</div></div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. RECEITAS COMPLETAS (8 SITUAÇÕES) -->
+    <section id="sec-receitas">
+      <div class="section-header">
+        <span class="section-kicker">Seção 04 · Fluxos Combinados</span>
+        <h2>8 Receitas completas para o dia a dia</h2>
+      </div>
+      <p>
+        O segredo do ganho de qualidade não é usar uma ferramenta isolada, e sim encadear 2 a 4 peças na ordem certa: estratégia/roteiro → direção visual → geração/execução → revisão anti-IA e exportação.
+      </p>
+
+      <div class="recipe-grid">
+
+        <!-- Receita 1 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 1 · Reels de 30 s com legenda animada e cortes limpos</h4>
+            <span class="recipe-num">Vídeo Curto</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-pack">ffmpeg-skill</span>
+            <span class="badge badge-public">hyperframes (/embedded-captions)</span>
+            <span class="badge badge-mcp">concat (opcional)</span>
+            <span class="badge badge-plugin">instagram-skills</span>
+            <span class="badge badge-public">humanizer</span>
+          </div>
+          <ol>
+            <li><strong>Limpeza e formato bruto:</strong> entregue o vídeo gravado no celular ou câmera para o agente e peça para usar a <code>ffmpeg-skill</code> para converter HDR→SDR se necessário, cortar silêncios longos, enquadrar em <code>1080x1920</code> (9:16) e normalizar a voz em <code>-14 LUFS</code> (mantendo a voz sempre em 100% de clareza).</li>
+            <li><strong>Legendas e cartões visuais:</strong> chame <code>/hyperframes</code> na rota <code>/embedded-captions</code> (para legendas cinematográficas sincronizadas) ou <code>/talking-head-recut</code> (se quiser também lower-thirds e cartões de dados). Se preferir ajustar cortes visualmente com o mouse depois, peça para montar a timeline pelo MCP do <code>concat</code>.</li>
+            <li><strong>Prévia antes de renderizar:</strong> abra a prévia no navegador (<code>npx hyperframes preview</code>), confira se nenhuma legenda invade a área dos botões do Instagram e só então mande renderizar o MP4 final.</li>
+            <li><strong>Legenda do post:</strong> peça uma legenda com gancho forte via <code>instagram-skills</code> e passe o texto final pela <code>humanizer</code> para remover qualquer cacoete de IA.</li>
+          </ol>
+        </article>
+
+        <!-- Receita 2 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 2 · Carrossel do Instagram pronto para postar (1080×1350 px)</h4>
+            <span class="recipe-num">Social &amp; Design</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-public">marketingskills (copywriting)</span>
+            <span class="badge badge-local">ComfyUI ou nano-banana</span>
+            <span class="badge badge-pack">Marketing-Skills-Carrossel</span>
+            <span class="badge badge-local">Playwright</span>
+            <span class="badge badge-public">humanizer</span>
+          </div>
+          <ol>
+            <li><strong>Texto afiado por lâmina:</strong> peça ao agente para estruturar uma sequência de 7 slides com <code>marketingskills</code> (capa com promessa concreta, 5 lâminas de desenvolvimento enxuto e chamada final) e passar o texto pela <code>humanizer</code>.</li>
+            <li><strong>Imagens de apoio (se houver):</strong> gere 1 ou 2 fotos de fundo/ilustração no <code>ComfyUI</code> (grátis local) ou via <code>nano-banana</code>.</li>
+            <li><strong>Prévia deslizável em HTML:</strong> acione <code>Marketing-Skills-Carrossel</code> informando arroba, paleta, fonte e caminho das imagens (a skill embute as fotos em base64 para nunca quebrarem). Abra o arquivo HTML gerado no navegador e deslize pelos slides.</li>
+            <li><strong>Ajuste cirúrgico e exportação PNG:</strong> peça eventuais correções só nos slides necessários ("diminua o título do slide 3") e diga "aprovado, pode exportar". O agente usa o <code>Playwright</code> com fator de escala de alta densidade para salvar <code>slide_1.png</code> a <code>slide_7.png</code> em exatos <strong>1080×1350 px</strong>.</li>
+          </ol>
+        </article>
+
+        <!-- Receita 3 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 3 · Vídeo explicativo sem rosto (Faceless Explainer)</h4>
+            <span class="recipe-num">Educação &amp; Produto</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-local">VoiceStudio</span>
+            <span class="badge badge-public">hyperframes (/faceless-explainer)</span>
+            <span class="badge badge-pack">anything2explainer ou manimgx</span>
+            <span class="badge badge-pack">ffmpeg-skill</span>
+          </div>
+          <ol>
+            <li><strong>Roteiro enxuto:</strong> peça um roteiro narrativo de 60 a 120 segundos (1 ideia central por parágrafo, números traduzidos em comparações concretas) e revise com a <code>humanizer</code>.</li>
+            <li><strong>Narração local gratuita:</strong> gere o arquivo <code>narracao.wav</code> no <code>VoiceStudio</code>.</li>
+            <li><strong>Animação em código:</strong> para vídeos de 45–90 s com estética livre, use <code>/hyperframes</code> na rota <code>/faceless-explainer</code>; para vídeos de 3–5 min divididos em capítulos sobre fundo escuro estilo documentário técnico, use <code>anything2explainer</code> (aprovando antes a amostra dos primeiros 30 s). Se houver uma demonstração matemática ou geométrica no meio, gere esse clipe com <code>manimgx</code>.</li>
+            <li><strong>Mixagem e entrega:</strong> use a <code>ffmpeg-skill</code> para garantir que a música de fundo baixe suavemente enquanto a voz permanece cristalina em primeiro plano e valide o MP4 final.</li>
+          </ol>
+        </article>
+
+        <!-- Receita 4 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 4 · Motion de logo / vinheta curta (Logo Sting de 5–8 s)</h4>
+            <span class="recipe-num">Motion Graphics</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-public">motion-design-skill</span>
+            <span class="badge badge-public">gsap-skills</span>
+            <span class="badge badge-public">hyperframes (/motion-graphics)</span>
+            <span class="badge badge-pack">motionmaxxing</span>
+          </div>
+          <ol>
+            <li><strong>Arquivo vetorial real:</strong> coloque o arquivo <code>logo.svg</code> oficial na pasta do projeto (nunca peça para a IA "redesenhar de cabeça" um logotipo que já existe).</li>
+            <li><strong>Direção de movimento:</strong> peça ao agente para ler <code>motion-design-skill</code> e <code>motionmaxxing</code> para planejar uma entrada física rápida (desaceleração limpa sem quicar artificialmente, luz e textura de fundo coerentes com a marca, sem fades preguiçosos).</li>
+            <li><strong>Construção e render:</strong> construa a composição de 5 a 8 segundos usando <code>gsap-skills</code> (MorphSVG/SplitText/Timeline) dentro da rota <code>/motion-graphics</code> do <code>hyperframes</code>.</li>
+            <li><strong>Inspeção quadro a quadro:</strong> visualize no preview, rode a checagem de quadros e exporte em MP4 60 fps (ou versão com fundo transparente para usar como assinatura sobre outros vídeos).</li>
+          </ol>
+        </article>
+
+        <!-- Receita 5 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 5 · Identidade de marca completa do zero</h4>
+            <span class="recipe-num">Branding</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-public">brand-skills</span>
+            <span class="badge badge-pack">brand + design-system</span>
+            <span class="badge badge-pack">brandkit</span>
+            <span class="badge badge-mcp">nano-banana (ou ComfyUI)</span>
+            <span class="badge badge-pack">claude-design</span>
+          </div>
+          <ol>
+            <li><strong>Estratégia, nome e voz:</strong> descreva o produto e o público em um parágrafo e rode <code>brand-skills</code> para definir opções de nome, posicionamento, personalidade, tom de voz e gerar o pacote <code>brand.yaml</code>.</li>
+            <li><strong>Tokens de código:</strong> use <code>brand</code> e <code>design-system</code> para converter paleta, tipografia e espaçamentos escolhidos em <code>brand-guidelines.md</code>, JSON de tokens e variáveis CSS.</li>
+            <li><strong>Pranchas visuais de estúdio:</strong> acione <code>brandkit</code> junto com <code>nano-banana</code> (ou gere os prompts para o <code>ComfyUI</code>) para criar pranchas de apresentação mostrando conceito de símbolo, grade construtiva e mockups de aplicação.</li>
+            <li><strong>Brand book navegável:</strong> feche pedindo à <code>claude-design</code> (ou <code>huashu-design</code>) um manual de marca interativo em um único arquivo HTML elegante para compartilhar com sócios ou designers.</li>
+          </ol>
+        </article>
+
+        <!-- Receita 6 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 6 · Landing page bonita (zero cara de template de IA)</h4>
+            <span class="recipe-num">Web &amp; Conversão</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-public">design-dna (opcional)</span>
+            <span class="badge badge-public">marketingskills + humanizer</span>
+            <span class="badge badge-pack">design-taste-frontend + high-end-visual-design</span>
+            <span class="badge badge-public">gsap-skills</span>
+            <span class="badge badge-mcp">context7</span>
+          </div>
+          <ol>
+            <li><strong>Referência opcional:</strong> se você tiver prints de 1 ou 2 sites cuja estética admira, extraia o perfil JSON com <code>design-dna</code>.</li>
+            <li><strong>Copy antes do layout:</strong> escreva os títulos, subtítulos, provas e chamadas com <code>marketingskills</code> (<code>copywriting</code> + <code>offers</code>) e limpe clichês com <code>humanizer</code>.</li>
+            <li><strong>Arquitetura e código:</strong> combine <code>design-taste-frontend</code> com <code>high-end-visual-design</code> (ou <code>minimalist-ui</code> se quiser editorial calmo) + <code>gsap-skills</code> para rolagem fluida, consultando <code>context7</code> caso use versões novas de frameworks.</li>
+            <li><strong>Inspeção real em navegador:</strong> peça para o agente abrir a página via <code>Playwright</code> invisível em resolução desktop (1440×900) e celular (390×844), olhar os screenshots gerados e corrigir qualquer quebra de linha ou falta de contraste antes de te entregar.</li>
+          </ol>
+        </article>
+
+        <!-- Receita 7 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 7 · Miniatura (Thumbnail) de YouTube de alto clique</h4>
+            <span class="recipe-num">YouTube &amp; Imagem</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-pack">youtube (/youtube thumbnail)</span>
+            <span class="badge badge-local">ComfyUI ou nano-banana</span>
+            <span class="badge badge-mcp">photoshop (ou banner-design + Playwright)</span>
+          </div>
+          <ol>
+            <li><strong>Conceito + título casados:</strong> rode <code>/youtube thumbnail</code> passando o tema do vídeo. A skill devolve pares de título + composição visual com no máximo 3 elementos em cena e texto curto complementar (que não repete o título do vídeo).</li>
+            <li><strong>Cena de fundo:</strong> gere o cenário ou elemento visual dramático em <code>16:9</code> usando o <code>ComfyUI</code> local (grátis, quantas tentativas quiser) ou o <code>nano-banana</code>, reservando espaço negativo limpo para o texto ou rosto.</li>
+            <li><strong>Montagem final em 1280×720 px:</strong> se tiver Photoshop, peça ao agente via MCP <code>photoshop</code> para recortar sua foto, tratar luz/contraste e montar o PSD editável; se não tiver Photoshop, peça para montar com <code>banner-design</code> em HTML/CSS e exportar o PNG final via <code>Playwright</code>, conferindo legibilidade também em tamanho minúsculo (como aparece no celular).</li>
+          </ol>
+        </article>
+
+        <!-- Receita 8 -->
+        <article class="recipe-card">
+          <div class="recipe-head">
+            <h4>Receita 8 · Locução clonada sincronizada quadro a quadro com vídeo</h4>
+            <span class="recipe-num">Áudio &amp; Vídeo</span>
+          </div>
+          <div class="recipe-stack">
+            <span class="badge badge-local">VoiceStudio</span>
+            <span class="badge badge-pack">ffmpeg-skill</span>
+            <span class="badge badge-public">huashu-motion (ou video-talkcraft)</span>
+          </div>
+          <ol>
+            <li><strong> Amostra limpa:</strong> grave de 30 a 60 segundos de voz limpa em ambiente silencioso e crie o modelo de voz no <code>VoiceStudio</code>.</li>
+            <li><strong>Geração e polimento do áudio:</strong> gere a locução completa do roteiro em <code>.wav</code> no VoiceStudio e passe na <code>ffmpeg-skill</code> para cortar silêncios excessivos no início/fim e acertar o volume sem comprimir demais a naturalidade.</li>
+            <li><strong> Vídeo guiado pela voz:</strong> passe esse arquivo de áudio para o <code>huashu-motion</code> (<code>om voice &lt;pasta&gt; --audio locucao.wav</code>) ou para o <code>video-talkcraft</code>. Os dois extraem os tempos exatos das palavras/frases para disparar entradas visuais na hora certa e abaixar automaticamente a trilha musical enquanto a voz fala.</li>
+          </ol>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 6. CHAVES E CONTAS -->
+    <section id="sec-chaves">
+      <div class="section-header">
+        <span class="section-kicker">Seção 05 · Segurança &amp; Custos</span>
+        <h2>Chaves, contas e boas práticas</h2>
+      </div>
+      <p>
+        Grande parte deste dossiê roda <strong>100% de graça na sua máquina</strong> (HyperFrames local, GSAP, Three.js, FFmpeg, Playwright, ComfyUI, VoiceStudio e quase todas as skills de design e copy). Você só precisa criar chaves para os conectores de nuvem que decidir ativar.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Serviço / Variável</th>
+              <th>Usado por</th>
+              <th>Onde criar a sua própria chave</th>
+              <th>Como funciona a cobrança</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Google AI Ultra</strong> (conta Google pessoal)</td>
+              <td>Google Antigravity (app desktop + CLI <code>agy</code>)</td>
+              <td>Na sua própria conta Google com assinatura ativa do plano Google AI Ultra (login direto no Antigravity).</td>
+              <td>Assinatura mensal fixa do plano Ultra. <em>Lembrete: o Gemini CLI antigo não aceita mais conta pessoal desde 18/06/2026; use o <code>agy</code>.</em></td>
+            </tr>
+            <tr>
+              <td><strong>API do Google Gemini</strong><br /><code>GEMINI_API_KEY</code></td>
+              <td><code>nano-banana</code>, <code>claude-image-gen</code>, funções de logo da skill <code>design</code></td>
+              <td>Acesse <strong>Google AI Studio</strong> (<code>aistudio.google.com/apikey</code>) logado na sua conta e gere uma API Key em um projeto seu.</td>
+              <td><strong>Cobrada à parte do plano Google AI Ultra</strong> (faturamento por uso/imagem gerada no Google Cloud / AI Studio). Configure alerta de orçamento lá!</td>
+            </tr>
+            <tr>
+              <td><strong>HeyGen API</strong><br /><code>HEYGEN_API_KEY</code></td>
+              <td>Servidor MCP <code>heygen-mcp</code></td>
+              <td>No painel da sua conta em <code>heygen.com</code> → configurações da conta → seção <strong>API</strong> (gere seu token pessoal).</td>
+              <td><strong>Créditos próprios de API</strong> (independentes do plano de criação manual na web). Peça sempre ao agente para confirmar antes de disparar renderização.</td>
+            </tr>
+            <tr>
+              <td><strong>OpenAI API</strong> (opcional)<br /><code>OPENAI_API_KEY</code></td>
+              <td><code>claude-image-gen</code> (apenas se quiser usar <code>gpt-image-2</code> em vez de Gemini)</td>
+              <td>Em <code>platform.openai.com/api-keys</code> na sua conta de desenvolvedor OpenAI.</td>
+              <td>Pré-pago por créditos de API (separado do ChatGPT Plus/Pro). Totalmente opcional se você já usa Gemini ou ComfyUI.</td>
+            </tr>
+            <tr>
+              <td><strong>Pexels / ElevenLabs / fal.ai / VEED</strong> (opcionais)</td>
+              <td>Recursos extras de nuvem em <code>remotion-superpowers</code> e <code>open-edit</code></td>
+              <td>Nos portais de desenvolvedor de cada serviço (Pexels API é gratuita; os demais são por crédito).</td>
+              <td>100% opcionais — você pode usar vídeos locais, FFmpeg e VoiceStudio sem criar nenhuma dessas contas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Regras de segurança que evitam dor de cabeça</h3>
+      <ol>
+        <li><strong>Nunca cole chaves de API dentro do chat com o agente:</strong> o histórico de conversa fica salvo em logs locais e consome contexto. Salve suas chaves em um arquivo <code>.env</code> local ou no bloco <code>env</code> da configuração do MCP fora do repositório.</li>
+        <li><strong>Trave o <code>.env</code> fora do Git no primeiro minuto de qualquer projeto:</strong> antes do primeiro commit, garanta que o arquivo de segredos está ignorado:</li>
+      </ol>
+<pre><code># Na raiz de qualquer projeto novo:
+echo ".env" &gt;&gt; .gitignore
+echo ".env.*" &gt;&gt; .gitignore</code></pre>
+      <ol start="3">
+        <li><strong>Modelo limpo de <code>.env</code> (preencha só na sua máquina, nunca suba para o GitHub):</strong></li>
+      </ol>
+<pre><code># Exemplo de .env local (NUNCA versionar no Git)
+GEMINI_API_KEY=coloque_sua_chave_do_google_ai_studio_aqui
+HEYGEN_API_KEY=coloque_sua_chave_da_heygen_aqui
+OPENAI_API_KEY=opcional_se_usar_gpt_image</code></pre>
+      <ol start="4">
+        <li><strong>Ative tetos mensais de gasto (Hard Limits):</strong> tanto no Google Cloud (vinculado ao AI Studio) quanto na OpenAI, defina um teto mensal baixo (ex.: US$ 10 ou US$ 20) para que um laço acidental de geração de imagens nunca gere susto na fatura.</li>
+      </ol>
+    </section>
+
+    <!-- 7. PROBLEMAS COMUNS E COMO RESOLVER -->
+    <section id="sec-problemas">
+      <div class="section-header">
+        <span class="section-kicker">Seção 06 · Solução Rápida</span>
+        <h2>Problemas comuns e como resolver</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sintoma / Erro</th>
+              <th>Causa raiz</th>
+              <th>Como resolver na hora</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Gemini CLI recusa login na conta pessoal ou não reconhece o plano Ultra</strong></td>
+              <td>O Gemini CLI encerrou o suporte a contas pessoais em 18/06/2026.</td>
+              <td>Instale e use o <strong>Google Antigravity</strong> (aplicativo desktop e CLI <code>agy</code>), que é onde o plano Google AI Ultra funciona para contas pessoais.</td>
+            </tr>
+            <tr>
+              <td><strong>Skill instalada não aparece no Antigravity</strong></td>
+              <td>Ou você criou um atalho de pasta (symlink/junction), ou ultrapassou o teto de ~248 skills no catálogo automático.</td>
+              <td>1) Substitua qualquer atalho por uma cópia real da pasta em <code>~/.gemini/antigravity-cli/skills/</code>.<br />2) Deixe no catálogo automático só as mais usadas e liste os caminhos exatos dos demais <code>SKILL.md</code> no seu <code>~/.gemini/GEMINI.md</code> para o agente ler com a ferramenta de leitura quando precisar.</td>
+            </tr>
+            <tr>
+              <td><strong>Clonei um repositório em <code>skills/</code>, mas o agente não acha as subskills</strong></td>
+              <td>Repositórios-coleção (como <code>marketingskills</code>, <code>gsap-skills</code> e <code>hyperframes</code>) guardam cada skill um nível abaixo, em <code>repo/skills/&lt;nome&gt;/SKILL.md</code>.</td>
+              <td>Rode <code>npx skills add &lt;dono/repo&gt;</code> (que já posiciona cada subpasta no lugar certo) ou copie o conteúdo interno de <code>repo/skills/*</code> para a raiz da pasta de skills do agente.</td>
+            </tr>
+            <tr>
+              <td><strong>HyperFrames falha ao iniciar ou ao gerar MP4</strong></td>
+              <td>Versão do Node abaixo da 22 ou <code>ffmpeg</code> fora do <code>PATH</code> do sistema.</td>
+              <td>Rode <code>node -v</code> (atualize se for menor que v22) e <code>ffmpeg -version</code>. No Windows, após instalar via <code>winget</code>, é obrigatório fechar todas as janelas de terminal e abrir uma nova.</td>
+            </tr>
+            <tr>
+              <td><strong>Acentos em português viram <code>?</code> ou <code></code> em scripts no Windows</strong></td>
+              <td>O PowerShell clássico interpreta argumentos literais na linha de comando em ANSI em vez de UTF-8.</td>
+              <td>Oriente o agente no seu <code>CLAUDE.md</code> / <code>GEMINI.md</code>: <em>"Nunca passe texto em português com acento direto em argumentos do PowerShell; grave sempre o arquivo ou JSON em UTF-8 pela ferramenta de escrita ou Python."</em></td>
+            </tr>
+            <tr>
+              <td><strong>Playwright falha ao exportar carrossel (<code>Executable doesn't exist</code>) ou fonte sai genérica</strong></td>
+              <td>O pacote Python foi instalado, mas o binário do Chromium não foi baixado — ou o print saiu antes de baixar a Google Font.</td>
+              <td>Rode <code>python -m playwright install chromium</code>. Nos scripts de exportação, aguarde <code>wait_until="networkidle"</code> + 2 a 3 segundos extras antes do screenshot.</td>
+            </tr>
+            <tr>
+              <td><strong>ComfyUI acusa falta de memória (<code>CUDA out of memory</code>) em GPU de 8 GB</strong></td>
+              <td>Checkpoint pesado demais em precisão máxima (FP16/FP32) ou resolução inicial muito alta de uma vez só.</td>
+              <td>Use versões FP8 ou GGUF dos modelos de imagem, gere primeiro na resolução base (ex.: 1024×1024 ou 1280×720) antes de passar por um nó de upscale separado e, se necessário, adicione <code>--lowvram</code> no arquivo <code>.bat</code> de abertura.</td>
+            </tr>
+            <tr>
+              <td><strong>No Mac, digitar <code>od</code> roda um comando estranho em vez do Open Design</strong></td>
+              <td>O macOS já vem com um utilitário nativo <code>/usr/bin/od</code> (octal dump) que ganha prioridade no <code>PATH</code>.</td>
+              <td>Abra o app desktop do Open Design → <strong>Settings → MCP server</strong> e copie o trecho de configuração com caminho absoluto em vez de chamar <code>od</code> solto no terminal.</td>
+            </tr>
+            <tr>
+              <td><strong>ComfyUI ou projetos de vídeo travando e demorando minutos para abrir</strong></td>
+              <td>Arquivos grandes de modelos ou <code>node_modules</code> instalados em HD externo USB mecânico.</td>
+              <td>Mantenha ferramentas locais, ambientes Python/Node e modelos sempre no SSD interno principal (<code>C:\</code> no Windows). Use disco externo só para arquivar vídeos já finalizados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      Dossiê pessoal preparado como presente · Aproveite o Google AI Ultra e boas criações! · <a href="#topo">Voltar ao topo ↑</a>
+    </footer>
+
+  </div>
+
+  <script>
+    (function () {
+      // Botão "Copiar" automático em todos os blocos <pre>
+      var pres = document.querySelectorAll('pre');
+      pres.forEach(function (pre) {
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.type = 'button';
+        btn.textContent = 'Copiar';
+        btn.addEventListener('click', function () {
+          var code = pre.querySelector('code');
+          var text = code ? code.innerText : pre.innerText;
+          navigator.clipboard.writeText(text).then(function () {
+            btn.textContent = 'Copiado!';
+            setTimeout(function () { btn.textContent = 'Copiar'; }, 1600);
+          });
+        });
+        pre.appendChild(btn);
+      });
+
+      // Filtro instantâneo dos cards de ferramentas
+      var searchInput = document.getElementById('toolSearch');
+      var countEl = document.getElementById('toolCount');
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.tool-card'));
+      var categories = Array.prototype.slice.call(document.querySelectorAll('.category-block'));
+      var total = cards.length;
+
+      function updateFilter() {
+        var q = (searchInput.value || '').trim().toLowerCase();
+        var visible = 0;
+
+        cards.forEach(function (card) {
+          var match = !q || card.innerText.toLowerCase().indexOf(q) !== -1;
+          card.style.display = match ? '' : 'none';
+          if (match) visible++;
+        });
+
+        categories.forEach(function (cat) {
+          var anyVisible = cat.querySelectorAll('.tool-card:not([style*="display: none"])').length > 0;
+          cat.style.display = anyVisible ? '' : 'none';
+        });
+
+        countEl.textContent = !q
+          ? 'Exibindo todas as ' + total + ' entradas'
+          : 'Exibindo ' + visible + ' de ' + total + ' entradas';
+      }
+
+      if (searchInput) {
+        updateFilter();
+        searchInput.addEventListener('input', updateFilter);
+      }
+    })();
+  </script>
+</body>
+</html>
