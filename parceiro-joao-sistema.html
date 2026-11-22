@@ -2461,8 +2461,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 window._ACCESS_TOKEN = 'demo';
 
 // ═══ CONFIG v2026-06-02 ═══
-const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+const SB_URL = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
 const TABLE = 'leads';
 
 // ═══ APARELHO DA EQUIPE (19/10) ═══
@@ -4026,7 +4026,7 @@ async function loadAnalista(force) {
 // ═══ EQUIPE DA EPOS (espelho do FM, 17/10) — vazia até cadastrar; sem ela os nomes saem como "Sem responsável" ═══
 let _equipe = [], _euEquipe = null;
 function emailLogado() {
-  try { return (JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.email || '').toLowerCase(); }
+  try { return (JSON.parse(localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token') || '{}').user?.email || '').toLowerCase(); }
   catch(e) { return ''; }
 }
 async function carregarEquipe() {
@@ -5631,7 +5631,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Chatwoot abre na pasta "Caixa de Entrada" (todas as conversas) de quem está logado (pedido do Thiago, 19/10).
   // Pasta por usuário no Chatwoot: Thiago 84. ?cw=ID na URL ainda vale; quem não está aqui abre todas as conversas.
   const CW_PASTA = { '4f1bda92-896f-4955-81c2-69676aeab73e': '84' };
-  let cwUid = ''; try { cwUid = JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.id || ''; } catch (e) {}
+  let cwUid = ''; try { cwUid = JSON.parse(localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token') || '{}').user?.id || ''; } catch (e) {}
   const cwPasta = new URLSearchParams(location.search).get('cw') || CW_PASTA[cwUid];
   const cwFrame = document.getElementById('chatwoot-iframe');
   if (cwFrame) cwFrame.src = 'about:blank#conversa/app/accounts/1/' + (cwPasta ? 'custom_view/' + cwPasta : 'conversations?status=all');
@@ -7632,7 +7632,7 @@ async function doLogout() {
     const client = window.supabase.createClient(SB_URL, SB_KEY, { auth: { autoRefreshToken: false, detectSessionInUrl: false } });
     await client.auth.signOut({ scope: 'local' });
   } catch(e) {}
-  localStorage.removeItem('sb-phszzzwqkujmmfregtsj-auth-token');
+  localStorage.removeItem('sb-wpriaoxsrfbamovlupkp-auth-token');
   location.replace('parceiro-joao.html');
 }
 // ═══ TEMA CLARO / ESCURO ═══

@@ -2158,7 +2158,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <script>
 // ═══ AUTENTICAÇÃO ═══
 (function() {
-  const storedSess = localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token');
+  const storedSess = localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token');
   let sess = null;
   try { sess = storedSess ? JSON.parse(storedSess) : null; } catch {}
   if (!sess || !sess.access_token || (sess.expires_at || 0) * 1000 < Date.now()) {
@@ -2183,9 +2183,9 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 
 // ═══ AUTO-REFRESH TOKEN SUPABASE ═══
 (function() {
-  const SB_URL_AR = 'https://phszzzwqkujmmfregtsj.supabase.co';
-  const SB_ANON_AR = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
-  const SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
+  const SB_URL_AR = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+  const SB_ANON_AR = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
+  const SESS_KEY = 'sb-wpriaoxsrfbamovlupkp-auth-token';
   try {
     const raw = localStorage.getItem(SESS_KEY);
     if (!raw) return;
@@ -2202,8 +2202,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 })();
 
 // ═══ CONFIG v2026-06-02 ═══
-const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+const SB_URL = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
 const TABLE = 'fm_leads';
 
 // ═══ APARELHO DA EQUIPE (19/10) ═══
@@ -2914,7 +2914,7 @@ let _equipe = [];
 let _euEquipe = null;     // linha da equipe do usuário logado
 
 function emailLogado() {
-  try { return (JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.email || '').toLowerCase(); }
+  try { return (JSON.parse(localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token') || '{}').user?.email || '').toLowerCase(); }
   catch(e) { return ''; }
 }
 
@@ -4691,7 +4691,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Chatwoot abre na pasta "Caixa de Entrada" (todas as conversas) de quem está logado (pedido do Thiago, 19/10).
   // As pastas são por usuário no Chatwoot: Thiago 1, César 15, Pedro 16. ?cw=ID na URL ainda vale; quem não está aqui abre todas as conversas.
   const CW_PASTA = { '4f1bda92-896f-4955-81c2-69676aeab73e': '1', 'c6f3d84c-bee2-458f-9a24-d17f9686bc21': '15', 'd0e93ac4-3ae9-4616-b476-cfbf0f3c5862': '16' };
-  let cwUid = ''; try { cwUid = JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user?.id || ''; } catch (e) {}
+  let cwUid = ''; try { cwUid = JSON.parse(localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token') || '{}').user?.id || ''; } catch (e) {}
   const CW_VIEW_ID = new URLSearchParams(location.search).get('cw') || CW_PASTA[cwUid];
   const iframe = document.getElementById('chatwoot-iframe');
   if (iframe) iframe.src = 'https://chatwoot.eposmktfilmsia.com.br/app/accounts/2/' + (CW_VIEW_ID ? 'custom_view/' + CW_VIEW_ID : 'conversations?status=all');
@@ -6532,7 +6532,7 @@ async function doLogout() {
     const client = window.supabase.createClient(SB_URL, SB_KEY, { auth: { autoRefreshToken: false, detectSessionInUrl: false } });
     await client.auth.signOut({ scope: 'local' });
   } catch(e) {}
-  localStorage.removeItem('sb-phszzzwqkujmmfregtsj-auth-token');
+  localStorage.removeItem('sb-wpriaoxsrfbamovlupkp-auth-token');
   location.replace('login-fm.html');
 }
 // ═══ TEMA CLARO / ESCURO ═══
@@ -6676,7 +6676,7 @@ const NOTIF_GRUPOS = [
   { k: 'erros', t: 'Erros do sistema', d: 'Sempre ligado; só para o admin', fixo: true, soAdmin: true }
 ];
 let _notifEquipe = [];
-function _notifJwt() { try { return JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || '{}').user || {}; } catch (e) { return {}; } }
+function _notifJwt() { try { return JSON.parse(localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token') || '{}').user || {}; } catch (e) { return {}; } }
 function _notifSouAdmin() { return (_notifJwt().app_metadata || {}).role === 'admin'; }
 function _notifHeaders() { return { apikey: SB_KEY, Authorization: 'Bearer ' + (window._ACCESS_TOKEN || SB_KEY), 'Content-Type': 'application/json' }; }
 async function _notifCarregar() {

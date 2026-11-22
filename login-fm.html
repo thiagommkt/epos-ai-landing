@@ -194,9 +194,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 // ─── CONFIG ───────────────────────────────────────────────
 const DASHBOARD_URL = 'fm-dashboard.html?v=20260924';
 const BIO_KEY = 'fm_bio_credential';
-const SB_URL = 'https://phszzzwqkujmmfregtsj.supabase.co';
-const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
-const SB_SESS_KEY = 'sb-phszzzwqkujmmfregtsj-auth-token';
+const SB_URL = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
+const SB_SESS_KEY = 'sb-wpriaoxsrfbamovlupkp-auth-token';
 const BIO_RP = { id: location.hostname || 'localhost', name: 'F&M IA' };
 const BIO_USER = { id: new Uint8Array([1,2,3,4,5,6,7,8]), name: 'fm_user', displayName: 'Farias & Moura' };
 
@@ -268,7 +268,7 @@ async function entrar() {
     if (error) throw error;
     // Chatwoot auto-SSO: proxy via Supabase Edge Function (evita CORS)
     try {
-      const cwR = await fetch('https://phszzzwqkujmmfregtsj.supabase.co/functions/v1/chatwoot-auth', {
+      const cwR = await fetch('https://wpriaoxsrfbamovlupkp.supabase.co/functions/v1/chatwoot-auth', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({email, password: pwd})
       });

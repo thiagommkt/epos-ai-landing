@@ -73,7 +73,7 @@
 // Login: a mesma sessão do painel Epos (sem sessão válida → tela de login)
 (function () {
   let s = null;
-  try { s = JSON.parse(localStorage.getItem('sb-phszzzwqkujmmfregtsj-auth-token') || 'null'); } catch (e) {}
+  try { s = JSON.parse(localStorage.getItem('sb-wpriaoxsrfbamovlupkp-auth-token') || 'null'); } catch (e) {}
   if (!s || !s.access_token || (s.expires_at || 0) * 1000 < Date.now()) { location.replace('login-epos.html'); throw new Error('login'); }
   window._TOKEN = s.access_token;
 })();
@@ -211,8 +211,8 @@
 </div>
 
 <script>
-const SB = 'https://phszzzwqkujmmfregtsj.supabase.co';
-const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBoc3p6endxa3VqbW1mcmVndHNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNTg0NzgsImV4cCI6MjA5MDgzNDQ3OH0.E8WPvaVQuemNIbL5SeHqpX1Kv-00E7tK6l8fzPxqeJA';
+const SB = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
 const URL_ENVIO = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-guia-ligacao';
 const RASC = 'guia_ligacao_rascunho';
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
