@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Dr. Lucas Lustosa | Pré-avaliação</title>
+<meta name="description" content="Responda poucas perguntas e o Dr. Lucas retorna pelo WhatsApp para combinar a sua avaliação individual.">
+<meta name="theme-color" content="#0A0908">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0908;
+  --card:#100F0C;
+  --tile:#15130E;
+  --tile-hover:#1C1912;
+  --gold:#C9A24B;
+  --gold-hi:#E8CD84;
+  --gold-lo:#8C6D26;
+  --gold-line:rgba(201,162,75,.28);
+  --gold-soft:rgba(201,162,75,.10);
+  --text:#F4EFE4;
+  --muted:#BDB5A4;
+  --dim:#8C8576;
+  --error:#E5736A;
+  --fD:'Cormorant Garamond','Times New Roman',serif;
+  --fB:'Jost',system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--fB);background:var(--bg);color:var(--text);min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(70% 40% at 50% -5%, rgba(201,162,75,.16), transparent 70%),
+    radial-gradient(50% 35% at 50% 110%, rgba(201,162,75,.07), transparent 70%);
+}
+.app{position:relative;z-index:1;width:100%;max-width:520px;padding:28px 22px 36px;}
+.brand{text-align:center;margin-bottom:22px}
+/* logo com fundo transparente (o preto original foi convertido em transparência) */
+.brand img{display:block;margin:0 auto;width:min(250px,70%);height:auto}
+.brand .rule{width:56px;height:1px;margin:8px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
+.progress{display:flex;gap:5px;flex:1}
+.progress span{flex:1;height:2px;background:rgba(255,255,255,.10);border-radius:2px;transition:background .4s var(--ease)}
+.progress span.on{background:linear-gradient(90deg,var(--gold-lo),var(--gold-hi))}
+.counter{font-size:11px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;white-space:nowrap}
+.counter b{color:var(--gold-hi);font-weight:500}
+.screen{display:none;animation:in .5s var(--ease)}
+.screen.active{display:block}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.eyebrow .multi{color:var(--dim);letter-spacing:.12em;text-transform:none}
+h1.headline{font-family:var(--fD);font-weight:600;font-size:38px;line-height:1.08;letter-spacing:-.005em;margin-bottom:16px}
+h1.headline em{font-style:italic;color:var(--gold-hi);font-weight:500}
+h2.q-title{font-family:var(--fD);font-weight:600;font-size:29px;line-height:1.14;margin-bottom:8px}
+.lead,.q-help{font-size:14.5px;color:var(--muted);margin-bottom:22px}
+.notice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--gold-line);background:var(--gold-soft);
+  padding:12px 14px;border-radius:10px;font-size:13px;color:var(--muted);margin:0 0 22px}
+.notice b{color:var(--gold-hi);font-weight:500}
+.notice svg{flex:none;width:16px;height:16px;margin-top:2px;stroke:var(--gold);fill:none;stroke-width:1.8}
+.opt-list{display:flex;flex-direction:column;gap:9px}
+.opt{
+  position:relative;display:flex;align-items:center;gap:13px;width:100%;text-align:left;cursor:pointer;
+  background:var(--tile);border:1px solid rgba(255,255,255,.08);color:var(--text);
+  padding:15px 16px;border-radius:12px;font:500 15px/1.35 var(--fB);transition:all .25s var(--ease);
+}
+.opt:hover{background:var(--tile-hover);border-color:var(--gold-line)}
+.opt .key{flex:none;width:26px;height:26px;border-radius:7px;border:1px solid var(--gold-line);display:grid;place-items:center;
+  font:500 11px var(--fB);color:var(--gold);letter-spacing:.04em;transition:all .25s var(--ease)}
+.opt.selected{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,162,75,.14),rgba(201,162,75,.05))}
+.opt.selected .key{background:var(--gold);border-color:var(--gold);color:#0A0908}
+.opt:focus-visible,.btn:focus-visible,input:focus-visible,textarea:focus-visible,.btn-back:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;cursor:pointer;border:0;
+  padding:16px 20px;border-radius:12px;font:600 15px var(--fB);letter-spacing:.04em;transition:all .25s var(--ease);text-decoration:none;
+}
+.btn-primary{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1A1407;box-shadow:0 10px 30px -12px rgba(201,162,75,.55)}
+.btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none;box-shadow:none}
+.btn-wa{background:transparent;border:1px solid var(--gold);color:var(--gold-hi)}
+.btn-wa:hover{background:var(--gold-soft)}
+.btn-wa svg{width:18px;height:18px}
+.btn-stack{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.step-nav{margin-top:18px}
+.btn-back{background:none;border:0;color:var(--dim);font:500 12.5px var(--fB);letter-spacing:.08em;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 2px}
+.btn-back:hover{color:var(--gold-hi)}
+.btn-back svg{width:14px;height:14px}
+.outro-box{display:none;margin-top:10px}
+.outro-box.show{display:block}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+input[type=text],input[type=tel],textarea{
+  width:100%;background:var(--tile);border:1px solid rgba(255,255,255,.10);border-radius:12px;color:var(--text);
+  padding:15px 16px;font:400 16px var(--fB);transition:border-color .25s var(--ease);
+}
+textarea{resize:none;min-height:84px}
+input::placeholder,textarea::placeholder{color:#6F695C}
+input:focus,textarea:focus{border-color:var(--gold);outline:0}
+.field.invalid input,.field.invalid textarea{border-color:var(--error)}
+.field-error{display:none;font-size:12.5px;color:var(--error);margin-top:6px}
+.field.invalid .field-error{display:block}
+.consent{display:flex;gap:11px;align-items:flex-start;font-size:12.5px;color:var(--muted);margin:6px 0 4px;padding:11px 12px;border:1px solid transparent;border-radius:10px}
+.consent input{flex:none;margin-top:3px;accent-color:var(--gold);width:17px;height:17px}
+.consent a{color:var(--gold-hi)}
+.consent.invalid{border-color:var(--error)}
+.erro-envio{display:none;border:1px solid var(--error);border-radius:12px;padding:14px;margin:6px 0 4px;font-size:13.5px;color:var(--muted)}
+.erro-envio.show{display:block}
+.erro-envio p{margin-bottom:12px}
+.end{text-align:center;padding-top:6px}
+.end-badge{width:58px;height:58px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;border:1px solid var(--gold);background:var(--gold-soft)}
+.end-badge svg{width:26px;height:26px;stroke:var(--gold-hi);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.end-title{font-family:var(--fD);font-weight:600;font-size:31px;line-height:1.12;margin-bottom:10px}
+.end-sub{font-size:14.5px;color:var(--muted);margin-bottom:20px}
+.readout{border:1px solid var(--gold-line);border-radius:12px;background:var(--card);padding:6px 16px;text-align:left}
+.readout div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}
+.readout div:last-child{border-bottom:0}
+.readout span{color:var(--dim);letter-spacing:.06em;text-transform:uppercase;font-size:10.5px;padding-top:2px;flex:none}
+.readout b{font-weight:500;color:var(--text);text-align:right}
+.footer-note{text-align:center;font-size:10px;letter-spacing:.3em;color:#5E594D;text-transform:uppercase;margin-top:26px}
+/* Rodapé padrão das páginas feitas pela Epos (regra do Thiago, 22/11/2026): igual em todas, só a cor muda */
+.feito-por{text-align:center;font-size:11px;letter-spacing:.14em;color:#6F695C;margin-top:12px}
+.feito-por a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-line);padding-bottom:1px;transition:color .25s var(--ease),border-color .25s var(--ease)}
+.feito-por a:hover,.feito-por a:focus-visible{color:var(--gold-hi);border-color:var(--gold-hi);outline:0}
+noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
+@media (max-width:380px){h1.headline{font-size:33px}h2.q-title{font-size:26px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="brand">
+    <img src="assets/lucas/logo.webp" width="640" height="487" alt="Dr. Lucas Lustosa · Odontologia Integrada">
+    <div class="rule"></div>
+  </header>
+
+  <div class="topbar">
+    <div class="progress" id="progress"></div>
+    <div class="counter" id="counter">2 min</div>
+  </div>
+
+  <noscript>Para responder a pré-avaliação, ative o JavaScript no seu navegador.</noscript>
+
+  <!-- HOOK -->
+  <section class="screen active" data-screen="hook">
+    <div class="eyebrow">Pré-avaliação</div>
+    <h1 class="headline">Uma avaliação pensada <em>só para você.</em></h1>
+    <p class="lead">Responda sete perguntas rápidas. O Dr. Lucas retorna pelo WhatsApp para combinar a sua avaliação individual.</p>
+    <div class="notice">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span>Os procedimentos são <b>exclusivos para maiores de 18 anos</b>.</span>
+    </div>
+    <div class="btn-stack"><button class="btn btn-primary" type="button" id="btnComecar">Começar</button></div>
+  </section>
+
+  <!-- 1 IDENTIDADE (opcional, linguagem inclusiva) -->
+  <section class="screen" data-screen="identidade">
+    <div class="eyebrow">Pergunta 01</div>
+    <h2 class="q-title">Como você se identifica?</h2>
+    <p class="q-help">Opcional. Usamos só para tratar você da forma que preferir. Se quiser, marque “Prefiro não dizer”.</p>
+    <div class="opt-list" data-group="identidade" id="identidadeList">
+      <button type="button" class="opt" data-value="Mulher">Mulher</button>
+      <button type="button" class="opt" data-value="Homem">Homem</button>
+      <button type="button" class="opt" data-value="Mulher trans">Mulher trans</button>
+      <button type="button" class="opt" data-value="Homem trans">Homem trans</button>
+      <button type="button" class="opt" data-value="Pessoa não binária">Pessoa não binária</button>
+      <button type="button" class="opt" data-value="Outra identidade" data-custom="true">Outra identidade</button>
+      <button type="button" class="opt" data-value="Prefiro não dizer">Prefiro não dizer</button>
+    </div>
+    <div class="outro-box" id="identidadeBox">
+      <div class="field">
+        <label for="identidadeTexto">Se quiser, conte como prefere que nos dirijamos a você</label>
+        <input type="text" id="identidadeTexto" maxlength="60" placeholder="Opcional" autocomplete="off">
+      </div>
+      <div class="btn-stack"><button type="button" class="btn btn-primary" id="identidadeContinuar">Continuar</button></div>
+    </div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="hook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- 2 PROCEDIMENTO -->
+  <section class="screen" data-screen="procedimento">
+    <div class="eyebrow">Pergunta 02</div>
+    <h2 class="q-title">Qual procedimento desperta o seu interesse?</h2>
+    <p class="q-help">Escolha o mais próximo do que você procura.</p>
+    <div class="opt-list" data-group="procedimento">
+      <button type="button" class="opt" data-value="Harmonização facial">Harmonização facial</button>
+      <button type="button" class="opt" data-value="Toxina botulínica">Toxina botulínica</button>
+      <button type="button" class="opt" data-value="Quero uma avaliação para saber">Quero uma avaliação para saber</button>
+    </div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="identidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- 3 IDADE -->
+  <section class="screen" data-screen="idade">
+    <div class="eyebrow">Pergunta 03</div>
+    <h2 class="q-title">Qual é a sua idade?</h2>
+    <p class="q-help">Os procedimentos são exclusivos para maiores de 18 anos.</p>
+    <div class="opt-list" data-group="idade">
+      <button type="button" class="opt" data-value="18 a 24 anos">18 a 24 anos</button>
+      <button type="button" class="opt" data-value="25 a 34 anos">25 a 34 anos</button>
+      <button type="button" class="opt" data-value="35 a 44 anos">35 a 44 anos</button>
+      <button type="button" class="opt" data-value="45 a 54 anos">45 a 54 anos</button>
+      <button type="button" class="opt" data-value="55 anos ou mais">55 anos ou mais</button>
+    </div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="procedimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- 3 QUANDO -->
+  <section class="screen" data-screen="quando">
+    <div class="eyebrow">Pergunta 04</div>
+    <h2 class="q-title">Quando você pretende fazer?</h2>
+    <p class="q-help">Assim o Dr. Lucas organiza a agenda das avaliações.</p>
+    <div class="opt-list" data-group="quando">
+      <button type="button" class="opt" data-value="O quanto antes">O quanto antes</button>
+      <button type="button" class="opt" data-value="Nas próximas semanas">Nas próximas semanas</button>
+      <button type="button" class="opt" data-value="Estou apenas pesquisando">Estou apenas pesquisando</button>
+    </div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="idade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- 4 EXPERIÊNCIA -->
+  <section class="screen" data-screen="experiencia">
+    <div class="eyebrow">Pergunta 05</div>
+    <h2 class="q-title">Já fez algum procedimento estético?</h2>
+    <p class="q-help">Isso ajuda o Dr. Lucas a conduzir a conversa do jeito certo.</p>
+    <div class="opt-list" data-group="experiencia">
+      <button type="button" class="opt" data-value="Sim, com o Dr. Lucas">Sim, com o Dr. Lucas</button>
+      <button type="button" class="opt" data-value="Sim, com outro profissional">Sim, com outro profissional</button>
+      <button type="button" class="opt" data-value="Não, seria a primeira vez">Não, seria a primeira vez</button>
+    </div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="quando"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- 5 MELHORAR (múltipla escolha + Outro) -->
+  <section class="screen" data-screen="melhorar">
+    <div class="eyebrow">Pergunta 06 · <span class="multi">pode marcar mais de uma</span></div>
+    <h2 class="q-title">O que você gostaria de melhorar?</h2>
+    <p class="q-help">Marque tudo o que faz sentido para você.</p>
+    <div class="opt-list" data-group="melhorar" data-multi="true" id="melhorarList">
+      <button type="button" class="opt" data-value="Suavizar linhas de expressão">Suavizar linhas de expressão</button>
+      <button type="button" class="opt" data-value="Definir o contorno do rosto">Definir o contorno do rosto</button>
+      <button type="button" class="opt" data-value="Dar volume e contorno aos lábios">Dar volume e contorno aos lábios</button>
+      <button type="button" class="opt" data-value="Um olhar mais descansado">Um olhar mais descansado</button>
+      <button type="button" class="opt" data-value="Equilibrar as proporções do rosto">Equilibrar as proporções do rosto</button>
+      <button type="button" class="opt" data-value="Outro" data-outro="true">Outro</button>
+    </div>
+    <div class="outro-box" id="outroBox">
+      <div class="field" id="fieldOutro">
+        <label for="outroTexto">Conte em poucas palavras</label>
+        <textarea id="outroTexto" maxlength="140" placeholder="Descreva o que você gostaria de melhorar"></textarea>
+        <div class="field-error">Escreva um pouco sobre o que você procura.</div>
+      </div>
+    </div>
+    <div class="btn-stack"><button type="button" class="btn btn-primary" id="melhorarContinuar" disabled>Continuar</button></div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="experiencia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- 6 DISPONIBILIDADE -->
+  <section class="screen" data-screen="disponibilidade">
+    <div class="eyebrow">Pergunta 07</div>
+    <h2 class="q-title">Qual dia fica melhor para a sua avaliação?</h2>
+    <p class="q-help">O Dr. Lucas confirma o horário com você pelo WhatsApp.</p>
+    <div class="opt-list" data-group="disponibilidade">
+      <button type="button" class="opt" data-value="Sexta-feira, manhã">Sexta-feira, manhã</button>
+      <button type="button" class="opt" data-value="Sexta-feira, tarde">Sexta-feira, tarde</button>
+      <button type="button" class="opt" data-value="Sábado, manhã">Sábado, manhã</button>
+      <button type="button" class="opt" data-value="Sábado, tarde">Sábado, tarde</button>
+      <button type="button" class="opt" data-value="Sexta ou sábado, tanto faz">Sexta ou sábado, tanto faz</button>
+    </div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="melhorar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- CONTATO -->
+  <section class="screen" data-screen="contato">
+    <div class="eyebrow">Último passo</div>
+    <h2 class="q-title">Para onde o Dr. Lucas retorna?</h2>
+    <p class="q-help">Ele chama você no WhatsApp para combinar a avaliação.</p>
+    <form id="leadForm" novalidate>
+      <div class="field" id="fieldNome">
+        <label for="nome">Seu nome</label>
+        <input type="text" id="nome" name="nome" placeholder="Nome ou apelido" autocomplete="name" maxlength="80">
+        <div class="field-error">Digite o seu nome.</div>
+      </div>
+      <div class="field" id="fieldTelefone">
+        <label for="telefone">WhatsApp com DDD</label>
+        <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel" inputmode="tel">
+        <div class="field-error">Digite um WhatsApp válido com DDD.</div>
+      </div>
+      <div class="consent" id="consentBox">
+        <input type="checkbox" id="consent" name="consent">
+        <label for="consent">Autorizo o uso dos meus dados para receber o contato do Dr. Lucas, conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
+      </div>
+      <div class="erro-envio" id="erroEnvio" role="alert">
+        <p>Não conseguimos enviar agora. Toque em “Tentar de novo” ou fale direto pelo WhatsApp, com as suas respostas já escritas.</p>
+        <a id="btnWaErro" href="#" target="_blank" rel="noopener" class="btn btn-wa">Falar pelo WhatsApp</a>
+      </div>
+      <div class="btn-stack"><button type="submit" id="btnEnviar" class="btn btn-primary">Solicitar minha avaliação</button></div>
+    </form>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="disponibilidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+  </section>
+
+  <!-- SUCESSO -->
+  <section class="screen end" data-screen="sucesso">
+    <div class="end-badge"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+    <h1 class="end-title" id="okTitle">Pedido recebido.</h1>
+    <p class="end-sub">O Dr. Lucas retorna pelo WhatsApp para confirmar o horário da sua avaliação.</p>
+    <div class="readout" id="readout"></div>
+    <div class="btn-stack">
+      <a id="btnWa" href="#" target="_blank" rel="noopener" class="btn btn-wa">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 1.9 1.1.9 2 1.2 2.3 1.4.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>
+        Abrir o WhatsApp agora</a>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-note">Seus dados estão protegidos</p>
+    <p class="feito-por">Feito por <a id="rodapeEpos" href="https://eposmktfilmsia.com.br/?utm_source=rodape&amp;utm_medium=pagina-cliente&amp;utm_campaign=lucas-pre-avaliacao" target="_blank" rel="noopener">Epos Marketing</a></p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  // ====== CONFIGURAÇÃO (fase de teste, 22/11/2026) ======
+  // Número que abre no botão "Abrir o WhatsApp" da tela final. TESTE = WhatsApp pessoal do Thiago.
+  // Na entrega, trocar pelo WhatsApp do consultório: 556199897401.
+  var WA_DESTINO = '556185545598';
+  var WEBHOOK = 'https://webhook.eposmktfilmsia.com.br/webhook/ll-form-lead';
+  // Pixel do Dr. Lucas fica DESLIGADO até a CAPI estar pronta e verificada (REGRA #5): nada vai à Meta por enquanto.
+  var PIXEL_ID = '1096551276694080';
+  var PIXEL_ATIVO = false;
+
+  var PERGUNTAS = ['identidade','procedimento','idade','quando','experiencia','melhorar','disponibilidade'];
+  var ROTULOS = { identidade:'Identidade', procedimento:'Procedimento', idade:'Idade', quando:'Quando pretende fazer', experiencia:'Já fez antes', melhorar:'Quer melhorar', disponibilidade:'Avaliação' };
+  // A identidade é opcional e sensível: fica no nosso banco e no aviso ao consultório, mas não aparece no resumo da tela nem na mensagem pronta do WhatsApp
+  var OCULTAS_NO_RESUMO = { identidade: true };
+  var STEP_INDEX = { hook:0, identidade:1, procedimento:2, idade:3, quando:4, experiencia:5, melhorar:6, disponibilidade:7, contato:8, sucesso:9 };
+  var QS = new URLSearchParams(location.search);
+  var TESTE = QS.get('teste') === '1';
+  var answers = {};
+
+  if (PIXEL_ATIVO && !TESTE) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('set','autoConfig',false,PIXEL_ID);   // antes do init: nenhuma resposta vai à Meta pelo clique automático
+    fbq('init',PIXEL_ID);
+    fbq('track','PageView');
+  }
+
+  var prog = document.getElementById('progress');
+  for (var i = 0; i < 8; i++) prog.appendChild(document.createElement('span'));
+
+  function trackStep(type, step, answer){
+    try { if (window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null }); } catch(e){}
+  }
+  function atualizarTopo(screen){
+    var n = PERGUNTAS.indexOf(screen), counter = document.getElementById('counter');
+    if (n >= 0) counter.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '</b> / 07';
+    else if (screen === 'contato') counter.innerHTML = '<b>Último</b> passo';
+    else if (screen === 'sucesso') counter.innerHTML = '<b>Enviado</b>';
+    else counter.textContent = '2 min';
+    var feitos = screen === 'sucesso' ? 8 : (screen === 'contato' ? 7 : Math.max(n, 0));
+    Array.prototype.forEach.call(prog.children, function(el, idx){ el.classList.toggle('on', idx < feitos); });
+  }
+
+  // O toque que veio da tela anterior não marca a resposta da próxima
+  var armadoEm = 0;
+  function goTo(screen){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    document.querySelector('[data-screen="' + screen + '"]').classList.add('active');
+    armadoEm = Date.now() + 400;
+    atualizarTopo(screen);
+    window.scrollTo(0, 0);
+    trackStep('step_view', screen);
+  }
+  window.goTo = goTo;
+
+  document.getElementById('btnComecar').addEventListener('click', function(){ goTo('identidade'); });
+  document.querySelectorAll('[data-voltar]').forEach(function(b){ b.addEventListener('click', function(){ goTo(b.getAttribute('data-voltar')); }); });
+
+  // Letras A, B, C… e seleção
+  var melhorarBtn = document.getElementById('melhorarContinuar'), outroBox = document.getElementById('outroBox'), outroTexto = document.getElementById('outroTexto');
+  function marcadosMelhorar(){
+    return Array.prototype.map.call(document.querySelectorAll('#melhorarList .opt.selected'), function(o){ return o.getAttribute('data-value'); });
+  }
+  function atualizarMelhorar(){
+    var m = marcadosMelhorar(), temOutro = m.indexOf('Outro') > -1;
+    outroBox.classList.toggle('show', temOutro);
+    melhorarBtn.disabled = !m.length;
+  }
+  document.querySelectorAll('.opt-list').forEach(function(list){
+    list.querySelectorAll('.opt').forEach(function(btn, idx){
+      btn.setAttribute('aria-pressed', 'false');
+      var k = document.createElement('span'); k.className = 'key'; k.textContent = String.fromCharCode(65 + idx);
+      btn.insertBefore(k, btn.firstChild);
+    });
+    var group = list.getAttribute('data-group');
+    list.addEventListener('click', function(e){
+      var btn = e.target.closest('.opt'); if (!btn) return;
+      if (Date.now() < armadoEm) return;
+      if (list.hasAttribute('data-multi')) {
+        var on = !btn.classList.contains('selected');
+        btn.classList.toggle('selected', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        atualizarMelhorar();
+        if (btn.getAttribute('data-outro') === 'true' && on) outroTexto.focus();
+        return;
+      }
+      list.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
+      btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true');
+      // "Outra identidade": abre um campo opcional e espera o Continuar (as demais opções avançam sozinhas)
+      var caixaIdentidade = document.getElementById('identidadeBox');
+      if (group === 'identidade' && caixaIdentidade) caixaIdentidade.classList.toggle('show', btn.getAttribute('data-custom') === 'true');
+      if (btn.getAttribute('data-custom') === 'true') { document.getElementById('identidadeTexto').focus(); return; }
+      answers[group] = btn.getAttribute('data-value');
+      trackStep('step_answer', group, answers[group]);
+      armadoEm = Date.now() + 5000;
+      setTimeout(function(){ goTo(PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato'); }, 240);
+    });
+  });
+
+  document.getElementById('identidadeContinuar').addEventListener('click', function(){
+    var txt = document.getElementById('identidadeTexto').value.replace(/\s+/g, ' ').trim();
+    answers.identidade = 'Outra identidade' + (txt ? ': ' + txt : '');
+    trackStep('step_answer', 'identidade', 'Outra identidade');   // o texto livre não vai para o funil, só para o cadastro
+    armadoEm = Date.now() + 5000;
+    goTo('procedimento');
+  });
+  outroTexto.addEventListener('input', function(){
+    if (outroTexto.value.replace(/\s+/g, ' ').trim().length >= 2) document.getElementById('fieldOutro').classList.remove('invalid');
+  });
+  melhorarBtn.addEventListener('click', function(){
+    var m = marcadosMelhorar();
+    if (!m.length) return;
+    var temOutro = m.indexOf('Outro') > -1, txt = outroTexto.value.replace(/\s+/g, ' ').trim();
+    if (temOutro && txt.length < 2) { document.getElementById('fieldOutro').classList.add('invalid'); outroTexto.focus(); return; }
+    document.getElementById('fieldOutro').classList.remove('invalid');
+    answers.melhorar = m.map(function(v){ return v === 'Outro' ? 'Outro: ' + txt : v; }).join('; ');
+    answers.melhorar_outro = temOutro ? txt : '';
+    trackStep('step_answer', 'melhorar', answers.melhorar);
+    goTo('disponibilidade');
+  });
+
+  // Celular com 11 dígitos tem 9 depois do DDD; zeros de discagem e +55 saem antes da máscara
+  function validPhone(v){
+    var d = v.replace(/\D/g, '');
+    if (d.length === 11) return d[0] !== '0' && d[1] !== '0' && d[2] === '9';
+    return d.length === 10 && d[0] !== '0' && d[1] !== '0';
+  }
+  document.getElementById('telefone').addEventListener('input', function(e){
+    var v = e.target.value.replace(/\D/g, '').replace(/^0+/, '');
+    if (v.length >= 12 && v.slice(0, 2) === '55') v = v.slice(2).replace(/^0+/, '');
+    e.target.value = v.length > 11 ? v : (v.length > 6 ? '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7) : (v.length > 2 ? '(' + v.slice(0,2) + ') ' + v.slice(2) : v));
+  });
+
+  function esc(s){ return String(s || '').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  var enviado = false;
+  document.getElementById('leadForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if (enviado) return;
+    var nome = document.getElementById('nome'), tel = document.getElementById('telefone'), consent = document.getElementById('consent');
+    var fN = document.getElementById('fieldNome'), fT = document.getElementById('fieldTelefone'), cB = document.getElementById('consentBox');
+    var erros = [];
+    if (nome.value.trim().length < 2) { fN.classList.add('invalid'); erros.push('nome_invalido'); } else fN.classList.remove('invalid');
+    if (!validPhone(tel.value)) { fT.classList.add('invalid'); erros.push('telefone_invalido'); } else fT.classList.remove('invalid');
+    if (!consent.checked) { cB.classList.add('invalid'); erros.push('sem_consentimento'); } else cB.classList.remove('invalid');
+    if (erros.length) {
+      if (window._histContato) window._histContato.tentativa(erros);
+      var rc = window._histContato ? window._histContato.resumo() : null;
+      trackStep('step_error', 'contato', erros.join(',') + (rc && erros.indexOf('telefone_invalido') >= 0 ? ' | digitou: ' + rc.telefone_digitado + ' | na tela: ' + rc.telefone_na_tela : ''));
+      return;
+    }
+
+    enviado = true;
+    if (window._histContato) window._histContato.enviado = true;
+    answers.nome = nome.value.trim();
+    answers.telefone = tel.value.replace(/\D/g, '');
+
+    // Mesmo event_id no pixel (navegador) e na CAPI (servidor), para a Meta deduplicar. Sem nenhuma resposta do formulário.
+    // O mesmo id vale nas novas tentativas de envio: o servidor ignora o repetido.
+    var eventId = window._llEventId || (window._llEventId = 'llpre_' + ((self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2))));
+    var btnEnviar = document.getElementById('btnEnviar'), erroEnvio = document.getElementById('erroEnvio');
+    btnEnviar.disabled = true; btnEnviar.textContent = 'Enviando…'; erroEnvio.classList.remove('show');
+
+    var fbclid = QS.get('fbclid') || '';
+    var ck = function(n){ try { var m = document.cookie.match(new RegExp(n + '=([^;]+)')); return m ? m[1] : ''; } catch(e2){ return ''; } };
+    var payload = {
+      nome: answers.nome, telefone: answers.telefone,
+      respostas: { identidade: answers.identidade || '', procedimento: answers.procedimento || '', faixa_etaria: answers.idade || '', quando: answers.quando || '', experiencia: answers.experiencia || '',
+                   melhorar: answers.melhorar || '', melhorar_outro: answers.melhorar_outro || '', disponibilidade: answers.disponibilidade || '' },
+      consentimento: true, teste: TESTE, event_id: eventId,
+      utm_source: QS.get('utm_source') || '', utm_medium: QS.get('utm_medium') || '', utm_campaign: QS.get('utm_campaign') || '',
+      utm_content: QS.get('utm_content') || '', utm_term: QS.get('utm_term') || '', utm_id: QS.get('utm_id') || '',
+      ad_id: QS.get('ad_id') || '', adset_id: QS.get('adset_id') || '', placement: QS.get('placement') || '',
+      test_event_code: QS.get('test_event_code') || '',
+      fbclid: fbclid, fbc: fbclid ? ('fb.1.' + Math.floor(Date.now() / 1000) + '.' + fbclid) : ck('_fbc'), fbp: ck('_fbp'),
+      user_agent: navigator.userAgent, page_url: location.href,
+      session_id: window._lpSid || '', historico_site: window._histContato ? window._histContato.dados() : null
+    };
+    // Resumo e mensagem pronta do WhatsApp: servem tanto para o sucesso quanto para a falha de envio (o lead nunca fica sem caminho)
+    var primeiro = answers.nome.split(/\s+/)[0];
+    var visiveis = PERGUNTAS.filter(function(k){ return !OCULTAS_NO_RESUMO[k]; });
+    var waTexto = 'Olá, Dr. Lucas! Acabei de preencher a pré-avaliação.\n\nNome: ' + answers.nome + '\n'
+      + visiveis.map(function(k){ return ROTULOS[k] + ': ' + (answers[k] || '—'); }).join('\n');
+    var waHref = 'https://wa.me/' + WA_DESTINO + '?text=' + encodeURIComponent(waTexto);
+    document.getElementById('btnWa').href = waHref;
+    document.getElementById('btnWaErro').href = waHref;
+
+    enviarComTentativas(payload).then(function(ok){
+      if (!ok) {
+        // Falhou 3 vezes: libera o botão para tentar de novo e mostra o caminho direto pelo WhatsApp
+        enviado = false; if (window._histContato) window._histContato.enviado = false;
+        btnEnviar.disabled = false; btnEnviar.textContent = 'Tentar de novo';
+        erroEnvio.classList.add('show');
+        trackStep('step_error', 'contato', 'envio_falhou');
+        return;
+      }
+      if (PIXEL_ATIVO && !TESTE && typeof fbq === 'function') fbq('track', 'Lead', {}, { eventID: eventId });   // só depois de o servidor confirmar
+      if (window._lpTrack) window._lpTrack('quiz_submitted');
+      window._llEventId = null;
+      document.getElementById('okTitle').textContent = primeiro + ', pedido recebido.';
+      document.getElementById('readout').innerHTML = visiveis.map(function(k){
+        return '<div><span>' + ROTULOS[k] + '</span><b>' + esc(answers[k] || '—') + '</b></div>';
+      }).join('');
+      goTo('sucesso');
+    });
+  });
+
+  // 3 tentativas (agora, +1,5 s, +4 s), 9 s de limite cada. O servidor ignora o event_id repetido, então reenviar não duplica o lead.
+  function enviarComTentativas(payload){
+    var esperas = [0, 1500, 4000];
+    function tenta(i){
+      return new Promise(function(r){ setTimeout(r, esperas[i]); }).then(function(){
+        var ctl = ('AbortController' in window) ? new AbortController() : null;
+        var t = ctl ? setTimeout(function(){ ctl.abort(); }, 9000) : null;
+        return fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true, signal: ctl ? ctl.signal : undefined })
+          .then(function(res){ if (t) clearTimeout(t); if (res.ok) return true; throw new Error('http ' + res.status); })
+          .catch(function(){ if (t) clearTimeout(t); return (i + 1 < esperas.length) ? tenta(i + 1) : false; });
+      });
+    }
+    return tenta(0);
+  }
+
+  atualizarTopo('hook');
+})();
+</script>
+
+<script>
+// Histórico do contato (cópia própria desta página): o que a pessoa digitou no telefone, tentativas com erro e abandono.
+(function () {
+  var T0 = Date.now(), LIMITE = 80, log = [], tentativas = [], bruto = '', ultimoAbandono = '';
+  function seg() { return Math.round((Date.now() - T0) / 100) / 10; }
+  function el(id) { return document.getElementById(id); }
+  function curto(v) { return String(v == null ? '' : v).slice(0, 40); }
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'telefone') return;
+    bruto = e.target.value;
+    log.push({ s: seg(), tipo: e.inputType || 'preenchimento', entrou: curto(e.data), bruto: curto(bruto) });
+  }, true);
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'telefone' || !log.length) return;
+    log[log.length - 1].tela = curto(e.target.value);
+    if (log.length > LIMITE) log.splice(5, log.length - LIMITE);
+  }, false);
+  document.addEventListener('change', function (e) {
+    if (!e.target || e.target.id !== 'telefone') return;
+    var ult = log.length ? log[log.length - 1].tela : '';
+    if (e.target.value !== ult) log.push({ s: seg(), tipo: 'change', bruto: curto(e.target.value), tela: curto(e.target.value) });
+  }, true);
+  window._histContato = {
+    enviado: false,
+    tentativa: function (erros) { var t = el('telefone'); tentativas.push({ s: seg(), erros: erros, telefone_na_tela: curto(t ? t.value : '') }); },
+    resumo: function () {
+      var n = el('nome'), t = el('telefone');
+      return { nome_digitado: n ? String(n.value).slice(0, 80) : '', telefone_digitado: curto(bruto), telefone_na_tela: curto(t ? t.value : '') };
+    },
+    dados: function () {
+      var r = this.resumo();
+      r.campo_telefone = log; r.tentativas_envio = tentativas; r.sessao = window._lpSid || '';
+      r.tempo_na_pagina_s = seg(); r.tela = (window.innerWidth || 0) + 'x' + (window.innerHeight || 0);
+      return r;
+    }
+  };
+  function abandono() {
+    try {
+      var h = window._histContato;
+      if (h.enviado || typeof window._lpTrack !== 'function') return;
+      var r = h.resumo();
+      if (!r.telefone_digitado && !r.nome_digitado) return;
+      var txt = 'nome: ' + r.nome_digitado + ' | digitou: ' + r.telefone_digitado + ' | na tela: ' + r.telefone_na_tela;
+      if (txt === ultimoAbandono) return;
+      ultimoAbandono = txt;
+      window._lpTrack('contato_abandonado', { step_name: 'contato', answer: txt.slice(0, 290) });
+    } catch (e) {}
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') abandono(); });
+  window.addEventListener('pagehide', abandono);
+})();
+</script>
+
+<script>
+// Rastreamento do funil: vai SOMENTE para o nosso banco (lp_events, RLS: só INSERT anônimo com lista fixa). Nada vai à Meta.
+(function(){
+  var SB_URL = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+  var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
+  var LP_SLUG = 'lucas-pre-avaliacao';
+  var p = new URLSearchParams(location.search);
+  var sid = null;
+  try { sid = localStorage.getItem('_lp_sid_ll'); } catch(e){}
+  if (!sid) { sid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem('_lp_sid_ll', sid); } catch(e){} }
+  window._lpSid = sid;
+  var utms = {};
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ utms[k] = p.get(k) || ''; });
+  // Visita de teste (?teste=1) entra no banco com campanha "teste", e a função de funil ignora essas linhas
+  if (p.get('teste') === '1') utms.utm_campaign = 'teste-' + (utms.utm_campaign || 'll');
+  function track(eventType, extra){
+    if (navigator.webdriver && p.get('teste') !== '1') return;   // auditoria automática não conta no funil
+    var body = Object.assign({ lp_slug: LP_SLUG, event_type: eventType, session_id: sid, referrer: (document.referrer || '').slice(0, 490) }, utms, extra || {});
+    fetch(SB_URL + '/rest/v1/lp_events', { method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON, 'Prefer': 'return=minimal' }, body: JSON.stringify(body) }).catch(function(){});
+  }
+  window._lpTrack = track;
+  var rodape = document.getElementById('rodapeEpos');
+  if (rodape) rodape.addEventListener('click', function(){ track('cta_click', { step_name: 'rodape_epos' }); });
+  track('pageview', { user_agent: (navigator.userAgent || '').slice(0, 390), viewport: window.innerWidth + 'x' + window.innerHeight });
+  track('step_view', { step_name: 'hook', step_index: 0 });
+  var visStart = Date.now(), totalVis = 0, enviado = false;
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') { totalVis += Date.now() - visStart; sendTime(); } else visStart = Date.now();
+  });
+  function sendTime(){
+    if (enviado) return; enviado = true;
+    var dur = Math.round(totalVis / 1000); if (dur >= 2) track('time_spent', { duration_s: dur });
+  }
+  window.addEventListener('pagehide', function(){ if (document.visibilityState === 'visible') totalVis += Date.now() - visStart; sendTime(); });
+})();
+</script>
+</body>
+</html>

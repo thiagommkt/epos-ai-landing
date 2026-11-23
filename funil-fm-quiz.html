@@ -374,9 +374,13 @@ h1.end-title{
   text-align:center;
   font-size:11px;
   color:#9AA6A1;
-  padding:14px 24px 20px;
+  padding:14px 24px 4px;
   flex-shrink:0;
 }
+/* Rodapé padrão das páginas feitas pela Epos (regra do Thiago, 22/11/2026): igual em todas, só a cor muda */
+.feito-por{text-align:center;font-size:11px;letter-spacing:.04em;color:#9AA6A1;padding:0 24px 20px;flex-shrink:0}
+.feito-por a{color:var(--gold-600);text-decoration:none;border-bottom:1px solid rgba(180,147,79,.4);padding-bottom:1px;transition:color .2s,border-color .2s}
+.feito-por a:hover,.feito-por a:focus-visible{color:var(--green-800);border-color:var(--green-800);outline:0}
 </style>
 </head>
 <body>
@@ -577,6 +581,7 @@ h1.end-title{
   </div>
 
   <p class="footer-note">Farias &amp; Moura Advocacia · seus dados estão protegidos</p>
+  <p class="feito-por">Feito por <a href="https://eposmktfilmsia.com.br/?utm_source=rodape&amp;utm_medium=pagina-cliente&amp;utm_campaign=funil-fm-quiz" target="_blank" rel="noopener" onclick="window._lpTrack&amp;&amp;window._lpTrack('cta_click',{step_name:'rodape_epos'})">Epos Marketing</a></p>
 </main>
 
 <script>
