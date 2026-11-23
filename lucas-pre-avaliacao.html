@@ -332,9 +332,10 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
   // WhatsApp do consultório (mesmo número da campanha, confirmado na Meta).
   var WA_DESTINO = '556199897401';
   var WEBHOOK = 'https://webhook.eposmktfilmsia.com.br/webhook/ll-form-lead';
-  // Pixel do Dr. Lucas fica DESLIGADO até a CAPI estar pronta e verificada (REGRA #5): nada vai à Meta por enquanto.
+  // Pixel do Dr. Lucas (REGRA #5): ligado em 23/11 com a CAPI no n8n (mesmo event_id). Visita de teste (?teste=1) não dispara,
+  // a não ser que traga ?test_event_code= (aí o evento aparece só na aba Testar eventos da Meta).
   var PIXEL_ID = '1096551276694080';
-  var PIXEL_ATIVO = false;
+  var PIXEL_ATIVO = true;
 
   var PERGUNTAS = ['identidade','procedimento','idade','quando','experiencia','melhorar','disponibilidade'];
   var ROTULOS = { identidade:'Identidade', procedimento:'Procedimento', idade:'Idade', quando:'Quando pretende fazer', experiencia:'Já fez antes', melhorar:'Quer melhorar', disponibilidade:'Avaliação' };
@@ -369,7 +370,8 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
     goTo(PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato');
   }
 
-  if (PIXEL_ATIVO && !TESTE) {
+  var PIXEL_LIGA = PIXEL_ATIVO && (!TESTE || !!QS.get('test_event_code'));
+  if (PIXEL_LIGA) {
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('set','autoConfig',false,PIXEL_ID);   // antes do init: nenhuma resposta vai à Meta pelo clique automático
     fbq('init',PIXEL_ID);
@@ -561,7 +563,7 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
         trackStep('step_error', 'contato', 'envio_falhou');
         return;
       }
-      if (PIXEL_ATIVO && !TESTE && typeof fbq === 'function') fbq('track', 'Lead', {}, { eventID: eventId });   // só depois de o servidor confirmar
+      if (PIXEL_LIGA && typeof fbq === 'function') fbq('track', 'Lead', {}, { eventID: eventId });   // só depois de o servidor confirmar
       if (window._lpTrack) window._lpTrack('quiz_submitted');
       window._llEventId = null;
       document.getElementById('okTitle').textContent = primeiro + ', pedido recebido.';
