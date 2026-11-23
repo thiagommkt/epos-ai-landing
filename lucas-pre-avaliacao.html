@@ -193,7 +193,7 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
       <button type="button" class="opt" data-value="Toxina botulínica">Toxina botulínica</button>
       <button type="button" class="opt" data-value="Quero uma avaliação para saber">Quero uma avaliação para saber</button>
     </div>
-    <div class="step-nav"><button type="button" class="btn-back" data-voltar="identidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="contato"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
   </section>
 
   <!-- 3 IDADE -->
@@ -273,12 +273,13 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
       <button type="button" class="opt" data-value="Sábado, tarde">Sábado, tarde</button>
       <button type="button" class="opt" data-value="Sexta ou sábado, tanto faz">Sexta ou sábado, tanto faz</button>
     </div>
+    <p class="q-help" id="enviandoInfo" style="display:none;margin-top:16px">Enviando as suas respostas…</p>
     <div class="step-nav"><button type="button" class="btn-back" data-voltar="melhorar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
   </section>
 
   <!-- CONTATO -->
   <section class="screen" data-screen="contato">
-    <div class="eyebrow">Último passo</div>
+    <div class="eyebrow">Antes de continuar</div>
     <h2 class="q-title">Para onde o Dr. Lucas retorna?</h2>
     <p class="q-help">Ele chama você no WhatsApp para combinar a avaliação.</p>
     <form id="leadForm" novalidate>
@@ -300,9 +301,9 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
         <p>Não conseguimos enviar agora. Toque em “Tentar de novo” ou fale direto pelo WhatsApp, com as suas respostas já escritas.</p>
         <a id="btnWaErro" href="#" target="_blank" rel="noopener" class="btn btn-wa">Falar pelo WhatsApp</a>
       </div>
-      <div class="btn-stack"><button type="submit" id="btnEnviar" class="btn btn-primary">Solicitar minha avaliação</button></div>
+      <div class="btn-stack"><button type="submit" id="btnEnviar" class="btn btn-primary">Continuar</button></div>
     </form>
-    <div class="step-nav"><button type="button" class="btn-back" data-voltar="disponibilidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+    <div class="step-nav"><button type="button" class="btn-back" data-voltar="identidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
   </section>
 
   <!-- SUCESSO -->
@@ -339,10 +340,34 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
   var ROTULOS = { identidade:'Identidade', procedimento:'Procedimento', idade:'Idade', quando:'Quando pretende fazer', experiencia:'Já fez antes', melhorar:'Quer melhorar', disponibilidade:'Avaliação' };
   // A identidade é opcional e sensível: fica no nosso banco e no aviso ao consultório, mas não aparece no resumo da tela nem na mensagem pronta do WhatsApp
   var OCULTAS_NO_RESUMO = { identidade: true };
-  var STEP_INDEX = { hook:0, identidade:1, procedimento:2, idade:3, quando:4, experiencia:5, melhorar:6, disponibilidade:7, contato:8, sucesso:9 };
+  var STEP_INDEX = { hook:0, identidade:1, contato:2, procedimento:3, idade:4, quando:5, experiencia:6, melhorar:7, disponibilidade:8, sucesso:9 };
   var QS = new URLSearchParams(location.search);
   var TESTE = QS.get('teste') === '1';
   var answers = {};
+  // 23/11 (Thiago: "o telefone nas primeiras etapas, pra conseguirmos recuperar os clientes de onde eles pararam"): o contato vem
+  // depois da 1ª pergunta; a partir dele cada resposta grava como parcial (webhook com parcial: true: não vira lead nem avisa).
+  // Quem parar no meio: o consultório recebe o aviso para chamar a pessoa (a pessoa não recebe mensagem automática).
+  var contatoFeito = false, enviado = false;
+  var QSID = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+  var SB_URL_Q = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+  var SB_ANON_Q = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
+  var CHAVES_Q = ['identidade','procedimento','idade','quando','experiencia','melhorar','melhorar_outro','disponibilidade'];
+  function salvarParcial(etapa){
+    if (!contatoFeito) return;
+    var resp = {};
+    CHAVES_Q.forEach(function(k){ if (answers[k]) resp[k] = answers[k]; });
+    var body = { parcial: true, ts: Date.now(), quiz_sid: QSID, session_id: window._lpSid || '', etapa: etapa, consentimento: true, teste: TESTE,
+      nome: answers.nome || '', telefone: String(answers.telefone || '').replace(/\D/g, ''), respostas: resp,
+      utm_source: QS.get('utm_source') || '', utm_medium: QS.get('utm_medium') || '', utm_campaign: QS.get('utm_campaign') || '',
+      utm_content: QS.get('utm_content') || '', utm_term: QS.get('utm_term') || '', ad_id: QS.get('ad_id') || '', adset_id: QS.get('adset_id') || '',
+      placement: QS.get('placement') || '', page_url: location.href };
+    fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true }).catch(function(){});
+  }
+  function avancar(group){
+    if (group === 'identidade' && !contatoFeito) { goTo('contato'); return; }
+    if (group === 'disponibilidade') { finalizar(); return; }
+    goTo(PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato');
+  }
 
   if (PIXEL_ATIVO && !TESTE) {
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
@@ -360,10 +385,10 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
   function atualizarTopo(screen){
     var n = PERGUNTAS.indexOf(screen), counter = document.getElementById('counter');
     if (n >= 0) counter.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '</b> / 07';
-    else if (screen === 'contato') counter.innerHTML = '<b>Último</b> passo';
+    else if (screen === 'contato') counter.innerHTML = '<b>Seu</b> WhatsApp';
     else if (screen === 'sucesso') counter.innerHTML = '<b>Enviado</b>';
     else counter.textContent = '2 min';
-    var feitos = screen === 'sucesso' ? 8 : (screen === 'contato' ? 7 : Math.max(n, 0));
+    var feitos = screen === 'sucesso' ? 8 : (screen === 'contato' ? 1 : (n >= 1 ? n + 1 : Math.max(n, 0)));
     Array.prototype.forEach.call(prog.children, function(el, idx){ el.classList.toggle('on', idx < feitos); });
   }
 
@@ -418,7 +443,8 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
       answers[group] = btn.getAttribute('data-value');
       trackStep('step_answer', group, answers[group]);
       armadoEm = Date.now() + 5000;
-      setTimeout(function(){ goTo(PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato'); }, 240);
+      salvarParcial(group);
+      setTimeout(function(){ avancar(group); }, 240);
     });
   });
 
@@ -427,7 +453,8 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
     answers.identidade = 'Outra identidade' + (txt ? ': ' + txt : '');
     trackStep('step_answer', 'identidade', 'Outra identidade');   // o texto livre não vai para o funil, só para o cadastro
     armadoEm = Date.now() + 5000;
-    goTo('procedimento');
+    salvarParcial('identidade');
+    avancar('identidade');
   });
   outroTexto.addEventListener('input', function(){
     if (outroTexto.value.replace(/\s+/g, ' ').trim().length >= 2) document.getElementById('fieldOutro').classList.remove('invalid');
@@ -441,6 +468,7 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
     answers.melhorar = m.map(function(v){ return v === 'Outro' ? 'Outro: ' + txt : v; }).join('; ');
     answers.melhorar_outro = temOutro ? txt : '';
     trackStep('step_answer', 'melhorar', answers.melhorar);
+    salvarParcial('melhorar');
     goTo('disponibilidade');
   });
 
@@ -458,7 +486,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   function esc(s){ return String(s || '').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
-  var enviado = false;
   document.getElementById('leadForm').addEventListener('submit', function(e){
     e.preventDefault();
     if (enviado) return;
@@ -475,10 +502,22 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
       return;
     }
 
-    enviado = true;
-    if (window._histContato) window._histContato.enviado = true;
     answers.nome = nome.value.trim();
     answers.telefone = tel.value.replace(/\D/g, '');
+    if (window._histContato) window._histContato.enviado = true;
+    if (!contatoFeito) trackStep('step_answer', 'contato', 'ok');
+    contatoFeito = true;
+    salvarParcial('contato');
+    var falta = PERGUNTAS.filter(function(k){ return !answers[k]; })[0];
+    if (falta) { goTo(falta); return; }
+    finalizar();   // tudo respondido (ex.: "Tentar de novo" depois de falha no envio)
+  });
+
+  // 23/11: o envio completo (banco + aviso ao consultório) só sai depois da última pergunta
+  function finalizar(){
+    if (enviado || !contatoFeito) return;
+    enviado = true;
+    var info = document.getElementById('enviandoInfo'); if (info) info.style.display = 'block';
 
     // Mesmo event_id no pixel (navegador) e na CAPI (servidor), para a Meta deduplicar. Sem nenhuma resposta do formulário.
     // O mesmo id vale nas novas tentativas de envio: o servidor ignora o repetido.
@@ -499,7 +538,8 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
       test_event_code: QS.get('test_event_code') || '',
       fbclid: fbclid, fbc: fbclid ? ('fb.1.' + Math.floor(Date.now() / 1000) + '.' + fbclid) : ck('_fbc'), fbp: ck('_fbp'),
       user_agent: navigator.userAgent, page_url: location.href,
-      session_id: window._lpSid || '', historico_site: window._histContato ? window._histContato.dados() : null
+      session_id: window._lpSid || '', historico_site: window._histContato ? window._histContato.dados() : null,
+      quiz_sid: QSID
     };
     // Resumo e mensagem pronta do WhatsApp: servem tanto para o sucesso quanto para a falha de envio (o lead nunca fica sem caminho)
     var primeiro = answers.nome.split(/\s+/)[0];
@@ -516,6 +556,8 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
         enviado = false; if (window._histContato) window._histContato.enviado = false;
         btnEnviar.disabled = false; btnEnviar.textContent = 'Tentar de novo';
         erroEnvio.classList.add('show');
+        if (info) info.style.display = 'none';
+        goTo('contato');   // a tela do contato tem o "Tentar de novo" e o caminho direto pelo WhatsApp
         trackStep('step_error', 'contato', 'envio_falhou');
         return;
       }
@@ -526,9 +568,10 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
       document.getElementById('readout').innerHTML = visiveis.map(function(k){
         return '<div><span>' + ROTULOS[k] + '</span><b>' + esc(answers[k] || '—') + '</b></div>';
       }).join('');
+      if (info) info.style.display = 'none';
       goTo('sucesso');
     });
-  });
+  }
 
   // 3 tentativas (agora, +1,5 s, +4 s), 9 s de limite cada. O servidor ignora o event_id repetido, então reenviar não duplica o lead.
   function enviarComTentativas(payload){
@@ -544,6 +587,44 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
     }
     return tenta(0);
   }
+
+  // 23/11: link "continuar de onde parou" (?r=<token>), que o consultório pode mandar para a pessoa
+  (function retomar(){
+    var tok = QS.get('r');
+    if (!tok || !/^[0-9a-f-]{36}$/i.test(tok)) return;
+    fetch(SB_URL_Q + '/rest/v1/rpc/quiz_retomar', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SB_ANON_Q, Authorization: 'Bearer ' + SB_ANON_Q },
+      body: JSON.stringify({ p_token: tok }) })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        var q = Array.isArray(rows) && rows[0];
+        if (!q || q.conta !== 'lucas') return;
+        QSID = q.session_id || QSID;
+        var resp = q.respostas || {};
+        CHAVES_Q.forEach(function(k){ if (resp[k]) answers[k] = resp[k]; });
+        answers.nome = q.nome || '';
+        var iN = document.getElementById('nome'), iT = document.getElementById('telefone');
+        iN.value = answers.nome; iT.value = String(q.telefone || '').replace(/^55(?=\d{10,11}$)/, '');
+        try { iT.dispatchEvent(new Event('input', { bubbles: true })); } catch(eI){}
+        answers.telefone = iT.value.replace(/\D/g, '');
+        document.getElementById('consent').checked = true;
+        contatoFeito = true;
+        PERGUNTAS.forEach(function(k){
+          var lista = document.querySelector('.opt-list[data-group="' + k + '"]'); if (!lista || !answers[k]) return;
+          var vals = k === 'melhorar' ? String(answers[k]).split('; ') : [String(answers[k])];
+          lista.querySelectorAll('.opt').forEach(function(o){
+            var v = o.getAttribute('data-value');
+            var on = vals.some(function(x){ return x === v || (v === 'Outro' && x.indexOf('Outro: ') === 0) || (v === 'Outra identidade' && x.indexOf('Outra identidade') === 0); });
+            o.classList.toggle('selected', on); o.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+        });
+        if (answers.melhorar_outro) outroTexto.value = answers.melhorar_outro;
+        if (answers.melhorar) atualizarMelhorar();
+        var falta = PERGUNTAS.filter(function(k){ return !answers[k]; })[0] || 'disponibilidade';
+        trackStep('quiz_retomado', falta);
+        goTo(falta);
+      }).catch(function(){});
+  })();
 
   atualizarTopo('hook');
 })();

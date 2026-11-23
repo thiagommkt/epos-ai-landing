@@ -283,7 +283,7 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
         <button class="opt" data-value="R$ 10.000 a R$ 30.000">R$ 10.000 a R$ 30.000</button>
         <button class="opt" data-value="Acima de R$ 30.000">Acima de R$ 30.000</button>
       </div>
-      <div class="step-nav"><button class="btn-back" onclick="goTo('segmento')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+      <div class="step-nav"><button class="btn-back" onclick="goTo('contato')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
     </section>
 
     <!-- 3 INVESTIMENTO -->
@@ -358,15 +358,15 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
         <button class="opt" data-value="A equipe não consegue fechar">A equipe não consegue fechar</button>
         <button class="opt" data-value="Não sei qual anúncio dá resultado">Não sei qual anúncio dá resultado</button>
       </div>
-      <button type="button" class="btn btn-primary" id="dorContinuar" disabled>Continuar</button>
+      <button type="button" class="btn btn-primary" id="dorContinuar" disabled>Falar com o especialista agora</button>
       <div class="step-nav"><button class="btn-back" onclick="goTo('conteudo')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
     </section>
 
     <!-- CONTATO -->
     <section class="screen" data-screen="contato">
-      <div class="q-eyebrow">Último passo</div>
+      <div class="q-eyebrow">Antes de continuar</div>
       <h2 class="q-title">Para onde a Donna manda o seu raio-X?</h2>
-      <p class="q-help">Ela te chama no WhatsApp em instantes, já com as suas respostas.</p>
+      <p class="q-help">No fim, ela te chama no WhatsApp com o resultado.</p>
       <form id="leadForm" novalidate>
         <div class="field" id="fieldNome">
           <label for="nome">Seu nome</label>
@@ -383,10 +383,10 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
           <label for="consent">Concordo com o uso dos meus dados para receber o contato da Epos, conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
         </div>
         <div class="btn-stack">
-          <button type="submit" id="btnEnviar" class="btn btn-primary">Receber meu raio-X no WhatsApp</button>
+          <button type="submit" id="btnEnviar" class="btn btn-primary">Continuar</button>
         </div>
       </form>
-      <div class="step-nav" style="margin-top:10px"><button class="btn-back" onclick="goTo('dor')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
+      <div class="step-nav" style="margin-top:10px"><button class="btn-back" onclick="goTo('segmento')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Voltar</button></div>
     </section>
 
     <!-- SUCESSO -->
@@ -421,7 +421,32 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   var PERGUNTAS = ['segmento','ticket','investimento','volume','atendimento','conteudo','dor'];
   var ROTULOS = { segmento:'Segmento', ticket:'Ticket médio', investimento:'Anúncios/mês', volume:'Contatos/mês', atendimento:'Quem atende', conteudo:'Conteúdo', dor:'O que trava' };
   var ROTULOS_WA = { segmento:'Segmento', ticket:'Ticket médio', investimento:'Anúncios por mês', volume:'Contatos por mês', atendimento:'Quem atende hoje', conteudo:'Conteúdo e criativos', dor:'O que trava as vendas' };
-  var STEP_INDEX = { hook:0, segmento:1, ticket:2, investimento:3, volume:4, atendimento:5, conteudo:6, dor:7, contato:8, sucesso:9, sair:10 };
+  // 22/11 (Thiago: "o telefone nas primeiras etapas, pra conseguirmos recuperar os clientes de onde eles pararam"): o contato vem
+  // depois da 1ª pergunta; a partir dele cada resposta grava como parcial (webhook com parcial: true, sem lead, sem Donna, sem Meta).
+  var FLUXO = ['segmento','contato','ticket','investimento','volume','atendimento','conteudo','dor'];
+  var STEP_INDEX = { hook:0, segmento:1, contato:2, ticket:3, investimento:4, volume:5, atendimento:6, conteudo:7, dor:8, sucesso:9, sair:10 };
+  var contatoFeito = false;
+  var QSID = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+  var WEBHOOK_Q = 'https://webhook.eposmktfilmsia.com.br/webhook/epos-quiz-lead';
+  var SB_URL_Q = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+  var SB_ANON_Q = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
+  function proxima(atual){
+    var i = FLUXO.indexOf(atual), prox = FLUXO[i + 1];
+    if (prox === 'contato' && contatoFeito) prox = FLUXO[i + 2];
+    return prox || 'dor';
+  }
+  function salvarParcial(etapa){
+    if (!contatoFeito) return;
+    var p = new URLSearchParams(location.search), resp = {};
+    PERGUNTAS.forEach(function(k){ if (answers[k]) resp[k] = answers[k]; });
+    var body = { parcial: true, ts: Date.now(), quiz_sid: QSID, session_id: window._lpSid || '', etapa: etapa,
+      nome: answers.nome || '', telefone: answers.telefone || '', respostas: resp,
+      utm_source: p.get('utm_source') || (BOARD ? 'metodo' : 'quiz-epos'), utm_medium: p.get('utm_medium') || '',
+      utm_campaign: p.get('utm_campaign') || '', utm_content: p.get('utm_content') || '', utm_term: p.get('utm_term') || '',
+      ad_id: p.get('ad_id') || '', adset_id: p.get('adset_id') || '', placement: p.get('placement') || '',
+      page_url: location.href, modo: BOARD ? 'board' : 'pagina' };
+    fetch(WEBHOOK_Q, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true }).catch(function(){});
+  }
   var DONNA_WA = '5561990448205';
   var answers = {};
   var BOARD = document.documentElement.classList.contains('board');
@@ -442,10 +467,10 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     var n = PERGUNTAS.indexOf(screen);
     var counter = document.getElementById('counter');
     if (n >= 0) counter.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '</b> / 07';
-    else if (screen === 'contato') counter.innerHTML = '<b>Último</b> passo';
+    else if (screen === 'contato') counter.innerHTML = '<b>Seu</b> WhatsApp';
     else if (screen === 'sucesso') counter.innerHTML = '<b>Enviado</b>';
     else counter.textContent = '2 min';
-    var feitos = screen === 'sucesso' ? 8 : (screen === 'contato' ? 7 : Math.max(n, 0));
+    var feitos = screen === 'sucesso' ? 8 : Math.max(FLUXO.indexOf(screen), 0);
     Array.prototype.forEach.call(prog.children, function(el, idx){ el.classList.toggle('on', idx < feitos); });
   }
 
@@ -489,17 +514,15 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
       answers[group] = btn.getAttribute('data-value');
       trackStep('step_answer', group, answers[group]);
       armadoEm = Date.now() + 5000;   // já respondeu: novos toques esperam a próxima tela
-      setTimeout(function(){
-        var prox = PERGUNTAS[PERGUNTAS.indexOf(group) + 1] || 'contato';
-        goTo(prox);
-      }, 240);
+      salvarParcial(group);
+      setTimeout(function(){ goTo(proxima(group)); }, 240);
     });
   });
 
   document.getElementById('dorContinuar').addEventListener('click', function(){
     if (!answers.dor) return;
     trackStep('step_answer', 'dor', answers.dor);
-    goTo('contato');
+    finalizar();
   });
 
   function abrirOutro(){
@@ -520,7 +543,8 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     if (v.length < 2) { document.getElementById('fieldSegmentoCustom').classList.add('invalid'); return; }
     answers.segmento = v;
     trackStep('step_answer', 'segmento', 'outro: ' + v);
-    goTo('ticket');
+    salvarParcial('segmento');
+    goTo(proxima('segmento'));
   });
 
   // 06/11: celular com 11 dígitos tem 9 logo depois do DDD. "(55) 61999-7606" passava como DDD 55: era o +55 do país
@@ -545,7 +569,6 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
   var enviado = false;
   document.getElementById('leadForm').addEventListener('submit', function(e){
     e.preventDefault();
-    if (enviado) return;
     var nome = document.getElementById('nome'), tel = document.getElementById('telefone'), consent = document.getElementById('consent');
     var fN = document.getElementById('fieldNome'), fT = document.getElementById('fieldTelefone'), cB = document.getElementById('consentBox');
     var erros = [];
@@ -560,10 +583,19 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
       return;
     }
 
-    enviado = true;
     if (window._histContato) window._histContato.enviado = true;
     answers.nome = nome.value.trim();
     answers.telefone = tel.value.replace(/\D/g, '');
+    contatoFeito = true;
+    trackStep('step_answer', 'contato', 'ok');
+    salvarParcial('contato');
+    goTo(proxima('contato'));
+  });
+
+  // 22/11: o envio completo (lead, Donna, evento Lead da Meta) só acontece no fim das perguntas
+  function finalizar(){
+    if (enviado || !contatoFeito) return;
+    enviado = true;
 
     // event_id único: o mesmo vai no pixel (navegador) e na API de Conversões (servidor), para a Meta deduplicar
     var eventId = 'quizepos_' + ((self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)));
@@ -586,7 +618,8 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
       fbclid: fbclid, fbc: fbclid ? ('fb.1.' + Math.floor(Date.now() / 1000) + '.' + fbclid) : ck('_fbc'), fbp: ck('_fbp'),
       user_agent: navigator.userAgent, page_url: location.href, modo: BOARD ? 'board' : 'pagina',
       // 06/11: liga o lead à visita (lp_events) e leva o que a pessoa digitou no contato
-      session_id: window._lpSid || '', historico_site: window._histContato ? window._histContato.dados() : null
+      session_id: window._lpSid || '', historico_site: window._histContato ? window._histContato.dados() : null,
+      quiz_sid: QSID
     };
     fetch('https://webhook.eposmktfilmsia.com.br/webhook/epos-quiz-lead', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true
@@ -606,9 +639,45 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     // modo board: avisa a página do Método que o formulário já foi preenchido (o botão "Agendar diagnóstico" muda de texto)
     if (BOARD && window.parent !== window) { try { window.parent.postMessage({ tipo: 'epos-quiz', etapa: 'enviado', primeiro_nome: primeiro }, ORIGEM_PAI); } catch(e3){} }
     goTo('sucesso');
-  });
+  }
 
   atualizarTopo('hook');
+
+  // 22/11: link "continuar de onde parou" (?r=<token>) que a recuperação manda no WhatsApp
+  (function retomar(){
+    var tok = new URLSearchParams(location.search).get('r');
+    if (!tok || !/^[0-9a-f-]{36}$/i.test(tok)) return;
+    fetch(SB_URL_Q + '/rest/v1/rpc/quiz_retomar', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SB_ANON_Q, Authorization: 'Bearer ' + SB_ANON_Q },
+      body: JSON.stringify({ p_token: tok }) })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        var q = Array.isArray(rows) && rows[0];
+        if (!q || q.conta !== 'epos') return;
+        QSID = q.session_id || QSID;
+        var resp = q.respostas || {};
+        PERGUNTAS.forEach(function(k){ if (resp[k]) answers[k] = resp[k]; });
+        answers.nome = q.nome || '';
+        answers.telefone = String(q.telefone || '').replace(/^55(?=\d{10,11}$)/, '');
+        var iN = document.getElementById('nome'), iT = document.getElementById('telefone');
+        iN.value = answers.nome; iT.value = answers.telefone;
+        try { iT.dispatchEvent(new Event('input', { bubbles: true })); } catch(eI){}
+        document.getElementById('consent').checked = true;
+        contatoFeito = true;
+        PERGUNTAS.forEach(function(k){
+          var lista = document.querySelector('.opt-list[data-group="' + k + '"]'); if (!lista || !answers[k]) return;
+          var marcados = String(answers[k]).split('; ');
+          lista.querySelectorAll('.opt').forEach(function(o){
+            var on = marcados.indexOf(o.getAttribute('data-value')) > -1;
+            o.classList.toggle('selected', on); o.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+        });
+        if (answers.dor) document.getElementById('dorContinuar').disabled = false;
+        var falta = FLUXO.filter(function(t){ return t !== 'contato' && !answers[t]; })[0] || 'dor';
+        trackStep('quiz_retomado', falta);
+        goTo(falta);
+      }).catch(function(){});
+  })();
 
   // modo board: informa a altura para a página do Método (o quadro aparece inteiro, sem rolagem interna)
   if (BOARD && window.parent !== window) {

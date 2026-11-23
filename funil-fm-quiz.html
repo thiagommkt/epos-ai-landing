@@ -457,7 +457,7 @@ h1.end-title{
         <button class="opt" aria-pressed="false" data-value="Não sei dizer"><span class="opt-dot"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>Não sei dizer</button>
       </div>
       <div class="step-nav">
-        <button class="btn-back" onclick="goTo('perfil')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="btn-back" onclick="goTo('contato')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       </div>
     </section>
 
@@ -526,9 +526,9 @@ h1.end-title{
 
     <!-- 5: CONTATO -->
     <section class="screen" data-screen="contato">
-      <div class="q-eyebrow">Último passo</div>
-      <h2 class="q-title">Ótimo! Você pode ter direito.</h2>
-      <p class="q-help">Deixe seus dados que um especialista entra em contato.</p>
+      <div class="q-eyebrow">Antes de continuar</div>
+      <h2 class="q-title">Para onde enviamos o seu resultado?</h2>
+      <p class="q-help">No fim, um especialista te chama no WhatsApp.</p>
       <form id="leadForm" novalidate>
         <div class="field" id="fieldNome">
           <label for="nome">Nome completo</label>
@@ -545,11 +545,11 @@ h1.end-title{
           <label for="consent">Concordo com o uso dos meus dados conforme a <a href="https://n8n.eposmktfilmsia.com.br/webhook/meta-privacy-page-fm" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
         </div>
         <div class="btn-stack">
-          <a id="btnEnviar" href="#" class="btn btn-primary" style="text-decoration:none;">Enviar e falar com especialista</a>
+          <a id="btnEnviar" href="#" class="btn btn-primary" style="text-decoration:none;">Continuar</a>
         </div>
       </form>
       <div class="step-nav" style="margin-top:12px">
-        <button class="btn-back" onclick="goTo('renda')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="btn-back" onclick="goTo('perfil')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
       </div>
     </section>
 
@@ -587,7 +587,7 @@ h1.end-title{
 <script>
 (function(){
   var order = ['hook','perfil','ir','doenca','renda','contato','sucesso','desqualificado'];
-  var progressMap = { hook:8, perfil:24, ir:40, doenca:56, renda:74, contato:90, sucesso:100, desqualificado:100 };
+  var progressMap = { hook:8, perfil:20, contato:36, ir:52, doenca:68, renda:84, sucesso:100, desqualificado:100 };
   var answers = {};
   // 20/10 (Thiago): desqualifica só quem ganha menos de R$ 3.500 E respondeu "Não" no imposto de renda.
   // Renda baixa com "Sim", "Já paguei" ou "Não sei dizer" segue no fluxo.
@@ -596,7 +596,28 @@ h1.end-title{
   var armadoEm = 0;   // até quando os toques são ignorados
 
   // Funil: etapa e resposta vão SOMENTE para o nosso banco (lp_events). Nada disso é enviado à Meta.
-  var STEP_INDEX = { hook:0, perfil:1, ir:2, doenca:3, renda:4, contato:5, sucesso:6, desqualificado:7 };
+  var STEP_INDEX = { hook:0, perfil:1, contato:2, ir:3, doenca:4, renda:5, sucesso:6, desqualificado:7 };
+  // 22/11 (Thiago: "o telefone nas primeiras etapas, pra conseguirmos recuperar os clientes de onde eles pararam"): o contato vem
+  // depois da 1ª pergunta; a partir dele cada resposta grava como parcial (webhook com parcial: true, sem lead, sem mensagem, sem Meta).
+  var PERGUNTAS_Q = ['perfil','ir','doenca','renda'];
+  var FLUXO_Q = ['perfil','contato','ir','doenca','renda'];
+  var contatoFeito = false;
+  var QSID = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2));
+  var WEBHOOK_Q = 'https://webhook.eposmktfilmsia.com.br/webhook/fm-quiz-lead';
+  var SB_URL_Q = 'https://wpriaoxsrfbamovlupkp.supabase.co';
+  var SB_ANON_Q = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwcmlhb3hzcmZiYW1vdmx1cGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzNzYwNTEsImV4cCI6MjExMDk1MjA1MX0.p9z-tZ_Aq0ErWQjA8ONl4hBqszcP9bZE4yx130tYHjo';
+  function salvarParcial(etapa, encerrado){
+    if (!contatoFeito) return;
+    var p = new URLSearchParams(location.search), resp = {};
+    PERGUNTAS_Q.forEach(function(k){ if (answers[k]) resp[k] = answers[k]; });
+    var body = { parcial: true, ts: Date.now(), quiz_sid: QSID, session_id: window._lpSid || '', etapa: etapa,
+      nome: answers.nome || '', telefone: String(answers.telefone || '').replace(/\D/g, ''), respostas: resp,
+      utm_source: p.get('utm_source') || 'quiz', utm_medium: p.get('utm_medium') || '', utm_campaign: p.get('utm_campaign') || '',
+      utm_content: p.get('utm_content') || 'funil-fm-quiz', utm_term: p.get('utm_term') || '',
+      ad_id: p.get('ad_id') || '', adset_id: p.get('adset_id') || '', placement: p.get('placement') || '', page_url: location.href };
+    if (encerrado) body.encerrado = encerrado;
+    fetch(WEBHOOK_Q, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true }).catch(function(){});
+  }
   function trackStep(type, step, answer){
     try {
       if(window._lpTrack) window._lpTrack(type, { step_name: step, step_index: STEP_INDEX[step], answer: answer ? String(answer).slice(0, 280) : null });
@@ -650,6 +671,7 @@ h1.end-title{
       trackStep('step_answer', group, answers[group]);
       if(disqualify) trackStep('step_disqualified', group, rendaSemIR ? answers.renda + ' · não paga IR' : answers[group]);
       armadoEm = Date.now() + 5000;   // já respondeu: novos toques esperam a próxima tela
+      salvarParcial(group, disqualify ? 'desqualificado' : '');
       setTimeout(function(){
         if(disqualify){
           document.getElementById('dqTitle').textContent = 'Agradecemos a participação!';
@@ -657,10 +679,10 @@ h1.end-title{
           goTo('desqualificado');
           return;
         }
-        if(group === 'perfil') goTo('ir');
+        if(group === 'perfil') goTo(contatoFeito ? 'ir' : 'contato');
         else if(group === 'ir') goTo('doenca');
         else if(group === 'doenca') goTo('renda');
-        else if(group === 'renda') goTo('contato');
+        else if(group === 'renda') finalizar();
       }, 260);
     });
   });
@@ -684,6 +706,7 @@ h1.end-title{
     field.classList.remove('invalid');
     answers.doenca = value;
     trackStep('step_answer', 'doenca', 'outra: ' + value);
+    salvarParcial('doenca', '');
     goTo('renda');
   });
 
@@ -738,6 +761,16 @@ h1.end-title{
     answers.nome = nome.value.trim();
     answers.telefone = telefone.value.trim();
     answers.consent = true;
+    if(window._histContato) window._histContato.enviado = true;
+    contatoFeito = true;
+    trackStep('step_answer', 'contato', 'ok');
+    salvarParcial('contato', '');
+    goTo('ir');
+  });
+
+  // 22/11: o envio completo (lead, mensagem, evento Lead da Meta) só acontece depois da última pergunta
+  function finalizar(){
+    if (_quizSubmitted || !contatoFeito) return;
 
     // Gerar event_id para deduplicação pixel ↔ CAPI
     var eventId = 'quiz_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,function(c){return(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16);});
@@ -779,7 +812,8 @@ h1.end-title{
       page_url: window.location.href,
       // 06/11: liga o lead à visita (lp_events) e leva o que a pessoa digitou no contato
       session_id: window._lpSid || '',
-      historico_site: window._histContato ? window._histContato.dados() : null
+      historico_site: window._histContato ? window._histContato.dados() : null,
+      quiz_sid: QSID
     };
 
     _quizSubmitted = true;
@@ -801,7 +835,42 @@ h1.end-title{
     var waUrl = 'https://wa.me/5561995731944?text=' + encodeURIComponent(waMsg);
     document.getElementById('btnWaSucesso').href = waUrl;
     goTo('sucesso');
-  });
+  }
+
+  // 22/11: link "continuar de onde parou" (?r=<token>) que a recuperação manda no WhatsApp
+  (function retomar(){
+    var tok = new URLSearchParams(location.search).get('r');
+    if (!tok || !/^[0-9a-f-]{36}$/i.test(tok)) return;
+    fetch(SB_URL_Q + '/rest/v1/rpc/quiz_retomar', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SB_ANON_Q, Authorization: 'Bearer ' + SB_ANON_Q },
+      body: JSON.stringify({ p_token: tok }) })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        var q = Array.isArray(rows) && rows[0];
+        if (!q || q.conta !== 'fm') return;
+        QSID = q.session_id || QSID;
+        var resp = q.respostas || {};
+        PERGUNTAS_Q.forEach(function(k){ if (resp[k]) answers[k] = resp[k]; });
+        answers.nome = q.nome || '';
+        answers.telefone = String(q.telefone || '').replace(/^55(?=\d{10,11}$)/, '');
+        var iN = document.getElementById('nome'), iT = document.getElementById('telefone');
+        iN.value = answers.nome; iT.value = answers.telefone;
+        try { iT.dispatchEvent(new Event('input', { bubbles: true })); } catch(eI){}
+        answers.telefone = iT.value;
+        document.getElementById('consent').checked = true;
+        contatoFeito = true;
+        PERGUNTAS_Q.forEach(function(k){
+          var lista = document.querySelector('.opt-list[data-group="' + k + '"]'); if (!lista || !answers[k]) return;
+          lista.querySelectorAll('.opt').forEach(function(o){
+            var on = o.getAttribute('data-value') === answers[k];
+            o.classList.toggle('selected', on); o.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+        });
+        var falta = FLUXO_Q.filter(function(t){ return t !== 'contato' && !answers[t]; })[0] || 'renda';
+        trackStep('quiz_retomado', falta);
+        goTo(falta);
+      }).catch(function(){});
+  })();
 
   document.getElementById('telefone').addEventListener('input', function(e){
     // 21/10: com +55 (digitado ou preenchido pelo celular) o corte em 11 dígitos guardava o 55 e perdia os 2 últimos números
