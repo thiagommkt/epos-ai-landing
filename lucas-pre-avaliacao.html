@@ -44,6 +44,7 @@ body::before{
 .app{position:relative;z-index:1;width:100%;max-width:520px;padding:28px 22px 36px;}
 .brand{text-align:center;margin-bottom:22px}
 /* logo com fundo transparente (o preto original foi convertido em transparência) */
+.brand picture{display:block}
 .brand img{display:block;margin:0 auto;width:min(250px,70%);height:auto}
 .brand .rule{width:56px;height:1px;margin:8px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
@@ -136,7 +137,7 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 <body>
 <main class="app">
   <header class="brand">
-    <img src="assets/lucas/logo.webp" width="640" height="487" alt="Dr. Lucas Lustosa · Odontologia Integrada">
+    <picture><source srcset="assets/lucas/logo.avif" type="image/avif"><img src="assets/lucas/logo.webp" width="640" height="487" alt="Dr. Lucas Lustosa · Odontologia Integrada"></picture>
     <div class="rule"></div>
   </header>
 

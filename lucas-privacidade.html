@@ -22,6 +22,7 @@ body{font-family:var(--fB);background:var(--bg);color:var(--text);line-height:1.
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(70% 40% at 50% -5%,rgba(201,162,75,.14),transparent 70%)}
 .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:32px 22px 28px}
 .brand{text-align:center;margin-bottom:26px}
+.brand picture{display:block}
 .brand img{display:block;margin:0 auto;width:min(220px,64%);height:auto}
 .brand .rule{width:56px;height:1px;margin:10px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 h1{font-family:var(--fD);font-weight:600;font-size:clamp(30px,6vw,40px);line-height:1.15;text-align:center;margin-bottom:6px}
@@ -43,7 +44,7 @@ a{color:var(--gold-hi)}
 </head>
 <body>
 <main class="wrap">
-  <div class="brand"><img src="assets/lucas/logo.webp" alt="Dr. Lucas Lustosa"><div class="rule"></div></div>
+  <div class="brand"><picture><source srcset="assets/lucas/logo.avif" type="image/avif"><img src="assets/lucas/logo.webp" alt="Dr. Lucas Lustosa"></picture><div class="rule"></div></div>
   <h1>Política de Privacidade</h1>
   <p class="sub">Como tratamos os dados de quem preenche a pré-avaliação. Última atualização: 24 de novembro de 2026.</p>
 
