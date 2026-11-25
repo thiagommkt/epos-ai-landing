@@ -1577,7 +1577,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     </a>
     <a data-sec="quizzes" id="nav-quizzes" style="display:none" onclick="navTo('quizzes')">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="1.5" width="12" height="13" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h3.5" stroke-linecap="round"/></svg>
-      Quizzes
+      Forms Ads
     </a>
     <div class="nav-section">Automação</div>
     <a data-sec="campanhas" onclick="navTo('campanhas')">
@@ -2298,8 +2298,8 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
 <section class="section" id="s-quizzes">
   <div class="sec-head">
     <div>
-      <div class="sec-title">QUIZZES <span>TODOS OS CLIENTES</span></div>
-      <div class="sec-sub">FUNIL, RESPOSTAS E LEADS DE CADA QUIZ · TESTES FICAM DE FORA</div>
+      <div class="sec-title">FORMS ADS <span>TODOS OS CLIENTES</span></div>
+      <div class="sec-sub">FUNIL, RESPOSTAS E LEADS DE CADA FORMULÁRIO · TESTES FICAM DE FORA</div>
     </div>
     <div style="display:flex;gap:6px">
       <button class="qz-per" data-d="7" onclick="qzLoad(7)">7 dias</button>
@@ -8015,8 +8015,8 @@ async function qzLoad(dias) {
   const chips = document.getElementById('qz-chips'), corpo = document.getElementById('qz-corpo');
   corpo.innerHTML = '<div class="loading"></div>';
   let lista = [];
-  try { lista = await rmRpc('quiz_lista', { p_desde: desde }); } catch (e) { corpo.innerHTML = `<div class="qz-vazio">Não carregou a lista de quizzes: ${escHtml(e.message)}</div>`; return; }
-  if (!Array.isArray(lista) || !lista.length) { chips.innerHTML = ''; corpo.innerHTML = '<div class="qz-vazio">Nenhum quiz encontrado.</div>'; return; }
+  try { lista = await rmRpc('quiz_lista', { p_desde: desde }); } catch (e) { corpo.innerHTML = `<div class="qz-vazio">Não carregou a lista de formulários: ${escHtml(e.message)}</div>`; return; }
+  if (!Array.isArray(lista) || !lista.length) { chips.innerHTML = ''; corpo.innerHTML = '<div class="qz-vazio">Nenhum formulário encontrado.</div>'; return; }
   if (!_qzSlug) { try { _qzSlug = localStorage.getItem('qz_slug'); } catch (e) {} }
   if (!lista.some(q => q.slug === _qzSlug)) _qzSlug = (lista.find(q => q.sessoes) || lista[0]).slug;
   chips.innerHTML = lista.map(q => `<button class="qz-chip${q.slug === _qzSlug ? ' ativo' : ''}" onclick="qzEscolher('${escHtml(q.slug)}')">
@@ -8024,7 +8024,7 @@ async function qzLoad(dias) {
   const q = lista.find(x => x.slug === _qzSlug);
   let p, leads;
   try { [p, leads] = await Promise.all([rmRpc('quiz_painel', { p_slug: _qzSlug, p_desde: desde }), rmRpc('quiz_leads', { p_slug: _qzSlug, p_desde: desde })]); }
-  catch (e) { corpo.innerHTML = `<div class="qz-vazio">Não carregou este quiz: ${escHtml(e.message)}</div>`; return; }
+  catch (e) { corpo.innerHTML = `<div class="qz-vazio">Não carregou este formulário: ${escHtml(e.message)}</div>`; return; }
   _qzLeads = Array.isArray(leads) ? leads : [];
   corpo.innerHTML = qzResumo(q, p) + qzEtapas(p) + qzRespostas(p) + qzCriativos(p) + qzLeadsCard(q) + qzErros(p);
   qzFiltrar('');
@@ -8033,7 +8033,7 @@ function qzEscolher(slug) { _qzSlug = slug; try { localStorage.setItem('qz_slug'
 function qzResumo(q, p) {
   const t = p.totais || {}, k = (rot, v, sub) => `<div class="kpi"><div class="kpi-lbl">${rot}</div><div class="kpi-val">${numFmt(v)}</div><div class="qz-sub">${sub}</div></div>`;
   const dias = (p.por_dia || []).map(d => ({ dia: String(d.dia), v: Number(d.sessoes) || 0 }));
-  return `<div class="qz-card"><div class="qz-tit">${escHtml(q.cliente)} · ${escHtml(q.nome)} <span>últimos ${_qzDias} dias${q.url ? ` · <a href="${escHtml(q.url)}" target="_blank" rel="noopener">abrir o quiz ↗</a>` : ''}</span></div>
+  return `<div class="qz-card"><div class="qz-tit">${escHtml(q.cliente)} · ${escHtml(q.nome)} <span>últimos ${_qzDias} dias${q.url ? ` · <a href="${escHtml(q.url)}" target="_blank" rel="noopener">abrir o formulário ↗</a>` : ''}</span></div>
     <div class="kpi-row qz-kpis">${k('Visitas', t.sessoes, 'abriram a página')}${k('Começaram', t.comecaram, qzPct(t.comecaram, t.sessoes) + ' das visitas')}
       ${k('Deixaram WhatsApp', t.contato, qzPct(t.contato, t.comecaram) + ' de quem começou')}${k('Concluíram', t.concluiram, qzPct(t.concluiram, t.sessoes) + ' das visitas')}
       ${t.desqualificados ? k('Desqualificados', t.desqualificados, 'pelas respostas') : ''}</div>
@@ -8072,7 +8072,7 @@ function qzCriativos(p) {
       <td class="n" data-r="WhatsApp">${numFmt(x.contato)}</td><td class="n" data-r="Concluíram">${numFmt(x.concluiram)}</td><td class="n" data-r="Taxa">${qzPct(x.concluiram, x.sessoes)}</td></tr>`).join('') + '</tbody></table></div>';
 }
 function qzLeadsCard(q) {
-  if (!q.conta) return `<div class="qz-card"><div class="qz-tit">Leads</div><div class="qz-vazio">Este quiz ainda não está cadastrado com um cliente: os números acima já aparecem, a lista de leads entra quando ele for cadastrado.</div></div>`;
+  if (!q.conta) return `<div class="qz-card"><div class="qz-tit">Leads</div><div class="qz-vazio">Este formulário ainda não está cadastrado com um cliente: os números acima já aparecem, a lista de leads entra quando ele for cadastrado.</div></div>`;
   return `<div class="qz-card"><div class="qz-tit">Leads <span id="qz-leads-n">${numFmt(_qzLeads.length)} no período</span></div>
     <input class="qz-busca" type="search" placeholder="Buscar por nome, telefone ou resposta" oninput="qzFiltrar(this.value)"><div id="qz-leads"></div></div>`;
 }
