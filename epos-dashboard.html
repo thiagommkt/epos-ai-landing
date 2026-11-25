@@ -1575,6 +1575,10 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
       <svg viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="1" width="12" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="5" y="9" width="1.6" height="3"/><rect x="7.2" y="7" width="1.6" height="5"/><rect x="9.4" y="5" width="1.6" height="7"/></svg>
       Relatório
     </a>
+    <a data-sec="quizzes" id="nav-quizzes" style="display:none" onclick="navTo('quizzes')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="1.5" width="12" height="13" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h3.5" stroke-linecap="round"/></svg>
+      Quizzes
+    </a>
     <div class="nav-section">Automação</div>
     <a data-sec="campanhas" onclick="navTo('campanhas')">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zM1 7h10v2H1zM1 11h12v2H1z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="13" cy="12" r="2" fill="currentColor"/></svg>
@@ -2289,6 +2293,81 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     @media (prefers-reduced-motion:reduce) { .ig-tile, .ig-det, .ig-det-bg { animation:none; } .ig-tile img { transition:none; } }
   </style>
   <div id="num-corpo"><div class="num-vazio">Carregando…</div></div>
+</section>
+<!-- 25/11: quizzes de todos os clientes (Epos, FM, Dr. Lucas e qualquer quiz novo, sozinho pelo endereço da página) -->
+<section class="section" id="s-quizzes">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">QUIZZES <span>TODOS OS CLIENTES</span></div>
+      <div class="sec-sub">FUNIL, RESPOSTAS E LEADS DE CADA QUIZ · TESTES FICAM DE FORA</div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="qz-per" data-d="7" onclick="qzLoad(7)">7 dias</button>
+      <button class="qz-per" data-d="30" onclick="qzLoad(30)">30 dias</button>
+      <button class="qz-per" data-d="90" onclick="qzLoad(90)">90 dias</button>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <style>
+    .qz-per { padding:6px 12px; background:transparent; border:1px solid var(--bd); color:var(--muted); font-family:var(--fD); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
+    .qz-per.ativo { border-color:var(--purple); color:var(--text); background:var(--pur-l); }
+    .qz-chips { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 16px; }
+    .qz-chip { display:flex; flex-direction:column; gap:2px; text-align:left; padding:9px 12px; background:var(--bg2); border:1px solid var(--bd); border-radius:10px; color:var(--muted); cursor:pointer; min-width:0; max-width:100%; }
+    .qz-chip b { font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.04em; color:var(--text); }
+    .qz-chip span { font-size:11px; }
+    .qz-chip.ativo { border-color:var(--purple); background:var(--pur-l); }
+    #qz-corpo { display:flex; flex-direction:column; gap:16px; }
+    .qz-card { background:var(--bg2); border:1px solid var(--bd); padding:16px; border-radius:10px; min-width:0; }
+    .qz-tit { font-family:var(--fD); font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:12px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+    .qz-tit span { color:var(--muted); font-weight:500; letter-spacing:0; text-transform:none; font-size:12px; }
+    .qz-tit a { color:var(--muted); font-weight:500; letter-spacing:0; text-transform:none; font-size:12px; }
+    .qz-kpis { grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); margin-bottom:0; }
+    .qz-kpis .kpi-val { font-size:clamp(22px, 2.2vw, 30px); white-space:nowrap; }
+    @media (max-width:768px) { #s-quizzes .qz-kpis .kpi-val { font-size:26px !important; } }
+    .qz-sub { font-size:11px; color:var(--muted); }
+    .qz-etapa { display:grid; grid-template-columns:minmax(110px, 190px) 1fr auto; gap:10px; align-items:center; padding:7px 0; border-top:1px solid var(--bd); font-size:13px; }
+    .qz-etapa:first-of-type { border-top:none; }
+    .qz-etapa .nm { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .qz-trilho { height:10px; background:var(--bg3); border-radius:5px; overflow:hidden; }
+    .qz-trilho i { display:block; height:100%; background:var(--purple); border-radius:5px; }
+    .qz-etapa .num { font-size:12px; color:var(--muted); white-space:nowrap; text-align:right; }
+    .qz-queda { color:var(--warn); font-weight:600; }
+    .qz-resp-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; }
+    .qz-resp { border:1px solid var(--bd); border-radius:8px; padding:10px 12px; min-width:0; }
+    .qz-resp h5 { margin:0 0 8px; font-family:var(--fD); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    .qz-linha { display:grid; grid-template-columns:1fr auto; gap:8px; font-size:12px; padding:3px 0; }
+    .qz-linha span { overflow-wrap:anywhere; }
+    .qz-linha b { font-weight:600; color:var(--muted); white-space:nowrap; }
+    .qz-linha .qz-trilho { grid-column:1 / -1; height:5px; }
+    .qz-tab { width:100%; border-collapse:collapse; font-size:12px; }
+    .qz-tab th { text-align:left; font-family:var(--fD); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:6px 8px; border-bottom:1px solid var(--bd); }
+    .qz-tab td { padding:7px 8px; border-bottom:1px solid var(--bd); vertical-align:top; }
+    .qz-tab td.n { text-align:right; white-space:nowrap; }
+    .qz-lead { border-top:1px solid var(--bd); padding:9px 0; font-size:13px; }
+    .qz-lead summary { cursor:pointer; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; list-style:none; }
+    .qz-lead summary::-webkit-details-marker { display:none; }
+    .qz-lead summary b { font-weight:600; }
+    .qz-lead .qz-sit { font-size:11px; padding:2px 7px; border:1px solid var(--bd-b); color:var(--muted); white-space:nowrap; }
+    .qz-lead .qz-sit.ok { color:var(--neon); border-color:var(--neon); }
+    .qz-lead .qz-sit.parou { color:var(--warn); border-color:var(--warn); }
+    .qz-lead dl { display:grid; grid-template-columns:minmax(90px, 160px) 1fr; gap:4px 10px; margin:8px 0 0; font-size:12px; }
+    .qz-lead dt { color:var(--muted); }
+    .qz-lead dd { margin:0; overflow-wrap:anywhere; }
+    .qz-vazio { color:var(--muted); font-size:13px; padding:8px 0; }
+    .qz-busca { width:100%; box-sizing:border-box; margin:0 0 8px; padding:8px 10px; background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-size:13px; }
+    @media (max-width:640px) {
+      .qz-etapa { grid-template-columns:1fr auto; }
+      .qz-etapa .qz-trilho { grid-column:1 / -1; grid-row:2; }
+      .qz-tab thead { display:none; }
+      .qz-tab tr { display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--bd); padding:6px 0; }
+      .qz-tab td { border:none; padding:2px 6px; }
+      .qz-tab td:first-child { grid-column:1 / -1; font-weight:600; }
+      .qz-tab td.n { text-align:left; }
+      .qz-tab td[data-r]::before { content:attr(data-r) ': '; color:var(--muted); }
+    }
+  </style>
+  <div class="qz-chips" id="qz-chips"></div>
+  <div id="qz-corpo"><div class="loading"></div></div>
 </section>
 <section class="section" id="s-laboratorio">
   <div class="sec-head">
@@ -5009,6 +5088,7 @@ function show(id) {
     if(id==='laboratorio') labLoad();
     if(id==='agenda') agendaLoad();
     if(id==='numeros') numLoad();
+    if(id==='quizzes') qzLoad();
     if(id==='remarketing') rmLoad();
   }
   if(id==='dashboard') {
@@ -7912,7 +7992,110 @@ async function labPodeVer() {
     if (a) a.style.display = adm === true ? '' : 'none';
     const an = document.getElementById('nav-numeros');   // 16/11: aba Números, só admin
     if (an) an.style.display = adm === true ? '' : 'none';
+    const aq = document.getElementById('nav-quizzes');   // 25/11: aba Quizzes, só admin
+    if (aq) aq.style.display = adm === true ? '' : 'none';
   } catch (e) {}
+}
+// ═══ QUIZZES (25/11): todos os quizzes de todos os clientes. Quiz novo aparece sozinho (pelo endereço da página); a tabela
+// `quizzes` só dá nome e cliente. Funil e respostas vêm dos passos gravados pela página (lp_events); os leads, do quiz_parcial
+// e do histórico de cada cliente. Testes (utm "teste…", números 5500000000…) ficam de fora. ═══
+let _qzDias = 30, _qzSlug = null, _qzLeads = [];
+const QZ_ETAPA = { perfil: 'Perfil', ir: 'Imposto de renda', doenca: 'Doença', renda: 'Renda', contato: 'WhatsApp', segmento: 'Segmento',
+  ticket: 'Ticket médio', investimento: 'Investe em anúncios', volume: 'Contatos por mês', atendimento: 'Quem atende', conteudo: 'Quem faz o conteúdo',
+  dor: 'O que mais trava', identidade: 'Identidade', procedimento: 'Procedimento', idade: 'Idade', quando: 'Quando quer fazer',
+  experiencia: 'Já fez antes', melhorar: 'O que quer melhorar', disponibilidade: 'Disponibilidade' };
+function qzNomeEtapa(e) { return QZ_ETAPA[e] || (String(e || '?').charAt(0).toUpperCase() + String(e || '').slice(1).replace(/_/g, ' ')); }
+function qzPct(a, b) { return b ? Math.round(a / b * 100) + '%' : '—'; }
+function qzDec(t) { try { return decodeURIComponent(String(t || '').replace(/\+/g, ' ')); } catch (e) { return String(t || ''); } }
+function qzTel(t) { const d = String(t || '').replace(/\D/g, ''); const n = d.startsWith('55') ? d.slice(2) : d; return n.length >= 10 ? `(${n.slice(0, 2)}) ${n.slice(2, -4)}-${n.slice(-4)}` : (t || ''); }
+async function qzLoad(dias) {
+  if (dias) _qzDias = dias;
+  document.querySelectorAll('.qz-per').forEach(b => b.classList.toggle('ativo', Number(b.dataset.d) === _qzDias));
+  const desde = new Date(Date.now() - _qzDias * 864e5).toISOString();
+  const chips = document.getElementById('qz-chips'), corpo = document.getElementById('qz-corpo');
+  corpo.innerHTML = '<div class="loading"></div>';
+  let lista = [];
+  try { lista = await rmRpc('quiz_lista', { p_desde: desde }); } catch (e) { corpo.innerHTML = `<div class="qz-vazio">Não carregou a lista de quizzes: ${escHtml(e.message)}</div>`; return; }
+  if (!Array.isArray(lista) || !lista.length) { chips.innerHTML = ''; corpo.innerHTML = '<div class="qz-vazio">Nenhum quiz encontrado.</div>'; return; }
+  if (!_qzSlug) { try { _qzSlug = localStorage.getItem('qz_slug'); } catch (e) {} }
+  if (!lista.some(q => q.slug === _qzSlug)) _qzSlug = (lista.find(q => q.sessoes) || lista[0]).slug;
+  chips.innerHTML = lista.map(q => `<button class="qz-chip${q.slug === _qzSlug ? ' ativo' : ''}" onclick="qzEscolher('${escHtml(q.slug)}')">
+    <b>${escHtml(q.cliente)}</b><span>${escHtml(q.nome)} · ${numFmt(q.sessoes)} visita${q.sessoes === 1 ? '' : 's'} · ${numFmt(q.concluiram)} ${q.concluiram === 1 ? 'concluiu' : 'concluíram'}</span></button>`).join('');
+  const q = lista.find(x => x.slug === _qzSlug);
+  let p, leads;
+  try { [p, leads] = await Promise.all([rmRpc('quiz_painel', { p_slug: _qzSlug, p_desde: desde }), rmRpc('quiz_leads', { p_slug: _qzSlug, p_desde: desde })]); }
+  catch (e) { corpo.innerHTML = `<div class="qz-vazio">Não carregou este quiz: ${escHtml(e.message)}</div>`; return; }
+  _qzLeads = Array.isArray(leads) ? leads : [];
+  corpo.innerHTML = qzResumo(q, p) + qzEtapas(p) + qzRespostas(p) + qzCriativos(p) + qzLeadsCard(q) + qzErros(p);
+  qzFiltrar('');
+}
+function qzEscolher(slug) { _qzSlug = slug; try { localStorage.setItem('qz_slug', slug); } catch (e) {} qzLoad(); }
+function qzResumo(q, p) {
+  const t = p.totais || {}, k = (rot, v, sub) => `<div class="kpi"><div class="kpi-lbl">${rot}</div><div class="kpi-val">${numFmt(v)}</div><div class="qz-sub">${sub}</div></div>`;
+  const dias = (p.por_dia || []).map(d => ({ dia: String(d.dia), v: Number(d.sessoes) || 0 }));
+  return `<div class="qz-card"><div class="qz-tit">${escHtml(q.cliente)} · ${escHtml(q.nome)} <span>últimos ${_qzDias} dias${q.url ? ` · <a href="${escHtml(q.url)}" target="_blank" rel="noopener">abrir o quiz ↗</a>` : ''}</span></div>
+    <div class="kpi-row qz-kpis">${k('Visitas', t.sessoes, 'abriram a página')}${k('Começaram', t.comecaram, qzPct(t.comecaram, t.sessoes) + ' das visitas')}
+      ${k('Deixaram WhatsApp', t.contato, qzPct(t.contato, t.comecaram) + ' de quem começou')}${k('Concluíram', t.concluiram, qzPct(t.concluiram, t.sessoes) + ' das visitas')}
+      ${t.desqualificados ? k('Desqualificados', t.desqualificados, 'pelas respostas') : ''}</div>
+    ${dias.length > 1 ? numBarras(dias, 'Visitas por dia') : ''}
+    ${t.testes_fora ? `<div class="qz-sub" style="margin-top:8px">${numFmt(t.testes_fora)} visita(s) de teste ficaram fora destes números.</div>` : ''}</div>`;
+}
+function qzEtapas(p) {
+  const et = p.etapas || [], base = Math.max(1, (p.totais || {}).sessoes || 0);
+  if (!et.length) return '';
+  let ant = { viram: base };   // a 1ª pergunta compara com quem abriu a página
+  const linhas = et.map(e => {
+    const queda = ant && ant.viram ? Math.round((1 - e.viram / ant.viram) * 100) : null; ant = e;
+    return `<div class="qz-etapa"><span class="nm" title="${escHtml(e.etapa)}">${escHtml(qzNomeEtapa(e.etapa))}</span>
+      <div class="qz-trilho"><i style="width:${Math.max(1, Math.round(e.viram / base * 100))}%"></i></div>
+      <span class="num">${numFmt(e.viram)} viram · ${numFmt(e.responderam)} responderam${queda > 0 ? ` · <span class="qz-queda">−${queda}%</span>` : ''}</span></div>`;
+  }).join('');
+  return `<div class="qz-card"><div class="qz-tit">Onde as pessoas param <span>cada etapa, em relação às visitas; em vermelho, a queda desde a etapa anterior</span></div>${linhas}</div>`;
+}
+function qzRespostas(p) {
+  const rs = p.respostas || [], por = {};
+  rs.forEach(r => (por[r.etapa] = por[r.etapa] || []).push(r));
+  const ordem = (p.etapas || []).map(e => e.etapa).filter(e => por[e]).concat(Object.keys(por).filter(e => !(p.etapas || []).some(x => x.etapa === e)));
+  if (!ordem.length) return '';
+  return `<div class="qz-card"><div class="qz-tit">O que responderam <span>pessoas por resposta (em pergunta de várias escolhas, cada escolha conta)</span></div><div class="qz-resp-grid">`
+    + ordem.map(et => { const l = por[et], tot = l.reduce((a, r) => Math.max(a, r.n), 0) || 1, soma = l.reduce((a, r) => a + r.n, 0);
+      return `<div class="qz-resp"><h5>${escHtml(qzNomeEtapa(et))}</h5>` + l.map(r => `<div class="qz-linha"><span>${escHtml(r.resposta)}</span><b>${numFmt(r.n)} · ${qzPct(r.n, soma)}</b>
+        <div class="qz-trilho"><i style="width:${Math.round(r.n / tot * 100)}%"></i></div></div>`).join('') + '</div>'; }).join('') + '</div></div>';
+}
+function qzCriativos(p) {
+  const c = {}; (p.criativos || []).forEach(x => { const k = qzDec(x.criativo); const o = c[k] = c[k] || { criativo: k, sessoes: 0, comecaram: 0, contato: 0, concluiram: 0 };
+    ['sessoes', 'comecaram', 'contato', 'concluiram'].forEach(f => o[f] += Number(x[f]) || 0); });
+  const l = Object.values(c).sort((a, b) => b.concluiram - a.concluiram || b.sessoes - a.sessoes);
+  if (!l.length) return '';
+  return `<div class="qz-card"><div class="qz-tit">Por criativo <span>do anúncio que trouxe a pessoa (utm_content)</span></div><table class="qz-tab"><thead><tr><th>Criativo</th><th>Visitas</th><th>Começaram</th><th>WhatsApp</th><th>Concluíram</th><th>Taxa</th></tr></thead><tbody>`
+    + l.map(x => `<tr><td>${escHtml(x.criativo)}</td><td class="n" data-r="Visitas">${numFmt(x.sessoes)}</td><td class="n" data-r="Começaram">${numFmt(x.comecaram)}</td>
+      <td class="n" data-r="WhatsApp">${numFmt(x.contato)}</td><td class="n" data-r="Concluíram">${numFmt(x.concluiram)}</td><td class="n" data-r="Taxa">${qzPct(x.concluiram, x.sessoes)}</td></tr>`).join('') + '</tbody></table></div>';
+}
+function qzLeadsCard(q) {
+  if (!q.conta) return `<div class="qz-card"><div class="qz-tit">Leads</div><div class="qz-vazio">Este quiz ainda não está cadastrado com um cliente: os números acima já aparecem, a lista de leads entra quando ele for cadastrado.</div></div>`;
+  return `<div class="qz-card"><div class="qz-tit">Leads <span id="qz-leads-n">${numFmt(_qzLeads.length)} no período</span></div>
+    <input class="qz-busca" type="search" placeholder="Buscar por nome, telefone ou resposta" oninput="qzFiltrar(this.value)"><div id="qz-leads"></div></div>`;
+}
+function qzFiltrar(txt) {
+  const box = document.getElementById('qz-leads'); if (!box) return;
+  const t = String(txt || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const l = _qzLeads.filter(x => !t || JSON.stringify(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(t));
+  const n = document.getElementById('qz-leads-n'); if (n) n.textContent = (t ? `${l.length} de ` : '') + `${_qzLeads.length} no período`;
+  if (!l.length) { box.innerHTML = `<div class="qz-vazio">${t ? 'Nenhum lead com essa busca.' : 'Nenhum lead neste período.'}</div>`; return; }
+  box.innerHTML = l.slice(0, 200).map(x => {
+    const sit = String(x.situacao || ''), cls = /^parou/.test(sit) ? 'parou' : /desqual/.test(sit) ? '' : 'ok';
+    const resp = Object.entries(x.respostas || {}).filter(([k, v]) => v !== null && v !== '' && typeof v !== 'object' && !/^(modo|origem|session|lp_session|utm_|fbclid|event_id|teste|consent)/i.test(k));   // campos técnicos não são resposta
+    return `<details class="qz-lead"><summary><b>${escHtml(x.nome || '(sem nome)')}</b><span class="qz-sub">${escHtml(qzTel(x.telefone))} · ${labData(x.quando)}</span>
+      <span class="qz-sit ${cls}">${escHtml(sit)}</span></summary><dl>${resp.map(([k, v]) => `<dt>${escHtml(qzNomeEtapa(k))}</dt><dd>${escHtml(String(v))}</dd>`).join('')}
+      ${x.criativo ? `<dt>Criativo</dt><dd>${escHtml(qzDec(x.criativo))}</dd>` : ''}${x.crm_stage ? `<dt>Etapa no CRM</dt><dd>${escHtml(x.crm_stage)}</dd>` : ''}
+      ${x.recuperacao ? `<dt>Recuperação</dt><dd>${escHtml(x.recuperacao)}</dd>` : ''}</dl></details>`;
+  }).join('') + (l.length > 200 ? `<div class="qz-vazio">Mostrando 200 de ${l.length}. Use a busca para achar os outros.</div>` : '');
+}
+function qzErros(p) {
+  const e = p.erros || []; if (!e.length) return '';
+  const nome = { telefone_invalido: 'telefone inválido', nome_invalido: 'nome inválido', sem_consentimento: 'sem marcar o consentimento' };
+  return `<div class="qz-card"><div class="qz-tit">Erros no formulário <span>tentativas barradas antes de enviar</span></div>`
+    + e.map(x => `<div class="qz-linha"><span>${escHtml(String(x.motivo).split(',').map(m => nome[m] || m).join(' + '))}</span><b>${numFmt(x.n)}</b></div>`).join('') + '</div>';
 }
 // ═══ NÚMEROS (16/11): Instagram pela Meta; YouTube, site (GA4) e busca (Search Console) pelo Google ═══
 let _numDias = 7;
