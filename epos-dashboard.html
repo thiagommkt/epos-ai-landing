@@ -2389,6 +2389,20 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .rm-placar .barra { height:4px; background:var(--bg3); }
     .rm-placar .barra i { display:block; height:100%; background:var(--purple); }
     .rm-placar .ligado { color:var(--neon); }
+    /* 25/11: bancada da retomada (textos da Donna em conversas antigas; nada é enviado) */
+    .rm-bancada > summary { cursor:pointer; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text); padding:4px 0; }
+    .rm-bancada .rm-card { margin-top:10px; }
+    .rm-bc-conv { max-height:280px; overflow:auto; border:1px solid var(--bd); background:var(--bg3); padding:8px 10px; display:flex; flex-direction:column; gap:6px; }
+    .rm-bc-conv div { font-family:var(--fB); font-size:12px; line-height:1.5; color:var(--text); white-space:pre-wrap; overflow-wrap:anywhere; }
+    .rm-bc-conv div b { font-family:var(--fD); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-right:6px; }
+    .rm-bc-conv div.nos b { color:var(--purple); }
+    .rm-bc-conv div.ret { border-left:2px solid var(--purple); padding-left:8px; }
+    .rm-bc-toque { border-top:1px solid var(--bd); padding-top:10px; display:flex; flex-direction:column; gap:8px; }
+    .rm-bc-toque .rm-acoes { flex-wrap:wrap; }
+    .rm-bc-toque input[type=text] { flex:1 1 220px; min-width:0; background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-family:var(--fB); font-size:13px; padding:8px 10px; }
+    .rm-bc-feito { font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-bc-feito b { color:var(--neon); font-weight:600; }
+    .rm-bc-feito b.nao { color:var(--warn); }
     .rm-txt { font-family:var(--fB); font-size:13px; line-height:1.55; color:var(--text); }
     .rm-txt small { display:block; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; font-family:var(--fD); }
     .rm-card textarea { width:100%; min-height:84px; resize:vertical; background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-family:var(--fB); font-size:14px; line-height:1.5; padding:10px 12px; box-sizing:border-box; }
@@ -8492,7 +8506,82 @@ async function rmCarregarRetomada() {
         <div class="barra"><i style="width:${Math.min(100, Math.round(cont / 20 * 100))}%"></i></div>
         <span>${cont} de 20 avaliadas · ${ac} aprovadas sem mudança (precisa de 18)${p.bancada ? ` · ${p.bancada} do teste com conversas antigas` : ''}${p.errou ? ' · ⚠️ uma errou' : ''}</span>
         <span>${estado}</span>${botao}</div>`;
-    }).join('')}</div></div>`;
+    }).join('')}</div><div id="rm-bancada"></div></div>`;
+  rmCarregarBancada();
+}
+// 25/11 (etapa 3, Thiago: "pode prosseguir"): bancada. A Donna escreveu as 4 retomadas em cima de conversas antigas reais,
+// cortadas no ponto em que o contato parou. Nada é enviado: a avaliação entra no placar acima como "teste com conversas antigas"
+// (no máximo 10 das 20 de cada mensagem). [SEM_RESPOSTA] e [ESPERAR] são decisões da Donna: concordo ou discordo, fora do placar.
+let _rmBanc = [], _rmBancAberto = {};
+const RM_BC_RES = { aprovada: 'Mandaria assim', editada: 'Mandaria com ajuste', recusada: 'Não mandaria', errou: 'Errou feio' };
+async function rmCarregarBancada() {
+  const box = document.getElementById('rm-bancada');
+  if (!box) return;
+  const { data } = await sb('retomada_bancada?conta=eq.epos&select=id,caso,n,nome,parou_em,sairia_em,conversa,texto,falhas,status,resultado,texto_editado,comentario&order=caso.asc,n.asc');
+  _rmBanc = Array.isArray(data) ? data : [];
+  if (!_rmBanc.length) { box.innerHTML = ''; return; }
+  const falta = _rmBanc.filter(b => b.status === 'para_avaliar').length;
+  const casos = [...new Set(_rmBanc.map(b => b.caso))];
+  box.innerHTML = `<details class="rm-bancada"${falta ? ' open' : ''}><summary id="rm-bc-resumo">${rmBcResumo()}</summary>
+    <p>Conversas reais em que o contato parou depois de uma mensagem nossa. A Donna escreveu cada retomada como se fosse hoje, sem saber o que aconteceu depois. Nada disso é enviado: a sua avaliação só ensina o placar.</p>
+    ${casos.map(c => rmBancadaCaso(_rmBanc.filter(b => b.caso === c))).join('')}</details>`;
+}
+function rmBcResumo() {
+  const falta = _rmBanc.filter(b => b.status === 'para_avaliar').length;
+  return `Teste com conversas antigas · ${falta ? `${falta} de ${_rmBanc.length} para avaliar` : `todas as ${_rmBanc.length} avaliadas`}`;
+}
+function rmBcRefaz(id) {   // redesenha só o cartão mexido (não perde o que foi digitado nos outros nem a rolagem)
+  const b = _rmBanc.find(x => x.id === id), el = document.getElementById('rm-bc-' + id);
+  if (b && el) el.outerHTML = rmBancadaToque(b);
+  const r = document.getElementById('rm-bc-resumo'); if (r) r.textContent = rmBcResumo();
+}
+function rmBancadaDecisao(texto) {
+  const esp = String(texto).match(/^\[ESPERAR:\s*(\d{4})-(\d{2})-(\d{2})\]/i);
+  if (esp) return `A Donna entendeu que o contato pediu para ser chamado em ${esp[3]}/${esp[2]}: a mensagem fica para esse dia.`;
+  return 'A Donna decidiu não mandar nada' + (String(texto).replace(/^\[SEM_RESPOSTA\]\s*/i, '').trim() ? ': ' + String(texto).replace(/^\[SEM_RESPOSTA\]\s*/i, '').trim() : '.');
+}
+function rmBancadaCaso(itens) {
+  const b0 = itens[0];
+  const conv = (b0.conversa || []).filter(m => !m.retomada);
+  return `<div class="rm-card"><div class="rm-topo"><h3>${labEsc(b0.nome || b0.caso)}</h3><div class="rm-chips"><span class="rm-chip">${labEsc(b0.caso)}</span><span class="rm-chip">parou ${labData(b0.parou_em)}</span></div></div>
+    <details><summary class="rm-txt"><small style="display:inline">Conversa até onde parou (${conv.length} mensagens)</small></summary>
+      <div class="rm-bc-conv">${conv.map(m => `<div class="${m.de === 'nos' ? 'nos' : ''}"><b>${m.de === 'nos' ? 'Nós' : 'Contato'} · ${labData(m.em)}</b>${labEsc(m.texto)}</div>`).join('')}</div></details>
+    ${itens.map(rmBancadaToque).join('')}</div>`;
+}
+function rmBancadaToque(b) {
+  const decisao = /^\[/.test(String(b.texto || ''));
+  const editando = _rmBancAberto[b.id] === 'editar';
+  const topo = `<div class="rm-chips"><span class="rm-chip retomada">${decisao ? 'Decisão da Donna' : `Retomada ${b.n} de 4`}</span>${b.sairia_em && !decisao ? `<span class="rm-chip">sairia ${labData(b.sairia_em)}</span>` : ''}</div>`;
+  const corpo = decisao ? `<div class="rm-txt">${labEsc(rmBancadaDecisao(b.texto))}</div>` : `<div class="rm-txt">${labEsc(b.texto)}</div>`;
+  const falhas = Array.isArray(b.falhas) && b.falhas.length ? `<div class="rm-txt alerta"><small>⚠️ A conferência apontou</small>${labEsc(b.falhas.map(x => x.msg).join('; '))}</div>` : '';
+  if (b.status === 'avaliada' && !_rmBancAberto[b.id]) {
+    const res = decisao ? (b.resultado === 'aprovada' ? 'Concordo' : 'Discordo') : RM_BC_RES[b.resultado] || b.resultado;
+    return `<div class="rm-bc-toque" id="rm-bc-${b.id}">${topo}${corpo}
+      ${b.texto_editado ? `<div class="rm-txt"><small>Como você mandaria</small>${labEsc(b.texto_editado)}</div>` : ''}
+      <div class="rm-bc-feito">Sua avaliação: <b class="${['recusada', 'errou'].includes(b.resultado) ? 'nao' : ''}">${labEsc(res)}</b>${b.comentario ? ' · ' + labEsc(b.comentario) : ''}
+        · <a href="javascript:void(0)" onclick="_rmBancAberto['${b.id}']='mudar';rmBcRefaz('${b.id}')">mudar</a></div></div>`;
+  }
+  const coment = `<input type="text" id="rm-bc-c-${b.id}" maxlength="500" placeholder="Por quê? (opcional, ajuda a Donna a acertar)" value="${labEsc(b.comentario || '').replace(/"/g, '&quot;')}">`;
+  const botoes = decisao
+    ? `<button class="rm-btn forte" onclick="rmBancadaAvaliar('${b.id}','aprovada')">Concordo</button><button class="rm-btn" onclick="rmBancadaAvaliar('${b.id}','recusada')">Discordo</button>`
+    : editando
+      ? `<button class="rm-btn forte" onclick="rmBancadaAvaliar('${b.id}','editada')">Salvar como eu mandaria</button><button class="rm-btn" onclick="_rmBancAberto['${b.id}']=null;rmBcRefaz('${b.id}')">Cancelar</button>`
+      : `<button class="rm-btn forte" onclick="rmBancadaAvaliar('${b.id}','aprovada')">Mandaria assim</button><button class="rm-btn" onclick="_rmBancAberto['${b.id}']='editar';rmBcRefaz('${b.id}')">Mandaria com ajuste</button><button class="rm-btn" onclick="rmBancadaAvaliar('${b.id}','recusada')">Não mandaria</button><button class="rm-btn" onclick="rmBancadaAvaliar('${b.id}','errou')" title="Erro grave: fato errado, tom ofensivo, promessa ou dado inventado">Errou feio</button>`;
+  return `<div class="rm-bc-toque" id="rm-bc-${b.id}">${topo}${editando ? `<textarea id="rm-bc-t-${b.id}" maxlength="1000">${labEsc(b.texto_editado || b.texto)}</textarea>` : corpo}${falhas}
+    <div class="rm-acoes">${botoes}${coment}</div></div>`;
+}
+async function rmBancadaAvaliar(id, resultado) {
+  const texto = resultado === 'editada' ? String(document.getElementById('rm-bc-t-' + id)?.value || '').trim() : null;
+  if (resultado === 'editada' && !texto) { toast('Escreva como você mandaria', 'err'); return; }
+  const comentario = String(document.getElementById('rm-bc-c-' + id)?.value || '').trim() || null;
+  try {
+    const r = await rmRpc('retomada_bancada_avaliar', { p_id: id, p_resultado: resultado, p_texto: texto, p_comentario: comentario });
+    _rmBancAberto[id] = null;
+    const b = _rmBanc.find(x => x.id === id);
+    if (b) Object.assign(b, { status: 'avaliada', resultado: (r && r.resultado) || resultado, texto_editado: r && r.resultado === 'editada' ? texto : null, comentario });
+    toast(r && r.resultado === 'aprovada' && resultado === 'editada' ? 'Texto igual ao da Donna: contou como "mandaria assim"' : 'Avaliação salva', 'ok');
+    rmBcRefaz(id);
+  } catch (e) { toast('Não salvou: ' + e.message, 'err'); }
 }
 async function rmRetomadaAuto(n, ligar) {
   if (ligar && !confirm(`Ligar o automático da mensagem ${n} da retomada?\n\nA partir de agora ela sai sozinha, sem passar por você (conversa da equipe continua com aprovação). Dá para voltar a qualquer momento.`)) return;
