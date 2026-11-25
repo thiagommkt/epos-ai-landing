@@ -8421,7 +8421,10 @@ function rmCardPlano(t) {
         : pl.retomada ? `<span class="rm-chip">${pl.retomada}ª retomada</span>` : '')}</div></div>
     ${pl.resumo ? `<div class="rm-txt"><small>${pl.origem === 'retomada' ? 'Onde a conversa parou (retomada da Donna)' : 'O que aconteceu (auditoria do Analista)'}</small>${labEsc(pl.resumo)}</div>` : ''}
     ${pl.origem === 'retomada' && Array.isArray(pl.falhas) && pl.falhas.length ? `<div class="rm-txt alerta"><small>⚠️ A conferência apontou (a Donna reescreveu e insistiu)</small>${labEsc(pl.falhas.map(x => x.msg).join('; '))}</div>` : ''}
-    ${t.acao ? `<div class="rm-txt"><small>Por que retomar</small>${labEsc(t.acao)}</div>` : ''}
+    ${pl.origem === 'retomada' && Array.isArray(pl.avisos) && pl.avisos.some(x => x.codigo !== 'conversa_da_equipe') ? `<div class="rm-txt"><small>Aviso</small>${labEsc(pl.avisos.filter(x => x.codigo !== 'conversa_da_equipe').map(x => x.msg).join('; '))}</div>` : ''}
+    ${t.acao ? (pl.origem === 'retomada'
+      ? `<div class="rm-txt"><small>O papel desta mensagem</small>${labEsc(String(t.acao).replace(/^Retomada \d de 4 da Donna:?\s*/, '') || t.acao)}</div>`
+      : `<div class="rm-txt"><small>Por que retomar</small>${labEsc(t.acao)}</div>`) : ''}
     <div class="rm-txt"><small>Mensagem (pode editar antes de aprovar) · planejada para ${labData(t.quando)}</small></div>
     <textarea id="rm-t-${t.id}" maxlength="1000" oninput="_rmEdits['${t.id}']=this.value">${labEsc(_rmEdits[t.id] ?? t.mensagem_sugerida ?? '')}</textarea>
     <div class="rm-acoes"><label class="rm-marca"><input type="checkbox" ${_rmSel.has(t.id) ? 'checked' : ''} onchange="rmMarcar('${t.id}',this.checked)"> Selecionar</label>
