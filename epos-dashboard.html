@@ -2377,6 +2377,18 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .rm-chip { font-family:var(--fD); font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border:1px solid var(--bd-b); color:var(--muted); }
     .rm-chip.alto { color:var(--neon); border-color:var(--neon); }
     .rm-chip.donna { color:var(--orange); border-color:var(--orange); }
+    /* 25/11: retomada da Donna (4 mensagens para quem parou no meio da conversa) */
+    .rm-chip.retomada { color:var(--purple); border-color:var(--purple); }
+    .rm-txt.alerta { color:var(--warn); }
+    .rm-retomada { margin:0 0 18px; background:var(--bg2); border:1px solid var(--bd); padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+    .rm-retomada h4 { margin:0; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--purple); }
+    .rm-retomada p { margin:0; font-family:var(--fB); font-size:12px; line-height:1.55; color:var(--muted); max-width:760px; }
+    .rm-placar { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:8px; }
+    .rm-placar > div { border:1px solid var(--bd); padding:10px 12px; display:flex; flex-direction:column; gap:6px; font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-placar b { font-family:var(--fD); font-size:12px; letter-spacing:.04em; color:var(--text); }
+    .rm-placar .barra { height:4px; background:var(--bg3); }
+    .rm-placar .barra i { display:block; height:100%; background:var(--purple); }
+    .rm-placar .ligado { color:var(--neon); }
     .rm-txt { font-family:var(--fB); font-size:13px; line-height:1.55; color:var(--text); }
     .rm-txt small { display:block; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px; font-family:var(--fD); }
     .rm-card textarea { width:100%; min-height:84px; resize:vertical; background:var(--bg3); border:1px solid var(--bd); color:var(--text); font-family:var(--fB); font-size:14px; line-height:1.5; padding:10px 12px; box-sizing:border-box; }
@@ -2410,6 +2422,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div style="font-size:12px;color:var(--muted);margin:0 0 14px;font-family:var(--fB);line-height:1.55;max-width:760px">
     Quando a conversa de um lead esfria, o Analista audita a conversa inteira (canal de aquisição, quem procurou quem, etapa, sinais de interesse) e monta o plano do próximo contato: a mensagem já escrita, uma ligação (vai para o card "Precisam de ligação") ou nada (sem chance de fechamento: vai como sugestão para Perdido). O ritmo é o da Torneira: 1, 3, 7, 15 e 30 dias. Aprove aqui em lote ou na ficha do lead. A fila segue a temperatura (a nota do Analista): o lead mais quente sai primeiro e, se um lead esquentar, ele passa na frente na próxima rodada (a cada 5 minutos), sem sair antes do ritmo do plano. Entre uma mensagem e outra, 10 minutos ou mais; ela é cancelada sozinha se a pessoa escrever antes ou a equipe assumir. Todo remarketing sai pelo número da Donna: quando a conversa foi pelo número de disparos, a Donna se apresenta e explica que aquele é o número usado só para disparos.
   </div>
+  <div id="rm-retomada"></div>
   <div id="rm-avisos"></div>
   <div class="rm-abas" id="rm-abas"></div>
   <div class="rm-barra" id="rm-barra"></div>
@@ -8331,10 +8344,12 @@ async function rmLoad() {
   lista.innerHTML = '<div class="loading"></div>';
   const desde = new Date(Date.now() - 7 * 864e5).toISOString();
   const [p, f] = await Promise.all([
-    sb('tarefas?conta=eq.epos&status=eq.sugerida&tipo=eq.contato&mensagem_sugerida=not.is.null&plano=not.is.null&select=id,lead_telefone,acao,quando,mensagem_sugerida,plano,criada_em&order=quando.asc&limit=300'),
-    sb(`remarketing_sugestoes?conta=eq.epos&or=(status.in.(aprovada,enviando),criada_em.gte.${desde})&status=neq.sugerida&status=neq.nao_enviar&order=agendada_para.asc&limit=300`)]);
+    // 25/11: número de teste (laboratório da retomada, 5500000000…) não aparece aqui; as rodadas ficam na aba Laboratório
+    sb('tarefas?conta=eq.epos&status=eq.sugerida&tipo=eq.contato&mensagem_sugerida=not.is.null&plano=not.is.null&lead_telefone=not.like.5500000000*&select=id,lead_telefone,acao,quando,mensagem_sugerida,plano,criada_em&order=quando.asc&limit=300'),
+    sb(`remarketing_sugestoes?conta=eq.epos&or=(status.in.(aprovada,enviando),criada_em.gte.${desde})&status=neq.sugerida&status=neq.nao_enviar&lead_telefone=not.like.5500000000*&order=agendada_para.asc&limit=300`)]);
   _rmPlanos = Array.isArray(p.data) ? p.data : []; _rmFila = Array.isArray(f.data) ? f.data : [];
   rmCarregarAvisos();
+  rmCarregarRetomada();
   const tels = [...new Set(_rmPlanos.map(t => t.lead_telefone))];
   _rmLeads = {};
   if (tels.length) { const { data } = await sb(`leads?telefone=in.(${tels.join(',')})&select=telefone,nome,crm_stage`); (data || []).forEach(l => _rmLeads[l.telefone] = l); }
@@ -8401,8 +8416,11 @@ function rmCardPlano(t) {
   const nome = pl.nome || l.nome || t.lead_telefone;
   return `<div class="rm-card${_rmSel.has(t.id) ? ' sel' : ''}" id="rm-${t.id}">
     <div class="rm-topo"><h3><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(t.lead_telefone)}')" style="color:inherit;text-decoration:none">${labEsc(nome)}</a></h3>
-      <div class="rm-chips">${rmChips(pl.canal, l.crm_stage, pl.sinais, pl.numero, pl.retomada ? `<span class="rm-chip">${pl.retomada}ª retomada</span>` : '')}</div></div>
-    ${pl.resumo ? `<div class="rm-txt"><small>O que aconteceu (auditoria do Analista)</small>${labEsc(pl.resumo)}</div>` : ''}
+      <div class="rm-chips">${rmChips(pl.canal, l.crm_stage, pl.sinais, pl.numero, pl.origem === 'retomada'
+        ? `<span class="rm-chip retomada">Retomada ${labEsc(pl.retomada)} de 4</span>${pl.humana ? '<span class="rm-chip">Conversa da equipe</span>' : ''}`
+        : pl.retomada ? `<span class="rm-chip">${pl.retomada}ª retomada</span>` : '')}</div></div>
+    ${pl.resumo ? `<div class="rm-txt"><small>${pl.origem === 'retomada' ? 'Onde a conversa parou (retomada da Donna)' : 'O que aconteceu (auditoria do Analista)'}</small>${labEsc(pl.resumo)}</div>` : ''}
+    ${pl.origem === 'retomada' && Array.isArray(pl.falhas) && pl.falhas.length ? `<div class="rm-txt alerta"><small>⚠️ A conferência apontou (a Donna reescreveu e insistiu)</small>${labEsc(pl.falhas.map(x => x.msg).join('; '))}</div>` : ''}
     ${t.acao ? `<div class="rm-txt"><small>Por que retomar</small>${labEsc(t.acao)}</div>` : ''}
     <div class="rm-txt"><small>Mensagem (pode editar antes de aprovar) · planejada para ${labData(t.quando)}</small></div>
     <textarea id="rm-t-${t.id}" maxlength="1000" oninput="_rmEdits['${t.id}']=this.value">${labEsc(_rmEdits[t.id] ?? t.mensagem_sugerida ?? '')}</textarea>
@@ -8414,7 +8432,8 @@ function rmCardFila(s) {
   const st = s.status === 'aprovada' ? `<span class="rm-status">Sai às ${labData(s.agendada_para)}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span><button class="rm-btn forte" onclick="rmEnviarAgoraFila('${s.id}')" title="Manda já pela Donna, fora da ordem da fila">⚡ Enviar agora</button><button class="rm-btn" onclick="rmEditarFila('${s.id}')">Editar</button><button class="rm-btn" onclick="rmCancelarEnvio('${s.id}')">Cancelar envio</button>`
     : `<span class="rm-status${['falhou', 'cancelada'].includes(s.status) ? ' erro' : ''}">${RM_STATUS[s.status] || s.status}${s.enviada_em ? ' em ' + labData(s.enviada_em) : s.aprovada_em ? ' em ' + labData(s.aprovada_em) : ''}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span>`;
   return `<div class="rm-card" id="rm-${s.id}">
-    <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${rmChips(s.canal_aquisicao, s.stage, s.sinais, s.numero)}</div></div>
+    <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${rmChips(s.canal_aquisicao, s.stage, s.sinais, s.numero,
+      s.origem === 'retomada' ? `<span class="rm-chip retomada">${labEsc((String(s.motivo || '').match(/Retomada \d de 4/) || ['Retomada'])[0])}</span>${s.aprovada_por === 'automatico' ? '<span class="rm-chip">Saiu sozinha</span>' : ''}` : '')}</div></div>
     ${s.mensagem_final || s.mensagem ? `<div class="rm-txt" id="rm-fm-${s.id}"><small>Mensagem</small>${labEsc(s.mensagem_final || s.mensagem)}</div>` : ''}
     <div class="rm-acoes">${st}${rmLinkConversa(s.conversa_id, s.lead_nome || s.lead_telefone)}</div>
   </div>`;
@@ -8445,6 +8464,37 @@ async function rmCarregarAvisos() {
         <button class="rm-btn" onclick="rmAvisoRespondido('${t.id}')" title="Use quando você já respondeu pelo celular ou por outro canal">Já respondi por fora</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
     </div>`;
   }).join('') + '</div>';
+}
+// 25/11 (Thiago: "conforme ele for acertando, deixar pronto pra uma hora ele mesmo enviar a mensagem automaticamente"):
+// placar de cada mensagem da retomada da Donna e o botão do automático. O placar é calculado pelo fluxo (Leads Parados) a cada rodada;
+// o botão só liga quando o placar libera (20 seguidas, 18 aprovadas sem mudança, nenhuma "errou") e quem liga é o Thiago.
+let _rmModo = [];
+async function rmCarregarRetomada() {
+  const box = document.getElementById('rm-retomada');
+  if (!box) return;
+  const { data } = await sb('retomada_modo?conta=eq.epos&lab=eq.false&select=n,ligado,ligado_em,placar,placar_em&order=n.asc');
+  _rmModo = Array.isArray(data) ? data : [];
+  if (!_rmModo.length) { box.innerHTML = ''; return; }
+  const papel = { 1: 'retoma o ponto em que parou', 2: 'a dor, com as palavras do contato', 3: 'prova (case) e convite para a ligação', 4: 'despedida, sem pergunta' };
+  box.innerHTML = `<div class="rm-retomada"><h4>Retomada da Donna · quando cada mensagem pode sair sozinha</h4>
+    <p>Quem parou no meio da conversa recebe até 4 mensagens da Donna. Cada uma começa passando pela sua aprovação. Quando você aprovar 18 das últimas 20 daquela mensagem sem mexer no texto, o botão libera e ela pode sair sozinha. Conversa que estava com a equipe sempre passa por você. Se uma automática errar, aquela mensagem volta para aprovação.</p>
+    <div class="rm-placar">${_rmModo.map(m => {
+      const p = m.placar || {}, cont = p.contados || 0, ac = p.acertos || 0;
+      const pode = !!p.liberavel;
+      const estado = m.ligado ? `<span class="ligado">● Saindo sozinha desde ${labData(m.ligado_em)}</span>` : 'Passa pela sua aprovação';
+      const botao = m.ligado
+        ? `<button class="rm-btn" onclick="rmRetomadaAuto(${m.n}, false)">Voltar para aprovação</button>`
+        : `<button class="rm-btn${pode ? ' forte' : ''}" onclick="rmRetomadaAuto(${m.n}, true)" ${pode ? '' : 'disabled'} title="${pode ? 'Liga o envio automático desta mensagem' : 'Libera com 20 seguidas e 18 aprovadas sem mudança'}">Ligar automático</button>`;
+      return `<div><b>Mensagem ${m.n} de 4</b><span>${papel[m.n] || ''}</span>
+        <div class="barra"><i style="width:${Math.min(100, Math.round(cont / 20 * 100))}%"></i></div>
+        <span>${cont} de 20 avaliadas · ${ac} aprovadas sem mudança (precisa de 18)${p.bancada ? ` · ${p.bancada} do teste com conversas antigas` : ''}${p.errou ? ' · ⚠️ uma errou' : ''}</span>
+        <span>${estado}</span>${botao}</div>`;
+    }).join('')}</div></div>`;
+}
+async function rmRetomadaAuto(n, ligar) {
+  if (ligar && !confirm(`Ligar o automático da mensagem ${n} da retomada?\n\nA partir de agora ela sai sozinha, sem passar por você (conversa da equipe continua com aprovação). Dá para voltar a qualquer momento.`)) return;
+  try { await rmRpc('retomada_ligar_automatico', { p_n: n, p_ligado: ligar }); toast(ligar ? `Mensagem ${n} da retomada: sai sozinha a partir de agora` : `Mensagem ${n} da retomada volta para a sua aprovação`, 'ok'); rmCarregarRetomada(); }
+  catch (e) { toast('Não mudou: ' + e.message, 'err'); }
 }
 function rmCopiarRascunho(id) {
   const txt = String(document.getElementById('rm-av-t-' + id)?.value ?? _rmEdits['av-' + id] ?? (_rmAvisos[id] || {}).mensagem_sugerida ?? '');
