@@ -8038,7 +8038,7 @@ function qzResumo(q, p) {
       ${k('Deixaram WhatsApp', t.contato, qzPct(t.contato, t.comecaram) + ' de quem começou')}${k('Concluíram', t.concluiram, qzPct(t.concluiram, t.sessoes) + ' das visitas')}
       ${t.desqualificados ? k('Desqualificados', t.desqualificados, 'pelas respostas') : ''}</div>
     ${dias.length > 1 ? numBarras(dias, 'Visitas por dia') : ''}
-    ${t.testes_fora ? `<div class="qz-sub" style="margin-top:8px">${numFmt(t.testes_fora)} visita(s) de teste ficaram fora destes números.</div>` : ''}</div>`;
+    ${(t.testes_fora || t.robos_fora) ? `<div class="qz-sub" style="margin-top:8px">Ficaram fora destes números: ${[t.testes_fora ? numFmt(t.testes_fora) + ' visita(s) de teste' : '', t.robos_fora ? numFmt(t.robos_fora) + ' visita(s) do robô que a Meta usa para revisar o anúncio' : ''].filter(Boolean).join(' e ')}.</div>` : ''}</div>`;
 }
 function qzEtapas(p) {
   const et = p.etapas || [], base = Math.max(1, (p.totais || {}).sessoes || 0);
