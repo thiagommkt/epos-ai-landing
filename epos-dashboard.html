@@ -8614,13 +8614,13 @@ function rmCardPlano(t) {
   return `<div class="rm-card${_rmSel.has(t.id) ? ' sel' : ''}" id="rm-${t.id}">
     <div class="rm-topo"><h3><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(t.lead_telefone)}')" style="color:inherit;text-decoration:none">${labEsc(nome)}</a></h3>
       <div class="rm-chips">${rmChips(pl.canal, l.crm_stage, pl.sinais, pl.numero, pl.origem === 'retomada'
-        ? `<span class="rm-chip retomada">Retomada ${labEsc(pl.retomada)} de 4</span>${pl.humana ? '<span class="rm-chip">Conversa da equipe</span>' : ''}`
+        ? `<span class="rm-chip retomada">Retomada ${labEsc(pl.retomada)} de 6</span>${pl.audio_url ? '<span class="rm-chip">🎤 Seu áudio</span>' : ''}${pl.midia_url ? '<span class="rm-chip">🎬 Vídeo do nicho junto</span>' : ''}${pl.humana ? '<span class="rm-chip">Conversa da equipe</span>' : ''}`
         : pl.retomada ? `<span class="rm-chip">${pl.retomada}ª retomada</span>` : '')}</div></div>
     ${pl.resumo ? `<div class="rm-txt"><small>${pl.origem === 'retomada' ? 'Onde a conversa parou (retomada da Donna)' : 'O que aconteceu (auditoria do Analista)'}</small>${labEsc(pl.resumo)}</div>` : ''}
     ${pl.origem === 'retomada' && Array.isArray(pl.falhas) && pl.falhas.length ? `<div class="rm-txt alerta"><small>⚠️ A conferência apontou (a Donna reescreveu e insistiu)</small>${labEsc(pl.falhas.map(x => x.msg).join('; '))}</div>` : ''}
     ${pl.origem === 'retomada' && Array.isArray(pl.avisos) && pl.avisos.some(x => x.codigo !== 'conversa_da_equipe') ? `<div class="rm-txt"><small>Aviso</small>${labEsc(pl.avisos.filter(x => x.codigo !== 'conversa_da_equipe').map(x => x.msg).join('; '))}</div>` : ''}
     ${t.acao ? (pl.origem === 'retomada'
-      ? `<div class="rm-txt"><small>O papel desta mensagem</small>${labEsc(String(t.acao).replace(/^Retomada \d de 4 da Donna:?\s*/, '') || t.acao)}</div>`
+      ? `<div class="rm-txt"><small>O papel desta mensagem</small>${labEsc(String(t.acao).replace(/^Retomada \d de \d da Donna:?\s*/, '') || t.acao)}</div>`
       : `<div class="rm-txt"><small>Por que retomar</small>${labEsc(t.acao)}</div>`) : ''}
     <div class="rm-txt"><small>Mensagem (pode editar antes de aprovar) · planejada para ${labData(t.quando)}</small></div>
     <textarea id="rm-t-${t.id}" maxlength="1000" oninput="_rmEdits['${t.id}']=this.value">${labEsc(_rmEdits[t.id] ?? t.mensagem_sugerida ?? '')}</textarea>
@@ -8633,7 +8633,7 @@ function rmCardFila(s) {
     : `<span class="rm-status${['falhou', 'cancelada'].includes(s.status) ? ' erro' : ''}">${RM_STATUS[s.status] || s.status}${s.enviada_em ? ' em ' + labData(s.enviada_em) : s.aprovada_em ? ' em ' + labData(s.aprovada_em) : ''}${s.erro ? ' · ' + labEsc(s.erro) : ''}</span>`;
   return `<div class="rm-card" id="rm-${s.id}">
     <div class="rm-topo"><h3>${labEsc(s.lead_nome || s.lead_telefone)}</h3><div class="rm-chips">${rmChips(s.canal_aquisicao, s.stage, s.sinais, s.numero,
-      s.origem === 'retomada' ? `<span class="rm-chip retomada">${labEsc((String(s.motivo || '').match(/Retomada \d de 4/) || ['Retomada'])[0])}</span>${s.aprovada_por === 'automatico' ? '<span class="rm-chip">Saiu sozinha</span>' : ''}` : '')}</div></div>
+      s.origem === 'retomada' ? `<span class="rm-chip retomada">${labEsc((String(s.motivo || '').match(/Retomada \d de \d/) || ['Retomada'])[0])}</span>${s.audio_url ? '<span class="rm-chip">🎤 Seu áudio</span>' : ''}${s.midia_url ? '<span class="rm-chip">🎬 Vídeo do nicho junto</span>' : ''}${s.aprovada_por === 'automatico' ? '<span class="rm-chip">Saiu sozinha</span>' : ''}` : '')}</div></div>
     ${s.mensagem_final || s.mensagem ? `<div class="rm-txt" id="rm-fm-${s.id}"><small>Mensagem</small>${labEsc(s.mensagem_final || s.mensagem)}</div>` : ''}
     <div class="rm-acoes">${st}${rmLinkConversa(s.conversa_id, s.lead_nome || s.lead_telefone)}</div>
   </div>`;
@@ -8675,9 +8675,9 @@ async function rmCarregarRetomada() {
   const { data } = await sb('retomada_modo?conta=eq.epos&lab=eq.false&select=n,ligado,ligado_em,placar,placar_em&order=n.asc');
   _rmModo = Array.isArray(data) ? data : [];
   if (!_rmModo.length) { box.innerHTML = ''; return; }
-  const papel = { 1: 'retoma o ponto em que parou', 2: 'a dor, com as palavras do contato', 3: 'prova (case) e convite para a ligação', 4: 'despedida, sem pergunta' };
+  const papel = { 1: 'retoma o ponto em que parou', 2: 'o seu áudio do segmento (ou a dor, em texto)', 3: 'prova (case) e convite, com o vídeo do nicho para quem nunca viu', 4: 'a sua afronta, com o fato da conversa', 5: 'a conta da perda: a verba de anúncio ou o silêncio da conversa', 6: 'despedida, sem pergunta' };
   box.innerHTML = `<div class="rm-retomada"><h4>Retomada da Donna · quando cada mensagem pode sair sozinha</h4>
-    <p>Quem parou no meio da conversa recebe até 4 mensagens da Donna. Cada uma começa passando pela sua aprovação. Quando você aprovar 18 das últimas 20 daquela mensagem sem mexer no texto, o botão libera e ela pode sair sozinha. Conversa que estava com a equipe sempre passa por você. Se uma automática errar, aquela mensagem volta para aprovação.</p>
+    <p>Quem parou no meio da conversa recebe até 6 mensagens: a Donna retoma, vai o seu áudio, o caso com o vídeo do nicho, a sua afronta, a conta da perda e a despedida. Cada uma começa passando pela sua aprovação. Quando você aprovar 18 das últimas 20 daquela mensagem sem mexer no texto, o botão libera e ela pode sair sozinha. Conversa que estava com a equipe sempre passa por você. Se uma automática errar, aquela mensagem volta para aprovação.</p>
     <div class="rm-placar">${_rmModo.map(m => {
       const p = m.placar || {}, cont = p.contados || 0, ac = p.acertos || 0;
       const pode = !!p.liberavel;
@@ -8685,7 +8685,7 @@ async function rmCarregarRetomada() {
       const botao = m.ligado
         ? `<button class="rm-btn" onclick="rmRetomadaAuto(${m.n}, false)">Voltar para aprovação</button>`
         : `<button class="rm-btn${pode ? ' forte' : ''}" onclick="rmRetomadaAuto(${m.n}, true)" ${pode ? '' : 'disabled'} title="${pode ? 'Liga o envio automático desta mensagem' : 'Libera com 20 seguidas e 18 aprovadas sem mudança'}">Ligar automático</button>`;
-      return `<div><b>Mensagem ${m.n} de 4</b><span>${papel[m.n] || ''}</span>
+      return `<div><b>Mensagem ${m.n} de 6</b><span>${papel[m.n] || ''}</span>
         <div class="barra"><i style="width:${Math.min(100, Math.round(cont / 20 * 100))}%"></i></div>
         <span>${cont} de 20 avaliadas · ${ac} aprovadas sem mudança (precisa de 18)${p.bancada ? ` · ${p.bancada} do teste com conversas antigas` : ''}${p.errou ? ' · ⚠️ uma errou' : ''}</span>
         <span>${estado}</span>${botao}</div>`;
@@ -8734,7 +8734,7 @@ function rmBancadaCaso(itens) {
 function rmBancadaToque(b) {
   const decisao = /^\[/.test(String(b.texto || ''));
   const editando = _rmBancAberto[b.id] === 'editar';
-  const topo = `<div class="rm-chips"><span class="rm-chip retomada">${decisao ? 'Decisão da Donna' : `Retomada ${b.n} de 4`}</span>${b.sairia_em && !decisao ? `<span class="rm-chip">sairia ${labData(b.sairia_em)}</span>` : ''}</div>`;
+  const topo = `<div class="rm-chips"><span class="rm-chip retomada">${decisao ? 'Decisão da Donna' : `Retomada ${b.n} de 6`}</span>${b.sairia_em && !decisao ? `<span class="rm-chip">sairia ${labData(b.sairia_em)}</span>` : ''}</div>`;
   const corpo = decisao ? `<div class="rm-txt">${labEsc(rmBancadaDecisao(b.texto))}</div>` : `<div class="rm-txt">${labEsc(b.texto)}</div>`;
   const falhas = Array.isArray(b.falhas) && b.falhas.length ? `<div class="rm-txt alerta"><small>⚠️ A conferência apontou</small>${labEsc(b.falhas.map(x => x.msg).join('; '))}</div>` : '';
   if (b.status === 'avaliada' && !_rmBancAberto[b.id]) {
