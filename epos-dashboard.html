@@ -8508,7 +8508,7 @@ async function numLoad(dias) {
     for (const s of ((rs && rs.data) || [])) (_numStories[s.perfil] = _numStories[s.perfil] || []).push(s);
     const grupos = {};   // fonte|perfil → linhas por dia
     for (const l of (data || [])) (grupos[l.fonte + '|' + l.perfil] = grupos[l.fonte + '|' + l.perfil] || []).push(l);
-    const CARTOES = { google_ads: numCartaoGoogleAds, instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, busca: numCartaoBusca };   // 27/11: Google Ads primeiro (dinheiro rodando)
+    const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, google_ads: numCartaoGoogleAds, busca: numCartaoBusca };   // 27/11 (Thiago): Google Ads logo antes da busca do Google
     for (const f of Object.keys(CARTOES))
       for (const [k, linhas] of Object.entries(grupos)) if (k.startsWith(f + '|')) {
         try { html += CARTOES[f](k.slice(f.length + 1), linhas); } catch (e) { html += `<div class="num-vazio">Não consegui montar o cartão ${escHtml(k)}.</div>`; }
