@@ -2186,6 +2186,17 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .ga-barras .num-barra { max-width:44px; }   /* campanha com poucos dias: uma barra não ocupa a largura toda */
     .kpi-rs { font-size:.5em; font-weight:600; margin-right:3px; vertical-align:.35em; color:var(--muted); -webkit-text-fill-color:var(--muted); background:none; }   /* o número usa texto com degradê: o R$ precisa de cor própria */
     .ga-alerta { font-size:13px; color:var(--text); border-left:3px solid var(--warn); padding:8px 12px; margin-bottom:12px; background:var(--bg3); border-radius:0 6px 6px 0; line-height:1.45; }
+    /* 27/11: avisos aos anúncios na ficha (Meta e Google: lead automático; reunião e contrato só com confirmação) */
+    .av-grade { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr); border:1px solid var(--bd); border-radius:8px; overflow:hidden; font-size:12px; }
+    .av-grade > div { padding:8px 10px; border-top:1px solid var(--bd); line-height:1.35; min-width:0; overflow-wrap:anywhere; }
+    .av-grade > .av-h { border-top:0; font-family:var(--fM); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); background:var(--bg3); }
+    .av-grade .av-et { color:var(--text); font-weight:600; }
+    .av-grade .av-et small, .av-grade .av-c small { display:block; color:var(--dim); font-weight:400; font-size:11px; margin-top:2px; }
+    .av-c { color:var(--muted); }
+    .av-c.ok { color:var(--neon); }
+    .av-c.err { color:#ff6b6b; }
+    .av-c button { margin-top:6px; padding:4px 8px; background:transparent; border:1px solid var(--bd-b); color:var(--text); font-family:var(--fD); font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; border-radius:4px; }
+    .av-nota { font-family:var(--fM); font-size:10px; color:var(--dim); margin-top:8px; line-height:1.5; }
     /* 27/11: quem veio pelo anúncio (cartões Google Ads e Meta) e selo na ficha do lead */
     .ql-item { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--bd); }
     .ql-item a { color:var(--text); font-weight:600; font-size:13px; text-decoration:none; }
@@ -3624,7 +3635,7 @@ async function executarConfirmacaoContrato() {
       body: JSON.stringify({ token: PROXY_TOKEN, action: 'confirmar_contrato', telefone, valor_estimado: valorRaw })
     });
     const d = await r.json();
-    if (d.success) { closeLeadPanel(); loadPendentes(); loadDashboard(); if (initialized && initialized.dados) loadLeads(); toast('Contrato confirmado · CAPI Purchase disparado' + (valorRaw > 0 ? ' · R$' + valorRaw.toLocaleString('pt-BR') : ''), 'ok'); }
+    if (d.success) { closeLeadPanel(); loadPendentes(); loadDashboard(); if (initialized && initialized.dados) loadLeads(); toast('Contrato confirmado · Meta avisada' + (d.google === 'enviado' ? ' · Google Ads avisado' : '') + (valorRaw > 0 ? ' · R$' + valorRaw.toLocaleString('pt-BR') : ''), 'ok'); }
     else alert('Erro: ' + (d.error || 'Falha ao confirmar'));
   } catch(e) { alert('Erro de rede: ' + e.message); }
 }
@@ -3959,7 +3970,7 @@ async function confirmarContratoLista(btn) {
     const d = await acaoContrato({ action: 'confirmar_contrato', telefone: tel, valor_estimado: valor, fechou_em: dataFech });
     if (!d.success) throw new Error(d.error || 'falha ao confirmar');
     linha.remove();
-    toast('Contrato confirmado' + (d.capi === 'enviado' ? ' · evento de compra enviado à Meta' : d.capi === 'mais_de_7_dias_sem_evento' ? ' · mais de 7 dias: sem evento na Meta' : ''), 'ok');
+    toast('Contrato confirmado' + (d.capi === 'enviado' ? ' · evento de compra enviado à Meta' : d.capi === 'mais_de_7_dias_sem_evento' ? ' · mais de 7 dias: sem evento na Meta' : '') + (d.google === 'enviado' ? ' · Google Ads avisado' : ''), 'ok');
     if (!document.querySelector('#contratos-conf-lista .cc-linha')) carregarContratosAConfirmar();
   } catch (e) { btn.disabled = false; alert('Erro: ' + e.message); }
 }
@@ -4325,6 +4336,70 @@ function seloAnuncioLead(l) {
   }, 0);
   return `<div class="selo-anuncio"><div>📣</div><div><b>Veio ${c === 'google_ads' ? 'do Google Ads' : 'dos anúncios da Meta'}</b>`
     + `<span id="${id}">${escHtml(det.filter(Boolean).join(' · ') || (c === 'google_ads' ? 'clique em anúncio do Google' : 'anúncio da Meta'))}</span></div></div>`;
+}
+// 27/11 (Thiago: "Coloque a opção de avisar no modal como é feita para o meta ... a marcada aparece pra mim, mas só gera algo
+// para ads as que forem confirmadas ... um botão só"). Lead (Raio-X) vai sozinho; reunião realizada e contrato só com os botões
+// "Confirmar presença" e "Fechou", que avisam a Meta e, se o lead veio de anúncio do Google, o Google Ads (fluxo n8n
+// "[Epos] Google Ads — reunião e contrato (painel)", conversões secundárias: o Google vê, ainda não aprende com elas).
+function temCliqueGoogle(l) { return !!(l && (l.gclid || l.gbraid || l.wbraid)); }
+function _avData(iso) { return iso ? new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''; }
+function _avErro(e) {
+  const t = String(e || '');
+  if (/scope|permission|PERMISSION_DENIED|403/i.test(t)) return 'falta liberar o acesso ao Google';
+  if (/expired_click/i.test(t)) return 'clique com mais de 90 dias';
+  if (/too_recent/i.test(t)) return 'muito recente, o Google pede para esperar umas horas';
+  if (/precedes_click/i.test(t)) return 'data antes do clique';
+  return t.slice(0, 80) || 'erro';
+}
+function _avGoogle(l, tipo, confirmado) {
+  if (!temCliqueGoogle(l)) return ['—', ''];
+  const lista = (Array.isArray(l.google_avisos) ? l.google_avisos : []).filter(a => a && a.tipo === tipo);
+  const ult = lista[lista.length - 1];
+  const tel = escHtml(l.telefone);
+  const botao = `<button onclick="reenviarGoogleAds('${tel}','${tipo}',this)">Tentar de novo</button>`;
+  if (!confirmado) return ['aguarda sua confirmação', ''];
+  if (!ult) return ['enviando…', ''];
+  if (ult.status === 'ok') return [`registrado<small>${_avData(ult.conferido_em || ult.em)}</small>`, 'ok'];
+  if (ult.status === 'aceito') return [`enviado<small>${_avData(ult.em)} · o Google confere em até 1 dia</small>`, 'ok'];
+  if (ult.status === 'validado') return [`teste conferido<small>${_avData(ult.em)} · nada gravado</small>`, 'ok'];
+  return [`não foi<small>${escHtml(_avErro(ult.erro))}</small>${botao}`, 'err'];
+}
+function blocoAvisosAnuncios(l) {
+  const g = temCliqueGoogle(l);
+  const canal = typeof canalAnuncioLead === 'function' ? canalAnuncioLead(l) : null;
+  const viaQuiz = l.canal === 'quiz_epos' || !!(l.quiz_respostas && Object.keys(l.quiz_respostas).length);
+  const marcada = !!(l.agendou || l.dia_agendamento || ['agendou', 'fechou', 'cliente'].includes(l.crm_stage));
+  const realizada = !!l.consulta_realizada_em;
+  const fechou = !!l.fechou_em;
+  const dMarc = l.dia_agendamento && !isNaN(Date.parse(l.dia_agendamento)) ? _avData(l.dia_agendamento) : '';
+  const cel = (txt, cls) => `<div class="av-c ${cls || ''}">${txt}</div>`;
+  const gReu = _avGoogle(l, 'reuniao', realizada), gCon = _avGoogle(l, 'contrato', fechou);
+  const linhas = [
+    `<div class="av-et">Lead<small>Raio-X enviado</small></div>`
+      + cel(viaQuiz ? 'automático' : '—', viaQuiz ? 'ok' : '')
+      + cel(g && viaQuiz ? 'automático' : '—', g && viaQuiz ? 'ok' : ''),
+    `<div class="av-et">Reunião marcada${dMarc ? `<small>${dMarc}</small>` : ''}</div>`
+      + `<div class="av-c" style="grid-column:span 2">${marcada ? 'fica só aqui no painel' : '—'}</div>`,
+    `<div class="av-et">Reunião realizada</div>`
+      + cel(l.consulta_capi_enviada_em ? `enviado<small>${_avData(l.consulta_capi_enviada_em)}</small>` : realizada ? 'enviado na confirmação' : 'aguarda sua confirmação', realizada ? 'ok' : '')
+      + cel(gReu[0], gReu[1]),
+    `<div class="av-et">Contrato fechado</div>`
+      + cel(fechou ? `confirmado<small>${_avData(l.fechou_em)} · a Meta só aceita até 7 dias</small>` : 'aguarda sua confirmação', fechou ? 'ok' : '')
+      + cel(gCon[0], gCon[1]),
+  ];
+  return `<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
+      <div style="font-family:var(--fM);font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">Avisos aos anúncios</div>
+      <div class="av-grade"><div class="av-h">Etapa</div><div class="av-h">Meta</div><div class="av-h">Google</div>${linhas.join('')}</div>
+      <div class="av-nota">Reunião realizada e contrato só vão quando você confirma ("Confirmar presença" e "Fechou"), para a Meta e${g ? '' : ', quando o lead veio de anúncio do Google,'} para o Google Ads. Hoje o Google aprende só com o Raio-X.${!g && canal !== 'google_ads' ? ' Este lead não veio do Google.' : ''}</div>
+    </div>`;
+}
+async function reenviarGoogleAds(tel, tipo, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+  try {
+    const ok = await rmRpc('epos_google_reenviar', { p_telefone: tel, p_tipo: tipo });
+    toast(ok ? 'Enviado de novo ao Google Ads. Atualizo a ficha em alguns segundos.' : 'Este lead não tem clique do Google.', ok ? 'ok' : 'err');
+    if (ok) setTimeout(() => abrirFichaPorTelefone(tel), 4000);
+  } catch (e) { toast('Erro: ' + e.message, 'err'); if (btn) { btn.disabled = false; btn.textContent = 'Tentar de novo'; } }
 }
 function origemLeadFicha(l) {
   const linhas = [];
@@ -5787,7 +5862,7 @@ async function openLeadPanel(lead) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0 12px">
       ${STAGES.map(s => { const ativo = getStage(lead) === s.key; return `<button onclick="mudarEtapa('${s.key}')" data-stage-btn="${s.key}" style="padding:8px 6px;background:${ativo?'var(--purple)':'var(--bg3)'};border:1px solid ${ativo?'var(--purple)':'var(--bd)'};color:${ativo?'#fff':'var(--muted)'};font-family:var(--fD);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center">${s.label}</button>`; }).join('')}
     </div>
-    ${!lead.fechou ? '<div style="padding:4px 0 10px"><button id="marcar-fechou-btn" style="width:100%;padding:11px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s">✅ Marcar como Fechado → CAPI Purchase</button></div>' : ''}
+    ${!lead.fechou ? '<div style="padding:4px 0 10px"><button id="marcar-fechou-btn" style="width:100%;padding:11px;background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.3);color:var(--neon);font-family:var(--fD);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s">✅ Marcar como Fechado · avisa os anúncios</button></div>' : ''}
     <div class="panel-row"><div class="panel-key">Bot ativo</div><div class="panel-val" id="panel-bot-ativo">—</div></div>
     ${lead.ultima_interacao_humano?`<div class="panel-row"><div class="panel-key">Último humano</div><div class="panel-val">${fmtDate(lead.ultima_interacao_humano)}</div></div>`:''}
     <div id="panel-nota-atendimento" style="margin-top:8px"></div>
@@ -5910,6 +5985,8 @@ async function openLeadPanel(lead) {
       }
     </div>
 
+    ${blocoAvisosAnuncios(lead)}
+
     ${buildRmktSection(lead)}
 
     ${buildTimelineSection(lead)}
@@ -6012,7 +6089,8 @@ async function enviarMensagem(telefone) {
 // ═══ MARCAR COMPARECEU ═══
 async function marcarCompareceu(telefone) {
   // 04/11 (regra do FM espelhada): único caminho que envia o Schedule (reunião realizada) para a Meta — o gatilho do banco reage a consulta_realizada_em
-  if (!confirm('Confirmar que a reunião aconteceu?\n\nIsso envia o evento "reunião realizada" para a Meta.')) return;
+  const _l0 = allLeads.find(l => l.telefone === telefone);
+  if (!confirm('Confirmar que a reunião aconteceu?\n\nIsso envia o evento "reunião realizada" para a Meta' + (temCliqueGoogle(_l0) ? ' e para o Google Ads (o lead veio de anúncio do Google).' : '.'))) return;
   const btn = document.getElementById('compareceu-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
   try {
