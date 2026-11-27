@@ -2186,6 +2186,18 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .ga-barras .num-barra { max-width:44px; }   /* campanha com poucos dias: uma barra não ocupa a largura toda */
     .kpi-rs { font-size:.5em; font-weight:600; margin-right:3px; vertical-align:.35em; color:var(--muted); -webkit-text-fill-color:var(--muted); background:none; }   /* o número usa texto com degradê: o R$ precisa de cor própria */
     .ga-alerta { font-size:13px; color:var(--text); border-left:3px solid var(--warn); padding:8px 12px; margin-bottom:12px; background:var(--bg3); border-radius:0 6px 6px 0; line-height:1.45; }
+    /* 27/11: quem veio pelo anúncio (cartões Google Ads e Meta) e selo na ficha do lead */
+    .ql-item { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--bd); }
+    .ql-item a { color:var(--text); font-weight:600; font-size:13px; text-decoration:none; }
+    .ql-item a:hover { text-decoration:underline; }
+    .ql-item small { display:block; color:var(--muted); font-size:11px; margin-top:2px; line-height:1.4; }
+    .ql-item > div { min-width:0; }
+    .ql-chip { font:600 10px var(--fD); letter-spacing:.04em; padding:3px 8px; border-radius:999px; border:1px solid var(--bd-b); color:var(--muted); white-space:nowrap; flex-shrink:0; }
+    .ql-chip.ok { color:var(--neon); border-color:var(--neon); }
+    .ql-chip.warn { color:var(--warn); border-color:var(--warn); }
+    .selo-anuncio { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; margin:0 0 14px; border-radius:8px; border:1px solid var(--bd-b); background:var(--pur-l); font-size:13px; line-height:1.45; }
+    .selo-anuncio b { display:block; font-family:var(--fD); font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+    .selo-anuncio span { color:var(--muted); }
     /* 27/11: cartões "Investimento total" e "ROI" (lado a lado no computador) */
     .inv-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media (max-width:768px) { .inv-grid { grid-template-columns:1fr; } }
@@ -4277,10 +4289,42 @@ function rotuloOrigemUtm(o) {
   if (!o) return '';
   if (o.rotulo) return o.rotulo;
   const med = String(o.utm_medium || '').toLowerCase();
-  if (/^(paid|cpc|ppc|ads?)$/.test(med) || o.ad_id) return ['Anúncio Meta', o.utm_campaign && `campanha "${o.utm_campaign}"`, o.utm_content && `anúncio "${o.utm_content}"`, o.placement && String(o.placement).replace(/_/g, ' ')].filter(Boolean).join(' · ');
+  if (/^(paid|cpc|ppc|ads?)$/.test(med) || o.ad_id) return [/google|gads|adwords/.test(String(o.utm_source || '').toLowerCase()) && !o.ad_id ? 'Anúncio Google' : 'Anúncio Meta', o.utm_campaign && `campanha "${o.utm_campaign}"`, o.utm_content && `anúncio "${o.utm_content}"`, o.placement && String(o.placement).replace(/_/g, ' ')].filter(Boolean).join(' · ');
   if (o.utm_source === 'site') return 'Site da Epos' + (o.utm_content ? ` (página ${o.utm_content})` : '');
   if (o.utm_source === 'metodo') return 'Página do Método';
   return '';
+}
+// 27/11 (Thiago: "quero que a pessoa também seja sinalizada no seu modal"): selo de anúncio na ficha. Mesma regra do funil (epos_canal):
+// código do clique do Google ou UTM google/cpc = Google Ads; clique para o WhatsApp, ID do anúncio ou UTM paga da Meta = Meta.
+function canalAnuncioLead(l) {
+  const pago = o => {
+    if (!o) return null;
+    const src = String(o.utm_source || '').toLowerCase(), med = String(o.utm_medium || '').toLowerCase();
+    if (o.gclid || o.gbraid || o.wbraid || (/^(google|gads|adwords)$/.test(src) && /^(cpc|ppc|paid|ads?|pago)$/.test(med))) return 'google_ads';
+    if (o.ctwa_clid || o.ad_id || (/^(facebook|fb|instagram|ig|meta|an|msg)$/.test(src) && /^(paid|pago|cpc|ppc|ads?|paid_social)$/.test(med))) return 'meta_ads';
+    return null;
+  };
+  return pago(l) || pago(l.quiz_respostas && l.quiz_respostas.origem);
+}
+function seloAnuncioLead(l) {
+  const c = canalAnuncioLead(l);
+  if (!c) return '';
+  const q = (l.quiz_respostas && l.quiz_respostas.origem) || {};
+  const camp = l.utm_campaign || q.utm_campaign, anun = l.utm_content || q.utm_content;
+  const det = c === 'google_ads'
+    ? [camp && `campanha ${camp}`, l.utm_term && `palavra ${l.utm_term}`]
+    : [l.ctwa_clid ? 'clique para o WhatsApp' : '', camp && `campanha ${camp}`, anun && !/^(quiz-epos|metodo-board)$/i.test(anun) && `anúncio "${anun}"`];
+  const id = 'selo-anu-' + String(l.telefone || '').replace(/\D/g, '');
+  const gclid = l.gclid || l.gbraid || l.wbraid;
+  if (gclid) setTimeout(async () => {   // a palavra pesquisada vem do clique pago (google_ads_cliques, gravado de hora em hora)
+    try {
+      const { data } = await sb(`google_ads_cliques?gclid=eq.${encodeURIComponent(gclid)}&select=palavra,grupo,campanha,dia`);
+      const k = Array.isArray(data) && data[0], el = document.getElementById(id);
+      if (k && el) el.textContent = [k.palavra && `pesquisou "${k.palavra}"`, k.grupo && `grupo ${k.grupo}`, k.campanha && `campanha ${k.campanha}`, k.dia && `clique em ${numDia(k.dia)}`].filter(Boolean).join(' · ');
+    } catch (e) {}
+  }, 0);
+  return `<div class="selo-anuncio"><div>📣</div><div><b>Veio ${c === 'google_ads' ? 'do Google Ads' : 'dos anúncios da Meta'}</b>`
+    + `<span id="${id}">${escHtml(det.filter(Boolean).join(' · ') || (c === 'google_ads' ? 'clique em anúncio do Google' : 'anúncio da Meta'))}</span></div></div>`;
 }
 function origemLeadFicha(l) {
   const linhas = [];
@@ -5706,6 +5750,7 @@ async function openLeadPanel(lead) {
     </button>
     <div style="text-align:right;margin:-10px 0 14px"><a href="javascript:void(0)" onclick="openConversationInChat(${lead.chatwoot_conversation_id})" style="font-family:var(--fM);font-size:10px;color:var(--dim)">ou abrir na aba Chat</a></div>` : `<div style="margin-bottom:16px;padding:8px 10px;background:rgba(145,70,255,.04);border:1px solid var(--bd);font-size:10px;color:var(--dim);font-family:var(--fM);text-align:center">Conversa do Chat ainda não vinculada — será vinculada na próxima auditoria</div>`}
 
+    ${seloAnuncioLead(lead)}
     <div class="panel-section">Identificação</div>
     <div class="panel-row"><div class="panel-key">WhatsApp</div><div class="panel-val">${telFmt}</div></div>
     <div class="panel-row"><div class="panel-key">Perfil</div><div class="panel-val">${lead.perfil||'—'}</div></div>
@@ -8532,7 +8577,30 @@ function numCartaoGoogleAds(perfil, linhas) {
     + `<div class="num-sub-tit">Palavras-chave · desde o início</div>` + (palavras.length ? `<div class="ga-lista">${numGaLista(palavras, 8)}</div>` : '<div class="num-vazio">Nenhuma palavra-chave ativa.</div>')
     + `<div class="num-sub-tit">O que as pessoas digitaram no Google · últimos 35 dias</div>`
     + (termos.length ? `<div class="ga-lista">${numGaLista(termos, 10)}</div>` : '<div class="num-vazio">Nenhuma busca ainda. Aparecem aqui assim que o anúncio for exibido.</div>')
+    + numQuemVeio('google_ads')
     + (anuncios.length ? '<div class="num-sub-tit">Anúncios · desde o início</div>' + anuncios.join('') : '') + '</div>';
+}
+// ═══ QUEM VEIO PELO ANÚNCIO (27/11, Thiago: "que eu possa ver diretamente quem foi no painel do google") — RPC epos_leads_anuncio(90) ═══
+const NUM_ETAPA = { novo: 'Novo', em_conversa: 'Em conversa', qualificado: 'Qualificado', agendou: 'Agendou', fechou: 'Fechou', cliente: 'Cliente',
+  perdido: 'Perdido', desqualificado: 'Desqualificado', sem_resposta: 'Sem resposta' };
+function numQuemVeio(canal) {
+  const todos = window._numLeadsAnuncio;
+  const tit = '<div class="num-sub-tit">Quem veio pelo anúncio · últimos 90 dias</div>';
+  if (todos == null) return tit + '<div class="num-vazio">Não consegui carregar a lista agora.</div>';
+  const ls = todos.filter(l => l.canal === canal);
+  if (!ls.length) return tit + '<div class="num-vazio">Ninguém ainda. Quem chegar pelo anúncio e virar lead aparece aqui, com o link para a ficha.</div>';
+  const itens = ls.map(l => {
+    const det = canal === 'google_ads'
+      ? [l.palavra && `pesquisou "${l.palavra}"`, l.grupo && `grupo ${l.grupo}`, !l.palavra && l.termo && `palavra ${l.termo}`]
+      : [l.anuncio && `anúncio "${l.anuncio}"`, l.campanha];
+    const sub = [numDia(String(l.criado_em).slice(0, 10)), ...det, NUM_ETAPA[l.etapa] || l.etapa].filter(Boolean).join(' · ');
+    const chip = l.reuniao_realizada ? ['Reunião realizada', 'ok'] : l.nao_compareceu ? ['Marcou e não veio', 'warn'] : l.reuniao_marcada ? ['Reunião marcada', ''] : null;
+    return `<div class="ql-item"><div><a href="javascript:void(0)" data-tel="${escHtml(l.telefone)}" onclick="abrirFichaPorTelefone(this.dataset.tel)">${escHtml(l.nome || l.telefone)}</a>`
+      + `<small>${escHtml(sub)}</small></div>${chip ? `<span class="ql-chip ${chip[1]}">${chip[0]}</span>` : ''}</div>`;
+  });
+  const n = ls.length, marc = ls.filter(l => l.reuniao_marcada).length, feit = ls.filter(l => l.reuniao_realizada).length;
+  return `<div class="num-sub-tit">Quem veio pelo anúncio · últimos 90 dias · ${n} lead${n === 1 ? '' : 's'} · ${marc} reuni${marc === 1 ? 'ão marcada' : 'ões marcadas'} · ${feit} realizada${feit === 1 ? '' : 's'}</div>`
+    + numGaLista(itens, 8);
 }
 // ═══ META ADS (27/11): conta act_558364437656694, lida de hora em hora na mesma rotina do Google Ads (n8n 2ARJpl2FWHQMViTK, nó "Meta Ads (gravar)") ═══
 const NUM_META_SIT = { ACTIVE: ['Ativa', 'ok'], PAUSED: ['Pausada', ''], CAMPAIGN_PAUSED: ['Pausada', ''], WITH_ISSUES: ['Com problema', 'warn'],
@@ -8567,7 +8635,8 @@ function numCartaoMetaAds(perfil, linhas) {
     + `<a class="ga-link" href="https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${escHtml(String(perfil).replace(/^act_/, ''))}" target="_blank" rel="noopener">abrir no Gerenciador</a></span></div>`
     + avisos + blocos + `<div class="kpi-row num-kpis">${kpis}</div><div class="ga-barras">`
     + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).custo) || 0 })), 'Gasto por dia (R$)') + '</div>'
-    + '<div class="num-aviso" style="margin-top:12px">Leads = cadastros que a Meta contou pelo pixel do diagnóstico. O cartão "De onde vêm os clientes" conta pelo nosso banco.</div></div>';
+    + '<div class="num-aviso" style="margin-top:12px">Leads = cadastros que a Meta contou pelo pixel do diagnóstico. O cartão "De onde vêm os clientes" conta pelo nosso banco.</div>'
+    + numQuemVeio('meta_ads') + '</div>';
 }
 // ═══ INVESTIMENTO TOTAL E ROI (27/11, Thiago: "um card de 'investimento total' e outro de 'ROI' ... com os dados de tudo compilados") ═══
 // Investimento = anúncios (Meta + Google Ads) gravados de hora em hora. ROI = clientes novos cadastrados em Clientes & Vagas, ligados ao lead
@@ -8638,7 +8707,8 @@ async function numLoad(dias) {
     const desde30 = new Date(Date.now() - 31 * 864e5).toISOString();
     const [{ data }, rs, origem] = await Promise.all([sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`),
       sb(`instagram_stories?conta=eq.epos&publicado_em=gte.${desde30}&order=publicado_em.desc&select=id,perfil,publicado_em,tipo,thumb,link,dados`).catch(() => ({ data: [] })),
-      rmRpc('epos_origem_clientes', { p_dias: _numDias }).catch(() => null)]);   // 27/11: funil por canal
+      rmRpc('epos_origem_clientes', { p_dias: _numDias }).catch(() => null),   // 27/11: funil por canal
+      rmRpc('epos_leads_anuncio', { p_dias: 90 }).then(x => { window._numLeadsAnuncio = Array.isArray(x) ? x : []; }).catch(() => { window._numLeadsAnuncio = null; })]);   // 27/11: quem veio por anúncio
     _numStories = {};
     for (const s of ((rs && rs.data) || [])) (_numStories[s.perfil] = _numStories[s.perfil] || []).push(s);
     const grupos = {};   // fonte|perfil → linhas por dia
