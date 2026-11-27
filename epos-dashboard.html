@@ -2491,6 +2491,15 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     /* 25/11: bancada da retomada (textos da Donna em conversas antigas; nada é enviado) */
     .rm-bancada > summary { cursor:pointer; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text); padding:4px 0; }
     .rm-bancada .rm-card { margin-top:10px; }
+    /* 27/11: leads sem próximo passo (auditoria do remarketing) */
+    .rm-semprox { margin:0 0 18px; background:var(--bg2); border:1px solid var(--bd); padding:12px 16px; }
+    .rm-semprox > summary { cursor:pointer; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text); padding:2px 0; }
+    .rm-semprox p { margin:8px 0 10px; font-family:var(--fB); font-size:12px; line-height:1.55; color:var(--muted); max-width:760px; }
+    .rm-sp-linha { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; padding:8px 0; border-top:1px solid var(--bd); font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-sp-linha b { font-family:var(--fB); font-size:13px; color:var(--text); font-weight:600; min-width:0; overflow-wrap:anywhere; }
+    .rm-sp-linha b a { color:inherit; text-decoration:none; }
+    .rm-sp-linha > a { color:var(--neon); font-family:var(--fB); font-size:12px; text-decoration:none; }
+    .rm-chip.fila { color:var(--neon); border-color:var(--neon); }
     .rm-bc-conv { max-height:280px; overflow:auto; border:1px solid var(--bd); background:var(--bg3); padding:8px 10px; display:flex; flex-direction:column; gap:6px; }
     .rm-bc-conv div { font-family:var(--fB); font-size:12px; line-height:1.5; color:var(--text); white-space:pre-wrap; overflow-wrap:anywhere; }
     .rm-bc-conv div b { font-family:var(--fD); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-right:6px; }
@@ -2537,6 +2546,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
   <div id="rm-retomada"></div>
   <div id="rm-avisos"></div>
+  <div id="rm-semprox"></div>
   <div class="rm-abas" id="rm-abas"></div>
   <div class="rm-barra" id="rm-barra"></div>
   <div class="rm-lista" id="rm-lista"><div class="loading"></div></div>
@@ -8645,6 +8655,7 @@ async function rmLoad() {
   _rmPlanos = Array.isArray(p.data) ? p.data : []; _rmFila = Array.isArray(f.data) ? f.data : [];
   rmCarregarAvisos();
   rmCarregarRetomada();
+  rmCarregarSemProximo();
   const tels = [...new Set(_rmPlanos.map(t => t.lead_telefone))];
   _rmLeads = {};
   if (tels.length) { const { data } = await sb(`leads?telefone=in.(${tels.join(',')})&select=telefone,nome,crm_stage`); (data || []).forEach(l => _rmLeads[l.telefone] = l); }
@@ -8663,7 +8674,7 @@ function rmRender() {
   document.getElementById('rm-barra').innerHTML = _rmAba === 'aprovar' && itens.length
     ? `<label class="rm-marca"><input type="checkbox" onchange="rmMarcarTodos(this.checked)" ${itens.every(t => _rmSel.has(t.id)) ? 'checked' : ''}> Marcar todas</label>
        <button class="rm-btn forte" onclick="rmAprovarSelecionadas()" ${_rmSel.size ? '' : 'disabled'}>Aprovar selecionadas (${_rmSel.size})</button>
-       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 35 por dia, sempre pela Donna. Quem fez o raio-X sai primeiro; depois, o mais quente (nota do Analista). ⚡ Enviar agora manda na hora, fora da fila.</span>` : '';
+       <span>Saem a partir do dia planejado, com 8 a 11 min entre uma e outra, no máximo 50 por dia, sempre pela Donna. Quem fez o raio-X sai primeiro; depois, o mais quente (nota do Analista). ⚡ Enviar agora manda na hora, fora da fila.</span>` : '';
   const lista = document.getElementById('rm-lista');
   if (!itens.length) {
     lista.innerHTML = `<div class="rm-vazio">${{ aprovar: 'Nenhuma mensagem planejada esperando aprovação.<br>O Analista planeja quando a conversa de um lead esfria; ligações aparecem no card "Precisam de ligação" do Painel.', fila: 'Nada na fila de envio.', historico: 'Nenhum envio nos últimos 7 dias.' }[_rmAba]}</div>`;
@@ -8762,6 +8773,34 @@ async function rmCarregarAvisos() {
         <button class="rm-btn" onclick="rmAvisoRespondido('${t.id}')" title="Use quando você já respondeu pelo celular ou por outro canal">Já respondi por fora</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
     </div>`;
   }).join('') + '</div>';
+}
+// 27/11 (Thiago, depois da auditoria do remarketing: "Pode fazer, além de deixar essas pessoas visíveis no remarketing pra facilitar"):
+// leads sem próximo passo (sem mensagem na fila, sem tarefa, sem retomada, 3 dias ou mais sem contato). A varredura das 10h (dias
+// úteis) manda até 40 por dia para o Analista; quem ele leu nos últimos 7 dias espera a semana. Regra no banco: epos_sem_proximo_passo.
+async function rmCarregarSemProximo() {
+  const box = document.getElementById('rm-semprox');
+  if (!box) return;
+  let itens = [];
+  try { itens = await rmRpc('remarketing_sem_proximo_passo', {}); } catch (e) { box.innerHTML = ''; return; }
+  itens = (Array.isArray(itens) ? itens : []).map(x => (typeof x === 'string' ? JSON.parse(x) : x));
+  if (!itens.length) { box.innerHTML = ''; return; }
+  const naFila = itens.filter(x => x.na_fila).length;
+  const tipo = { mensagem: '1º remarketing', espelho: 'espelho', audio: 'seu áudio', afronta: 'afronta', ligacao: 'ligação' };
+  const quando = x => {
+    if (x.na_fila) return `<span class="rm-chip fila">Na fila do Analista desde ${labEsc(labData(x.fila_desde))}</span>`;
+    if (x.analisado_em && Date.parse(x.analisado_em) > Date.now() - 7 * 864e5)
+      return `<span class="rm-chip">Analista leu em ${labEsc(labData(x.analisado_em))}: volta em até 7 dias</span>`;
+    return '<span class="rm-chip">Entra na próxima varredura (dia útil, 10h)</span>';
+  };
+  box.innerHTML = `<details class="rm-semprox"><summary>Sem próximo passo · ${itens.length} lead${itens.length === 1 ? '' : 's'} · ${naFila} já na fila do Analista</summary>
+    <p>Quem não tem mensagem na fila, tarefa nem retomada e está há 3 dias ou mais sem contato. Todo dia útil às 10h o Analista recebe até 40 destes; as sugestões aparecem em "Para aprovar". Recusa, desqualificado, perdido e conversa com a equipe ficam de fora.</p>
+    ${itens.map(x => {
+      const nome = x.nome || x.telefone;
+      const parado = x.dias == null ? 'sem data de contato' : `${x.dias} dia${x.dias === 1 ? '' : 's'} sem contato`;
+      const rm = x.remarketings ? `${x.remarketings} remarketing${x.remarketings === 1 ? '' : 's'}${tipo[x.ultimo_tipo] ? ` (último: ${tipo[x.ultimo_tipo]})` : ''}` : 'nenhum remarketing';
+      return `<div class="rm-sp-linha"><b><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(x.telefone)}')">${labEsc(nome)}</a></b>
+        <span class="rm-chip">${labEsc(RM_ETAPA[x.etapa] || x.etapa || 'Sem etapa')}</span><span>${parado} · ${rm}</span>${quando(x)}${rmLinkConversa(x.conversa_id, nome)}</div>`;
+    }).join('')}</details>`;
 }
 // 25/11 (Thiago: "conforme ele for acertando, deixar pronto pra uma hora ele mesmo enviar a mensagem automaticamente"):
 // placar de cada mensagem da retomada da Donna e o botão do automático. O placar é calculado pelo fluxo (Leads Parados) a cada rodada;
