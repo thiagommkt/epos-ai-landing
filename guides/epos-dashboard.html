@@ -2136,7 +2136,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="sec-head">
     <div>
       <div class="sec-title">NÚMEROS <span>REDES E GOOGLE</span></div>
-      <div class="sec-sub">FOTO DIÁRIA ÀS 06H10 · COMPARAÇÃO COM O PERÍODO ANTERIOR</div>
+      <div class="sec-sub">FOTO DIÁRIA ÀS 06H10 (GOOGLE ADS DE HORA EM HORA) · COMPARAÇÃO COM O PERÍODO ANTERIOR</div>
     </div>
     <div style="display:flex;gap:6px">
       <button class="num-per" data-d="7" onclick="numLoad(7)">7 dias</button>
@@ -2167,6 +2167,26 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .num-pend { opacity:.85; }
     .num-pend p { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.45; }
     .num-vazio { color:var(--muted); font-size:13px; padding:12px 0; }
+    /* 27/11: Google Ads (campanha do site): situação, verba gasta, números do período, palavras, buscas e anúncios */
+    .ga-camp { border:1px solid var(--bd); border-radius:8px; padding:12px 14px; margin-bottom:12px; }
+    .ga-camp-top { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+    .ga-camp-nome { font-family:var(--fD); font-weight:700; font-size:14px; min-width:0; overflow-wrap:anywhere; }
+    .ga-chip { font:600 11px var(--fD); padding:3px 9px; border-radius:999px; border:1px solid var(--bd-b); color:var(--muted); white-space:nowrap; }
+    .ga-chip.ok { color:var(--neon); border-color:var(--neon); }
+    .ga-chip.warn { color:var(--warn); border-color:var(--warn); }
+    .ga-verba-top { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:13px; color:var(--muted); margin:10px 0 6px; }
+    .ga-verba-top b { color:var(--text); font-weight:700; }
+    .ga-meter { height:8px; border-radius:4px; background:var(--bg3); overflow:hidden; }
+    .ga-meter i { display:block; height:100%; min-width:2px; background:var(--purple); border-radius:4px; }
+    .ga-ritmo { font-size:12px; color:var(--muted); margin-top:6px; line-height:1.45; }
+    .ga-mais summary { cursor:pointer; font-size:12px; color:var(--muted); padding:8px 0; border-top:1px solid var(--bd); list-style:none; }
+    .ga-mais summary::-webkit-details-marker { display:none; }
+    .ga-mais[open] summary { display:none; }
+    .ga-link { color:var(--text); font-size:12px; text-decoration:underline; text-underline-offset:2px; }
+    .ga-barras .num-barra { max-width:44px; }   /* campanha com poucos dias: uma barra não ocupa a largura toda */
+    .ga-anu > span { white-space:normal; }
+    .ga-anu small { display:block; color:var(--muted); font-size:11px; margin-top:2px; }
+    @media (max-width:768px) { .ga-lista .num-post span { white-space:normal; } }
     /* 16/11: Instagram no estilo do painel profissional da Meta (perfil, grade de conteúdos, detalhe do post) */
     .ig-perfil { display:flex; align-items:center; gap:14px; margin:2px 0 14px; }
     .ig-ava { width:60px; height:60px; border-radius:50%; padding:2.5px; flex-shrink:0; background:conic-gradient(from 210deg,#FEDA75,#FA7E1E,#D62976,#962FBF,#4F5BD5,#FEDA75); }
@@ -2471,6 +2491,15 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     /* 25/11: bancada da retomada (textos da Donna em conversas antigas; nada é enviado) */
     .rm-bancada > summary { cursor:pointer; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text); padding:4px 0; }
     .rm-bancada .rm-card { margin-top:10px; }
+    /* 27/11: leads sem próximo passo (auditoria do remarketing) */
+    .rm-semprox { margin:0 0 18px; background:var(--bg2); border:1px solid var(--bd); padding:12px 16px; }
+    .rm-semprox > summary { cursor:pointer; font-family:var(--fD); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text); padding:2px 0; }
+    .rm-semprox p { margin:8px 0 10px; font-family:var(--fB); font-size:12px; line-height:1.55; color:var(--muted); max-width:760px; }
+    .rm-sp-linha { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; padding:8px 0; border-top:1px solid var(--bd); font-family:var(--fB); font-size:12px; color:var(--muted); }
+    .rm-sp-linha b { font-family:var(--fB); font-size:13px; color:var(--text); font-weight:600; min-width:0; overflow-wrap:anywhere; }
+    .rm-sp-linha b a { color:inherit; text-decoration:none; }
+    .rm-sp-linha > a { color:var(--neon); font-family:var(--fB); font-size:12px; text-decoration:none; }
+    .rm-chip.fila { color:var(--neon); border-color:var(--neon); }
     .rm-bc-conv { max-height:280px; overflow:auto; border:1px solid var(--bd); background:var(--bg3); padding:8px 10px; display:flex; flex-direction:column; gap:6px; }
     .rm-bc-conv div { font-family:var(--fB); font-size:12px; line-height:1.5; color:var(--text); white-space:pre-wrap; overflow-wrap:anywhere; }
     .rm-bc-conv div b { font-family:var(--fD); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-right:6px; }
@@ -2517,6 +2546,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   </div>
   <div id="rm-retomada"></div>
   <div id="rm-avisos"></div>
+  <div id="rm-semprox"></div>
   <div class="rm-abas" id="rm-abas"></div>
   <div class="rm-barra" id="rm-barra"></div>
   <div class="rm-lista" id="rm-lista"><div class="loading"></div></div>
@@ -8392,6 +8422,84 @@ function numCartaoBusca(perfil, linhas) {
     + '<div class="num-sub-tit">Buscas em que o site apareceu (últimos 28 dias)</div>'
     + (bus || '<div class="num-vazio">O Google ainda não mostrou nenhuma busca com o site nos últimos 28 dias.</div>') + '</div>';
 }
+// ═══ GOOGLE ADS (27/11, Thiago: "Quero que mostre no dashboard os dados dele"): conta 390-341-3710, lida de hora em hora pela rotina
+// "[Epos] Google Ads — números do painel" (n8n 2ARJpl2FWHQMViTK). Linhas por dia em metricas_redes (fonte google_ads); a mais recente
+// traz a foto: campanhas (situação, verba, números desde o início), saldo pago, palavras-chave, buscas e anúncios.
+const NUM_GA_SIT = { ELIGIBLE: ['No ar', 'ok'], LEARNING: ['No ar · aprendendo', 'ok'], LIMITED: ['No ar com limitação', 'warn'], PENDING: ['Agendada', ''],
+  PAUSED: ['Pausada', ''], ENDED: ['Encerrada', ''], NOT_ELIGIBLE: ['Parada', 'warn'], MISCONFIGURED: ['Com erro de configuração', 'warn'] };
+const NUM_GA_MOTIVO = { BIDDING_STRATEGY_LEARNING: 'o Google ainda está aprendendo quem clica (primeiros dias)', BUDGET_CONSTRAINED: 'a verba está limitando as exibições',
+  HAS_ADS_DISAPPROVED: 'tem anúncio reprovado', HAS_ADS_LIMITED_BY_POLICY: 'tem anúncio limitado pelas políticas', MOST_ADS_UNDER_REVIEW: 'os anúncios estão em análise',
+  BIDDING_STRATEGY_LIMITED: 'o lance está limitando as exibições', BIDDING_STRATEGY_CONSTRAINED: 'o lance está limitando as exibições', MISSING_INVOICE_SETUP: 'falta configurar o pagamento',
+  CAMPAIGN_PENDING: 'ainda não começou', CAMPAIGN_ENDED: 'chegou à data final', CAMPAIGN_PAUSED: 'foi pausada' };
+const NUM_GA_TIPO = { EXACT: 'exata', PHRASE: 'frase', BROAD: 'ampla' };
+const NUM_GA_APROV = { APPROVED: 'aprovado', APPROVED_LIMITED: 'aprovado com limite', AREA_OF_INTEREST_ONLY: 'aprovado com limite', DISAPPROVED: 'reprovado', UNDER_REVIEW: 'em análise' };
+const NUM_GA_FORCA = { EXCELLENT: 'excelente', GOOD: 'boa', AVERAGE: 'média', POOR: 'fraca', PENDING: 'em cálculo' };
+function numReais(v) { return v == null ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function numHora(iso) { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às'); }
+function numGaLista(itens, visiveis) {   // os primeiros à vista; o resto atrás de "Ver mais"
+  if (itens.length <= visiveis + 2) return itens.join('');
+  return itens.slice(0, visiveis).join('') + `<details class="ga-mais"><summary>Ver mais ${itens.length - visiveis}</summary>${itens.slice(visiveis).join('')}</details>`;
+}
+function numGaCampanha(c, hoje) {
+  const [sit, cls] = NUM_GA_SIT[c.status === 'PAUSED' ? 'PAUSED' : c.situacao] || [c.situacao || c.status || '—', ''];
+  const fim = c.fim && c.fim < '2037-01-01' ? c.fim : null;   // sem data final o Google grava 2037-12-30
+  const motivos = (c.motivos || []).map(m => NUM_GA_MOTIVO[m]).filter(Boolean);
+  let verba = '';
+  if (c.verba_total) {
+    const gasto = Number(c.custo) || 0, total = Number(c.verba_total), resta = Math.max(0, total - gasto);
+    const pct = Math.min(100, gasto / total * 100);
+    const dias = Math.max(1, Math.round((Date.parse(hoje) - Date.parse(c.inicio)) / 864e5) + 1);   // dias corridos desde o início, hoje conta
+    const media = gasto / dias;
+    let ritmo;
+    if (!gasto) ritmo = 'Ainda sem gasto: o Google está começando a mostrar os anúncios.';
+    else if (!resta) ritmo = 'A verba da campanha acabou.';
+    else {
+      const n = Math.ceil(resta / media), ate = new Date(Date.parse(hoje + 'T12:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+      ritmo = `No ritmo atual (${numReais(media)} por dia), a verba dura mais ${n} dia${n > 1 ? 's' : ''}, até ${numDia(ate)}`
+        + (fim && ate > fim ? `. A campanha termina antes, em ${numDia(fim)}, e o Google distribui a verba para gastar tudo até essa data.` : '.');
+    }
+    verba = `<div class="ga-verba-top"><span>Gasto <b>${numReais(gasto)}</b> de ${numReais(total)}</span><span>sobram <b>${numReais(resta)}</b></span></div>`
+      + `<div class="ga-meter" role="meter" aria-label="Verba gasta" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${gasto}"><i style="width:${pct.toFixed(1)}%"></i></div>`
+      + `<div class="ga-ritmo">${ritmo}</div>`;
+  } else if (c.verba_dia) verba = `<div class="ga-ritmo">Verba de ${numReais(c.verba_dia)} por dia · gasto desde o início ${numReais(c.custo)}</div>`;
+  const desde = `Desde ${numDia(c.inicio)}: ${numFmt(c.impressoes)} vezes que apareceu · ${numFmt(c.cliques)} clique${c.cliques === 1 ? '' : 's'} · ${numFmt(c.conversoes)} diagnóstico${c.conversoes === 1 ? '' : 's'} enviado${c.conversoes === 1 ? '' : 's'}`;
+  return `<div class="ga-camp"><div class="ga-camp-top"><span class="ga-camp-nome">${escHtml(c.nome || c.id)}</span><span class="ga-chip ${cls}">${escHtml(sit)}</span></div>`
+    + `<div class="num-sub">${numDia(c.inicio)} a ${fim ? numDia(fim) : 'sem data final'}${motivos.length ? ' · ' + escHtml(motivos.join('; ')) : ''}</div>`
+    + verba + `<div class="ga-ritmo">${desde}</div></div>`;
+}
+function numCartaoGoogleAds(perfil, linhas) {
+  const rec = linhas.slice(-_numDias), ant = linhas.slice(-2 * _numDias, -_numDias), ult = linhas[linhas.length - 1] || {};
+  const atual = numExtra(linhas, 'atualizado_em'), camps = numExtra(linhas, 'campanhas_info') || [], saldo = numExtra(linhas, 'saldo');
+  const erros = numExtra(linhas, 'erros') || [];
+  const im = numSoma(rec, 'impressoes'), cl = numSoma(rec, 'cliques'), gasto = numSoma(rec, 'custo'), conv = numSoma(rec, 'conversoes');
+  const pct = n => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  const kpis = numKpi('Gasto', numReais(gasto), numVar(gasto, numSoma(ant, 'custo'))) + numKpiVar('Vezes que apareceu', rec, ant, 'impressoes')
+    + numKpiVar('Cliques', rec, ant, 'cliques') + numKpi('Taxa de clique', im ? pct(cl / im * 100) + '%' : '—', 'cliques ÷ vezes que apareceu')
+    + numKpi('Custo por clique', cl ? numReais(gasto / cl) : '—', 'média do período')
+    + numKpi('Diagnósticos enviados', numFmt(conv), conv ? numReais(gasto / conv) + ' por diagnóstico' : 'conversão do site');
+  let avisos = '';
+  if (atual && Date.now() - Date.parse(atual) > 3 * 3600e3) avisos += `<div class="num-aviso">A última leitura foi em ${numHora(atual)}. A rotina deveria ler de hora em hora: pode ter parado.</div>`;
+  if (erros.length) avisos += `<div class="num-aviso">Parte dos números não veio na última leitura (${escHtml(erros.map(e => String(e).split(':')[0]).join(', '))}).</div>`;
+  const palavras = (numExtra(linhas, 'palavras') || []).map(p => numItem('', `${p.texto} · ${NUM_GA_TIPO[p.tipo] || p.tipo || ''}`,
+    `${numFmt(p.impressoes)}× · ${numFmt(p.cliques)} clique${p.cliques === 1 ? '' : 's'} · ${numReais(p.custo)}${p.nota ? ' · nota ' + p.nota + '/10' : ''}`));
+  const termos = (numExtra(linhas, 'termos') || []).map(t => numItem('', t.termo, `${numFmt(t.impressoes)}× · ${numFmt(t.cliques)} clique${t.cliques === 1 ? '' : 's'} · ${numReais(t.custo)}`));
+  const anuncios = (numExtra(linhas, 'anuncios') || []).map(a => {   // título em cima, aprovação e força embaixo (no celular o título não some)
+    const sub = [NUM_GA_APROV[a.aprovacao] || '', a.forca && NUM_GA_FORCA[a.forca] ? 'força ' + NUM_GA_FORCA[a.forca] : ''].filter(Boolean).join(' · ');
+    const tag = a.url ? `a href="${escHtml(a.url)}" target="_blank" rel="noopener"` : 'div';
+    return `<${tag} class="num-post ga-anu"><span>${escHtml(a.grupo + ': ' + (a.titulos || []).slice(0, 2).join(' | '))}${sub ? `<small>${escHtml(sub)}</small>` : ''}</span>`
+      + `<b>${numFmt(a.impressoes)}× · ${numFmt(a.cliques)} clique${a.cliques === 1 ? '' : 's'}</b></${a.url ? 'a' : 'div'}>`;
+  });
+  return `<div class="num-card"><div class="num-card-tit">Google Ads ${escHtml(perfil)} <span>${atual ? 'atualizado em ' + numHora(atual) + ' · ' : ''}lido de hora em hora · `
+    + `<a class="ga-link" href="https://ads.google.com/aw/campaigns?ocid=143473820" target="_blank" rel="noopener">abrir no Google Ads</a></span></div>`
+    + avisos + camps.map(c => numGaCampanha(c, ult.dia)).join('')
+    + (saldo ? `<div class="num-sub" style="margin-bottom:12px">Saldo pago na conta: <b style="color:var(--text)">${numReais(saldo.saldo)}</b> (o Google desconta deste saldo o que as campanhas gastam)</div>` : '')
+    + `<div class="kpi-row num-kpis">${kpis}</div><div class="ga-barras">` + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).custo) || 0 })), 'Gasto por dia (R$)') + '</div>'
+    + '<div class="num-aviso" style="margin-top:12px">Conversão = diagnóstico enviado no site (conversa no WhatsApp não conta). O Google leva algumas horas para fechar os números do dia.</div>'
+    + `<div class="num-sub-tit">Palavras-chave · desde o início</div>` + (palavras.length ? `<div class="ga-lista">${numGaLista(palavras, 8)}</div>` : '<div class="num-vazio">Nenhuma palavra-chave ativa.</div>')
+    + `<div class="num-sub-tit">O que as pessoas digitaram no Google · últimos 35 dias</div>`
+    + (termos.length ? `<div class="ga-lista">${numGaLista(termos, 10)}</div>` : '<div class="num-vazio">Nenhuma busca ainda. Aparecem aqui assim que o anúncio for exibido.</div>')
+    + (anuncios.length ? '<div class="num-sub-tit">Anúncios · desde o início</div>' + anuncios.join('') : '') + '</div>';
+}
 const NUM_PENDENTES = [
   ['Google Meu Negócio', 'Visualizações do perfil, ligações, pedidos de rota e cliques no site.', 'O Google só libera a API 60 dias depois da validação do perfil (lembrete no WhatsApp em 15/01/2027). Até lá, os números ficam na aba "Desempenho" do próprio perfil.'],
 ];
@@ -8410,7 +8518,7 @@ async function numLoad(dias) {
     for (const s of ((rs && rs.data) || [])) (_numStories[s.perfil] = _numStories[s.perfil] || []).push(s);
     const grupos = {};   // fonte|perfil → linhas por dia
     for (const l of (data || [])) (grupos[l.fonte + '|' + l.perfil] = grupos[l.fonte + '|' + l.perfil] || []).push(l);
-    const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, busca: numCartaoBusca };
+    const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, google_ads: numCartaoGoogleAds, busca: numCartaoBusca };   // 27/11 (Thiago): Google Ads logo antes da busca do Google
     for (const f of Object.keys(CARTOES))
       for (const [k, linhas] of Object.entries(grupos)) if (k.startsWith(f + '|')) {
         try { html += CARTOES[f](k.slice(f.length + 1), linhas); } catch (e) { html += `<div class="num-vazio">Não consegui montar o cartão ${escHtml(k)}.</div>`; }
@@ -8547,6 +8655,7 @@ async function rmLoad() {
   _rmPlanos = Array.isArray(p.data) ? p.data : []; _rmFila = Array.isArray(f.data) ? f.data : [];
   rmCarregarAvisos();
   rmCarregarRetomada();
+  rmCarregarSemProximo();
   const tels = [...new Set(_rmPlanos.map(t => t.lead_telefone))];
   _rmLeads = {};
   if (tels.length) { const { data } = await sb(`leads?telefone=in.(${tels.join(',')})&select=telefone,nome,crm_stage`); (data || []).forEach(l => _rmLeads[l.telefone] = l); }
@@ -8565,7 +8674,7 @@ function rmRender() {
   document.getElementById('rm-barra').innerHTML = _rmAba === 'aprovar' && itens.length
     ? `<label class="rm-marca"><input type="checkbox" onchange="rmMarcarTodos(this.checked)" ${itens.every(t => _rmSel.has(t.id)) ? 'checked' : ''}> Marcar todas</label>
        <button class="rm-btn forte" onclick="rmAprovarSelecionadas()" ${_rmSel.size ? '' : 'disabled'}>Aprovar selecionadas (${_rmSel.size})</button>
-       <span>Saem a partir do dia planejado, com 10 a 15 min entre uma e outra, no máximo 35 por dia, sempre pela Donna. Quem fez o raio-X sai primeiro; depois, o mais quente (nota do Analista). ⚡ Enviar agora manda na hora, fora da fila.</span>` : '';
+       <span>Saem a partir do dia planejado, com 8 a 11 min entre uma e outra, no máximo 50 por dia, sempre pela Donna. Quem fez o raio-X sai primeiro; depois, o mais quente (nota do Analista). ⚡ Enviar agora manda na hora, fora da fila.</span>` : '';
   const lista = document.getElementById('rm-lista');
   if (!itens.length) {
     lista.innerHTML = `<div class="rm-vazio">${{ aprovar: 'Nenhuma mensagem planejada esperando aprovação.<br>O Analista planeja quando a conversa de um lead esfria; ligações aparecem no card "Precisam de ligação" do Painel.', fila: 'Nada na fila de envio.', historico: 'Nenhum envio nos últimos 7 dias.' }[_rmAba]}</div>`;
@@ -8664,6 +8773,34 @@ async function rmCarregarAvisos() {
         <button class="rm-btn" onclick="rmAvisoRespondido('${t.id}')" title="Use quando você já respondeu pelo celular ou por outro canal">Já respondi por fora</button>${rmLinkConversa(pl.conversa_id, nome)}</div>
     </div>`;
   }).join('') + '</div>';
+}
+// 27/11 (Thiago, depois da auditoria do remarketing: "Pode fazer, além de deixar essas pessoas visíveis no remarketing pra facilitar"):
+// leads sem próximo passo (sem mensagem na fila, sem tarefa, sem retomada, 3 dias ou mais sem contato). A varredura das 10h (dias
+// úteis) manda até 40 por dia para o Analista; quem ele leu nos últimos 7 dias espera a semana. Regra no banco: epos_sem_proximo_passo.
+async function rmCarregarSemProximo() {
+  const box = document.getElementById('rm-semprox');
+  if (!box) return;
+  let itens = [];
+  try { itens = await rmRpc('remarketing_sem_proximo_passo', {}); } catch (e) { box.innerHTML = ''; return; }
+  itens = (Array.isArray(itens) ? itens : []).map(x => (typeof x === 'string' ? JSON.parse(x) : x));
+  if (!itens.length) { box.innerHTML = ''; return; }
+  const naFila = itens.filter(x => x.na_fila).length;
+  const tipo = { mensagem: '1º remarketing', espelho: 'espelho', audio: 'seu áudio', afronta: 'afronta', ligacao: 'ligação' };
+  const quando = x => {
+    if (x.na_fila) return `<span class="rm-chip fila">Na fila do Analista desde ${labEsc(labData(x.fila_desde))}</span>`;
+    if (x.analisado_em && Date.parse(x.analisado_em) > Date.now() - 7 * 864e5)
+      return `<span class="rm-chip">Analista leu em ${labEsc(labData(x.analisado_em))}: volta em até 7 dias</span>`;
+    return '<span class="rm-chip">Entra na próxima varredura (dia útil, 10h)</span>';
+  };
+  box.innerHTML = `<details class="rm-semprox"><summary>Sem próximo passo · ${itens.length} lead${itens.length === 1 ? '' : 's'} · ${naFila} já na fila do Analista</summary>
+    <p>Quem não tem mensagem na fila, tarefa nem retomada e está há 3 dias ou mais sem contato. Todo dia útil às 10h o Analista recebe até 40 destes; as sugestões aparecem em "Para aprovar". Recusa, desqualificado, perdido e conversa com a equipe ficam de fora.</p>
+    ${itens.map(x => {
+      const nome = x.nome || x.telefone;
+      const parado = x.dias == null ? 'sem data de contato' : `${x.dias} dia${x.dias === 1 ? '' : 's'} sem contato`;
+      const rm = x.remarketings ? `${x.remarketings} remarketing${x.remarketings === 1 ? '' : 's'}${tipo[x.ultimo_tipo] ? ` (último: ${tipo[x.ultimo_tipo]})` : ''}` : 'nenhum remarketing';
+      return `<div class="rm-sp-linha"><b><a href="javascript:void(0)" onclick="abrirFichaPorTelefone('${labEsc(x.telefone)}')">${labEsc(nome)}</a></b>
+        <span class="rm-chip">${labEsc(RM_ETAPA[x.etapa] || x.etapa || 'Sem etapa')}</span><span>${parado} · ${rm}</span>${quando(x)}${rmLinkConversa(x.conversa_id, nome)}</div>`;
+    }).join('')}</details>`;
 }
 // 25/11 (Thiago: "conforme ele for acertando, deixar pronto pra uma hora ele mesmo enviar a mensagem automaticamente"):
 // placar de cada mensagem da retomada da Donna e o botão do automático. O placar é calculado pelo fluxo (Leads Parados) a cada rodada;
