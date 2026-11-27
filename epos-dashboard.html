@@ -2136,7 +2136,7 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
   <div class="sec-head">
     <div>
       <div class="sec-title">NÚMEROS <span>REDES E GOOGLE</span></div>
-      <div class="sec-sub">FOTO DIÁRIA ÀS 06H10 (GOOGLE ADS DE HORA EM HORA) · COMPARAÇÃO COM O PERÍODO ANTERIOR</div>
+      <div class="sec-sub">FOTO DIÁRIA ÀS 06H10 (ANÚNCIOS DE HORA EM HORA) · COMPARAÇÃO COM O PERÍODO ANTERIOR</div>
     </div>
     <div style="display:flex;gap:6px">
       <button class="num-per" data-d="7" onclick="numLoad(7)">7 dias</button>
@@ -2184,6 +2184,35 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .ga-mais[open] summary { display:none; }
     .ga-link { color:var(--text); font-size:12px; text-decoration:underline; text-underline-offset:2px; }
     .ga-barras .num-barra { max-width:44px; }   /* campanha com poucos dias: uma barra não ocupa a largura toda */
+    .kpi-rs { font-size:.5em; font-weight:600; margin-right:3px; vertical-align:.35em; color:var(--muted); -webkit-text-fill-color:var(--muted); background:none; }   /* o número usa texto com degradê: o R$ precisa de cor própria */
+    .ga-alerta { font-size:13px; color:var(--text); border-left:3px solid var(--warn); padding:8px 12px; margin-bottom:12px; background:var(--bg3); border-radius:0 6px 6px 0; line-height:1.45; }
+    /* 27/11: cartões "Investimento total" e "ROI" (lado a lado no computador) */
+    .inv-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media (max-width:768px) { .inv-grid { grid-template-columns:1fr; } }
+    .inv-num { font-family:var(--fD); font-size:clamp(30px, 3.2vw, 42px); font-weight:700; line-height:1.1; margin:4px 0 6px; font-variant-numeric:tabular-nums; }
+    .inv-num.pos { color:var(--neon); }
+    .inv-num.neg { color:var(--warn); }
+    .inv-lin { display:flex; justify-content:space-between; gap:12px; font-size:13px; padding:7px 0; border-top:1px solid var(--bd); }
+    .inv-lin span { color:var(--muted); }
+    .inv-lin b { font-weight:600; white-space:nowrap; }
+    .inv-txt { font-size:13px; color:var(--muted); line-height:1.5; margin:6px 0 10px; }
+    /* 27/11: "De onde vêm os clientes" — funil por canal (tabela no computador, blocos no celular) */
+    .og-tab { width:100%; border-collapse:collapse; font-size:13px; }
+    .og-tab th { font-family:var(--fD); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-align:right; padding:0 8px 8px; white-space:nowrap; }
+    .og-tab th:first-child, .og-tab td:first-child { text-align:left; padding-left:0; }
+    .og-tab td { text-align:right; padding:9px 8px; border-top:1px solid var(--bd); white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .og-tab td:first-child { white-space:normal; font-weight:600; }
+    .og-tab tr.og-total td { font-weight:700; border-top:2px solid var(--bd-b); }
+    .og-tab td.og-zero { color:var(--dim); }
+    @media (max-width:768px) {
+      .og-tab thead { display:none; }
+      .og-tab, .og-tab tbody, .og-tab tr, .og-tab td { display:block; width:100%; }
+      .og-tab tr { border-top:1px solid var(--bd); padding:10px 0; display:grid; grid-template-columns:1fr 1fr; gap:4px 12px; }
+      .og-tab td { border:0; padding:0; text-align:left; display:flex; justify-content:space-between; gap:8px; }
+      .og-tab td:first-child { grid-column:1 / -1; font-size:14px; margin-bottom:2px; }
+      .og-tab td:not(:first-child)::before { content:attr(data-l); color:var(--muted); font-size:11px; }
+      .og-tab tr.og-total td { border:0; }
+    }
     .ga-anu > span { white-space:normal; }
     .ga-anu small { display:block; color:var(--muted); font-size:11px; margin-top:2px; }
     @media (max-width:768px) { .ga-lista .num-post span { white-space:normal; } }
@@ -8435,6 +8464,9 @@ const NUM_GA_TIPO = { EXACT: 'exata', PHRASE: 'frase', BROAD: 'ampla' };
 const NUM_GA_APROV = { APPROVED: 'aprovado', APPROVED_LIMITED: 'aprovado com limite', AREA_OF_INTEREST_ONLY: 'aprovado com limite', DISAPPROVED: 'reprovado', UNDER_REVIEW: 'em análise' };
 const NUM_GA_FORCA = { EXCELLENT: 'excelente', GOOD: 'boa', AVERAGE: 'média', POOR: 'fraca', PENDING: 'em cálculo' };
 function numReais(v) { return v == null ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function numRS(v) {   // valor em reais nos quadros: o R$ menor para o número caber (27/11: "R$ 399,4" cortava)
+  return v == null ? '—' : '<small class="kpi-rs">R$</small>' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 function numHora(iso) { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' às'); }
 function numGaLista(itens, visiveis) {   // os primeiros à vista; o resto atrás de "Ver mais"
   if (itens.length <= visiveis + 2) return itens.join('');
@@ -8473,9 +8505,9 @@ function numCartaoGoogleAds(perfil, linhas) {
   const erros = numExtra(linhas, 'erros') || [];
   const im = numSoma(rec, 'impressoes'), cl = numSoma(rec, 'cliques'), gasto = numSoma(rec, 'custo'), conv = numSoma(rec, 'conversoes');
   const pct = n => n.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
-  const kpis = numKpi('Gasto', numReais(gasto), numVar(gasto, numSoma(ant, 'custo'))) + numKpiVar('Vezes que apareceu', rec, ant, 'impressoes')
+  const kpis = numKpi('Gasto', numRS(gasto), numVar(gasto, numSoma(ant, 'custo'))) + numKpiVar('Vezes que apareceu', rec, ant, 'impressoes')
     + numKpiVar('Cliques', rec, ant, 'cliques') + numKpi('Taxa de clique', im ? pct(cl / im * 100) + '%' : '—', 'cliques ÷ vezes que apareceu')
-    + numKpi('Custo por clique', cl ? numReais(gasto / cl) : '—', 'média do período')
+    + numKpi('Custo por clique', cl ? numRS(gasto / cl) : '—', 'média do período')
     + numKpi('Diagnósticos enviados', numFmt(conv), conv ? numReais(gasto / conv) + ' por diagnóstico' : 'conversão do site');
   let avisos = '';
   if (atual && Date.now() - Date.parse(atual) > 3 * 3600e3) avisos += `<div class="num-aviso">A última leitura foi em ${numHora(atual)}. A rotina deveria ler de hora em hora: pode ter parado.</div>`;
@@ -8500,6 +8532,96 @@ function numCartaoGoogleAds(perfil, linhas) {
     + (termos.length ? `<div class="ga-lista">${numGaLista(termos, 10)}</div>` : '<div class="num-vazio">Nenhuma busca ainda. Aparecem aqui assim que o anúncio for exibido.</div>')
     + (anuncios.length ? '<div class="num-sub-tit">Anúncios · desde o início</div>' + anuncios.join('') : '') + '</div>';
 }
+// ═══ META ADS (27/11): conta act_558364437656694, lida de hora em hora na mesma rotina do Google Ads (n8n 2ARJpl2FWHQMViTK, nó "Meta Ads (gravar)") ═══
+const NUM_META_SIT = { ACTIVE: ['Ativa', 'ok'], PAUSED: ['Pausada', ''], CAMPAIGN_PAUSED: ['Pausada', ''], WITH_ISSUES: ['Com problema', 'warn'],
+  IN_PROCESS: ['Em análise', ''], PENDING_BILLING_INFO: ['Falta pagamento', 'warn'] };
+const NUM_META_OBJ = { OUTCOME_LEADS: 'objetivo: leads', OUTCOME_ENGAGEMENT: 'objetivo: engajamento', OUTCOME_TRAFFIC: 'objetivo: tráfego',
+  OUTCOME_SALES: 'objetivo: vendas', OUTCOME_AWARENESS: 'objetivo: reconhecimento', OUTCOME_APP_PROMOTION: 'objetivo: aplicativo' };
+const NUM_META_CONTA = { 2: 'A conta de anúncios está desativada pela Meta.', 3: 'Pagamento pendente: a conta deve {devendo} e a Meta não mostra os anúncios até o pagamento.',
+  7: 'A conta está em análise de risco pela Meta.', 8: 'A conta aguarda o acerto de um pagamento.', 9: 'A conta está no período de carência do pagamento.', 101: 'A conta de anúncios foi fechada.' };
+function numCartaoMetaAds(perfil, linhas) {
+  const rec = linhas.slice(-_numDias), ant = linhas.slice(-2 * _numDias, -_numDias);
+  const atual = numExtra(linhas, 'atualizado_em'), conta = numExtra(linhas, 'conta') || {}, camps = numExtra(linhas, 'campanhas_info') || [], erros = numExtra(linhas, 'erros') || [];
+  const travada = conta.status && conta.status !== 1;
+  const ultimo = camps.map(c => c.ultimo_gasto).filter(Boolean).sort().pop();
+  let avisos = '';
+  if (travada) avisos += `<div class="ga-alerta">${escHtml((NUM_META_CONTA[conta.status] || 'A conta de anúncios está com restrição na Meta.').replace('{devendo}', numReais(conta.devendo)))}`
+    + (ultimo ? ` Último gasto em ${numDia(ultimo)}.` : '') + ' Para resolver: Gerenciador de Anúncios → Cobrança.</div>';
+  if (atual && Date.now() - Date.parse(atual) > 3 * 3600e3) avisos += `<div class="num-aviso">A última leitura foi em ${numHora(atual)}. A rotina deveria ler de hora em hora: pode ter parado.</div>`;
+  if (erros.length) avisos += `<div class="num-aviso">Parte dos números não veio na última leitura (${escHtml(erros.map(e => String(e).split(':')[0]).join(', '))}).</div>`;
+  const blocos = camps.map(c => {
+    const [sit, cls] = travada && c.situacao === 'ACTIVE' ? ['Ativa, sem veicular', 'warn'] : (NUM_META_SIT[c.situacao] || [c.situacao || '—', '']);
+    const verba = c.verba_dia ? numReais(c.verba_dia) + ' por dia' : c.verba_total ? numReais(c.verba_total) + ' no total' : '';
+    const sub = [NUM_META_OBJ[c.objetivo] || '', verba, c.ultimo_gasto ? 'último gasto ' + numDia(c.ultimo_gasto) : 'sem gasto nos últimos 60 dias'].filter(Boolean).join(' · ');
+    return `<div class="ga-camp"><div class="ga-camp-top"><span class="ga-camp-nome">${escHtml(c.nome || c.id)}</span><span class="ga-chip ${cls}">${escHtml(sit)}</span></div>`
+      + `<div class="num-sub">${escHtml(sub)}</div><div class="ga-ritmo">Últimos 60 dias: ${numReais(c.custo)} gastos · ${numFmt(c.leads)} lead${c.leads === 1 ? '' : 's'}`
+      + (c.leads ? ` · ${numReais(c.custo / c.leads)} por lead` : '') + (c.conversas ? ` · ${numFmt(c.conversas)} conversa${c.conversas === 1 ? '' : 's'} no WhatsApp` : '') + '</div></div>';
+  }).join('');
+  const gasto = numSoma(rec, 'custo'), leads = numSoma(rec, 'leads');
+  const kpis = numKpi('Gasto', numRS(gasto), numVar(gasto, numSoma(ant, 'custo'))) + numKpiVar('Vezes que apareceu', rec, ant, 'impressoes')
+    + numKpiVar('Cliques no link', rec, ant, 'cliques') + numKpiVar('Leads', rec, ant, 'leads') + numKpiVar('Conversas no WhatsApp', rec, ant, 'conversas')
+    + numKpi('Custo por lead', leads ? numRS(gasto / leads) : '—', 'média do período');
+  return `<div class="num-card"><div class="num-card-tit">Meta Ads ${escHtml(conta.nome || perfil)} <span>${atual ? 'atualizado em ' + numHora(atual) + ' · ' : ''}lido de hora em hora · `
+    + `<a class="ga-link" href="https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${escHtml(String(perfil).replace(/^act_/, ''))}" target="_blank" rel="noopener">abrir no Gerenciador</a></span></div>`
+    + avisos + blocos + `<div class="kpi-row num-kpis">${kpis}</div><div class="ga-barras">`
+    + numBarras(rec.map(l => ({ dia: l.dia, v: Number((l.dados || {}).custo) || 0 })), 'Gasto por dia (R$)') + '</div>'
+    + '<div class="num-aviso" style="margin-top:12px">Leads = cadastros que a Meta contou pelo pixel do diagnóstico. O cartão "De onde vêm os clientes" conta pelo nosso banco.</div></div>';
+}
+// ═══ INVESTIMENTO TOTAL E ROI (27/11, Thiago: "um card de 'investimento total' e outro de 'ROI' ... com os dados de tudo compilados") ═══
+// Investimento = anúncios (Meta + Google Ads) gravados de hora em hora. ROI = clientes novos cadastrados em Clientes & Vagas, ligados ao lead
+// pelo telefone e ao canal pago de onde ele veio: (receita mensal nova − investimento) ÷ investimento.
+function numCartaoInvestRoi(o, grupos) {
+  const n = _numDias, pagos = ['meta_ads', 'google_ads'];
+  const soma = (f, ini, fim) => Object.entries(grupos || {}).filter(([k]) => k.startsWith(f + '|')).reduce((t, [, ls]) => t + numSoma(fim === undefined ? ls.slice(ini) : ls.slice(ini, fim), 'custo'), 0);
+  const porCanal = Object.fromEntries(pagos.map(f => [f, soma(f, -n)]));
+  const inv = porCanal.meta_ads + porCanal.google_ads, invAnt = pagos.reduce((t, f) => t + soma(f, -2 * n, -n), 0);
+  const cs = (o && o.canais) || [], pg = cs.filter(c => pagos.includes(c.canal));
+  const leads = pg.reduce((t, c) => t + (c.leads || 0), 0), reun = pg.reduce((t, c) => t + (c.reunioes || 0), 0);
+  const cli = (o && o.clientes_novos) || [], cliPago = cli.filter(c => pagos.includes(c.canal)), cliOutros = cli.filter(c => !pagos.includes(c.canal));
+  const receita = cliPago.reduce((t, c) => t + (Number(c.valor_mensal) || 0), 0), receitaOut = cliOutros.reduce((t, c) => t + (Number(c.valor_mensal) || 0), 0);
+  const lin = (rot, val) => `<div class="inv-lin"><span>${rot}</span><b>${val}</b></div>`;
+  const cartaoInv = `<div class="num-card"><div class="num-card-tit">Investimento total <span>últimos ${n} dias · anúncios</span></div>`
+    + `<div class="inv-num">${numRS(inv)}</div><div class="num-sub">${invAnt ? `${inv >= invAnt ? '▲' : '▼'} ${Math.abs(Math.round((inv - invAnt) / invAnt * 100))}% vs ${n} dias antes (${numReais(invAnt)})` : 'sem gasto no período anterior'}</div>`
+    + `<div style="margin-top:10px">${lin('Anúncios da Meta', numReais(porCanal.meta_ads))}${lin('Google Ads', numReais(porCanal.google_ads))}`
+    + lin('Custo por lead (anúncios)', leads && inv ? numReais(inv / leads) : '—') + lin('Custo por reunião (anúncios)', reun && inv ? numReais(inv / reun) : '—') + '</div>'
+    + '<div class="inv-txt" style="margin-bottom:0">O custo do disparo pela API oficial e das ferramentas ainda não entra.</div></div>';
+  const pct = v => (v >= 0 ? '+' : '−') + Math.abs(Math.round(v)).toLocaleString('pt-BR') + '%';
+  let corpo;
+  if (!inv) corpo = '<div class="inv-num">—</div><div class="inv-txt">Sem investimento em anúncios no período.</div>';
+  else if (receita) {
+    const r1 = (receita - inv) / inv * 100, r12 = (receita * 12 - inv) / inv * 100;
+    corpo = `<div class="inv-num ${r1 >= 0 ? 'pos' : 'neg'}">${pct(r1)}</div><div class="num-sub">no 1º mês de contrato</div><div style="margin-top:10px">`
+      + lin('Clientes novos por anúncio', numFmt(cliPago.length)) + lin('Receita mensal nova', numReais(receita))
+      + lin('Em 12 meses de contrato', pct(r12)) + lin('Cada R$ 1 investido virou', numReais(receita / inv) + ' por mês') + '</div>';
+  } else corpo = '<div class="inv-num">—</div>'
+    + `<div class="inv-txt">Nenhum cliente novo por anúncio nos últimos ${n} dias. Um cliente de ${numReais(inv)} por mês já paga o investimento do período no 1º mês.</div>`
+    + `<div>${lin('Reuniões vindas de anúncio', numFmt(reun))}${lin('Leads vindos de anúncio', numFmt(leads))}</div>`;
+  if (cliOutros.length) corpo += `<div>${lin('Clientes novos por outros canais', numFmt(cliOutros.length) + ' · ' + numReais(receitaOut) + '/mês')}</div>`;
+  const cartaoRoi = `<div class="num-card"><div class="num-card-tit">ROI <span>retorno dos anúncios · últimos ${n} dias</span></div>${corpo}`
+    + '<div class="inv-txt" style="margin-bottom:0">Conta os clientes cadastrados em Clientes &amp; Vagas com o telefone do lead e o valor mensal.</div></div>';
+  return `<div class="inv-grid">${cartaoInv}${cartaoRoi}</div>`;
+}
+// ═══ DE ONDE VÊM OS CLIENTES (27/11): funil por canal, RPC epos_origem_clientes(dias). O lead conta no canal do 1º contato. ═══
+const NUM_CANAL = { google_ads: 'Google Ads', meta_ads: 'Anúncios da Meta', google_organico: 'Busca do Google (orgânico)', google_meu_negocio: 'Google Meu Negócio',
+  instagram: 'Instagram (orgânico)', disparo: 'Disparo de prospecção no WhatsApp', indicacao: 'Indicação', rodape_clientes: 'Rodapé das páginas de clientes',
+  whatsapp: 'Links enviados no WhatsApp', direto: 'Direto ou não identificado' };
+function numCartaoOrigem(o) {
+  const cs = (o && o.canais) || [];
+  if (!cs.length) return '';
+  const tot = cs.reduce((t, c) => { for (const k of ['investido', 'visitas', 'leads', 'ligacoes', 'reunioes', 'clientes']) t[k] = (t[k] || 0) + (Number(c[k]) || 0); return t; }, {});
+  const cel = (rot, v, fmt) => `<td data-l="${rot}"${!v ? ' class="og-zero"' : ''}>${fmt ? fmt(v) : numFmt(v)}</td>`;
+  const linha = (c, total) => `<tr${total ? ' class="og-total"' : ''}><td>${escHtml(total ? 'Total' : (NUM_CANAL[c.canal] || c.canal))}</td>`
+    + `<td data-l="Investido"${c.investido == null ? ' class="og-zero"' : ''}>${c.investido == null ? '—' : numReais(c.investido)}</td>`
+    + cel('Visitas', c.visitas) + cel('Leads', c.leads) + cel('Ligações feitas', c.ligacoes) + cel('Reuniões', c.reunioes) + cel('Clientes', c.clientes)
+    + (total ? '<td data-l="Custo por lead" class="og-zero">—</td><td data-l="Custo por reunião" class="og-zero">—</td></tr>'   // no total misturaria canal pago com canal sem custo
+      : `<td data-l="Custo por lead"${!(c.investido && c.leads) ? ' class="og-zero"' : ''}>${c.investido && c.leads ? numReais(c.investido / c.leads) : '—'}</td>`
+      + `<td data-l="Custo por reunião"${!(c.investido && c.reunioes) ? ' class="og-zero"' : ''}>${c.investido && c.reunioes ? numReais(c.investido / c.reunioes) : '—'}</td></tr>`);
+  return `<div class="num-card"><div class="num-card-tit">De onde vêm os clientes <span>últimos ${_numDias} dias · desde ${numDia(o.desde)}</span></div>`
+    + '<table class="og-tab"><thead><tr><th>Canal</th><th>Investido</th><th>Visitas</th><th>Leads</th><th>Ligações feitas</th><th>Reuniões</th><th>Clientes</th><th>Custo por lead</th><th>Custo por reunião</th></tr></thead><tbody>'
+    + cs.map(c => linha(c)).join('') + linha(tot, true) + '</tbody></table>'
+    + '<div class="num-aviso" style="margin-top:12px">Cada lead conta no canal do primeiro contato: o anúncio (código do clique ou UTM), a página de onde a pessoa veio ou o disparo de prospecção pelo telefone. '
+    + 'Visitas = site, raio-X e Método, sem a equipe. O custo do disparo pela API oficial do WhatsApp ainda não entra no investido.</div></div>';
+}
 const NUM_PENDENTES = [
   ['Google Meu Negócio', 'Visualizações do perfil, ligações, pedidos de rota e cliques no site.', 'O Google só libera a API 60 dias depois da validação do perfil (lembrete no WhatsApp em 15/01/2027). Até lá, os números ficam na aba "Desempenho" do próprio perfil.'],
 ];
@@ -8512,18 +8634,20 @@ async function numLoad(dias) {
   let html = '';
   try {
     const desde30 = new Date(Date.now() - 31 * 864e5).toISOString();
-    const [{ data }, rs] = await Promise.all([sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`),
-      sb(`instagram_stories?conta=eq.epos&publicado_em=gte.${desde30}&order=publicado_em.desc&select=id,perfil,publicado_em,tipo,thumb,link,dados`).catch(() => ({ data: [] }))]);
+    const [{ data }, rs, origem] = await Promise.all([sb(`metricas_redes?conta=eq.epos&dia=gte.${desde}&order=dia.asc&select=fonte,perfil,dia,dados`),
+      sb(`instagram_stories?conta=eq.epos&publicado_em=gte.${desde30}&order=publicado_em.desc&select=id,perfil,publicado_em,tipo,thumb,link,dados`).catch(() => ({ data: [] })),
+      rmRpc('epos_origem_clientes', { p_dias: _numDias }).catch(() => null)]);   // 27/11: funil por canal
     _numStories = {};
     for (const s of ((rs && rs.data) || [])) (_numStories[s.perfil] = _numStories[s.perfil] || []).push(s);
     const grupos = {};   // fonte|perfil → linhas por dia
     for (const l of (data || [])) (grupos[l.fonte + '|' + l.perfil] = grupos[l.fonte + '|' + l.perfil] || []).push(l);
-    const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, google_ads: numCartaoGoogleAds, busca: numCartaoBusca };   // 27/11 (Thiago): Google Ads logo antes da busca do Google
+    const CARTOES = { instagram: numCartaoInstagram, youtube: numCartaoYoutube, site: numCartaoSite, meta_ads: numCartaoMetaAds, google_ads: numCartaoGoogleAds, busca: numCartaoBusca };   // 27/11 (Thiago): anúncios logo antes da busca do Google
     for (const f of Object.keys(CARTOES))
       for (const [k, linhas] of Object.entries(grupos)) if (k.startsWith(f + '|')) {
         try { html += CARTOES[f](k.slice(f.length + 1), linhas); } catch (e) { html += `<div class="num-vazio">Não consegui montar o cartão ${escHtml(k)}.</div>`; }
       }
     if (!html) html = '<div class="num-vazio">Ainda não há números gravados. A rotina roda todo dia às 06h10.</div>';
+    if (origem) { try { html = numCartaoInvestRoi(origem, grupos) + numCartaoOrigem(origem) + html; } catch (e) { html = '<div class="num-vazio">Não consegui montar o cartão De onde vêm os clientes.</div>' + html; } }
   } catch (e) { html = '<div class="num-vazio">Não consegui ler os números agora.</div>'; }
   html += NUM_PENDENTES.map(([tit, oque, estado]) => `<div class="num-card num-pend"><div class="num-card-tit">${tit} <span>em breve</span></div><p>${oque}</p><p>${estado}</p></div>`).join('');
   corpo.innerHTML = html;
