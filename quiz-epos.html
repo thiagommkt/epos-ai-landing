@@ -209,6 +209,14 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
 }
 </style>
 <script>if(/[?&]modo=(board|site)\b/.test(location.search))document.documentElement.classList.add('board');if(/[?&]modo=site\b/.test(location.search))document.documentElement.classList.add('site');</script>
+<!-- Google Ads (conta 390-341-3710). Conversão = SÓ o envio do diagnóstico; clique no WhatsApp não conta (Thiago, 27/11/2026).
+     Nenhuma resposta nem dado pessoal vai ao Google. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-931866380"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','AW-931866380',{allow_enhanced_conversions:false});
+var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico enviado" (principal; só o formulário)
+</script>
 </head>
 <body>
 
@@ -600,6 +608,12 @@ h1.end-title{font-size:27px;line-height:1.15;letter-spacing:-.02em;font-weight:8
     // event_id único: o mesmo vai no pixel (navegador) e na API de Conversões (servidor), para a Meta deduplicar
     var eventId = 'quizepos_' + ((self.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2)));
     if (typeof fbq === 'function') fbq('track', 'Lead', {}, { eventID: eventId });   // sem nenhuma resposta do quiz
+    // conversão do Google Ads: fora testes (webdriver, test_event_code, aparelho da equipe, número 5500...)
+    try {
+      var teste = navigator.webdriver || /[?&]test_event_code=/.test(location.search)
+        || localStorage.getItem('_epos_equipe') === '1' || /^(55)?5500/.test(String(answers.telefone || '').replace(/\D/g, ''));
+      if (GADS_ENVIO && !teste) gtag('event', 'conversion', { send_to: GADS_ENVIO, transaction_id: eventId });
+    } catch (eG) {}
 
     var p = new URLSearchParams(location.search);
     var fbclid = p.get('fbclid') || '';
