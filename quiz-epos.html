@@ -443,13 +443,16 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
     if (prox === 'contato' && contatoFeito) prox = FLUXO[i + 2];
     return prox || 'dor';
   }
+  // 27/11 (Thiago: rastreio do Google Ads): quem chega por anúncio do Google traz o código do clique (gclid; gbraid/wbraid no iPhone)
+  function cliqueGoogle(q){ return q.get('gclid') || q.get('gbraid') || q.get('wbraid') || ''; }
   function salvarParcial(etapa){
     if (!contatoFeito) return;
     var p = new URLSearchParams(location.search), resp = {};
     PERGUNTAS.forEach(function(k){ if (answers[k]) resp[k] = answers[k]; });
     var body = { parcial: true, ts: Date.now(), quiz_sid: QSID, session_id: window._lpSid || '', etapa: etapa,
       nome: answers.nome || '', telefone: answers.telefone || '', respostas: resp,
-      utm_source: p.get('utm_source') || (BOARD ? 'metodo' : 'quiz-epos'), utm_medium: p.get('utm_medium') || '',
+      utm_source: p.get('utm_source') || (cliqueGoogle(p) ? 'google' : (BOARD ? 'metodo' : 'quiz-epos')), utm_medium: p.get('utm_medium') || (cliqueGoogle(p) ? 'cpc' : ''),
+      gclid: p.get('gclid') || '', gbraid: p.get('gbraid') || '', wbraid: p.get('wbraid') || '',
       utm_campaign: p.get('utm_campaign') || '', utm_content: p.get('utm_content') || '', utm_term: p.get('utm_term') || '',
       ad_id: p.get('ad_id') || '', adset_id: p.get('adset_id') || '', placement: p.get('placement') || '',
       page_url: location.href, modo: BOARD ? 'board' : 'pagina' };
@@ -623,12 +626,13 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
       respostas: { segmento: answers.segmento || '', ticket: answers.ticket || '', investimento: answers.investimento || '', volume: answers.volume || '',
                    atendimento: answers.atendimento || '', conteudo: answers.conteudo || '', dor: answers.dor || '' },
       event_id: eventId,
-      utm_source: p.get('utm_source') || (BOARD ? 'metodo' : 'quiz-epos'),
-      utm_medium: p.get('utm_medium') || '', utm_campaign: p.get('utm_campaign') || '',
+      utm_source: p.get('utm_source') || (cliqueGoogle(p) ? 'google' : (BOARD ? 'metodo' : 'quiz-epos')),
+      utm_medium: p.get('utm_medium') || (cliqueGoogle(p) ? 'cpc' : ''), utm_campaign: p.get('utm_campaign') || '',
       utm_content: p.get('utm_content') || (BOARD ? 'metodo-board' : 'quiz-epos'),
       utm_term: p.get('utm_term') || '', utm_id: p.get('utm_id') || '',
       ad_id: p.get('ad_id') || '', adset_id: p.get('adset_id') || '', placement: p.get('placement') || '',
       test_event_code: p.get('test_event_code') || '',
+      gclid: p.get('gclid') || '', gbraid: p.get('gbraid') || '', wbraid: p.get('wbraid') || '',   // 27/11: clique do anúncio do Google
       fbclid: fbclid, fbc: fbclid ? ('fb.1.' + Math.floor(Date.now() / 1000) + '.' + fbclid) : ck('_fbc'), fbp: ck('_fbp'),
       user_agent: navigator.userAgent, page_url: location.href, modo: BOARD ? 'board' : 'pagina',
       // 06/11: liga o lead à visita (lp_events) e leva o que a pessoa digitou no contato
@@ -786,6 +790,8 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
   window._lpSid = sid;   // 06/11: vai junto do lead (liga o cadastro à visita)
   var utms = {};
   ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','ad_id','adset_id','placement'].forEach(function(k){ utms[k] = p.get(k) || ''; });
+  var _clk = p.get('gclid') || p.get('gbraid') || p.get('wbraid') || '';   // 27/11: visita que veio do anúncio do Google
+  if (_clk) { utms.gclid = _clk.slice(0, 200); if (!utms.utm_source) { utms.utm_source = 'google'; utms.utm_medium = utms.utm_medium || 'cpc'; } }
   if (/[?&]modo=board\b/.test(location.search) && !utms.utm_content) utms.utm_content = 'metodo-board';
   function track(eventType, extra){
     if (navigator.webdriver) return;   // auditoria automática não conta no funil
