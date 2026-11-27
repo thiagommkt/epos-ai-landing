@@ -218,6 +218,8 @@ h1.headline{
 .btn-stack{display:flex;flex-direction:column;gap:12px;margin-top:auto}
 
 /* ---- Question screens ---- */
+/* 27/11: sem "Pergunta N de 4"; o título ganha o respiro que o rótulo dava */
+.screen > h2.q-title:first-child{margin-top:26px}
 .q-eyebrow{
   font-family:var(--font-body);
   font-size:12px;
@@ -419,7 +421,6 @@ h1.end-title{
 
     <!-- 1: PERFIL -->
     <section class="screen" data-screen="perfil">
-      <div class="q-eyebrow">Pergunta 1 de 4</div>
       <h2 class="q-title">Qual é a sua situação hoje?</h2>
       <p class="q-help">Selecione a opção que melhor descreve você.</p>
       <div class="opt-list" data-group="perfil">
@@ -447,7 +448,6 @@ h1.end-title{
 
     <!-- 2: IMPOSTO DE RENDA (20/10) -->
     <section class="screen" data-screen="ir">
-      <div class="q-eyebrow">Pergunta 2 de 4</div>
       <h2 class="q-title">Você paga imposto de renda?</h2>
       <p class="q-help">Vale também o desconto que vem direto no contracheque ou no benefício.</p>
       <div class="opt-list" data-group="ir">
@@ -463,7 +463,6 @@ h1.end-title{
 
     <!-- 3: DOENCA -->
     <section class="screen" data-screen="doenca">
-      <div class="q-eyebrow">Pergunta 3 de 4</div>
       <h2 class="q-title">Você tem ou já teve alguma destas condições?</h2>
       <p class="q-help">Mesmo que já esteja curado(a) ou controlado(a).</p>
       <div class="opt-list" data-group="doenca" id="doencaList">
@@ -508,7 +507,6 @@ h1.end-title{
 
     <!-- 4: RENDA -->
     <section class="screen" data-screen="renda">
-      <div class="q-eyebrow">Pergunta 4 de 4</div>
       <h2 class="q-title">Qual sua remuneração bruta mensal?</h2>
       <p class="q-help">Usamos isso apenas para confirmar seu direito.</p>
       <div class="opt-list" data-group="renda">

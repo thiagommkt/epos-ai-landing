@@ -162,7 +162,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 1 IDENTIDADE (opcional, linguagem inclusiva) -->
   <section class="screen" data-screen="identidade">
-    <div class="eyebrow">Pergunta 01</div>
     <h2 class="q-title">Como você se identifica?</h2>
     <p class="q-help">Opcional. Usamos só para tratar você da forma que preferir. Se quiser, marque “Prefiro não dizer”.</p>
     <div class="opt-list" data-group="identidade" id="identidadeList">
@@ -186,7 +185,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 2 PROCEDIMENTO -->
   <section class="screen" data-screen="procedimento">
-    <div class="eyebrow">Pergunta 02</div>
     <h2 class="q-title">Qual procedimento desperta o seu interesse?</h2>
     <p class="q-help">Escolha o mais próximo do que você procura.</p>
     <div class="opt-list" data-group="procedimento">
@@ -199,7 +197,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 3 IDADE -->
   <section class="screen" data-screen="idade">
-    <div class="eyebrow">Pergunta 03</div>
     <h2 class="q-title">Qual é a sua idade?</h2>
     <p class="q-help">Os procedimentos são exclusivos para maiores de 18 anos.</p>
     <div class="opt-list" data-group="idade">
@@ -214,7 +211,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 3 QUANDO -->
   <section class="screen" data-screen="quando">
-    <div class="eyebrow">Pergunta 04</div>
     <h2 class="q-title">Quando você pretende fazer?</h2>
     <p class="q-help">Assim o Dr. Lucas organiza a agenda das avaliações.</p>
     <div class="opt-list" data-group="quando">
@@ -227,7 +223,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 4 EXPERIÊNCIA -->
   <section class="screen" data-screen="experiencia">
-    <div class="eyebrow">Pergunta 05</div>
     <h2 class="q-title">Já fez algum procedimento estético?</h2>
     <p class="q-help">Isso ajuda o Dr. Lucas a conduzir a conversa do jeito certo.</p>
     <div class="opt-list" data-group="experiencia">
@@ -240,7 +235,7 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 5 MELHORAR (múltipla escolha + Outro) -->
   <section class="screen" data-screen="melhorar">
-    <div class="eyebrow">Pergunta 06 · <span class="multi">pode marcar mais de uma</span></div>
+    <div class="eyebrow"><span class="multi">pode marcar mais de uma</span></div>
     <h2 class="q-title">O que você gostaria de melhorar?</h2>
     <p class="q-help">Marque tudo o que faz sentido para você.</p>
     <div class="opt-list" data-group="melhorar" data-multi="true" id="melhorarList">
@@ -264,7 +259,6 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
 
   <!-- 6 DISPONIBILIDADE -->
   <section class="screen" data-screen="disponibilidade">
-    <div class="eyebrow">Pergunta 07</div>
     <h2 class="q-title">Qual dia fica melhor para a sua avaliação?</h2>
     <p class="q-help">O Dr. Lucas confirma o horário com você pelo WhatsApp.</p>
     <div class="opt-list" data-group="disponibilidade">
@@ -387,7 +381,7 @@ noscript{display:block;padding:20px;text-align:center;color:var(--muted)}
   }
   function atualizarTopo(screen){
     var n = PERGUNTAS.indexOf(screen), counter = document.getElementById('counter');
-    if (n >= 0) counter.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '</b> / 07';
+    if (n >= 0) counter.textContent = '';   // 27/11: sem número de perguntas (regra de 23/11)
     else if (screen === 'contato') counter.innerHTML = '<b>Seu</b> WhatsApp';
     else if (screen === 'sucesso') counter.innerHTML = '<b>Enviado</b>';
     else counter.textContent = '2 min';

@@ -254,7 +254,6 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 1 SEGMENTO -->
     <section class="screen" data-screen="segmento">
-      <div class="q-eyebrow">Pergunta 01</div>
       <h2 class="q-title">Qual é o seu segmento?</h2>
       <p class="q-help">Escolha o mais próximo do seu negócio.</p>
       <div class="opt-list" data-group="segmento" id="segmentoList">
@@ -281,7 +280,6 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 2 TICKET -->
     <section class="screen" data-screen="ticket">
-      <div class="q-eyebrow">Pergunta 02</div>
       <h2 class="q-title">Quanto vale, em média, uma venda sua?</h2>
       <p class="q-help">O valor de um contrato, procedimento ou serviço.</p>
       <div class="opt-list" data-group="ticket">
@@ -296,7 +294,6 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 3 INVESTIMENTO -->
     <section class="screen" data-screen="investimento">
-      <div class="q-eyebrow">Pergunta 03</div>
       <h2 class="q-title">Quanto você investe em anúncios por mês?</h2>
       <p class="q-help">Somando Instagram, Facebook, Google e outros.</p>
       <div class="opt-list" data-group="investimento">
@@ -311,7 +308,6 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 4 VOLUME -->
     <section class="screen" data-screen="volume">
-      <div class="q-eyebrow">Pergunta 04</div>
       <h2 class="q-title">Quantos contatos chegam no seu WhatsApp por mês?</h2>
       <p class="q-help">Pessoas interessadas, não clientes que já compraram.</p>
       <div class="opt-list" data-group="volume">
@@ -326,7 +322,6 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 5 ATENDIMENTO -->
     <section class="screen" data-screen="atendimento">
-      <div class="q-eyebrow">Pergunta 05</div>
       <h2 class="q-title">Quem responde esses contatos hoje?</h2>
       <p class="q-help">Quem atende primeiro, na maior parte das vezes.</p>
       <div class="opt-list" data-group="atendimento">
@@ -341,7 +336,6 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 6 CONTEÚDO -->
     <section class="screen" data-screen="conteudo">
-      <div class="q-eyebrow">Pergunta 06</div>
       <h2 class="q-title">Quem produz o seu conteúdo e criativos?</h2>
       <p class="q-help">Posts, vídeos e anúncios.</p>
       <div class="opt-list" data-group="conteudo">
@@ -355,7 +349,7 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
 
     <!-- 7 DOR -->
     <section class="screen" data-screen="dor">
-      <div class="q-eyebrow">Pergunta 07 · <span class="multi">pode marcar mais de uma</span></div>
+      <div class="q-eyebrow"><span class="multi">pode marcar mais de uma</span></div>
       <h2 class="q-title">Hoje, o que mais trava as suas vendas?</h2>
       <p class="q-help">Marque tudo o que pesa hoje.</p>
       <div class="opt-list" data-group="dor" data-multi="true">
@@ -477,7 +471,7 @@ var GADS_ENVIO = 'AW-931866380/PfzkCLmTqcAdEIzOrLwD';   // ação "Diagnóstico 
   function atualizarTopo(screen){
     var n = PERGUNTAS.indexOf(screen);
     var counter = document.getElementById('counter');
-    if (n >= 0) counter.innerHTML = '<b>' + String(n + 1).padStart(2, '0') + '</b> / 07';
+    if (n >= 0) counter.textContent = '';   // 27/11: sem número de perguntas (regra de 23/11)
     else if (screen === 'contato') counter.innerHTML = '<b>Seu</b> WhatsApp';
     else if (screen === 'sucesso') counter.innerHTML = '<b>Enviado</b>';
     else counter.textContent = '2 min';
