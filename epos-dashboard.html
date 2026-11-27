@@ -2198,7 +2198,9 @@ html[data-theme="light"] .col-cards::-webkit-scrollbar-thumb:hover{background:rg
     .inv-txt { font-size:13px; color:var(--muted); line-height:1.5; margin:6px 0 10px; }
     /* 27/11: "De onde vêm os clientes" — funil por canal (tabela no computador, blocos no celular) */
     .og-tab { width:100%; border-collapse:collapse; font-size:13px; }
-    .og-tab th { font-family:var(--fD); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-align:right; padding:0 8px 8px; white-space:nowrap; }
+    .og-tab th { font-family:var(--fD); font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); text-align:right; padding:0 8px 8px; line-height:1.35; vertical-align:bottom; }
+    .og-rolar { overflow-x:auto; }
+    .og-tab td:first-child { min-width:190px; }
     .og-tab th:first-child, .og-tab td:first-child { text-align:left; padding-left:0; }
     .og-tab td { text-align:right; padding:9px 8px; border-top:1px solid var(--bd); white-space:nowrap; font-variant-numeric:tabular-nums; }
     .og-tab td:first-child { white-space:normal; font-weight:600; }
@@ -8576,14 +8578,14 @@ function numCartaoInvestRoi(o, grupos) {
   const porCanal = Object.fromEntries(pagos.map(f => [f, soma(f, -n)]));
   const inv = porCanal.meta_ads + porCanal.google_ads, invAnt = pagos.reduce((t, f) => t + soma(f, -2 * n, -n), 0);
   const cs = (o && o.canais) || [], pg = cs.filter(c => pagos.includes(c.canal));
-  const leads = pg.reduce((t, c) => t + (c.leads || 0), 0), reun = pg.reduce((t, c) => t + (c.reunioes || 0), 0);
+  const leads = pg.reduce((t, c) => t + (c.leads || 0), 0), reun = pg.reduce((t, c) => t + (c.reunioes || 0), 0), feitas = pg.reduce((t, c) => t + (c.realizadas || 0), 0);
   const cli = (o && o.clientes_novos) || [], cliPago = cli.filter(c => pagos.includes(c.canal)), cliOutros = cli.filter(c => !pagos.includes(c.canal));
   const receita = cliPago.reduce((t, c) => t + (Number(c.valor_mensal) || 0), 0), receitaOut = cliOutros.reduce((t, c) => t + (Number(c.valor_mensal) || 0), 0);
   const lin = (rot, val) => `<div class="inv-lin"><span>${rot}</span><b>${val}</b></div>`;
   const cartaoInv = `<div class="num-card"><div class="num-card-tit">Investimento total <span>últimos ${n} dias · anúncios</span></div>`
     + `<div class="inv-num">${numRS(inv)}</div><div class="num-sub">${invAnt ? `${inv >= invAnt ? '▲' : '▼'} ${Math.abs(Math.round((inv - invAnt) / invAnt * 100))}% vs ${n} dias antes (${numReais(invAnt)})` : 'sem gasto no período anterior'}</div>`
     + `<div style="margin-top:10px">${lin('Anúncios da Meta', numReais(porCanal.meta_ads))}${lin('Google Ads', numReais(porCanal.google_ads))}`
-    + lin('Custo por lead (anúncios)', leads && inv ? numReais(inv / leads) : '—') + lin('Custo por reunião (anúncios)', reun && inv ? numReais(inv / reun) : '—') + '</div>'
+    + lin('Custo por lead (anúncios)', leads && inv ? numReais(inv / leads) : '—') + lin('Custo por reunião realizada (anúncios)', feitas && inv ? numReais(inv / feitas) : '—') + '</div>'
     + '<div class="inv-txt" style="margin-bottom:0">O custo do disparo pela API oficial e das ferramentas ainda não entra.</div></div>';
   const pct = v => (v >= 0 ? '+' : '−') + Math.abs(Math.round(v)).toLocaleString('pt-BR') + '%';
   let corpo;
@@ -8595,7 +8597,7 @@ function numCartaoInvestRoi(o, grupos) {
       + lin('Em 12 meses de contrato', pct(r12)) + lin('Cada R$ 1 investido virou', numReais(receita / inv) + ' por mês') + '</div>';
   } else corpo = '<div class="inv-num">—</div>'
     + `<div class="inv-txt">Nenhum cliente novo por anúncio nos últimos ${n} dias. Um cliente de ${numReais(inv)} por mês já paga o investimento do período no 1º mês.</div>`
-    + `<div>${lin('Reuniões vindas de anúncio', numFmt(reun))}${lin('Leads vindos de anúncio', numFmt(leads))}</div>`;
+    + `<div>${lin('Leads vindos de anúncio', numFmt(leads))}${lin('Reuniões de anúncio', numFmt(reun) + ' marcada' + (reun === 1 ? '' : 's') + ' · ' + numFmt(feitas) + ' realizada' + (feitas === 1 ? '' : 's'))}</div>`;
   if (cliOutros.length) corpo += `<div>${lin('Clientes novos por outros canais', numFmt(cliOutros.length) + ' · ' + numReais(receitaOut) + '/mês')}</div>`;
   const cartaoRoi = `<div class="num-card"><div class="num-card-tit">ROI <span>retorno dos anúncios · últimos ${n} dias</span></div>${corpo}`
     + '<div class="inv-txt" style="margin-bottom:0">Conta os clientes cadastrados em Clientes &amp; Vagas com o telefone do lead e o valor mensal.</div></div>';
@@ -8608,17 +8610,17 @@ const NUM_CANAL = { google_ads: 'Google Ads', meta_ads: 'Anúncios da Meta', goo
 function numCartaoOrigem(o) {
   const cs = (o && o.canais) || [];
   if (!cs.length) return '';
-  const tot = cs.reduce((t, c) => { for (const k of ['investido', 'visitas', 'leads', 'ligacoes', 'reunioes', 'clientes']) t[k] = (t[k] || 0) + (Number(c[k]) || 0); return t; }, {});
+  const tot = cs.reduce((t, c) => { for (const k of ['investido', 'visitas', 'leads', 'ligacoes', 'reunioes', 'realizadas', 'clientes']) t[k] = (t[k] || 0) + (Number(c[k]) || 0); return t; }, {});
   const cel = (rot, v, fmt) => `<td data-l="${rot}"${!v ? ' class="og-zero"' : ''}>${fmt ? fmt(v) : numFmt(v)}</td>`;
   const linha = (c, total) => `<tr${total ? ' class="og-total"' : ''}><td>${escHtml(total ? 'Total' : (NUM_CANAL[c.canal] || c.canal))}</td>`
     + `<td data-l="Investido"${c.investido == null ? ' class="og-zero"' : ''}>${c.investido == null ? '—' : numReais(c.investido)}</td>`
-    + cel('Visitas', c.visitas) + cel('Leads', c.leads) + cel('Ligações feitas', c.ligacoes) + cel('Reuniões', c.reunioes) + cel('Clientes', c.clientes)
-    + (total ? '<td data-l="Custo por lead" class="og-zero">—</td><td data-l="Custo por reunião" class="og-zero">—</td></tr>'   // no total misturaria canal pago com canal sem custo
+    + cel('Visitas', c.visitas) + cel('Leads', c.leads) + cel('Ligações feitas', c.ligacoes) + cel('Reuniões marcadas', c.reunioes) + cel('Reuniões realizadas', c.realizadas) + cel('Clientes', c.clientes)
+    + (total ? '<td data-l="Custo por lead" class="og-zero">—</td><td data-l="Custo por reunião realizada" class="og-zero">—</td></tr>'   // no total misturaria canal pago com canal sem custo
       : `<td data-l="Custo por lead"${!(c.investido && c.leads) ? ' class="og-zero"' : ''}>${c.investido && c.leads ? numReais(c.investido / c.leads) : '—'}</td>`
-      + `<td data-l="Custo por reunião"${!(c.investido && c.reunioes) ? ' class="og-zero"' : ''}>${c.investido && c.reunioes ? numReais(c.investido / c.reunioes) : '—'}</td></tr>`);
+      + `<td data-l="Custo por reunião realizada"${!(c.investido && c.realizadas) ? ' class="og-zero"' : ''}>${c.investido && c.realizadas ? numReais(c.investido / c.realizadas) : '—'}</td></tr>`);   // 27/11: marcada ≠ realizada
   return `<div class="num-card"><div class="num-card-tit">De onde vêm os clientes <span>últimos ${_numDias} dias · desde ${numDia(o.desde)}</span></div>`
-    + '<table class="og-tab"><thead><tr><th>Canal</th><th>Investido</th><th>Visitas</th><th>Leads</th><th>Ligações feitas</th><th>Reuniões</th><th>Clientes</th><th>Custo por lead</th><th>Custo por reunião</th></tr></thead><tbody>'
-    + cs.map(c => linha(c)).join('') + linha(tot, true) + '</tbody></table>'
+    + '<div class="og-rolar"><table class="og-tab"><thead><tr><th>Canal</th><th>Investido</th><th>Visitas</th><th>Leads</th><th>Ligações<br>feitas</th><th>Reuniões<br>marcadas</th><th>Reuniões<br>realizadas</th><th>Clientes</th><th>Custo por<br>lead</th><th>Custo por reunião<br>realizada</th></tr></thead><tbody>'
+    + cs.map(c => linha(c)).join('') + linha(tot, true) + '</tbody></table></div>'
     + '<div class="num-aviso" style="margin-top:12px">Cada lead conta no canal do primeiro contato: o anúncio (código do clique ou UTM), a página de onde a pessoa veio ou o disparo de prospecção pelo telefone. '
     + 'Visitas = site, raio-X e Método, sem a equipe. O custo do disparo pela API oficial do WhatsApp ainda não entra no investido.</div></div>';
 }
